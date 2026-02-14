@@ -1,0 +1,25 @@
+name: Monthly Leaderboard Reset
+
+on:
+  schedule:
+    # Esegui il 1° di ogni mese alle 00:01 UTC
+    - cron: '1 0 1 * *'
+  workflow_dispatch: # Permette esecuzione manuale
+
+jobs:
+  reset-leaderboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Reset Monthly Leaderboard
+        run: |
+          curl -X POST \
+            '${{ secrets.SUPABASE_URL }}/functions/v1/monthly-reset' \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json"
+      
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "Monthly reset failed! Check logs."
+          # Qui puoi aggiungere notifiche (Discord, Slack, Email, etc.)
