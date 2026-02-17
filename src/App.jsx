@@ -38,7 +38,11 @@ const PartnerJoin = lazy(() => import("./pages/PartnerJoin.jsx"));
 const PartnerDashboard = lazy(() => import("./pages/PartnerDashboard.jsx"));
 const PinPad = lazy(() => import("./pages/PinPad.jsx"));
 const AcquistaGettoni = lazy(() => import("./pages/AcquistaGettoni.jsx"));
+const AcquistaGettoni = lazy(() => import("./pages/AcquistaGettoni.jsx"));
 const BoostAcquista = lazy(() => import("./pages/BoostAcquista.jsx"));
+
+// Mappa (lazy loaded)
+const Mappa = lazy(() => import("./pages/Mappa"));
 
 
 // Onboarding interessi
