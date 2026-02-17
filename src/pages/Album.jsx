@@ -125,7 +125,7 @@ export default function Album() {
                 <div className="flex justify-between items-end mb-4">
                     <div>
                         <h1 className="text-2xl font-serif font-bold text-olive-dark">Il mio Album</h1>
-                        <p className="text-sm text-olive-light">Colleziona la Puglia, una figurina alla volta.</p>
+                        <p className="text-sm text-olive-light">Colleziona i Desideri della Puglia.</p>
                     </div>
                     <div className="text-right">
                         <span className="text-3xl font-bold text-gold">{stats.unlocked}</span>
@@ -167,21 +167,10 @@ export default function Album() {
                 </div>
             </header>
 
-            {/* Manual Unlock FAB or Button */}
-            <div className="px-4">
-                <button
-                    onClick={() => setShowPinModal(true)}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-olive-dark to-slate-800 text-white font-bold shadow-lg flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
-                >
-                    <Zap className="w-5 h-5 text-gold" />
-                    <span>Inserisci PIN Partner</span>
-                </button>
-            </div>
-
             {/* Grid */}
             <div className="px-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {loading ? (
-                    <p className="col-span-full text-center py-10 text-olive-light">Caricamento figurine...</p>
+                    <p className="col-span-full text-center py-10 text-olive-light">Caricamento collezione...</p>
                 ) : filteredCards.length > 0 ? (
                     filteredCards.map(card => (
                         <AlbumCard
@@ -193,7 +182,7 @@ export default function Album() {
                     ))
                 ) : (
                     <div className="col-span-full text-center py-20 text-olive-light italic">
-                        Nessuna figurina trovata con questo filtro.
+                        Nessun Desiderio trovato con questo filtro.
                     </div>
                 )}
             </div>
@@ -257,13 +246,13 @@ export default function Album() {
                             {selectedCard.isUnlocked ? (
                                 <div className="bg-green-50 text-green-800 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium border border-green-100">
                                     <Unlock className="w-5 h-5 shrink-0" />
-                                    Hai sbloccato questa figurina il {new Date(selectedCard.unlockedAt).toLocaleDateString()}
+                                    Hai collezionato questo Desiderio il {new Date(selectedCard.unlockedAt).toLocaleDateString()}
                                 </div>
                             ) : (
                                 <div className="bg-slate-50 text-slate-600 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium border border-slate-100">
                                     <Lock className="w-5 h-5 shrink-0" />
                                     {selectedCard.type === 'monument'
-                                        ? `Raggiungi ${selectedCard.city} per sbloccarla (${formatDistance(calculateDistance(location?.lat, location?.lng, selectedCard.gps_lat, selectedCard.gps_lng) || 999999)}).`
+                                        ? `Raggiungi ${selectedCard.city} per sbloccarlo (${formatDistance(calculateDistance(location?.lat, location?.lng, selectedCard.gps_lat, selectedCard.gps_lng) || 999999)}).`
                                         : (
                                             <div className="flex flex-col gap-3 w-full">
                                                 <div className="bg-slate-50 text-slate-600 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium border border-slate-100">

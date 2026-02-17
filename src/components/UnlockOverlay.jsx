@@ -40,7 +40,7 @@ export function UnlockOverlay({ card, onClose }) {
 
                     <div className="bg-white rounded-[20px] overflow-hidden">
                         <div className="bg-gold text-white text-center py-2 font-bold uppercase tracking-widest text-sm animate-pulse">
-                            Nuova Figurina!
+                            Nuovo Desiderio!
                         </div>
                         <motion.img
                             src={card.image_url}
