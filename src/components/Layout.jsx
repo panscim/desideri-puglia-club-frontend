@@ -49,6 +49,8 @@ const Layout = () => {
     { path: '/chat', icon: MessageCircle, label: t('nav.chat') },
     { path: '/partner', icon: Handshake, label: 'Partner' },
     { path: '/classifica', icon: Trophy, label: t('nav.ranking') },
+    { icon: MapPin, label: t('nav.map'), path: '/mappa' },
+    { icon: Grid, label: 'Album', path: '/album' },
     { path: '/profilo', icon: User, label: t('nav.profile') },
   ]
 

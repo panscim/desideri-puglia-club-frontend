@@ -62,6 +62,10 @@ const AdminPrizes = lazy(() => import("./pages/admin/AdminPrizes"));
 const AdminPartners = lazy(() => import("./pages/admin/AdminPartners"));
 // (AdminOffers removed)
 const AdminTransazioni = lazy(() => import("./pages/admin/AdminTransazioni.jsx"));
+const AdminCards = lazy(() => import("./pages/admin/AdminCards.jsx"));
+
+// ⭐️ NEW ALBUM PAGE
+const Album = lazy(() => import("./pages/Album"));
 
 
 // ⭐️ EVENTI CLUB
@@ -226,6 +230,8 @@ function App() {
 
 
               {/* Mercato */}
+              <Route path="/mappa" element={<Mappa />} />
+              <Route path="/album" element={<Album />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/shop/:itemId" element={<MarketItemDetail />} />
               <Route
@@ -252,10 +258,10 @@ function App() {
               {/* Admin */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/missions" element={<AdminMissions />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/prizes" element={<AdminPrizes />} />
-              <Route path="/admin/partners" element={<AdminPartners />} />
-              {/* (AdminOffers route removed) */}
+              <Route path="/admin/premi" element={<AdminPrizes />} />
+              <Route path="/admin/partner" element={<AdminPartners />} />
+              <Route path="/admin/cards" element={<AdminCards />} />
+              {/* <Route path="/admin/offerte" element={<AdminOffers />} /> Removed legacy route */}
               <Route path="/admin/transazioni" element={<AdminTransazioni />} />
 
             </Route>
