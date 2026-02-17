@@ -264,14 +264,31 @@ export default function Album() {
                                     <Lock className="w-5 h-5 shrink-0" />
                                     {selectedCard.type === 'monument'
                                         ? `Raggiungi ${selectedCard.city} per sbloccarla (${formatDistance(calculateDistance(location?.lat, location?.lng, selectedCard.gps_lat, selectedCard.gps_lng) || 999999)}).`
-                                        : 'Richiedi il codice al partner.'}
-                                </div>
+                                        : (
+                                            <div className="flex flex-col gap-3 w-full">
+                                                <div className="bg-slate-50 text-slate-600 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium border border-slate-100">
+                                                    <Lock className="w-5 h-5 shrink-0" />
+                                                    Richiedi il codice al partner.
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedCard(null); // Close detail
+                                                        setShowPinModal(true); // Open PIN modal
+                                                    }}
+                                                    className="w-full py-3 rounded-xl bg-gold text-white font-bold shadow-lg hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Zap className="w-4 h-4" />
+                                                    Inserisci PIN ora
+                                                </button>
+                                            </div>
+                                        )
+                                    }
                             )}
-                        </div>
+                                </div>
                     </div>
-                </div>
+                    </div>
             )}
 
-        </div>
-    );
+                </div>
+            );
 }
