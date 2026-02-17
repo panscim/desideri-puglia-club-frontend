@@ -36,8 +36,6 @@ const Partner = lazy(() => import("./pages/Partner.jsx"));
 const PartnerDetail = lazy(() => import("./pages/PartnerDetail.jsx"));
 const PartnerJoin = lazy(() => import("./pages/PartnerJoin.jsx"));
 const PartnerDashboard = lazy(() => import("./pages/PartnerDashboard.jsx"));
-const PinPad = lazy(() => import("./pages/PinPad.jsx"));
-const AcquistaGettoni = lazy(() => import("./pages/AcquistaGettoni.jsx"));
 const AcquistaGettoni = lazy(() => import("./pages/AcquistaGettoni.jsx"));
 const BoostAcquista = lazy(() => import("./pages/BoostAcquista.jsx"));
 
