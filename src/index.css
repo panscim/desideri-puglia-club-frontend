@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-warm-white text-olive-dark font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-olive-dark text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 active:scale-95 transition-all shadow-md hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-olive-light/20 text-olive-dark px-6 py-3 rounded-full font-medium hover:bg-opacity-30 active:scale-95 transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-md p-6 border border-sand;
+  }
+
+  .mission-card {
+    @apply card hover:shadow-lg transition-all cursor-pointer;
+  }
+
+  .badge {
+    @apply inline-block px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-gold {
+    @apply badge bg-gold bg-opacity-20 text-gold;
+  }
+
+  .progress-bar {
+    @apply w-full bg-sand rounded-full h-3 overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-olive-light rounded-full transition-all duration-500;
+  }
+}
+
+/* 👈 chiusura di @layer components */
+
+/* 👇 REGOLE GLOBALI, fuori dai layer */
+html {
+  -webkit-text-size-adjust: 100%;
+}
