@@ -11,7 +11,6 @@ import {
   LogOut,
   Handshake,
   TicketPercent,
-  TicketPercent,
   MessageCircle,   // 👈 NUOVA ICONA CHAT
   MapPin,          // 👈 NUOVA ICONA MAPPA
   Grid,            // 👈 NUOVA ICONA ALBUM
