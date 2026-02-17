@@ -1,5 +1,6 @@
 import { MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 // Placeholder for future Map implementation
 // Currently this route exists but no real content was defined in the specific task.
@@ -19,12 +20,12 @@ export default function Mappa() {
                 Nel frattempo, usa l'Album per trovare i luoghi!
             </p>
 
-            <a
-                href="/album"
+            <Link
+                to="/album"
                 className="mt-8 px-6 py-3 bg-gold text-white font-bold rounded-xl shadow-lg hover:bg-gold/90 transition-all"
             >
                 Vai all'Album
-            </a>
+            </Link>
         </div>
     );
 }
