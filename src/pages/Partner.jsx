@@ -110,6 +110,17 @@ const RADIUS_OPTIONS = [
   { label: "50 km", value: 50 },
 ];
 
+// ── Helper for Translation inside Card ──
+function PartnerCardContent() {
+  const { t } = useTranslation();
+  return (
+    <>
+      <span>{t('common.discover') || 'SCOPRI'}</span>
+      <ChevronRight size={14} />
+    </>
+  );
+}
+
 // ── PARTNER CARD (Reusable) ──
 function PartnerCard({ p }) {
   return (
