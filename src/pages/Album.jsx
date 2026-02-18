@@ -265,28 +265,29 @@ export default function Album() {
                     </div>
 
                 </div>
-            );
+            )}
+        </div>
+    );
 }
-
-            function LockedCardContent({card, location, onEnterPin}) {
+function LockedCardContent({ card, location, onEnterPin }) {
     if (card.type === 'monument') {
         const dist = location ? calculateDistance(location.lat, location.lng, card.gps_lat, card.gps_lng) : null;
-            return `Raggiungi ${card.city} per sbloccarlo (${formatDistance(dist || 999999)}).`;
+        return `Raggiungi ${card.city} per sbloccarlo (${formatDistance(dist || 999999)}).`;
     }
 
-            return (
-            <div className="flex flex-col gap-3 w-full">
-                <div className="bg-slate-50 text-slate-600 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium border border-slate-100">
-                    <Lock className="w-5 h-5 shrink-0" />
-                    Richiedi il codice al partner.
-                </div>
-                <button
-                    onClick={onEnterPin}
-                    className="w-full py-3 rounded-xl bg-gold text-white font-bold shadow-lg hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
-                >
-                    <Zap className="w-4 h-4" />
-                    Inserisci PIN ora
-                </button>
+    return (
+        <div className="flex flex-col gap-3 w-full">
+            <div className="bg-slate-50 text-slate-600 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium border border-slate-100">
+                <Lock className="w-5 h-5 shrink-0" />
+                Richiedi il codice al partner.
             </div>
-            );
+            <button
+                onClick={onEnterPin}
+                className="w-full py-3 rounded-xl bg-gold text-white font-bold shadow-lg hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
+            >
+                <Zap className="w-4 h-4" />
+                Inserisci PIN ora
+            </button>
+        </div>
+    );
 }
