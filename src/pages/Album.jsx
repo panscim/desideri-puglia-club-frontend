@@ -334,10 +334,7 @@ export default function Album() {
     );
 }
 
-// ... LockedCardContent helper ...
-        </div >
-    );
-}
+
 function LockedCardContent({ card, location, onEnterPin }) {
     if (card.type === 'monument') {
         const dist = location ? calculateDistance(location.lat, location.lng, card.gps_lat, card.gps_lng) : null;
