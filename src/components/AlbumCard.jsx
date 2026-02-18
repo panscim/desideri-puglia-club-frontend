@@ -15,21 +15,19 @@ export function AlbumCard({ card, onClick, userLocation }) {
         // Let's just show "Locked" for now or use a simple prop if passed.
     }
 
-    const isLegendary = card.rarity === 'legendary';
-    const rarityColor = isLegendary ? 'text-[#D4AF37] border-[#D4AF37]' : card.rarity === 'rare' ? 'text-blue-400 border-blue-400' : 'text-slate-200 border-slate-300';
-    const rarityBorder = isLegendary ? 'border-2 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'border border-stone-200';
+    // Simplified: No borders for unlocked cards, just full image.
+    // Locked cards still get the "Locked" look.
 
     return (
         <div
             onClick={() => onClick(card)}
             className={`
-        relative aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer group bg-stone-900
-        ${card.isUnlocked ? 'hover:-translate-y-2 hover:shadow-2xl' : 'opacity-90'}
-        ${card.isUnlocked ? rarityBorder : 'border-2 border-stone-800'}
+        relative aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer group bg-stone-900 shadow-lg
+        ${card.isUnlocked ? 'hover:-translate-y-2 hover:shadow-2xl' : 'opacity-90 border-2 border-stone-800'}
       `}
         >
-            {/* Image Layer */}
-            <div className={`w-full h-full transition-transform duration-700 ${card.isUnlocked ? 'group-hover:scale-110' : 'grayscale brightness-50 contrast-125'}`}>
+            {/* Image Layer - Full bleed for unlocked */}
+            <div className={`w-full h-full transition-transform duration-700 ${card.isUnlocked ? 'group-hover:scale-105' : 'grayscale brightness-50 contrast-125'}`}>
                 <img
                     src={card.image_url}
                     alt={card.title}
@@ -38,49 +36,36 @@ export function AlbumCard({ card, onClick, userLocation }) {
                 />
             </div>
 
-
-            {/* Locked Overlay */}
+            {/* Locked Overlay ONLY */}
             {!card.isUnlocked && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-20">
                     <Lock className="w-8 h-8 text-white/50 mb-2" />
                 </div>
             )}
 
-            {/* Unlocked "Legendary" Style Overlay */}
+            {/* Visual shine effect for unlocked cards (optional, subtle) */}
             {card.isUnlocked && (
-                <div className="absolute inset-0 z-30 flex flex-col justify-end p-4 bg-gradient-to-t from-black/90 via-black/20 to-transparent">
-                    <div className={`text-[9px] font-bold uppercase tracking-[0.2em] mb-1 ${rarityColor} border-none`}>
-                        {card.rarity === 'legendary' ? 'Leggendaria' : card.rarity}
-                    </div>
-                    <h4 className="font-serif font-bold text-white text-lg leading-tight drop-shadow-md">
-                        {card.title.toUpperCase()}
-                    </h4>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
             )}
-
-            {/* Level Badge (Visual Mockup) */}
-            <div className="absolute top-0 right-0 p-4 z-40">
-                {/* Could put a level or star here if needed */}
-            </div>
-
-            {/* Card Level Label underneath (Outside the card, mimicking the image design) */}
-            {/* The image shows "LVL 24" below the card. 
-                We might need to move this outside the card div if we want it completely outside. 
-                But for this component, let's keep it self contained or render it inside but at bottom?
-                The design has it outside. Let's modify the return structure to be a wrapper div.
-            */}
         </div>
     );
 }
 
-// Wrapper to include the bottom label "LVL 24"
+// Wrapper to include the bottom label "LVL 24" - Kept as requested by design 
 export function AlbumCardWrapper(props) {
+    if (!props.card.isUnlocked) {
+        return <AlbumCard {...props} />;
+    }
+
     return (
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-3">
             <AlbumCard {...props} />
-            <span className="text-[10px] font-medium text-stone-400 tracking-widest uppercase">
-                LVL {Math.floor(Math.random() * 30) + 1}
-            </span>
+            <div className="text-center">
+                <h4 className="font-serif font-bold text-olive-dark text-xs leading-tight mb-1">{props.card.title.toUpperCase()}</h4>
+                <span className="text-[10px] font-medium text-gold tracking-widest uppercase">
+                    LVL {Math.floor(Math.random() * 30) + 1}
+                </span>
+            </div>
         </div>
     )
 }
