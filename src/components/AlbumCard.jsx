@@ -62,9 +62,6 @@ export function AlbumCardWrapper(props) {
             <AlbumCard {...props} />
             <div className="text-center">
                 <h4 className="font-serif font-bold text-olive-dark text-xs leading-tight mb-1">{props.card.title.toUpperCase()}</h4>
-                <span className="text-[10px] font-medium text-gold tracking-widest uppercase">
-                    LVL {Math.floor(Math.random() * 30) + 1}
-                </span>
             </div>
         </div>
     )
