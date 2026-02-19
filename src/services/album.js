@@ -4,6 +4,9 @@ import { calculateDistance } from '../utils/geolocation';
 export const AlbumService = {
     // Fetch all available cards (both unlocked and locked)
     async getAllCards() {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const userId = sessionData?.session?.user?.id;
+
         const { data: cards, error: cardsError } = await supabase
             .from('cards')
             .select('*')
@@ -11,15 +14,21 @@ export const AlbumService = {
 
         if (cardsError) throw cardsError;
 
-        // Fetch user's unlocked cards
-        const { data: userCards, error: userCardsError } = await supabase
-            .from('user_cards')
-            .select('card_id, unlocked_at, is_favorite');
+        // Fetch user's unlocked cards - ONLY if logged in
+        let unlockedMap = new Map();
 
-        if (userCardsError) throw userCardsError;
+        if (userId) {
+            const { data: userCards, error: userCardsError } = await supabase
+                .from('user_cards')
+                .select('card_id, unlocked_at, is_favorite')
+                .eq('user_id', userId);
 
-        // Merge data
-        const unlockedMap = new Map(userCards.map(uc => [uc.card_id, uc]));
+            if (userCardsError) throw userCardsError;
+
+            if (userCards) {
+                unlockedMap = new Map(userCards.map(uc => [uc.card_id, uc]));
+            }
+        }
 
         return cards.map(card => ({
             ...card,
