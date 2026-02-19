@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { calculateDistance, formatDistance } from '../utils/geolocation';
 import { MapPin, Lock, X, Navigation } from 'lucide-react';
-// Using Lucide for consistency, but styling to match Material Symbols visually or importing if needed. 
-// For exact match we can use the class "material-symbols-outlined" if the font is loaded in index.html (which we did).
 
 export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlocking }) {
     const { t } = useTranslation();
@@ -24,8 +22,6 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
     const isNearby = distance !== null && distance <= unlockRadius;
 
     // Fake progress for distance (clamp between 5% and 100%)
-    // If very far (e.g. 10km), progress is low. If close (50m), progress is 100%.
-    // Visual Logic: Let's say max range is 5km for 0% (just for visual scaling)
     const maxRange = 2000; // 2km
     let progress = 5;
     if (distance !== null) {
@@ -45,15 +41,15 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
     };
 
     return (
-        <div className="fixed inset-0 z-[100] bg-[#f8f8f5] dark:bg-[#221e10] flex flex-col overflow-y-auto animate-pop-in">
+        <div className="fixed inset-0 z-[100] bg-stone-950 flex flex-col overflow-y-auto animate-pop-in">
             {/* Header */}
             <header className="flex items-center justify-between px-6 pt-8 pb-4">
                 <div className="flex-1">
-                    <h2 className="text-sm font-semibold tracking-widest uppercase text-[#f4c025]/80 font-sans">Monumenti Vicini</h2>
+                    <h2 className="text-sm font-semibold tracking-widest uppercase text-gold/80 font-sans">Monumenti Vicini</h2>
                 </div>
                 <button
                     onClick={onClose}
-                    className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-800/50 text-slate-100 hover:bg-slate-700 transition-colors"
+                    className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors backdrop-blur-sm"
                 >
                     <X size={24} />
                 </button>
@@ -62,18 +58,18 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
             <main className="flex-1 px-6 pb-24">
                 {/* Main Title */}
                 <div className="mb-6 text-center">
-                    <h1 className="text-2xl font-bold leading-tight tracking-tight text-slate-900 dark:text-slate-100 font-serif">
+                    <h1 className="text-2xl font-bold leading-tight tracking-tight text-white font-serif">
                         {card.title}
                     </h1>
-                    <p className="text-slate-400 text-sm mt-1">Collezione Storica</p>
+                    <p className="text-stone-400 text-sm mt-1">Collezione Storica</p>
                 </div>
 
                 {/* Locked Card Hero */}
                 <div className="relative group mb-8">
                     {/* Glow Effect */}
-                    <div className="absolute inset-0 bg-[#f4c025]/10 blur-[60px] rounded-full -z-10 mx-auto w-2/3 h-2/3 top-1/2 -translate-y-1/2"></div>
+                    <div className="absolute inset-0 bg-gold/20 blur-[60px] rounded-full -z-10 mx-auto w-2/3 h-2/3 top-1/2 -translate-y-1/2"></div>
 
-                    <div className="relative aspect-[3/4] w-full max-w-sm mx-auto overflow-hidden rounded-xl border-2 border-[#f4c025]/20 bg-slate-900/40 shadow-2xl">
+                    <div className="relative aspect-[3/4] w-full max-w-sm mx-auto overflow-hidden rounded-xl border-2 border-gold/30 bg-black/40 shadow-2xl">
                         {/* Background Image (Silhouette) */}
                         <div
                             className="absolute inset-0 bg-cover bg-center"
@@ -85,14 +81,14 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                         </div>
 
                         {/* Overlay Gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#221e10] via-transparent to-transparent"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-transparent to-transparent"></div>
 
                         {/* Padlock Centerpiece */}
                         <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <div className="w-20 h-20 rounded-full bg-[#f4c025]/10 border border-[#f4c025]/30 flex items-center justify-center mb-4">
-                                <Lock className="text-[#f4c025] w-10 h-10" strokeWidth={1.5} />
+                            <div className="w-20 h-20 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center mb-4 backdrop-blur-sm">
+                                <Lock className="text-gold w-10 h-10" strokeWidth={1.5} />
                             </div>
-                            <span className="px-3 py-1 bg-[#f4c025] text-[#221e10] text-[10px] font-bold tracking-widest uppercase rounded-full">
+                            <span className="px-3 py-1 bg-gold text-stone-900 text-[10px] font-bold tracking-widest uppercase rounded-full shadow-lg shadow-gold/20">
                                 Bloccato
                             </span>
                         </div>
@@ -103,7 +99,7 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                 <div className="mt-4 text-center">
                     {isNearby ? (
                         <>
-                            <h3 className="text-xl font-bold text-[#f4c025] mb-2 animate-pulse">Sei arrivato!</h3>
+                            <h3 className="text-xl font-bold text-gold mb-2 animate-pulse">Sei arrivato!</h3>
                             <button
                                 onClick={onUnlock}
                                 disabled={unlocking}
@@ -115,8 +111,8 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                         </>
                     ) : (
                         <>
-                            <h3 className="text-xl font-bold text-slate-100 mb-2">Sblocca questo Monumento</h3>
-                            <p className="text-slate-400 text-sm leading-relaxed px-4">
+                            <h3 className="text-xl font-bold text-white mb-2 font-serif">Sblocca questo Monumento</h3>
+                            <p className="text-stone-400 text-sm leading-relaxed px-4">
                                 Sei troppo lontano per consultare questa card storica. Raggiungi il monumento per aggiungerlo alla tua collezione.
                             </p>
                         </>
@@ -124,24 +120,24 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                 </div>
 
                 {/* Distance Tracking Module */}
-                <div className="mt-8 p-5 rounded-xl border border-[#f4c025]/10 bg-white/5 backdrop-blur-md">
+                <div className="mt-8 p-5 rounded-xl border border-gold/10 bg-white/5 backdrop-blur-md">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
-                            <Navigation className="text-[#f4c025] w-5 h-5 transform rotate-45" />
-                            <span className="font-bold text-slate-100">
+                            <Navigation className="text-gold w-5 h-5 transform rotate-45" />
+                            <span className="font-bold text-white">
                                 {distance !== null ? `Sei a ${formatDistance(distance)}` : 'Calcolo posizione...'}
                             </span>
                         </div>
-                        <span className="text-xs text-slate-500 font-medium tracking-wide">Target: {unlockRadius}m</span>
+                        <span className="text-xs text-stone-500 font-medium tracking-wide">Target: {unlockRadius}m</span>
                     </div>
                     {/* Progress Bar */}
-                    <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden mb-2">
+                    <div className="h-2 w-full bg-black/40 rounded-full overflow-hidden mb-2">
                         <div
-                            className="h-full bg-[#f4c025] shadow-[0_0_10px_rgba(244,192,37,0.5)] transition-all duration-1000"
+                            className="h-full bg-gold shadow-[0_0_10px_rgba(214,167,93,0.5)] transition-all duration-1000"
                             style={{ width: `${progress}%` }}
                         ></div>
                     </div>
-                    <p className="text-[11px] text-slate-500 italic text-center">
+                    <p className="text-[11px] text-stone-500 italic text-center">
                         {isNearby ? "Soglia raggiunta! Puoi sbloccare." : "Cammina verso il monumento per attivare lo sblocco"}
                     </p>
                 </div>
@@ -149,13 +145,13 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                 {/* Teaser Content */}
                 <div className="mt-8 relative">
                     <div className="flex items-center gap-2 mb-3">
-                        <span className="material-symbols-outlined text-[#f4c025] text-lg">history_edu</span>
-                        <h4 className="font-bold text-sm tracking-wide uppercase text-slate-300">Curiosità Storica</h4>
+                        <span className="material-symbols-outlined text-gold text-lg">history_edu</span>
+                        <h4 className="font-bold text-sm tracking-wide uppercase text-stone-300">Curiosità Storica</h4>
                     </div>
 
                     {/* Blurred Text Effect */}
                     <div
-                        className="text-slate-400 text-sm leading-relaxed relative"
+                        className="text-stone-400 text-sm leading-relaxed relative"
                         style={{
                             maskImage: 'linear-gradient(to bottom, black 20%, transparent 90%)',
                             WebkitMaskImage: 'linear-gradient(to bottom, black 20%, transparent 90%)'
@@ -168,7 +164,7 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                     </div>
 
                     <div className="text-center py-2 absolute bottom-0 left-0 right-0">
-                        <p className="text-xs text-[#f4c025] font-semibold flex items-center justify-center gap-1">
+                        <p className="text-xs text-gold font-semibold flex items-center justify-center gap-1">
                             <Lock size={12} />
                             Sblocca per leggere il resto
                         </p>
@@ -179,7 +175,7 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                 <div className="mt-6">
                     <button
                         onClick={handleOpenMap}
-                        className="w-full bg-[#f4c025] hover:bg-[#d6a75d] text-[#221e10] h-14 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-[#f4c025]/20"
+                        className="w-full bg-gold hover:bg-[#c5964a] text-stone-900 h-14 rounded-xl font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-gold/20"
                     >
                         <MapPin className="w-5 h-5" />
                         Vedi sulla Mappa
