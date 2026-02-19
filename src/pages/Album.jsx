@@ -45,42 +45,8 @@ export default function Album() {
         }
     };
 
-    // 2. GPS Auto-Unlock Effect
-    useEffect(() => {
-        if (!location || loading) return;
-
-        const checkUnlock = async () => {
-            const userLat = location.lat;
-            const userLng = location.lng;
-
-            const newUnlocked = await AlbumService.checkProximityUnlock(userLat, userLng, cards);
-
-            if (newUnlocked.length > 0) {
-                // Success!
-                const newest = newUnlocked[0];
-                // Add visual flag
-                newest.justUnlocked = true;
-                setSelectedCard(newest); // Show overlay
-
-                newUnlocked.forEach(card => {
-                    toast.success(`Hai trovato: ${card.title}!`, { duration: 5000, icon: '🎉' });
-                });
-                // Refresh list to update UI
-                loadCards();
-            }
-        };
-
-        // Debounce checking? For now runs on every location update which is fine for "watchPosition" 
-        // but maybe limit frequency if too many updates.
-        checkUnlock();
-
-    }, [location, loading]);
-    // Note: we depend on 'cards' but we don't want to re-run if cards change only due to unlocking. 
-    // Actually we DO want to re-run if cards list is updated? No, only on location change.
-    // The 'cards' dependency might cause loops if loadCards updates state.
-    // Better implementation: pass current cards to service, or let service fetch? 
-    // Here we pass local state 'cards'. If 'loadCards' runs, 'cards' changes, effect runs again.
-    // It's acceptable for now.
+    // 2. GPS Location Tracking (No auto-unlock)
+    // We just track location to update the UI in LockedCardContent
 
     // 3. Filtering
     const filteredCards = cards.filter(c => {
@@ -112,6 +78,21 @@ export default function Album() {
             toast.error(res.error);
         }
     };
+
+    // 5. Manual GPS Unlock
+    const handleGpsUnlock = async (card) => {
+        setUnlocking(true);
+        const res = await AlbumService.unlockCard(card.id);
+        setUnlocking(false);
+
+        if (res.success) {
+            toast.success(`Hai sbloccato: ${card.title}!`, { duration: 5000, icon: '🎉' });
+            setSelectedCard(null); // Close modal to show update
+            loadCards(); // Refresh list
+        } else {
+            toast.error(res.error || 'Errore durante lo sblocco');
+        }
+    }
 
     return (
         <div className="pb-24 bg-[#F9F9F7] min-h-screen font-sans">
@@ -320,6 +301,8 @@ export default function Album() {
                             <LockedCardContent
                                 card={selectedCard}
                                 location={location}
+                                onUnlock={() => handleGpsUnlock(selectedCard)}
+                                unlocking={unlocking}
                                 onEnterPin={() => {
                                     setSelectedCard(null);
                                     setShowPinModal(true);
@@ -335,10 +318,34 @@ export default function Album() {
 }
 
 
-function LockedCardContent({ card, location, onEnterPin }) {
+function LockedCardContent({ card, location, onEnterPin, onUnlock, unlocking }) {
     if (card.type === 'monument') {
         const dist = location ? calculateDistance(location.lat, location.lng, card.gps_lat, card.gps_lng) : null;
-        return `Raggiungi ${card.city} per sbloccarlo (${formatDistance(dist || 999999)}).`;
+
+        // Manual Unlock Logic: If within 50m (or card radius), show button
+        const radius = card.gps_radius || 50;
+        const isNearby = dist !== null && dist <= radius;
+
+        if (isNearby) {
+            return (
+                <button
+                    onClick={onUnlock}
+                    disabled={unlocking}
+                    className="w-full py-4 rounded-xl bg-green-600 text-white font-bold shadow-lg shadow-green-600/30 hover:bg-green-500 transition-all flex items-center justify-center gap-2 animate-bounce"
+                >
+                    <MapPin className="w-5 h-5" />
+                    {unlocking ? 'Sblocco in corso...' : 'SEI QUI! SBLOCCA ORA'}
+                </button>
+            )
+        }
+
+        return (
+            <div className="p-4 bg-stone-100 rounded-xl border border-stone-200 text-center">
+                <p className="text-stone-500 text-sm mb-1">Raggiungi questo luogo per sbloccare</p>
+                <p className="text-lg font-bold text-olive-dark">{formatDistance(dist || 999999)}</p>
+                <p className="text-xs text-stone-400 mt-1">Avvicinati a meno di 50m</p>
+            </div>
+        );
     }
 
     return (
