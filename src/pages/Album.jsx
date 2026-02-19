@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react'; import confetti from 'canvas-confetti';
 import { AlbumService } from '../services/album';
 import { useGeolocation } from '../hooks/useGeolocation';
-import { useGeolocation } from '../hooks/useGeolocation';
+
 import { AlbumCardWrapper as AlbumCard } from '../components/AlbumCard'; // Import wrapper as AlbumCard for easier replacement
 
 import { UnlockOverlay } from '../components/UnlockOverlay';
@@ -290,10 +290,7 @@ export default function Album() {
                 </div>
             )}
 
-            import {LockedCardDetail} from '../components/LockedCardDetail';
-            // ... top imports ...
 
-            // ... inside render ...
 
             {/* Card Detail Modal - UPDATED PRO */}
             {selectedCard && (
