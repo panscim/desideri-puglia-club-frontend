@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next';
 // Actually, to use Material Symbols we just need the className "material-symbols-outlined".
 
 export function UnlockedCardDetail({ card, onClose }) {
-    const { t } = useTranslation();
-
     // Prevent body scroll when modal is open
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -39,7 +37,7 @@ export function UnlockedCardDetail({ card, onClose }) {
         ];
     }
 
-    const audioTrack = card.audio_track || null; // URL to audio
+    // const audioTrack = card.audio_track || null; // URL to audio (Unused for now)
     const globalRarity = card.global_rarity || "Top 5%";
     const unlockedDate = card.unlockedAt ? new Date(card.unlockedAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' }) : "Recente";
 

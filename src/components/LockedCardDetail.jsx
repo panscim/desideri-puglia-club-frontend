@@ -4,7 +4,7 @@ import { calculateDistance, formatDistance } from '../utils/geolocation';
 import { MapPin, Lock, X, Navigation } from 'lucide-react';
 
 export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlocking }) {
-    const { t } = useTranslation();
+    // const { t } = useTranslation(); // Unused
     const [distance, setDistance] = useState(null);
 
     useEffect(() => {
@@ -15,7 +15,7 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
     }, [userLocation, card]);
 
     // Format distance: if < 1000m show m, else km
-    const distanceText = distance !== null ? formatDistance(distance) : '...';
+    // const distanceText = distance !== null ? formatDistance(distance) : '...'; // Unused, logic inline
 
     // Unlock threshold
     const unlockRadius = card.gps_radius || 50;
