@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.76.1",
+    "canvas-confetti": "^1.9.4",
     "framer-motion": "^12.23.24",
     "i18next": "^25.8.10",
     "i18next-browser-languagedetector": "^8.2.1",

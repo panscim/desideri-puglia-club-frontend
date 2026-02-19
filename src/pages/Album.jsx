@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Search, Grid, Filter, Lock, Unlock, Zap, X } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { AlbumService } from '../services/album';
 import { useGeolocation } from '../hooks/useGeolocation';
 import { calculateDistance, formatDistance } from '../utils/geolocation';
@@ -45,8 +46,44 @@ export default function Album() {
         }
     };
 
-    // 2. GPS Location Tracking (No auto-unlock)
-    // We just track location to update the UI in LockedCardContent
+    // 2. Main Unlock Logic (Confetti + Sound)
+    const triggerUnlockCelebration = (isLegendary) => {
+        // 1. Sound (Placeholder - Browser Policy often blocks auto-audio without user interaction, 
+        // but since this is triggered by a click, it might work if we had an Audio object)
+        // const audio = new Audio('/sounds/unlock.mp3'); 
+        // audio.play().catch(e => console.log('Audio muted'));
+
+        // 2. Confetti
+        if (isLegendary) {
+            // Intense confetti for Legendaries
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+            var randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+            var interval = setInterval(function () {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+            }, 250);
+        } else {
+            // Standard confetti pop
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                zIndex: 9999
+            });
+        }
+    };
+
 
     // 3. Filtering
     const filteredCards = cards.filter(c => {
@@ -70,6 +107,7 @@ export default function Album() {
         setUnlocking(false);
 
         if (res.success) {
+            triggerUnlockCelebration(res.card.rarity === 'legendary');
             toast.success(`Sbloccato: ${res.card.title}!`, { icon: '🔓' });
             setPinCode('');
             setShowPinModal(false);
@@ -86,9 +124,22 @@ export default function Album() {
         setUnlocking(false);
 
         if (res.success) {
+            triggerUnlockCelebration(card.rarity === 'legendary');
             toast.success(`Hai sbloccato: ${card.title}!`, { duration: 5000, icon: '🎉' });
-            setSelectedCard(null); // Close modal to show update
-            loadCards(); // Refresh list
+
+            // Close modal to refresh list, OR better: update local state to show it as unlocked immediately
+            // For now, let's close it so they see the grid update, or keep it open?
+            // User wants "Card esplode", so keeping it open with animation might be better.
+            // But 'loadCards' will refresh the list. Let's start by refreshing.
+            setSelectedCard(null);
+
+            // Optional: Re-open the card immediately to show it unlocked? 
+            // The user request was "Card entra con effetto Spring".
+            // If I close and re-open, it might flicker. 
+            // Let's just update the list and maybe the user manually opens it or we auto-open?
+            // "Appena la card si ferma al centro..." implies we are viewing it.
+
+            loadCards();
         } else {
             toast.error(res.error || 'Errore durante lo sblocco');
         }
@@ -244,8 +295,8 @@ export default function Album() {
             {/* Modals remain the same ... */}
             {/* PIN Modal */}
             {showPinModal && (
-                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
+                    <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-pop-in">
                         <h3 className="text-xl font-bold font-serif text-olive-dark mb-2 text-center">Codice Partner</h3>
                         <p className="text-sm text-olive-light text-center mb-6">Inserisci il codice di 4 cifre che ti ha dato il gestore per sbloccare la figurina.</p>
 
@@ -280,35 +331,35 @@ export default function Album() {
                 </div>
             )}
 
-            {/* Card Detail Modal - UPDATED */}
+            {/* Card Detail Modal - UPDATED PRO */}
             {selectedCard && (
-                <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur flex items-center justify-center p-4" onClick={() => setSelectedCard(null)}>
+                <div
+                    className="fixed inset-0 z-[100] bg-black/90 backdrop-blur flex items-center justify-center p-4"
+                    onClick={() => setSelectedCard(null)}
+                >
                     <div
-                        className="relative max-w-sm w-full bg-[#F9F9F7] rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col"
+                        className="relative max-w-sm w-full bg-[#F9F9F7] rounded-3xl shadow-2xl animate-pop-in max-h-[85vh] flex flex-col"
                         onClick={e => e.stopPropagation()}
                     >
                         {/* Close Button */}
                         <button
                             onClick={() => setSelectedCard(null)}
-                            className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center backdrop-blur-md hover:bg-black/70 transition-colors"
+                            className="absolute -top-3 -right-3 z-30 w-10 h-10 rounded-full bg-white text-black shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
                         >
-                            <X size={18} strokeWidth={2.5} />
+                            <X size={20} strokeWidth={2.5} />
                         </button>
 
-                        {/* Scrollable Content */}
-                        <div className="overflow-y-auto overflow-x-hidden p-6 custom-scrollbar">
+                        {/* Scrollable Content Container */}
+                        <div className="overflow-y-auto custom-scrollbar p-6 pb-12">
 
-                            {/* Full Card Image */}
-                            <div className="relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-lg mb-6 group">
+                            {/* Full Card Image with Shine if Legendary */}
+                            <div className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl mb-6 bg-stone-200 ${selectedCard.rarity === 'legendary' ? 'ring-4 ring-yellow-400/50 shine-effect' : ''}`}>
                                 <img
                                     src={selectedCard.image_url}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="w-full h-full object-cover"
                                     alt={selectedCard.title}
                                 />
-                                {/* Rarity Badge */}
-                                <div className={`absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-black/80 backdrop-blur text-white border border-white/10 shadow-lg`}>
-                                    {selectedCard.rarity === 'legendary' ? 'Leggendaria' : selectedCard.rarity === 'rare' ? 'Epica' : 'Comune'}
-                                </div>
+                                {/* Rarity Link DELETED from image as requested */}
                             </div>
 
                             {/* Info */}
@@ -316,11 +367,11 @@ export default function Album() {
                                 <h2 className="text-2xl font-serif font-bold text-olive-dark mb-1 leading-tight">{selectedCard.title}</h2>
                                 <div className="flex items-center justify-center gap-2 text-xs font-bold text-gold uppercase tracking-widest">
                                     <MapPin size={12} />
-                                    {selectedCard.city}
+                                    {selectedCard.city.toUpperCase()}
                                 </div>
                             </div>
 
-                            <div className="prose prose-sm text-olive-light leading-relaxed mb-8 text-center px-2">
+                            <div className="prose prose-sm text-olive-light leading-relaxed mb-8 text-center px-1">
                                 {selectedCard.description}
                             </div>
 
@@ -334,6 +385,9 @@ export default function Album() {
                                     setShowPinModal(true);
                                 }}
                             />
+
+                            {/* Extra spacer at bottom to ensure scroll works for button */}
+                            <div className="h-4"></div>
                         </div>
                     </div>
                 </div>
@@ -342,7 +396,7 @@ export default function Album() {
     );
 }
 
-
+// ... LockedCardContent remains the same ...
 function LockedCardContent({ card, location, onEnterPin, onUnlock, unlocking }) {
     if (card.type === 'monument') {
         const dist = location ? calculateDistance(location.lat, location.lng, card.gps_lat, card.gps_lng) : null;
