@@ -344,6 +344,14 @@ function LockedCardContent({ card, location, onEnterPin, onUnlock, unlocking }) 
                 <p className="text-stone-500 text-sm mb-1">Raggiungi questo luogo per sbloccare</p>
                 <p className="text-lg font-bold text-olive-dark">{formatDistance(dist || 999999)}</p>
                 <p className="text-xs text-stone-400 mt-1">Avvicinati a meno di 50m</p>
+
+                {/* DEBUG INFO - DA RIMUOVERE DOPO */}
+                <div className="mt-4 p-2 bg-black/5 rounded text-[10px] font-mono text-left opacity-70">
+                    <p><strong>DEBUG GPS:</strong></p>
+                    <p>Tu: {location?.lat?.toFixed(5)}, {location?.lng?.toFixed(5)} (±{location?.accuracy?.toFixed(0)}m)</p>
+                    <p>Card: {card.gps_lat?.toFixed(5)}, {card.gps_lng?.toFixed(5)}</p>
+                    <p>Dist: {dist?.toFixed(0)} m</p>
+                </div>
             </div>
         );
     }
