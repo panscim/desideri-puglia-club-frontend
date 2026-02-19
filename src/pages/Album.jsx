@@ -8,6 +8,8 @@ import { calculateDistance, formatDistance } from '../utils/geolocation';
 import { AlbumCardWrapper as AlbumCard } from '../components/AlbumCard'; // Import wrapper as AlbumCard for easier replacement
 
 import { UnlockOverlay } from '../components/UnlockOverlay';
+import { UnlockedCardDetail } from '../components/UnlockedCardDetail';
+import { LockedCardDetail } from '../components/LockedCardDetail';
 // We might need a generic Modal component or build one inline for PIN
 import { toast } from 'react-hot-toast'; // Assuming we have toast
 
