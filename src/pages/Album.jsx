@@ -289,68 +289,32 @@ export default function Album() {
                 </div>
             )}
 
+            import {LockedCardDetail} from '../components/LockedCardDetail';
+            // ... top imports ...
+
+            // ... inside render ...
+
             {/* Card Detail Modal - UPDATED PRO */}
             {selectedCard && (
-                <div
-                    className="fixed inset-0 z-[100] bg-black/90 backdrop-blur flex items-center justify-center p-4"
-                    onClick={() => setSelectedCard(null)}
-                >
-                    <div
-                        className="relative max-w-sm w-full bg-[#F9F9F7] rounded-3xl shadow-2xl animate-pop-in max-h-[85vh] flex flex-col"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        {/* Close Button */}
-                        <button
-                            onClick={() => setSelectedCard(null)}
-                            className="absolute -top-3 -right-3 z-30 w-10 h-10 rounded-full bg-white text-black shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
-                        >
-                            <X size={20} strokeWidth={2.5} />
-                        </button>
-
-                        {/* Scrollable Content Container */}
-                        <div className="overflow-y-auto custom-scrollbar p-6 pb-12">
-
-                            {/* Full Card Image with Shine if Legendary */}
-                            <div className={`relative w-full aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl mb-6 bg-stone-200 ${selectedCard.rarity === 'legendary' ? 'ring-4 ring-yellow-400/50 shine-effect' : ''}`}>
-                                <img
-                                    src={selectedCard.image_url}
-                                    className="w-full h-full object-cover"
-                                    alt={selectedCard.title}
-                                />
-                                {/* Rarity Link DELETED from image as requested */}
-                            </div>
-
-                            {/* Info */}
-                            <div className="text-center mb-6">
-                                <h2 className="text-2xl font-serif font-bold text-olive-dark mb-1 leading-tight">{selectedCard.title}</h2>
-                                <div className="flex items-center justify-center gap-2 text-xs font-bold text-gold uppercase tracking-widest">
-                                    <MapPin size={12} />
-                                    {selectedCard.city.toUpperCase()}
-                                </div>
-                            </div>
-
-                            <div className="prose prose-sm text-olive-light leading-relaxed mb-8 text-center px-1">
-                                {selectedCard.description}
-                            </div>
-
-                            <LockedCardContent
-                                card={selectedCard}
-                                location={location}
-                                onUnlock={() => handleGpsUnlock(selectedCard)}
-                                unlocking={unlocking}
-                                onEnterPin={() => {
-                                    setSelectedCard(null);
-                                    setShowPinModal(true);
-                                }}
-                            />
-
-                            {/* Extra spacer at bottom to ensure scroll works for button */}
-                            <div className="h-4"></div>
-                        </div>
-                    </div>
-                </div>
+                selectedCard.isUnlocked ? (
+                    <UnlockedCardDetail
+                        card={selectedCard}
+                        onClose={() => setSelectedCard(null)}
+                    />
+                ) : (
+                    <LockedCardDetail
+                        card={selectedCard}
+                        userLocation={location}
+                        onClose={() => setSelectedCard(null)}
+                        onUnlock={() => handleGpsUnlock(selectedCard)}
+                        unlocking={unlocking}
+                    />
+                )
             )}
         </div>
+    );
+}
+        </div >
     );
 }
 
