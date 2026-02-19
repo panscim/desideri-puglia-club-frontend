@@ -127,18 +127,15 @@ export default function Album() {
             triggerUnlockCelebration(card.rarity === 'legendary');
             toast.success(`Hai sbloccato: ${card.title}!`, { duration: 5000, icon: '🎉' });
 
-            // Close modal to refresh list, OR better: update local state to show it as unlocked immediately
-            // For now, let's close it so they see the grid update, or keep it open?
-            // User wants "Card esplode", so keeping it open with animation might be better.
-            // But 'loadCards' will refresh the list. Let's start by refreshing.
-            setSelectedCard(null);
+            // IMMEDIATELY update the selected card state so the UI switches to the Unlocked View
+            setSelectedCard({
+                ...card,
+                isUnlocked: true,
+                unlockedAt: new Date().toISOString(),
+                justUnlocked: true
+            });
 
-            // Optional: Re-open the card immediately to show it unlocked? 
-            // The user request was "Card entra con effetto Spring".
-            // If I close and re-open, it might flicker. 
-            // Let's just update the list and maybe the user manually opens it or we auto-open?
-            // "Appena la card si ferma al centro..." implies we are viewing it.
-
+            // Refresh the full list in the background
             loadCards();
         } else {
             toast.error(res.error || 'Errore durante lo sblocco');
@@ -249,45 +246,6 @@ export default function Album() {
                                 onClick={(c) => setSelectedCard(c)}
                             />
                         ))}
-
-                        {/* 2. Artificial "Unknown" / "Mission" Cards for visual match */}
-                        {filter === 'all' && (
-                            <>
-                                {/* Sconosciuto */}
-                                <div className="aspect-[3/4] rounded-2xl border-2 border-dashed border-stone-300 bg-stone-100/50 flex flex-col items-center justify-center gap-3 p-4">
-                                    <div className="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center text-stone-400">
-                                        <Lock size={18} />
-                                    </div>
-                                    <span className="text-[10px] font-bold text-stone-400 tracking-widest uppercase text-center leading-relaxed">
-                                        Sconosciuto
-                                    </span>
-                                    <span className="text-[10px] text-stone-400">Missione: Roma</span>
-                                </div>
-
-                                {/* In Arrivo */}
-                                <div className="aspect-[3/4] rounded-2xl border-2 border-dashed border-stone-300 bg-stone-100/50 flex flex-col items-center justify-center gap-3 p-4">
-                                    <div className="w-10 h-10 rounded-full bg-stone-200 flex items-center justify-center text-stone-400">
-                                        <div className="opacity-50">⏳</div> {/* Emoji or icon */}
-                                    </div>
-                                    <span className="text-[10px] font-bold text-stone-400 tracking-widest uppercase text-center leading-relaxed">
-                                        In Arrivo
-                                    </span>
-                                    <span className="text-[10px] text-stone-400">Evento Giugno</span>
-                                </div>
-                            </>
-                        )}
-
-                        {/* 3. "Next Mission" Card (Gold) */}
-                        <div className="aspect-[3/4] rounded-2xl bg-[#F8F5E6] border border-[#D4AF37]/30 relative overflow-hidden flex flex-col items-center justify-center p-6 text-center shadow-lg shadow-[#D4AF37]/10">
-                            <div className="w-12 h-12 mb-4 bg-[#D4AF37] rounded-xl flex items-center justify-center text-white shadow-md">
-                                <span className="text-xl">📋</span>
-                            </div>
-                            <h3 className="font-serif font-bold text-olive-dark text-lg leading-tight mb-2">PROSSIMA MISSIONE</h3>
-                            <p className="text-[10px] text-olive-light leading-relaxed mb-4">Trova 3 reperti per sbloccare il prossimo Card Pack</p>
-                            <button className="bg-[#D4AF37] text-white text-[10px] font-bold px-6 py-2 rounded-full shadow-md hover:bg-[#B5952F] transition-colors uppercase tracking-wider">
-                                Inizia
-                            </button>
-                        </div>
                     </>
                 )}
             </div>
