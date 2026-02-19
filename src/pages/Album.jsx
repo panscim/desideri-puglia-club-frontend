@@ -315,9 +315,7 @@ export default function Album() {
         </div>
     );
 }
-        </div >
-    );
-}
+
 
 // ... LockedCardContent remains the same ...
 
