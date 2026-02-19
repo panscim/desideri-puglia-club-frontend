@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import { calculateDistance, formatDistance } from '../utils/geolocation';
 import { MapPin, Lock, X, Navigation } from 'lucide-react';
 

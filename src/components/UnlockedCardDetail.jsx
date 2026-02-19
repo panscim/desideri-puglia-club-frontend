@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+
 // We still import some Lucide icons for fallback or consistency if needed, but primarily using Material Symbols as requested
 // Actually, to use Material Symbols we just need the className "material-symbols-outlined".
 

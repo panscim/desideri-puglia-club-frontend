@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Search, Grid, Filter, Lock, Unlock, Zap, X } from 'lucide-react';
-import confetti from 'canvas-confetti';
+import { Search } from 'lucide-react'; import confetti from 'canvas-confetti';
 import { AlbumService } from '../services/album';
 import { useGeolocation } from '../hooks/useGeolocation';
-import { calculateDistance, formatDistance } from '../utils/geolocation';
+import { useGeolocation } from '../hooks/useGeolocation';
 import { AlbumCardWrapper as AlbumCard } from '../components/AlbumCard'; // Import wrapper as AlbumCard for easier replacement
 
 import { UnlockOverlay } from '../components/UnlockOverlay';
@@ -321,57 +320,4 @@ export default function Album() {
 }
 
 // ... LockedCardContent remains the same ...
-function LockedCardContent({ card, location, onEnterPin, onUnlock, unlocking }) {
-    if (card.type === 'monument') {
-        const dist = location ? calculateDistance(location.lat, location.lng, card.gps_lat, card.gps_lng) : null;
 
-        // Manual Unlock Logic: If within 50m (or card radius), show button
-        const radius = card.gps_radius || 50;
-        const isNearby = dist !== null && dist <= radius;
-
-        if (isNearby) {
-            return (
-                <button
-                    onClick={onUnlock}
-                    disabled={unlocking}
-                    className="w-full py-4 rounded-xl bg-green-600 text-white font-bold shadow-lg shadow-green-600/30 hover:bg-green-500 transition-all flex items-center justify-center gap-2 animate-bounce"
-                >
-                    <MapPin className="w-5 h-5" />
-                    {unlocking ? 'Sblocco in corso...' : 'SEI QUI! SBLOCCA ORA'}
-                </button>
-            )
-        }
-
-        return (
-            <div className="p-4 bg-stone-100 rounded-xl border border-stone-200 text-center">
-                <p className="text-stone-500 text-sm mb-1">Raggiungi questo luogo per sbloccare</p>
-                <p className="text-lg font-bold text-olive-dark">{formatDistance(dist || 999999)}</p>
-                <p className="text-xs text-stone-400 mt-1">Avvicinati a meno di 50m</p>
-
-                {/* DEBUG INFO - DA RIMUOVERE DOPO */}
-                <div className="mt-4 p-2 bg-black/5 rounded text-[10px] font-mono text-left opacity-70">
-                    <p><strong>DEBUG GPS:</strong></p>
-                    <p>Tu: {location?.lat?.toFixed(5)}, {location?.lng?.toFixed(5)} (±{location?.accuracy?.toFixed(0)}m)</p>
-                    <p>Card: {card.gps_lat?.toFixed(5)}, {card.gps_lng?.toFixed(5)}</p>
-                    <p>Dist: {dist?.toFixed(0)} m</p>
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="flex flex-col gap-3 w-full">
-            <div className="bg-slate-50 text-slate-600 px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium border border-slate-100">
-                <Lock className="w-5 h-5 shrink-0" />
-                Richiedi il codice al partner.
-            </div>
-            <button
-                onClick={onEnterPin}
-                className="w-full py-3 rounded-xl bg-gold text-white font-bold shadow-lg hover:bg-gold/90 transition-all flex items-center justify-center gap-2"
-            >
-                <Zap className="w-4 h-4" />
-                Inserisci PIN ora
-            </button>
-        </div>
-    );
-}
