@@ -1,4 +1,4 @@
-// src/pages/Missioni.jsx
+// src/pages/MissioniClassifica.jsx
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../services/supabase'
@@ -17,7 +17,7 @@ const MissionSkeleton = () => (
   </div>
 )
 
-const Missioni = () => {
+const MissioniClassifica = () => {
   const { t, i18n } = useTranslation()
   const { profile } = useAuth()
   const navigate = useNavigate()
@@ -232,12 +232,6 @@ const Missioni = () => {
                     </div>
                   )}
                 </div>
-
-                <div className="mt-6">
-                  <Link to="/missioni-classifica" className="w-full bg-sand/20 hover:bg-sand/30 text-olive-dark font-bold text-sm py-4 rounded-xl flex items-center justify-center shadow-sm active:scale-95 transition-all">
-                    Guarda le missioni classifica
-                  </Link>
-                </div>
               </section>
 
               {/* ATTIVITÀ GIORNALIERE */}
@@ -334,4 +328,4 @@ const Missioni = () => {
   )
 }
 
-export default Missioni
+export default MissioniClassifica

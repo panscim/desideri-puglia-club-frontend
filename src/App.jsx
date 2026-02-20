@@ -22,6 +22,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword.jsx"));
 // Pages (protette)
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Missioni = lazy(() => import("./pages/Missioni"));
+const MissioniClassifica = lazy(() => import("./pages/MissioniClassifica.jsx"));
 const MissionDetail = lazy(() => import("./pages/MissionDetail"));
 const Classifica = lazy(() => import("./pages/Classifica"));
 const Profilo = lazy(() => import("./pages/Profilo.jsx"));
@@ -209,6 +210,7 @@ function App() {
               {/* Dashboard utente */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/missioni" element={<Missioni />} />
+              <Route path="/missioni-classifica" element={<MissioniClassifica />} />
               <Route path="/missione/:id" element={<MissionDetail />} />
               <Route path="/classifica" element={<Classifica />} />
               <Route path="/profilo" element={<Profilo />} />
