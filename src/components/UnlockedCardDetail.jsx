@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Share2, Lock, Play, Headphones, MapPin, Star, Sparkles } from 'lucide-react';
+import { ArrowLeft, Share2, Lock, Play, Headphones, MapPin, Star, Sparkles, Navigation } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export function UnlockedCardDetail({ card, onClose }) {
@@ -31,7 +31,7 @@ export function UnlockedCardDetail({ card, onClose }) {
 
     let curiosityItems = [curiosity1, curiosity2, curiosity3].filter(Boolean);
 
-    const audioTrack = currentLang === 'en' && card.audio_track_en ? card.audio_track_en : card.audio_track;
+    const audioTrack = currentLang === 'en' ? (card.audio_track_en || null) : (card.audio_track || null);
     const [isPlaying, setIsPlaying] = useState(false);
     const audioRef = useRef(null);
     const [audioProgress, setAudioProgress] = useState(0);
@@ -52,6 +52,15 @@ export function UnlockedCardDetail({ card, onClose }) {
             if (duration) {
                 setAudioProgress((currentTime / duration) * 100);
             }
+        }
+    };
+
+    const handleOpenMap = () => {
+        if (card.gps_lat && card.gps_lng) {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${card.gps_lat},${card.gps_lng}`;
+            window.open(url, '_blank');
+        } else if (card.city) {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(card.city)}`, '_blank');
         }
     };
 
@@ -204,20 +213,33 @@ export function UnlockedCardDetail({ card, onClose }) {
                             <p className="text-sm text-slate-300">{startLocation}</p>
                         </div>
 
-                        {/* Map Placeholder */}
-                        <div className="w-full h-32 bg-sky-200 rounded-xl overflow-hidden relative mb-6">
-                            <div
-                                className="absolute inset-0 opacity-80 bg-cover bg-center"
-                                style={{
-                                    backgroundImage: "url('https://maps.googleapis.com/maps/api/staticmap?center=41.1171,16.8719&zoom=14&size=600x300&maptype=roadmap&style=feature:all|saturation:-100&key=YOUR_API_KEY_HERE')"
-                                }}
-                            ></div>
-                            <div className="absolute inset-0 bg-blue-400/20"></div>
-                        </div>
+                        {/* Map Embed or Placeholder */}
+                        {card.gps_lat && card.gps_lng ? (
+                            <div className="w-full h-32 rounded-xl overflow-hidden relative mb-6 border border-slate-800 pointer-events-none">
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    frameBorder="0"
+                                    scrolling="no"
+                                    marginHeight="0"
+                                    marginWidth="0"
+                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${card.gps_lng - 0.005}%2C${card.gps_lat - 0.005}%2C${card.gps_lng + 0.005}%2C${card.gps_lat + 0.005}&layer=mapnik&marker=${card.gps_lat}%2C${card.gps_lng}`}
+                                    style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg) brightness(95%) contrast(85%)' }}
+                                    title="Mappa"
+                                ></iframe>
+                            </div>
+                        ) : (
+                            <div className="w-full h-32 bg-slate-800 rounded-xl overflow-hidden relative mb-6 flex items-center justify-center">
+                                <MapPin className="w-8 h-8 text-slate-600" />
+                            </div>
+                        )}
 
-                        <button className="w-full h-14 bg-[#f4c025] rounded-xl flex items-center justify-center gap-2 font-bold text-[#1a1f2e] hover:bg-[#e0b020] transition-colors">
-                            <span className="material-symbols-outlined text-xl">explore</span>
-                            Visit Again
+                        <button
+                            onClick={handleOpenMap}
+                            className="w-full h-14 bg-[#f4c025] rounded-xl flex items-center justify-center gap-2 font-bold text-[#1a1f2e] hover:bg-[#e0b020] transition-colors"
+                        >
+                            <Navigation className="w-5 h-5" />
+                            {currentLang === 'en' ? 'Open Map' : 'Apri Mappa'}
                         </button>
                     </div>
                 </section>
