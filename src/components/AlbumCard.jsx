@@ -3,20 +3,15 @@ import { useTranslation } from 'react-i18next';
 import { formatDistance } from '../utils/geolocation';
 
 export function AlbumCard({ card, onClick, userLocation }) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const currentLang = i18n.language || 'it';
+    const displayTitle = currentLang === 'en' && card.title_en ? card.title_en : card.title;
 
     // Calculate distance if locked and location available
     let distanceLabel = null;
     if (!card.isUnlocked && card.type === 'monument' && userLocation && card.gps_lat && card.gps_lng) {
-        // We calculate distance in the parent or here. Let's assume parent passes it or we calculate it.
-        // For simplicity, let's assume the parent might pass a 'distance' prop if already calculated, 
-        // or we rely on the formatting utility if we had the raw number.
-        // But wait, we don't have the raw number here easily without importing logic.
-        // Let's just show "Locked" for now or use a simple prop if passed.
+        // Distance info
     }
-
-    // Simplified: No borders for unlocked cards, just full image.
-    // Locked cards still get the "Locked" look.
 
     return (
         <div
@@ -30,7 +25,7 @@ export function AlbumCard({ card, onClick, userLocation }) {
             <div className={`w-full h-full transition-transform duration-700 ${card.isUnlocked ? 'group-hover:scale-105' : 'grayscale brightness-50 contrast-125'}`}>
                 <img
                     src={card.image_url}
-                    alt={card.title}
+                    alt={displayTitle}
                     className="w-full h-full object-cover"
                     loading="lazy"
                 />
@@ -53,6 +48,10 @@ export function AlbumCard({ card, onClick, userLocation }) {
 
 // Wrapper to include the bottom label "LVL 24" - Kept as requested by design 
 export function AlbumCardWrapper(props) {
+    const { i18n } = useTranslation();
+    const currentLang = i18n?.language || 'it';
+    const displayTitle = currentLang === 'en' && props.card.title_en ? props.card.title_en : props.card.title;
+
     if (!props.card.isUnlocked) {
         return <AlbumCard {...props} />;
     }
@@ -61,7 +60,7 @@ export function AlbumCardWrapper(props) {
         <div className="flex flex-col items-center gap-3">
             <AlbumCard {...props} />
             <div className="text-center">
-                <h4 className="font-serif font-bold text-olive-dark text-xs leading-tight mb-1">{props.card.title.toUpperCase()}</h4>
+                <h4 className="font-serif font-bold text-olive-dark text-xs leading-tight mb-1">{displayTitle ? displayTitle.toUpperCase() : ''}</h4>
             </div>
         </div>
     )

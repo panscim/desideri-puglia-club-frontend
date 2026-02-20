@@ -1,8 +1,11 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function UnlockOverlay({ card, onClose }) {
+    const { i18n } = useTranslation();
+
     useEffect(() => {
         // Auto close after 5 seconds
         const timer = setTimeout(onClose, 5000);
@@ -10,6 +13,9 @@ export function UnlockOverlay({ card, onClose }) {
     }, [onClose]);
 
     if (!card) return null;
+
+    const currentLang = i18n.language || 'it';
+    const displayTitle = currentLang === 'en' && card.title_en ? card.title_en : card.title;
 
     return (
         <AnimatePresence>
@@ -51,7 +57,7 @@ export function UnlockOverlay({ card, onClose }) {
                             transition={{ duration: 1 }}
                         />
                         <div className="p-6 text-center">
-                            <h2 className="text-2xl font-serif font-bold text-olive-dark mb-1">{card.title}</h2>
+                            <h2 className="text-2xl font-serif font-bold text-olive-dark mb-1">{displayTitle}</h2>
                             <p className="text-gold font-bold uppercase text-xs tracking-wider mb-4">{card.city}</p>
                             <div className="inline-block px-3 py-1 bg-sand/30 rounded-full text-olive-dark text-xs font-semibold">
                                 +{card.points_value || 100} Punti

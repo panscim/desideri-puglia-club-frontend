@@ -13,6 +13,7 @@ export default function AdminCards() {
     // Form State
     const [formData, setFormData] = useState({
         title: '',
+        title_en: '',
         image_url: '',
         type: 'monument', // monument, partner
         rarity: 'common', // common, rare, legendary
@@ -22,6 +23,11 @@ export default function AdminCards() {
         gps_radius: 100,
         pin_code: '',
         description: '',
+        description_en: '',
+        history: '',
+        history_en: '',
+        curiosity: '',
+        curiosity_en: '',
         points_value: 100
     });
 
@@ -47,7 +53,8 @@ export default function AdminCards() {
     const handleEdit = (card) => {
         setEditingCard(card);
         setFormData({
-            title: card.title,
+            title: card.title || '',
+            title_en: card.title_en || '',
             image_url: card.image_url || '',
             type: card.type,
             rarity: card.rarity,
@@ -57,6 +64,11 @@ export default function AdminCards() {
             gps_radius: card.gps_radius || 100,
             pin_code: card.pin_code || '',
             description: card.description || '',
+            description_en: card.description_en || '',
+            history: card.history || '',
+            history_en: card.history_en || '',
+            curiosity: typeof card.curiosity === 'string' ? card.curiosity : JSON.stringify(card.curiosity || []),
+            curiosity_en: typeof card.curiosity_en === 'string' ? card.curiosity_en : JSON.stringify(card.curiosity_en || []),
             points_value: card.points_value || 100
         });
         setShowModal(true);
@@ -66,6 +78,7 @@ export default function AdminCards() {
         setEditingCard(null);
         setFormData({
             title: '',
+            title_en: '',
             image_url: '',
             type: 'monument',
             rarity: 'common',
@@ -75,6 +88,11 @@ export default function AdminCards() {
             gps_radius: 100,
             pin_code: '',
             description: '',
+            description_en: '',
+            history: '',
+            history_en: '',
+            curiosity: '',
+            curiosity_en: '',
             points_value: 100
         });
         setShowModal(true);
@@ -104,13 +122,28 @@ export default function AdminCards() {
             return toast.error('PIN obbligatorio per i Partner');
         }
 
+        let curiosityPayload = null;
+        let curiosityEnPayload = null;
+        try {
+            curiosityPayload = formData.curiosity ? JSON.parse(formData.curiosity) : [];
+        } catch (e) {
+            return toast.error("Curiosity (IT) deve essere un array JSON valido, es: [\"fatto 1\", \"fatto 2\"]");
+        }
+        try {
+            curiosityEnPayload = formData.curiosity_en ? JSON.parse(formData.curiosity_en) : [];
+        } catch (e) {
+            return toast.error("Curiosity (EN) deve essere un array JSON valido, es: [\"fact 1\", \"fact 2\"]");
+        }
+
         const payload = {
             ...formData,
             // Convert numbers
             gps_lat: formData.gps_lat ? parseFloat(formData.gps_lat) : null,
             gps_lng: formData.gps_lng ? parseFloat(formData.gps_lng) : null,
             gps_radius: parseInt(formData.gps_radius),
-            points_value: parseInt(formData.points_value)
+            points_value: parseInt(formData.points_value),
+            curiosity: curiosityPayload,
+            curiosity_en: curiosityEnPayload
         };
 
         let error;
@@ -238,9 +271,13 @@ export default function AdminCards() {
                         <form onSubmit={handleSubmit} className="p-6 space-y-6">
 
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="col-span-2">
-                                    <label className="block text-sm font-bold text-olive-dark mb-1">Titolo</label>
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Titolo (IT)</label>
                                     <input required className="w-full p-2 border rounded-lg" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+                                </div>
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Titolo (EN)</label>
+                                    <input className="w-full p-2 border rounded-lg" value={formData.title_en} onChange={e => setFormData({ ...formData, title_en: e.target.value })} />
                                 </div>
 
                                 <div className="col-span-2">
@@ -292,7 +329,7 @@ export default function AdminCards() {
                                                 <input type="number" className="w-full p-2 border rounded" value={formData.gps_radius} onChange={e => setFormData({ ...formData, gps_radius: e.target.value })} />
                                             </div>
                                             <div className="col-span-3 text-xs text-blue-600">
-                         * Usa Google Maps per trovare le coordinate (tasto destro sul punto -> copia valori).
+                                                * Usa Google Maps per trovare le coordinate (tasto destro sul punto -{'>'} copia valori).
                                             </div>
                                         </div>
                                     ) : (
@@ -303,9 +340,33 @@ export default function AdminCards() {
                                     )}
                                 </div>
 
-                                <div className="col-span-2">
-                                    <label className="block text-sm font-bold text-olive-dark mb-1">Descrizione</label>
+                                <div className="col-span-2 mt-4"><h3 className="font-bold text-olive-dark border-b pb-2">Contenuti Multilingua</h3></div>
+
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Descrizione (IT)</label>
                                     <textarea className="w-full p-2 border rounded-lg h-24" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+                                </div>
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Descrizione (EN)</label>
+                                    <textarea className="w-full p-2 border rounded-lg h-24" value={formData.description_en} onChange={e => setFormData({ ...formData, description_en: e.target.value })} />
+                                </div>
+
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Storia (IT)</label>
+                                    <textarea className="w-full p-2 border rounded-lg h-24" value={formData.history} onChange={e => setFormData({ ...formData, history: e.target.value })} />
+                                </div>
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Storia (EN)</label>
+                                    <textarea className="w-full p-2 border rounded-lg h-24" value={formData.history_en} onChange={e => setFormData({ ...formData, history_en: e.target.value })} />
+                                </div>
+
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Curiosità Array JSON (IT)</label>
+                                    <textarea className="w-full p-2 border rounded-lg h-24 font-mono text-sm" placeholder='["fatto 1", "fatto 2"]' value={formData.curiosity} onChange={e => setFormData({ ...formData, curiosity: e.target.value })} />
+                                </div>
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Curiosità Array JSON (EN)</label>
+                                    <textarea className="w-full p-2 border rounded-lg h-24 font-mono text-sm" placeholder='["fact 1", "fact 2"]' value={formData.curiosity_en} onChange={e => setFormData({ ...formData, curiosity_en: e.target.value })} />
                                 </div>
                             </div>
 

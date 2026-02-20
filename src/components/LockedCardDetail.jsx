@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
-
+import { useTranslation } from 'react-i18next';
 import { calculateDistance, formatDistance } from '../utils/geolocation';
 import { MapPin, Lock, X, Navigation } from 'lucide-react';
 
 export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlocking }) {
-    // const { t } = useTranslation(); // Unused
+    const { t, i18n } = useTranslation();
+    const currentLang = i18n.language || 'it';
+    const displayTitle = currentLang === 'en' && card.title_en ? card.title_en : card.title;
+    const displayDescription = currentLang === 'en' && card.description_en ? card.description_en : card.description;
+
     const [distance, setDistance] = useState(null);
 
     useEffect(() => {
@@ -59,7 +63,7 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                 {/* Main Title */}
                 <div className="mb-6 text-center">
                     <h1 className="text-2xl font-bold leading-tight tracking-tight text-white font-serif">
-                        {card.title}
+                        {displayTitle}
                     </h1>
                     <p className="text-stone-400 text-sm mt-1">Collezione Storica</p>
                 </div>
@@ -157,7 +161,7 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                             WebkitMaskImage: 'linear-gradient(to bottom, black 20%, transparent 90%)'
                         }}
                     >
-                        {card.description}
+                        {displayDescription}
                         <br /><br />
                         {/* Fake extra text to ensure fade looks good if description is short */}
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.

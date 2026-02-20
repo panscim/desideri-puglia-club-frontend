@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
 import { ArrowLeft, Share2, Lock, Play, Headphones, MapPin, Star, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function UnlockedCardDetail({ card, onClose }) {
+    const { i18n } = useTranslation();
+
     // Prevent body scroll when modal is open
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -12,8 +15,12 @@ export function UnlockedCardDetail({ card, onClose }) {
 
     if (!card) return null;
 
+    const currentLang = i18n.language || 'it';
+    const displayTitle = currentLang === 'en' && card.title_en ? card.title_en : card.title;
+
     // Mock data handling
-    const historyText = card.history || "Costruito dai Normanni nell'XI secolo, questo monumento rappresenta un fulgido esempio di architettura storica. Le sue mura raccontano secoli di storia, difese e trasformazioni che hanno segnato il territorio.";
+    const rawHistory = currentLang === 'en' && card.history_en ? card.history_en : card.history;
+    const historyText = rawHistory || (currentLang === 'en' ? "Built by the Normans in the 11th century, this monument is a shining example of historical architecture." : "Costruito dai Normanni nell'XI secolo, questo monumento rappresenta un fulgido esempio di architettura storica. Le sue mura raccontano secoli di storia, difese e trasformazioni che hanno segnato il territorio.");
 
     // Split history text for Drop Cap effect (first letter vs rest)
     const firstLetter = historyText.charAt(0);
@@ -21,17 +28,22 @@ export function UnlockedCardDetail({ card, onClose }) {
 
     let curiosityItems = [];
     try {
-        if (typeof card.curiosity === 'string') {
-            curiosityItems = JSON.parse(card.curiosity);
-        } else if (Array.isArray(card.curiosity)) {
-            curiosityItems = card.curiosity;
+        const curiosityField = currentLang === 'en' && card.curiosity_en ? card.curiosity_en : card.curiosity;
+        if (typeof curiosityField === 'string') {
+            curiosityItems = JSON.parse(curiosityField);
+        } else if (Array.isArray(curiosityField)) {
+            curiosityItems = curiosityField;
         }
     } catch (e) {
         console.warn("Failed to parse curiosity", e);
     }
 
     if (curiosityItems.length === 0) {
-        curiosityItems = [
+        curiosityItems = currentLang === 'en' ? [
+            "The only known bust of Frederick II was found within these walls.",
+            "Hidden underground passages connect the castle directly to the ancient port.",
+            "The bastions were reinforced by Charles V of Spain, making it one of Italy's strongest forts."
+        ] : [
             "L'unico busto conosciuto di Federico II è stato trovato tra queste mura.",
             "Passaggi sotterranei nascosti collegano il castello direttamente al porto antico.",
             "I bastioni furono rinforzati da Carlo V di Spagna, rendendolo una delle fortezze più forti d'Italia."
@@ -75,7 +87,7 @@ export function UnlockedCardDetail({ card, onClose }) {
                             Ancient Tier
                         </div>
                         <h1 className="text-3xl font-serif font-bold text-white mb-1 leading-tight">
-                            {card.title}
+                            {displayTitle}
                         </h1>
                         <p className="text-white/80 text-sm font-light">
                             {card.city}, Italy
@@ -102,8 +114,6 @@ export function UnlockedCardDetail({ card, onClose }) {
                             {firstLetter}
                         </span>
                         {restOfText}
-                        <br /><br />
-                        La sua forma trapezoidale unica e i massicci bastioni rappresentano l'apice dell'ingegneria militare medievale, progettati per resistere all'evoluzione dell'artiglieria mantenendo un'eleganza regale.
                     </div>
                 </section>
 
