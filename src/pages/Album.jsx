@@ -18,7 +18,8 @@ export default function Album() {
 
     const [cards, setCards] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filter, setFilter] = useState('all'); // all, unlocked, locked
+    const [filterCity, setFilterCity] = useState('all');
+    const [filterRarity, setFilterRarity] = useState('all');
 
     // Selected card for details
     const [selectedCard, setSelectedCard] = useState(null);
@@ -86,11 +87,19 @@ export default function Album() {
     };
 
 
-    // 3. Filtering
+    // 3. Filtering and Sorting
+    const cities = [...new Set(cards.map(c => c.city).filter(Boolean))].sort();
+
     const filteredCards = cards.filter(c => {
-        if (filter === 'unlocked') return c.isUnlocked;
-        if (filter === 'locked') return !c.isUnlocked;
+        if (filterCity !== 'all' && c.city !== filterCity) return false;
+        if (filterRarity !== 'all' && c.rarity !== filterRarity) return false;
         return true;
+    }).sort((a, b) => {
+        // Show unlocked logic
+        if (a.isUnlocked && !b.isUnlocked) return -1;
+        if (!a.isUnlocked && b.isUnlocked) return 1;
+        // Then by title
+        return a.title?.localeCompare(b.title || '');
     });
 
     const stats = {
@@ -156,18 +165,7 @@ export default function Album() {
                 <div className="flex justify-between items-center mb-6">
                     <div>
                         <h4 className="text-xs font-bold text-gold uppercase tracking-widest mb-1">Collezione</h4>
-                        <h1 className="text-2xl font-serif font-bold text-olive-dark tracking-wide">ALBUM STORICO</h1>
-                    </div>
-                    <div className="flex gap-3">
-                        <div className="bg-white px-3 py-1.5 rounded-full shadow-sm border border-sand/30 flex items-center gap-2">
-                            <div className="w-4 h-4 rounded-full bg-gold/20 flex items-center justify-center">
-                                <span className="text-[10px] text-olive-dark">★</span>
-                            </div>
-                            <span className="text-xs font-bold text-olive-dark">1,240</span>
-                        </div>
-                        <button className="w-9 h-9 bg-white rounded-full shadow-sm border border-sand/30 flex items-center justify-center text-olive-dark">
-                            <Search size={18} />
-                        </button>
+                        <h1 className="text-2xl font-serif font-bold text-olive-dark tracking-wide">RELIQUIE</h1>
                     </div>
                 </div>
 
@@ -204,31 +202,30 @@ export default function Album() {
             </div>
 
             {/* FILTERS */}
-            <div className="px-6 mb-8 overflow-x-auto no-scrollbar">
+            <div className="px-6 mb-8 flex flex-col gap-3 relative z-10">
                 <div className="flex gap-3">
-                    {['Tutti', 'Leggendari', 'Comuni', 'Missioni'].map((f) => {
-                        const isActive = (filter === 'all' && f === 'Tutti') ||
-                            (filter === 'unlocked' && f === 'Leggendari') || // mapping for demo
-                            (filter === 'locked' && f === 'Missioni');
+                    <select
+                        className="flex-1 p-3 rounded-xl bg-white border border-sand/50 shadow-sm text-sm font-medium text-olive-dark outline-none focus:border-gold appearance-none"
+                        value={filterCity}
+                        onChange={(e) => setFilterCity(e.target.value)}
+                    >
+                        <option value="all">Tutte le città</option>
+                        {cities.map(city => (
+                            <option key={city} value={city}>{city}</option>
+                        ))}
+                    </select>
 
-                        return (
-                            <button
-                                key={f}
-                                onClick={() => {
-                                    if (f === 'Tutti') setFilter('all');
-                                    if (f === 'Leggendari') setFilter('unlocked'); // Temporary mapping
-                                    if (f === 'Missioni') setFilter('locked');
-                                }}
-                                className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300
-                                    ${isActive
-                                        ? 'bg-[#D4AF37] text-white shadow-lg shadow-gold/30'
-                                        : 'bg-white text-olive-light border border-black/5 shadow-sm hover:bg-stone-50'
-                                    }`}
-                            >
-                                {f}
-                            </button>
-                        );
-                    })}
+                    <select
+                        className="flex-1 p-3 rounded-xl bg-white border border-sand/50 shadow-sm text-sm font-medium text-olive-dark outline-none focus:border-gold appearance-none"
+                        value={filterRarity}
+                        onChange={(e) => setFilterRarity(e.target.value)}
+                    >
+                        <option value="all">Tutte le rarità</option>
+                        <option value="common">Comuni</option>
+                        <option value="rare">Rare</option>
+                        <option value="legendary">Leggendarie</option>
+                        <option value="time_limited">A Tempo</option>
+                    </select>
                 </div>
             </div>
 

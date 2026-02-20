@@ -107,10 +107,10 @@ export function LockedCardDetail({ card, userLocation, onClose, onUnlock, unlock
                             <button
                                 onClick={onUnlock}
                                 disabled={unlocking}
-                                className="w-full py-4 rounded-xl bg-green-600 text-white font-bold shadow-lg shadow-green-600/30 hover:bg-green-500 transition-all flex items-center justify-center gap-2 animate-bounce"
+                                className="w-full py-4 rounded-xl bg-[#8c6b4a] text-white font-bold shadow-lg shadow-[#8c6b4a]/30 hover:bg-[#7a5c3d] transition-all flex items-center justify-center gap-2 animate-bounce"
                             >
                                 <MapPin className="w-5 h-5" />
-                                {unlocking ? 'Attivazione...' : 'SBLOCCA ORA'}
+                                {unlocking ? 'Attivazione...' : 'RIVENDICA ORA'}
                             </button>
                         </>
                     ) : (
