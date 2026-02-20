@@ -26,17 +26,11 @@ export function UnlockedCardDetail({ card, onClose }) {
     const firstLetter = historyText.charAt(0);
     const restOfText = historyText.slice(1);
 
-    let curiosityItems = [];
-    try {
-        const curiosityField = currentLang === 'en' && card.curiosity_en ? card.curiosity_en : card.curiosity;
-        if (typeof curiosityField === 'string') {
-            curiosityItems = JSON.parse(curiosityField);
-        } else if (Array.isArray(curiosityField)) {
-            curiosityItems = curiosityField;
-        }
-    } catch (e) {
-        console.warn("Failed to parse curiosity", e);
-    }
+    const curiosity1 = currentLang === 'en' && card.curiosity1_en ? card.curiosity1_en : card.curiosity1_it;
+    const curiosity2 = currentLang === 'en' && card.curiosity2_en ? card.curiosity2_en : card.curiosity2_it;
+    const curiosity3 = currentLang === 'en' && card.curiosity3_en ? card.curiosity3_en : card.curiosity3_it;
+
+    let curiosityItems = [curiosity1, curiosity2, curiosity3].filter(Boolean);
 
     if (curiosityItems.length === 0) {
         curiosityItems = currentLang === 'en' ? [

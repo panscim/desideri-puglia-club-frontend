@@ -26,8 +26,12 @@ export default function AdminCards() {
         description_en: '',
         history: '',
         history_en: '',
-        curiosity: '',
-        curiosity_en: '',
+        curiosity1_it: '',
+        curiosity2_it: '',
+        curiosity3_it: '',
+        curiosity1_en: '',
+        curiosity2_en: '',
+        curiosity3_en: '',
         points_value: 100
     });
 
@@ -67,8 +71,12 @@ export default function AdminCards() {
             description_en: card.description_en || '',
             history: card.history || '',
             history_en: card.history_en || '',
-            curiosity: typeof card.curiosity === 'string' ? card.curiosity : JSON.stringify(card.curiosity || []),
-            curiosity_en: typeof card.curiosity_en === 'string' ? card.curiosity_en : JSON.stringify(card.curiosity_en || []),
+            curiosity1_it: card.curiosity1_it || '',
+            curiosity2_it: card.curiosity2_it || '',
+            curiosity3_it: card.curiosity3_it || '',
+            curiosity1_en: card.curiosity1_en || '',
+            curiosity2_en: card.curiosity2_en || '',
+            curiosity3_en: card.curiosity3_en || '',
             points_value: card.points_value || 100
         });
         setShowModal(true);
@@ -91,8 +99,12 @@ export default function AdminCards() {
             description_en: '',
             history: '',
             history_en: '',
-            curiosity: '',
-            curiosity_en: '',
+            curiosity1_it: '',
+            curiosity2_it: '',
+            curiosity3_it: '',
+            curiosity1_en: '',
+            curiosity2_en: '',
+            curiosity3_en: '',
             points_value: 100
         });
         setShowModal(true);
@@ -122,28 +134,13 @@ export default function AdminCards() {
             return toast.error('PIN obbligatorio per i Partner');
         }
 
-        let curiosityPayload = null;
-        let curiosityEnPayload = null;
-        try {
-            curiosityPayload = formData.curiosity ? JSON.parse(formData.curiosity) : [];
-        } catch (e) {
-            return toast.error("Curiosity (IT) deve essere un array JSON valido, es: [\"fatto 1\", \"fatto 2\"]");
-        }
-        try {
-            curiosityEnPayload = formData.curiosity_en ? JSON.parse(formData.curiosity_en) : [];
-        } catch (e) {
-            return toast.error("Curiosity (EN) deve essere un array JSON valido, es: [\"fact 1\", \"fact 2\"]");
-        }
-
         const payload = {
             ...formData,
             // Convert numbers
             gps_lat: formData.gps_lat ? parseFloat(formData.gps_lat) : null,
             gps_lng: formData.gps_lng ? parseFloat(formData.gps_lng) : null,
             gps_radius: parseInt(formData.gps_radius),
-            points_value: parseInt(formData.points_value),
-            curiosity: curiosityPayload,
-            curiosity_en: curiosityEnPayload
+            points_value: parseInt(formData.points_value)
         };
 
         let error;
@@ -360,13 +357,38 @@ export default function AdminCards() {
                                     <textarea className="w-full p-2 border rounded-lg h-24" value={formData.history_en} onChange={e => setFormData({ ...formData, history_en: e.target.value })} />
                                 </div>
 
-                                <div className="col-span-1">
-                                    <label className="block text-sm font-bold text-olive-dark mb-1">Curiosità Array JSON (IT)</label>
-                                    <textarea className="w-full p-2 border rounded-lg h-24 font-mono text-sm" placeholder='["fatto 1", "fatto 2"]' value={formData.curiosity} onChange={e => setFormData({ ...formData, curiosity: e.target.value })} />
+                                {/* Curiosità IT */}
+                                <div className="col-span-2 mt-2"><h3 className="font-bold text-olive-dark border-b pb-2">Curiosità (IT)</h3></div>
+                                <div className="col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-olive-dark mb-1">Curiosità 1 (IT)</label>
+                                        <textarea className="w-full p-2 border rounded-lg text-sm h-24" value={formData.curiosity1_it} onChange={e => setFormData({ ...formData, curiosity1_it: e.target.value })} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-olive-dark mb-1">Curiosità 2 (IT)</label>
+                                        <textarea className="w-full p-2 border rounded-lg text-sm h-24" value={formData.curiosity2_it} onChange={e => setFormData({ ...formData, curiosity2_it: e.target.value })} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-olive-dark mb-1">Curiosità 3 (IT)</label>
+                                        <textarea className="w-full p-2 border rounded-lg text-sm h-24" value={formData.curiosity3_it} onChange={e => setFormData({ ...formData, curiosity3_it: e.target.value })} />
+                                    </div>
                                 </div>
-                                <div className="col-span-1">
-                                    <label className="block text-sm font-bold text-olive-dark mb-1">Curiosità Array JSON (EN)</label>
-                                    <textarea className="w-full p-2 border rounded-lg h-24 font-mono text-sm" placeholder='["fact 1", "fact 2"]' value={formData.curiosity_en} onChange={e => setFormData({ ...formData, curiosity_en: e.target.value })} />
+
+                                {/* Curiosità EN */}
+                                <div className="col-span-2 mt-2"><h3 className="font-bold text-olive-dark border-b pb-2">Curiosità (EN)</h3></div>
+                                <div className="col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-2 rounded-xl">
+                                    <div>
+                                        <label className="block text-xs font-bold text-olive-dark mb-1">Curiosità 1 (EN)</label>
+                                        <textarea className="w-full p-2 border rounded-lg text-sm h-24" value={formData.curiosity1_en} onChange={e => setFormData({ ...formData, curiosity1_en: e.target.value })} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-olive-dark mb-1">Curiosità 2 (EN)</label>
+                                        <textarea className="w-full p-2 border rounded-lg text-sm h-24" value={formData.curiosity2_en} onChange={e => setFormData({ ...formData, curiosity2_en: e.target.value })} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-olive-dark mb-1">Curiosità 3 (EN)</label>
+                                        <textarea className="w-full p-2 border rounded-lg text-sm h-24" value={formData.curiosity3_en} onChange={e => setFormData({ ...formData, curiosity3_en: e.target.value })} />
+                                    </div>
                                 </div>
                             </div>
 
