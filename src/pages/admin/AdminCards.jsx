@@ -32,6 +32,8 @@ export default function AdminCards() {
         curiosity1_en: '',
         curiosity2_en: '',
         curiosity3_en: '',
+        audio_track: '',
+        audio_track_en: '',
         points_value: 100
     });
 
@@ -77,6 +79,8 @@ export default function AdminCards() {
             curiosity1_en: card.curiosity1_en || '',
             curiosity2_en: card.curiosity2_en || '',
             curiosity3_en: card.curiosity3_en || '',
+            audio_track: card.audio_track || '',
+            audio_track_en: card.audio_track_en || '',
             points_value: card.points_value || 100
         });
         setShowModal(true);
@@ -105,6 +109,8 @@ export default function AdminCards() {
             curiosity1_en: '',
             curiosity2_en: '',
             curiosity3_en: '',
+            audio_track: '',
+            audio_track_en: '',
             points_value: 100
         });
         setShowModal(true);
@@ -355,6 +361,15 @@ export default function AdminCards() {
                                 <div className="col-span-1">
                                     <label className="block text-sm font-bold text-olive-dark mb-1">Storia (EN)</label>
                                     <textarea className="w-full p-2 border rounded-lg h-24" value={formData.history_en} onChange={e => setFormData({ ...formData, history_en: e.target.value })} />
+                                </div>
+
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Traccia Audio URL (IT)</label>
+                                    <input className="w-full p-2 border rounded-lg" value={formData.audio_track} onChange={e => setFormData({ ...formData, audio_track: e.target.value })} placeholder="https://..." />
+                                </div>
+                                <div className="col-span-1">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Traccia Audio URL (EN)</label>
+                                    <input className="w-full p-2 border rounded-lg" value={formData.audio_track_en} onChange={e => setFormData({ ...formData, audio_track_en: e.target.value })} placeholder="https://..." />
                                 </div>
 
                                 {/* Curiosità IT */}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Share2, Lock, Play, Headphones, MapPin, Star, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,13 +18,12 @@ export function UnlockedCardDetail({ card, onClose }) {
     const currentLang = i18n.language || 'it';
     const displayTitle = currentLang === 'en' && card.title_en ? card.title_en : card.title;
 
-    // Mock data handling
-    const rawHistory = currentLang === 'en' && card.history_en ? card.history_en : card.history;
-    const historyText = rawHistory || (currentLang === 'en' ? "Built by the Normans in the 11th century, this monument is a shining example of historical architecture." : "Costruito dai Normanni nell'XI secolo, questo monumento rappresenta un fulgido esempio di architettura storica. Le sue mura raccontano secoli di storia, difese e trasformazioni che hanno segnato il territorio.");
+    // Real data handling
+    const historyText = (currentLang === 'en' && card.history_en ? card.history_en : card.history) || '';
 
     // Split history text for Drop Cap effect (first letter vs rest)
-    const firstLetter = historyText.charAt(0);
-    const restOfText = historyText.slice(1);
+    const firstLetter = historyText ? historyText.charAt(0) : '';
+    const restOfText = historyText ? historyText.slice(1) : '';
 
     const curiosity1 = currentLang === 'en' && card.curiosity1_en ? card.curiosity1_en : card.curiosity1_it;
     const curiosity2 = currentLang === 'en' && card.curiosity2_en ? card.curiosity2_en : card.curiosity2_it;
@@ -32,23 +31,39 @@ export function UnlockedCardDetail({ card, onClose }) {
 
     let curiosityItems = [curiosity1, curiosity2, curiosity3].filter(Boolean);
 
-    if (curiosityItems.length === 0) {
-        curiosityItems = currentLang === 'en' ? [
-            "The only known bust of Frederick II was found within these walls.",
-            "Hidden underground passages connect the castle directly to the ancient port.",
-            "The bastions were reinforced by Charles V of Spain, making it one of Italy's strongest forts."
-        ] : [
-            "L'unico busto conosciuto di Federico II è stato trovato tra queste mura.",
-            "Passaggi sotterranei nascosti collegano il castello direttamente al porto antico.",
-            "I bastioni furono rinforzati da Carlo V di Spagna, rendendolo una delle fortezze più forti d'Italia."
-        ];
-    }
+    const audioTrack = currentLang === 'en' && card.audio_track_en ? card.audio_track_en : card.audio_track;
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef(null);
+    const [audioProgress, setAudioProgress] = useState(0);
 
-    const startLocation = "Piazza Castello, 76121 Barletta BT, Italy"; // Default if missing
+    const togglePlay = () => {
+        if (!audioRef.current) return;
+        if (isPlaying) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+    };
+
+    const handleTimeUpdate = () => {
+        if (audioRef.current) {
+            const { currentTime, duration } = audioRef.current;
+            if (duration) {
+                setAudioProgress((currentTime / duration) * 100);
+            }
+        }
+    };
+
+
+
+    const startLocation = `${card.city || 'Sconosciuta'}`; // Use real city vs hardcoded "Barletta"
     const globalRarity = card.global_rarity || "Top 5%";
+
+    // Format the date based on language
     const unlockedDate = card.unlockedAt
-        ? new Date(card.unlockedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-        : "Oct 12, 2023";
+        ? new Date(card.unlockedAt).toLocaleDateString(currentLang === 'en' ? 'en-US' : 'it-IT', { month: 'short', day: 'numeric', year: 'numeric' })
+        : (currentLang === 'en' ? "Just Unlocked" : "Appena Sbloccato");
 
     // Bright yellow/gold from design
     const accentColor = "#f4c025";
@@ -101,55 +116,69 @@ export function UnlockedCardDetail({ card, onClose }) {
                 <div className="w-1 h-8 bg-[#f4c025] mb-4 rounded-full"></div>
 
                 {/* History Section */}
-                <section className="mb-10">
-                    <h3 className="text-2xl font-bold text-slate-900 mb-4 font-display">The History</h3>
-                    <div className="text-slate-600 leading-relaxed text-sm">
-                        <span className="float-left text-5xl font-bold text-[#f4c025] mr-3 mt-[-8px] font-serif">
-                            {firstLetter}
-                        </span>
-                        {restOfText}
-                    </div>
-                </section>
+                {historyText && (
+                    <section className="mb-10">
+                        <h3 className="text-2xl font-bold text-slate-900 mb-4 font-display">The History</h3>
+                        <div className="text-slate-600 leading-relaxed text-sm">
+                            <span className="float-left text-5xl font-bold text-[#f4c025] mr-3 mt-[-8px] font-serif">
+                                {firstLetter}
+                            </span>
+                            {restOfText}
+                        </div>
+                    </section>
+                )}
 
                 {/* Curiosity Card */}
-                <section className="bg-[#f0f0eb] rounded-2xl p-6 mb-10">
-                    <div className="flex items-center gap-2 mb-4">
-                        <Sparkles className="w-5 h-5 text-[#f4c025]" fill="#f4c025" />
-                        <h3 className="text-lg font-bold text-slate-900">Curiosity & Secrets</h3>
-                    </div>
-                    <ul className="space-y-4">
-                        {curiosityItems.map((item, idx) => (
-                            <li key={idx} className="flex gap-3 text-sm text-slate-700 leading-snug">
-                                <div className="mt-0.5 shrink-0">
-                                    <div className="w-5 h-5 rounded-full bg-[#f4c025] flex items-center justify-center">
-                                        <Star className="w-3 h-3 text-white" fill="white" />
+                {curiosityItems.length > 0 && (
+                    <section className="bg-[#f0f0eb] rounded-2xl p-6 mb-10">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Sparkles className="w-5 h-5 text-[#f4c025]" fill="#f4c025" />
+                            <h3 className="text-lg font-bold text-slate-900">Curiosity & Secrets</h3>
+                        </div>
+                        <ul className="space-y-4">
+                            {curiosityItems.map((item, idx) => (
+                                <li key={idx} className="flex gap-3 text-sm text-slate-700 leading-snug">
+                                    <div className="mt-0.5 shrink-0">
+                                        <div className="w-5 h-5 rounded-full bg-[#f4c025] flex items-center justify-center">
+                                            <Star className="w-3 h-3 text-white" fill="white" />
+                                        </div>
                                     </div>
-                                </div>
-                                <span>{item}</span>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
+                                    <span>{item}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
 
                 {/* Audio Guide */}
-                <section className="mb-10">
-                    <h3 className="text-lg font-bold text-slate-900 mb-4">Audio Guide</h3>
-                    <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-4">
-                        <button className="w-12 h-12 rounded-full bg-[#f4c025] flex items-center justify-center shadow-lg shadow-[#f4c025]/30 hover:scale-105 transition-transform shrink-0">
-                            <Play className="w-5 h-5 text-slate-900 ml-1" fill="#1a1a1a" />
-                        </button>
-                        <div className="flex-1 min-w-0">
-                            <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">The Emperor's Legacy</div>
-                            <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
-                                <div className="h-full w-1/3 bg-[#f4c025] rounded-full"></div>
+                {audioTrack && (
+                    <section className="mb-10">
+                        <h3 className="text-lg font-bold text-slate-900 mb-4">Audio Guide</h3>
+                        <div className="bg-white rounded-2xl p-4 shadow-sm flex items-center gap-4">
+                            <button
+                                onClick={togglePlay}
+                                className="w-12 h-12 rounded-full bg-[#f4c025] flex items-center justify-center shadow-lg shadow-[#f4c025]/30 hover:scale-105 transition-transform shrink-0"
+                            >
+                                <Play className="w-5 h-5 text-slate-900 ml-1" fill="#1a1a1a" />
+                            </button>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-[10px] uppercase font-bold text-slate-400 mb-1">{displayTitle}</div>
+                                <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden relative">
+                                    <div className="absolute top-0 left-0 h-full bg-[#f4c025] rounded-full transition-all duration-300" style={{ width: `${audioProgress}%` }}></div>
+                                </div>
                             </div>
+                            <div className="text-right shrink-0">
+                                <Headphones className="w-5 h-5 text-slate-300 ml-auto" />
+                            </div>
+                            <audio
+                                ref={audioRef}
+                                src={audioTrack}
+                                onTimeUpdate={handleTimeUpdate}
+                                onEnded={() => setIsPlaying(false)}
+                            />
                         </div>
-                        <div className="text-right shrink-0">
-                            <div className="text-xs font-bold text-slate-400 mb-1">4:22</div>
-                            <Headphones className="w-5 h-5 text-slate-300 ml-auto" />
-                        </div>
-                    </div>
-                </section>
+                    </section>
+                )}
 
                 {/* Stats Grid */}
                 <section className="mb-10">
