@@ -161,11 +161,11 @@ const Layout = () => {
               <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/mappa') ? 'text-gold' : 'text-slate-400'}`}>Mappa</span>
             </Link>
 
-            {/* Item 3: Center Action Button (Placeholder for multi-action menu) */}
+            {/* Item 3: Center Action Button (Missioni) */}
             <div className="w-1/5 flex justify-center relative -top-6">
-              <button className="w-14 h-14 rounded-full bg-olive-dark text-white flex items-center justify-center shadow-lg shadow-olive-dark/40 active:scale-90 transition-transform border-4 border-[#F9F9F7]">
-                <Plus size={28} strokeWidth={2.5} />
-              </button>
+              <Link to="/missioni" className="w-14 h-14 rounded-full bg-olive-dark text-white flex items-center justify-center shadow-lg shadow-olive-dark/40 active:scale-90 transition-transform border-4 border-[#F9F9F7]">
+                <Target size={28} strokeWidth={2.5} />
+              </Link>
             </div>
 
             {/* Item 4: Album */}
