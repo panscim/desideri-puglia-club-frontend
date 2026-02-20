@@ -14,6 +14,8 @@ import {
   MessageCircle,   // 👈 NUOVA ICONA CHAT
   MapPin,          // 👈 NUOVA ICONA MAPPA
   Grid,            // 👈 NUOVA ICONA ALBUM
+  Plus,            // 👈 NUOVA ICONA FAB
+  Menu,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
@@ -28,6 +30,7 @@ const Layout = () => {
   const { profile, isAdmin } = useAuth()
   const [activeIndex, setActiveIndex] = useState(0)
 
+  // We keep the logic for Desktop Sidebar active state
   useEffect(() => {
     const index = navItems.findIndex(item => isActive(item.path))
     if (index !== -1) setActiveIndex(index)
@@ -44,7 +47,7 @@ const Layout = () => {
 
   const { t } = useTranslation()
 
-  // 🔹 Navbar aggiornata (Chat al posto di Shop)
+  // 🔹 Sidebar Navigation (Desktop)
   const navItems = [
     { path: '/dashboard', icon: Home, label: t('nav.home') },
     { path: '/missioni', icon: Target, label: t('nav.missions') || 'Missioni' },
@@ -60,7 +63,7 @@ const Layout = () => {
     location.pathname === path || location.pathname.startsWith(path + '/')
 
   return (
-    <div className="min-h-screen flex flex-col pb-20 md:pb-0">
+    <div className="min-h-screen flex flex-col md:pb-0 bg-[#F9F9F7]">
       {typeof window !== 'undefined' && <Splash />}
 
       {/* ░ HEADER ░ */}
@@ -119,51 +122,71 @@ const Layout = () => {
       </header>
 
       {/* ░ MAIN CONTENT ░ */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-6 md:ml-64">
+      <main className="flex-1 max-w-[100vw] overflow-x-hidden md:ml-64 w-full">
         <Outlet />
       </main>
 
-      {/* ░ NAV MOBILE MINIMAL (Airbnb Style Clean) ░ */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 md:hidden pb-[env(safe-area-inset-bottom)]">
-        <div className="flex justify-around items-center h-[60px] pb-1">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            const active = isActive(item.path)
+      {/* ░ NEW NAV MOBILE (Premium Custom Layout) ░ */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
 
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex flex-col items-center justify-center w-full h-full space-y-[2px] transition-colors duration-200 ${active ? 'text-olive-dark' : 'text-gray-400 hover:text-gray-600'
-                  }`}
-              >
-                {/* Icon */}
-                <Icon
-                  size={24}
-                  strokeWidth={active ? 2 : 1.5}
-                  className="transition-transform active:scale-95"
-                />
-
-                {/* Label */}
-                <span className={`text-[10px] font-medium tracking-wide ${active ? 'font-semibold' : ''}`}>
-                  {item.label}
-                </span>
-              </Link>
-            )
-          })}
+        {/* Quick Map Floating Button */}
+        <div className="px-4 mb-4 pointer-events-auto">
+          <Link to="/mappa" className="w-full bg-[#E4AE2F] text-olive-dark rounded-xl p-4 flex items-center justify-between shadow-lg shadow-[#E4AE2F]/30 active:scale-95 transition-transform">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-olive-dark text-[#E4AE2F] flex items-center justify-center">
+                <span className="material-symbols-outlined text-[18px]">explore</span>
+              </div>
+              <div>
+                <p className="font-bold text-base leading-tight">Open Map</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-olive-dark/80">Next Discovery: 250m</p>
+              </div>
+            </div>
+            <span className="material-symbols-outlined">chevron_right</span>
+          </Link>
         </div>
-      </nav>
+
+        {/* Bottom Tab Bar */}
+        <nav className="bg-white border-t border-sand pb-[env(safe-area-inset-bottom)] pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.05)] relative">
+          <div className="flex justify-between items-center h-[70px] px-2 relative">
+
+            {/* Item 1: Dashboard */}
+            <Link to="/dashboard" className={`flex flex-col items-center justify-center w-1/5 h-full space-y-1 ${isActive('/dashboard') ? 'text-gold' : 'text-slate-400'}`}>
+              <Home size={24} strokeWidth={isActive('/dashboard') ? 2.5 : 2} className={isActive('/dashboard') ? 'fill-gold/20' : ''} />
+              <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/dashboard') ? 'text-gold' : 'text-slate-400'}`}>Dashboard</span>
+            </Link>
+
+            {/* Item 2: Mappa */}
+            <Link to="/mappa" className={`flex flex-col items-center justify-center w-1/5 h-full space-y-1 ${isActive('/mappa') ? 'text-gold' : 'text-slate-400'}`}>
+              <MapPin size={24} strokeWidth={isActive('/mappa') ? 2.5 : 2} className={isActive('/mappa') ? 'fill-gold/20' : ''} />
+              <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/mappa') ? 'text-gold' : 'text-slate-400'}`}>Mappa</span>
+            </Link>
+
+            {/* Item 3: Center Action Button (Placeholder for multi-action menu) */}
+            <div className="w-1/5 flex justify-center relative -top-6">
+              <button className="w-14 h-14 rounded-full bg-olive-dark text-white flex items-center justify-center shadow-lg shadow-olive-dark/40 active:scale-90 transition-transform border-4 border-[#F9F9F7]">
+                <Plus size={28} strokeWidth={2.5} />
+              </button>
+            </div>
+
+            {/* Item 4: Album */}
+            <Link to="/album" className={`flex flex-col items-center justify-center w-1/5 h-full space-y-1 ${isActive('/album') ? 'text-gold' : 'text-slate-400'}`}>
+              <Grid size={24} strokeWidth={isActive('/album') ? 2.5 : 2} className={isActive('/album') ? 'fill-gold/20' : ''} />
+              <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/album') ? 'text-gold' : 'text-slate-400'}`}>Album</span>
+            </Link>
+
+            {/* Item 5: Opzioni (Profilo/Menu) */}
+            <Link to="/profilo" className={`flex flex-col items-center justify-center w-1/5 h-full space-y-1 ${isActive('/profilo') ? 'text-gold' : 'text-slate-400'}`}>
+              <Settings size={24} strokeWidth={isActive('/profilo') ? 2.5 : 2} className={isActive('/profilo') ? 'fill-gold/20' : ''} />
+              <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/profilo') ? 'text-gold' : 'text-slate-400'}`}>Opzioni</span>
+            </Link>
+
+          </div>
+        </nav>
+      </div>
 
       {/* ░ SIDEBAR DESKTOP ░ */}
-      < div className="hidden md:block fixed left-0 top-20 bottom-0 w-64 bg-white border-r border-sand p-4" >
-        {/* Logo */}
-        < div className="flex items-center space-x-3 mb-4" >
-          <img src="/logo.png" alt="Desideri di Puglia" className="w-8 h-8 rounded-full object-cover" />
-          <span className="text-sm font-semibold text-olive-dark">Desideri di Puglia</span>
-        </div >
-
-        {/* Menu */}
-        < nav className="space-y-2" >
+      < div className="hidden md:block fixed left-0 top-20 bottom-0 w-64 bg-white border-r border-sand p-4 z-40" >
+        < nav className="space-y-2 h-full overflow-y-auto pb-20" >
           {
             navItems.map((item) => {
               const Icon = item.icon
@@ -211,8 +234,6 @@ const Layout = () => {
                   <Handshake className="w-5 h-5" />
                   <span>Gestione Partner</span>
                 </Link>
-
-                {/* (AdminOffers link removed) */}
               </>
             )
           }
