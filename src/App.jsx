@@ -209,7 +209,6 @@ function App() {
               {/* Dashboard utente */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/missioni" element={<Missioni />} />
-              <Route path="/missioni-classifica" element={<MissioniClassifica />} />
               <Route path="/missione/:id" element={<MissionDetail />} />
               <Route path="/classifica" element={<Classifica />} />
               <Route path="/profilo" element={<Profilo />} />
