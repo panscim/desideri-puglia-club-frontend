@@ -129,21 +129,7 @@ const Layout = () => {
       {/* ░ NEW NAV MOBILE (Premium Custom Layout) ░ */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
 
-        {/* Quick Map Floating Button */}
-        <div className="px-4 mb-4 pointer-events-auto">
-          <Link to="/mappa" className="w-full bg-[#E4AE2F] text-olive-dark rounded-xl p-4 flex items-center justify-between shadow-lg shadow-[#E4AE2F]/30 active:scale-95 transition-transform">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-olive-dark text-[#E4AE2F] flex items-center justify-center">
-                <span className="material-symbols-outlined text-[18px]">explore</span>
-              </div>
-              <div>
-                <p className="font-bold text-base leading-tight">Open Map</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-olive-dark/80">Next Discovery: 250m</p>
-              </div>
-            </div>
-            <span className="material-symbols-outlined">chevron_right</span>
-          </Link>
-        </div>
+
 
         {/* Bottom Tab Bar */}
         <nav className="bg-white border-t border-sand pb-[env(safe-area-inset-bottom)] pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.05)] relative">
