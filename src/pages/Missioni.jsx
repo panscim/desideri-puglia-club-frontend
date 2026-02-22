@@ -95,13 +95,16 @@ const Missioni = () => {
       <div className={`px-6 pt-12 pb-6 sticky top-0 z-20 ${mainTab === 'sfide_grado' ? 'bg-[#1C1A14]' : 'bg-[#F9F9F7]'}`}>
 
         {/* Top Navbar */}
-        <div className="flex items-center mb-6">
+        <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate(-1)}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${mainTab === 'sfide_grado' ? 'bg-[#312B1B] text-[#E4AE2F]' : 'bg-transparent text-slate-400'}`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${mainTab === 'sfide_grado' ? 'bg-[#312B1B] text-[#E4AE2F]' : 'bg-white shadow-sm text-slate-400'}`}
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
+          <h1 className={`text-2xl font-bold font-serif ${mainTab === 'sfide_grado' ? 'text-white' : 'text-olive-dark'}`}>
+            Missioni
+          </h1>
         </div>
 
         {/* Segmented Control Switch */}
