@@ -23,7 +23,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword.jsx"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Missioni = lazy(() => import("./pages/Missioni"));
 const MissionDetail = lazy(() => import("./pages/MissionDetail"));
-const SagaDetail = lazy(() => import("./pages/SagaDetail"));
+const SagaDetail = lazy(() => import("./pages/SagaDetail.jsx"));
 const Classifica = lazy(() => import("./pages/Classifica"));
 const Profilo = lazy(() => import("./pages/Profilo.jsx"));
 const VoucherList = lazy(() => import("./pages/VoucherList"));
