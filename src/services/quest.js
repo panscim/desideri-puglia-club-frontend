@@ -85,7 +85,7 @@ export const QuestService = {
             // 4. Fetch the actual card and partner data in parallel
             const fetchPromises = []
             if (cardIds.length > 0) {
-                fetchPromises.push(supabase.from('cards').select('id, image_url, gps_lat, gps_lng').in('id', cardIds))
+                fetchPromises.push(supabase.from('cards').select('*').in('id', cardIds))
             }
             if (partnerIds.length > 0) {
                 fetchPromises.push(supabase.from('partners').select('id, logo_url, nome, lat, lng').in('id', partnerIds))
@@ -108,6 +108,8 @@ export const QuestService = {
                 const ref = referencesMap[step.reference_id] || {}
                 return {
                     ...step,
+                    cardData: step.reference_table === 'cards' ? ref : null,
+                    partnerData: step.reference_table === 'partners' ? ref : null,
                     _image_url: step.reference_table === 'partners' ? ref.logo_url : ref.image_url,
                     _latitude: step.reference_table === 'partners' ? ref.lat : ref.gps_lat,
                     _longitude: step.reference_table === 'partners' ? ref.lng : ref.gps_lng,
@@ -118,6 +120,22 @@ export const QuestService = {
         } catch (err) {
             console.error('Error fetching saga detail:', err)
             return null
+        }
+    },
+
+    // Unlock a specific quest step for a user
+    async unlockQuestStep(userId, stepId) {
+        if (!userId || !stepId) return { success: false, error: 'Missing params' }
+        try {
+            const { error } = await supabase
+                .from('user_quest_set_steps')
+                .upsert({ user_id: userId, step_id: stepId }, { onConflict: 'user_id,step_id' })
+
+            if (error) throw error
+            return { success: true }
+        } catch (err) {
+            console.error('Error unlocking quest step:', err)
+            return { success: false, error: err.message }
         }
     }
 

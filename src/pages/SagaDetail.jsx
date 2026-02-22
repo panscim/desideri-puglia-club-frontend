@@ -5,6 +5,12 @@ import { QuestService } from '../services/quest';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { getLocalized } from '../utils/content';
+import { useGeolocation } from '../hooks/useGeolocation';
+import { LockedCardDetail } from '../components/LockedCardDetail';
+import { UnlockedCardDetail } from '../components/UnlockedCardDetail';
+import { AlbumService } from '../services/album';
+import toast from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 
 export default function SagaDetail() {
   const { id } = useParams();
@@ -15,6 +21,16 @@ export default function SagaDetail() {
   const [saga, setSaga] = useState(null);
   const [completedStepsIds, setCompletedStepsIds] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // New states for Step Modals
+  const { location, startWatching } = useGeolocation();
+  const [selectedStep, setSelectedStep] = useState(null);
+  const [unlockingStep, setUnlockingStep] = useState(false);
+
+  useEffect(() => {
+    startWatching();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     async function fetchSaga() {
@@ -82,6 +98,40 @@ export default function SagaDetail() {
   const completedCount = steps.filter(s => s.status === 'completed').length;
   const progressPercent = steps.length > 0 ? Math.round((completedCount / steps.length) * 100) : 0;
 
+  const activeStep = steps.find(s => s.status === 'active');
+
+  const handleStepClick = (step) => {
+    if (step.status === 'locked') {
+      toast('Continua la storia per sbloccare questo passo', { icon: '🔒' });
+      return;
+    }
+    setSelectedStep(step);
+  };
+
+  const handleUnlockStep = async (step) => {
+    setUnlockingStep(true);
+    try {
+      if (step.reference_table === 'cards' && step.reference_id) {
+        await AlbumService.unlockCard(step.reference_id);
+      }
+
+      const res = await QuestService.unlockQuestStep(user.id, step.id);
+      if (res.success) {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
+        toast.success(`Hai completato lo step: ${step.title}!`, { duration: 5000, icon: '🎉' });
+
+        setCompletedStepsIds(prev => [...prev, step.id]);
+        setSelectedStep(prev => ({ ...prev, status: 'completed' }));
+      } else {
+        toast.error(res.error || 'Errore durante lo sblocco');
+      }
+    } catch (e) {
+      toast.error('Errore imprevisto');
+    } finally {
+      setUnlockingStep(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#161512] text-white pb-40 font-sans">
 
@@ -126,7 +176,11 @@ export default function SagaDetail() {
           const isLocked = step.status === 'locked';
 
           return (
-            <div key={step.id} className={`flex ${isEven ? 'flex-row' : 'flex-row-reverse'} items-center gap-6 relative`}>
+            <div
+              key={step.id}
+              className={`flex ${isEven ? 'flex-row' : 'flex-row-reverse'} items-center gap-6 relative ${isLocked ? 'opacity-70 grayscale-[0.5]' : 'cursor-pointer hover:scale-[1.02]'} transition-transform`}
+              onClick={() => handleStepClick(step)}
+            >
 
               {/* Circle Area (Left or Right) */}
               <div className="relative flex-shrink-0 z-10 w-28 h-28">
@@ -207,24 +261,66 @@ export default function SagaDetail() {
         </div>
 
         {/* Dark Box */}
-        <div className="bg-[#1C1C18] border border-[#3A3A36] rounded-3xl p-5 shadow-2xl relative z-10 pointer-events-auto max-w-md mx-auto">
-          <div className="flex items-center gap-4 mb-5">
-            <div className="w-12 h-12 rounded-[14px] bg-[#2A2820] border border-[#3A3A36] flex items-center justify-center shrink-0">
-              <Navigation className="w-5 h-5 text-[#E4AE2F] rotate-45" fill="currentColor" />
+        {activeStep && (
+          <div className="bg-[#1C1C18] border border-[#3A3A36] rounded-3xl p-5 shadow-2xl relative z-10 pointer-events-auto max-w-md mx-auto mb-6">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="w-12 h-12 rounded-[14px] bg-[#2A2820] border border-[#3A3A36] flex items-center justify-center shrink-0">
+                <Navigation className="w-5 h-5 text-[#E4AE2F] rotate-45" fill="currentColor" />
+              </div>
+              <div>
+                <h4 className="text-white font-bold text-sm">Prossima Tappa</h4>
+                <p className="text-[#8A8476] text-xs mt-0.5">{activeStep.title}</p>
+              </div>
             </div>
-            <div>
-              <h4 className="text-white font-bold text-sm">Current Destination</h4>
-              <p className="text-[#8A8476] text-xs mt-0.5">Reach the fortress to unlock history</p>
-            </div>
-          </div>
 
-          <button className="w-full bg-[#E4AE2F] hover:bg-[#F2C24E] text-black font-black uppercase tracking-widest py-3.5 rounded-[14px] text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_5px_15px_rgba(228,174,47,0.3)]">
-            <Navigation className="w-4 h-4 -rotate-45" fill="black" />
-            Get Directions
-          </button>
-        </div>
+            <button
+              onClick={() => handleStepClick(activeStep)}
+              className="w-full bg-[#E4AE2F] hover:bg-[#F2C24E] text-black font-black uppercase tracking-widest py-3.5 rounded-[14px] text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_5px_15px_rgba(228,174,47,0.3)]">
+              <Navigation className="w-4 h-4 -rotate-45" fill="black" />
+              Apri Dettagli
+            </button>
+          </div>
+        )}
 
       </div>
+
+      {/* MODALS */}
+      {selectedStep && (
+        (() => {
+          const cardObj = selectedStep.reference_table === 'cards'
+            ? selectedStep.cardData
+            : {
+              ...selectedStep.partnerData,
+              title: selectedStep.partnerData?.nome || selectedStep.title,
+              image_url: selectedStep.partnerData?.logo_url || selectedStep.image_url,
+              description: selectedStep.description_it,
+              gps_lat: selectedStep.partnerData?.lat || selectedStep._latitude,
+              gps_lng: selectedStep.partnerData?.lng || selectedStep._longitude,
+              gps_radius: 50 // Default for partners if missing
+            };
+
+          if (!cardObj) return null;
+
+          if (selectedStep.status === 'completed') {
+            return (
+              <UnlockedCardDetail
+                card={{ ...cardObj, isUnlocked: true }}
+                onClose={() => setSelectedStep(null)}
+              />
+            );
+          } else {
+            return (
+              <LockedCardDetail
+                card={cardObj}
+                userLocation={location}
+                onClose={() => setSelectedStep(null)}
+                onUnlock={() => handleUnlockStep(selectedStep)}
+                unlocking={unlockingStep}
+              />
+            );
+          }
+        })()
+      )}
 
     </div>
   );
