@@ -67,7 +67,7 @@ const Layout = () => {
       {typeof window !== 'undefined' && <Splash />}
 
       {/* ░ HEADER ░ */}
-      <header className="bg-white border-b border-sand sticky top-0 z-40">
+      <header className="hidden md:block bg-white border-b border-sand sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-3">
