@@ -13,18 +13,28 @@ export default function SagaDetail() {
   const { t, i18n } = useTranslation();
 
   const [saga, setSaga] = useState(null);
+  const [completedStepsIds, setCompletedStepsIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchSaga() {
-      // For now, fetch active sets and find by id
-      const sets = await QuestService.getActiveSets();
-      const current = sets.find(s => s.id === id);
-      setSaga(current || null);
-      setLoading(false);
+      if (!id) return;
+      try {
+        const detail = await QuestService.getSagaDetail(id);
+        setSaga(detail || null);
+
+        if (user?.id) {
+          const progress = await QuestService.getUserProgress(user.id);
+          setCompletedStepsIds(progress.completedSteps || []);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchSaga();
-  }, [id]);
+  }, [id, user]);
 
   if (loading) {
     return (
@@ -45,52 +55,36 @@ export default function SagaDetail() {
 
   const title = getLocalized(saga, 'title', i18n?.language);
 
-  // Mock Steps data to perfectly match the mockup
-  const steps = [
-    {
-      id: 'mock1',
-      step_order: 1,
-      title: 'Castel del Monte',
-      image_url: 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format',
-      status: 'completed',
-      date: 'May 12'
-    },
-    {
-      id: 'mock2',
-      step_order: 2,
-      title: 'Cattedrale di Trani',
-      image_url: 'https://images.unsplash.com/photo-1563503287600-84dc2fc2541d?q=80&w=600&auto=format',
-      status: 'completed',
-      date: 'May 15'
-    },
-    {
-      id: 'mock3',
-      step_order: 3,
-      title: 'Castello di Barletta',
-      image_url: 'https://plus.unsplash.com/premium_photo-1661962360677-2da2f14300bf?q=80&w=600&auto=format',
-      status: 'active',
-      distance: '3.2 km away from you'
-    },
-    {
-      id: 'mock4',
-      step_order: 4,
-      title: 'Castello Svevo di Bari',
-      status: 'locked'
-    },
-    {
-      id: 'mock5',
-      step_order: 5,
-      title: 'Castel Lagopesole',
-      status: 'locked'
+  const stepsData = saga.steps || [];
+  let firstUncompletedFound = false;
+
+  const steps = stepsData.map(step => {
+    const isCompleted = completedStepsIds.includes(step.id);
+
+    let status = 'locked';
+    if (isCompleted) {
+      status = 'completed';
+    } else if (!firstUncompletedFound) {
+      status = 'active';
+      firstUncompletedFound = true;
     }
-  ];
+
+    return {
+      ...step,
+      title: step.description_it || `Step ${step.step_order}`,
+      image_url: step._image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format',
+      status,
+      date: isCompleted ? 'Completato' : '',
+      distance: status === 'active' ? 'La tua prossima meta' : ''
+    }
+  });
 
   const completedCount = steps.filter(s => s.status === 'completed').length;
-  const progressPercent = Math.round((completedCount / steps.length) * 100);
+  const progressPercent = steps.length > 0 ? Math.round((completedCount / steps.length) * 100) : 0;
 
   return (
     <div className="min-h-screen bg-[#161512] text-white pb-40 font-sans">
-      
+
       {/* HEADER */}
       <header className="sticky top-0 z-40 bg-[#161512]/95 backdrop-blur-md pt-[env(safe-area-inset-top)] border-b border-[#E4AE2F]/10">
         <div className="flex items-center justify-between px-4 h-16">
@@ -107,7 +101,7 @@ export default function SagaDetail() {
             </div>
           </button>
         </div>
-        
+
         {/* Progress Bar Area */}
         <div className="px-6 pb-4 pt-2">
           <div className="flex justify-between items-end mb-2">
@@ -133,7 +127,7 @@ export default function SagaDetail() {
 
           return (
             <div key={step.id} className={`flex ${isEven ? 'flex-row' : 'flex-row-reverse'} items-center gap-6 relative`}>
-              
+
               {/* Circle Area (Left or Right) */}
               <div className="relative flex-shrink-0 z-10 w-28 h-28">
                 {/* Dotted Line Tail */}
@@ -176,15 +170,15 @@ export default function SagaDetail() {
                 <h3 className={`text-base font-bold mb-1 ${isLocked ? 'text-[#5A564C]' : 'text-white'}`}>
                   {step.title}
                 </h3>
-                
+
                 {isCompleted && (
                   <p className="text-[12px] text-[#8A8476]">Completed {step.date}</p>
                 )}
-                
+
                 {isActive && (
                   <p className="text-[12px] text-[#E4AE2F] italic">{step.distance}</p>
                 )}
-                
+
                 {isLocked && (
                   <p className="text-[12px] text-[#3A3A36]">Locked</p>
                 )}
@@ -197,16 +191,16 @@ export default function SagaDetail() {
 
       {/* FIXED BOTTOM ACTION CARD */}
       <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none px-4 pb-[env(safe-area-inset-bottom)] mb-4">
-        
+
         {/* Legendary Reward Tab sticking up */}
         <div className="flex justify-center -mb-4 relative z-0 pointer-events-auto">
           <div className="bg-[#E4AE2F] rounded-t-2xl px-6 pt-3 pb-6 flex flex-col items-center shadow-[0_-10px_20px_rgba(228,174,47,0.15)]">
-            <span className="text-[9px] text-black font-black uppercase tracking-widest mb-1.5">Legendary<br/>Reward</span>
+            <span className="text-[9px] text-black font-black uppercase tracking-widest mb-1.5">Legendary<br />Reward</span>
             <div className="w-10 h-10 border-2 border-black/10 rounded-lg flex items-center justify-center">
               {/* Fake reward card icon */}
               <div className="w-8 h-8 bg-black/80 rounded flex flex-col items-center justify-center gap-0.5">
-                  <div className="w-5 h-3 bg-[#E4AE2F] rounded-sm"></div>
-                  <div className="w-5 h-1 bg-[#E4AE2F] opacity-50 rounded-sm"></div>
+                <div className="w-5 h-3 bg-[#E4AE2F] rounded-sm"></div>
+                <div className="w-5 h-1 bg-[#E4AE2F] opacity-50 rounded-sm"></div>
               </div>
             </div>
           </div>
@@ -223,7 +217,7 @@ export default function SagaDetail() {
               <p className="text-[#8A8476] text-xs mt-0.5">Reach the fortress to unlock history</p>
             </div>
           </div>
-          
+
           <button className="w-full bg-[#E4AE2F] hover:bg-[#F2C24E] text-black font-black uppercase tracking-widest py-3.5 rounded-[14px] text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_5px_15px_rgba(228,174,47,0.3)]">
             <Navigation className="w-4 h-4 -rotate-45" fill="black" />
             Get Directions

@@ -55,6 +55,70 @@ export const QuestService = {
             console.error('Error fetching user quest progress:', err)
             return { sets: [], completedSteps: [] }
         }
+    },
+
+    // Fetch detailed info for a single Quest Set including hydrated steps (with card/partner images)
+    async getSagaDetail(setId) {
+        try {
+            // 1. Fetch the saga and its steps
+            const { data: saga, error } = await supabase
+                .from('quest_sets')
+                .select(`
+                    *,
+                    steps:quest_set_steps(*)
+                `)
+                .eq('id', setId)
+                .single()
+
+            if (error) throw error
+            if (!saga) return null
+
+            // 2. Sort steps by order
+            if (saga.steps) {
+                saga.steps.sort((a, b) => a.step_order - b.step_order)
+            }
+
+            // 3. Extract IDs to fetch references
+            const cardIds = saga.steps.filter(s => s.reference_table === 'cards' && s.reference_id).map(s => s.reference_id)
+            const partnerIds = saga.steps.filter(s => s.reference_table === 'partners' && s.reference_id).map(s => s.reference_id)
+
+            // 4. Fetch the actual card and partner data in parallel
+            const fetchPromises = []
+            if (cardIds.length > 0) {
+                fetchPromises.push(supabase.from('cards').select('id, image_url, title_it, title_en, latitude, longitude').in('id', cardIds))
+            }
+            if (partnerIds.length > 0) {
+                fetchPromises.push(supabase.from('partners').select('id, logo_url, nome, lat, lng').in('id', partnerIds))
+            }
+
+            const results = await Promise.all(fetchPromises)
+
+            // Map the results back into a lookup dictionary
+            const referencesMap = {}
+            for (const result of results) {
+                if (result.data) {
+                    for (const row of result.data) {
+                        referencesMap[row.id] = row
+                    }
+                }
+            }
+
+            // 5. Hydrate the steps with images and coordinates
+            saga.steps = saga.steps.map(step => {
+                const ref = referencesMap[step.reference_id] || {}
+                return {
+                    ...step,
+                    _image_url: step.reference_table === 'partners' ? ref.logo_url : ref.image_url,
+                    _latitude: step.reference_table === 'partners' ? ref.lat : ref.latitude,
+                    _longitude: step.reference_table === 'partners' ? ref.lng : ref.longitude,
+                }
+            })
+
+            return saga
+        } catch (err) {
+            console.error('Error fetching saga detail:', err)
+            return null
+        }
     }
 
 }
