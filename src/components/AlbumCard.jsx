@@ -23,12 +23,20 @@ export function AlbumCard({ card, onClick, userLocation }) {
         >
             {/* Image Layer - Full bleed for unlocked */}
             <div className={`w-full h-full transition-transform duration-700 ${card.isUnlocked ? 'group-hover:scale-105' : 'grayscale brightness-50 contrast-125'}`}>
-                <img
-                    src={card.image_url}
-                    alt={displayTitle}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                />
+                {card.image_url ? (
+                    <img
+                        src={card.image_url}
+                        alt={displayTitle}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                    />
+                ) : (
+                    <div className="w-full h-full bg-stone-800 flex items-center justify-center p-4 border-2 border-dashed border-stone-700 rounded-2xl">
+                        <span className="text-stone-500 font-bold uppercase tracking-widest text-center text-xs opacity-70">
+                            Coming Soon
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Locked Overlay ONLY */}
