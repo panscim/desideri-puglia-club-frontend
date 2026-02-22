@@ -117,8 +117,8 @@ const Missioni = () => {
           <button
             onClick={() => setMainTab('saghe_storiche')}
             className={`flex-1 py-3 text-[13px] font-bold rounded-[10px] transition-all ${mainTab === 'saghe_storiche'
-                ? 'bg-[#E4AE2F] text-olive-dark shadow-sm'
-                : 'text-[#A0937D]'
+              ? 'bg-[#E4AE2F] text-olive-dark shadow-sm'
+              : 'text-[#A0937D]'
               }`}
           >
             Saghe Storiche
@@ -126,8 +126,8 @@ const Missioni = () => {
           <button
             onClick={() => setMainTab('sfide_grado')}
             className={`flex-1 py-3 text-[13px] font-bold rounded-[10px] transition-all ${mainTab === 'sfide_grado'
-                ? 'bg-[#E4AE2F] text-olive-dark shadow-sm'
-                : 'text-[#A0937D]'
+              ? 'bg-[#E4AE2F] text-olive-dark shadow-sm'
+              : 'text-[#A0937D]'
               }`}
           >
             Sfide Grado
@@ -172,62 +172,79 @@ const Missioni = () => {
                 {/* ATTIVE */}
                 {activeTab === 'attive' && (
                   <>
-                    {mainSet ? (
-                      <section>
-                        <h2 className="text-[11px] font-bold text-[#E4AE2F] uppercase tracking-wider mb-3">Missione Principale</h2>
+                    <h2 className="text-[11px] font-bold text-[#E4AE2F] uppercase tracking-wider mb-3">
+                      {questSets.length > 1 ? 'Saghe Attive' : 'Saga Principale'}
+                    </h2>
 
-                        <div className="relative rounded-[2rem] overflow-hidden shadow-xl shadow-stone-900/10 min-h-[340px] flex flex-col justify-between p-6 bg-stone-900 group">
-                          {/* Background Image */}
-                          <div
-                            className="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-overlay transition-transform duration-1000 group-hover:scale-105"
-                            style={{ backgroundImage: `url('${mainSet.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format'}')` }}
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#1A2E44] via-[#1A2E44]/60 to-[#1A2E44]/10" />
+                    {questSets.length > 0 ? (
+                      <div className="space-y-6">
+                        {questSets.map((set, index) => {
+                          let completedStepsCount = 0
+                          let totalStepsCount = 1
+                          if (set && questProgress) {
+                            totalStepsCount = set.steps?.length || 1
+                            const setStepIds = set.steps?.map(s => s.id) || []
+                            completedStepsCount = questProgress.completedSteps.filter(id => setStepIds.includes(id)).length
+                          }
+                          const progressPercent = Math.min(100, Math.round((completedStepsCount / totalStepsCount) * 100))
 
-                          {/* Top Badges */}
-                          <div className="relative flex justify-between items-start">
-                            <div className="bg-[#E4AE2F] text-olive-dark text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-md shadow-md">
-                              Leggendaria
-                            </div>
-                            <div className="bg-[#1A2E44] border border-[#2D3F55] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
-                              <span className="text-[#E4AE2F] material-symbols-outlined text-[14px]">star</span> Premio Raro
-                            </div>
-                          </div>
-
-                          {/* Content */}
-                          <div className="relative mt-12 text-white">
-                            <h3 className="text-3xl font-bold font-serif leading-tight mb-2 text-white drop-shadow-md">
-                              {getLocalized(mainSet, 'title', i18n?.language)}
-                            </h3>
-                            <p className="text-sm text-white/90 leading-relaxed mb-6 drop-shadow-sm">
-                              {getLocalized(mainSet, 'description', i18n?.language) || "Esplora i segreti celati nell'architettura federiciana e sblocca la carta esclusiva di Castel del Monte."}
-                            </p>
-
-                            {/* Progress */}
-                            <div className="mb-6">
-                              <div className="flex justify-between items-end mb-2">
-                                <span className="text-xs text-white/80 font-medium">Progresso</span>
-                                <span className="text-xs font-bold font-serif">{completedStepsCount} / {totalStepsCount} monumenti</span>
-                              </div>
-                              <div className="h-2.5 w-full bg-white/20 rounded-full overflow-hidden shadow-inner backdrop-blur-sm">
+                          return (
+                            <section key={set.id}>
+                              <div className="relative rounded-[2rem] overflow-hidden shadow-xl shadow-stone-900/10 min-h-[340px] flex flex-col justify-between p-6 bg-stone-900 group">
+                                {/* Background Image */}
                                 <div
-                                  className="h-full bg-[#E4AE2F] rounded-full transition-all duration-1000"
-                                  style={{ width: `${progressPercent}%` }}
+                                  className="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-overlay transition-transform duration-1000 group-hover:scale-105"
+                                  style={{ backgroundImage: `url('${set.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format'}')` }}
                                 />
-                              </div>
-                            </div>
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#1A2E44] via-[#1A2E44]/60 to-[#1A2E44]/10" />
 
-                            {/* Action Button */}
-                            <button className="w-full bg-[#E4AE2F] hover:bg-[#D4A02A] text-olive-dark font-bold text-base py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
-                              Continua il Viaggio <ArrowRight className="w-5 h-5" />
-                            </button>
-                          </div>
-                        </div>
-                      </section>
+                                {/* Top Badges */}
+                                <div className="relative flex justify-between items-start">
+                                  <div className="bg-[#E4AE2F] text-olive-dark text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-md shadow-md">
+                                    Saga Leggendaria
+                                  </div>
+                                  <div className="bg-[#1A2E44] border border-[#2D3F55] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
+                                    <span className="text-[#E4AE2F] material-symbols-outlined text-[14px]">star</span> Premio Raro
+                                  </div>
+                                </div>
+
+                                {/* Content */}
+                                <div className="relative mt-12 text-white">
+                                  <h3 className="text-3xl font-bold font-serif leading-tight mb-2 text-white drop-shadow-md">
+                                    {getLocalized(set, 'title', i18n?.language)}
+                                  </h3>
+                                  <p className="text-sm text-white/90 leading-relaxed mb-6 drop-shadow-sm">
+                                    {getLocalized(set, 'description', i18n?.language) || "Esplora i segreti celati in questa saga leggendaria."}
+                                  </p>
+
+                                  {/* Progress */}
+                                  <div className="mb-6">
+                                    <div className="flex justify-between items-end mb-2">
+                                      <span className="text-xs text-white/80 font-medium">Progresso</span>
+                                      <span className="text-xs font-bold font-serif">{completedStepsCount} / {totalStepsCount} step</span>
+                                    </div>
+                                    <div className="h-2.5 w-full bg-white/20 rounded-full overflow-hidden shadow-inner backdrop-blur-sm">
+                                      <div
+                                        className="h-full bg-[#E4AE2F] rounded-full transition-all duration-1000"
+                                        style={{ width: `${progressPercent}%` }}
+                                      />
+                                    </div>
+                                  </div>
+
+                                  {/* Action Button */}
+                                  <button className="w-full bg-[#E4AE2F] hover:bg-[#D4A02A] text-olive-dark font-bold text-base py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+                                    Continua il Viaggio <ArrowRight className="w-5 h-5" />
+                                  </button>
+                                </div>
+                              </div>
+                            </section>
+                          )
+                        })}
+                      </div>
                     ) : (
                       <div className="text-center py-10 bg-white rounded-[2rem] border border-dashed border-sand">
                         <span className="material-symbols-outlined text-4xl text-sand block mb-2">event_busy</span>
-                        <p className="text-olive-light text-sm">Nessun Set Leggendario al momento.</p>
+                        <p className="text-olive-light text-sm">Nessuna Saga Leggendaria al momento.</p>
                       </div>
                     )}
                   </>
