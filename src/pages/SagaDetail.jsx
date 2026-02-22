@@ -137,9 +137,9 @@ export default function SagaDetail() {
 
       {/* HEADER */}
       <header className="sticky top-0 z-40 bg-[#161512]/95 backdrop-blur-md pt-[env(safe-area-inset-top)] border-b border-[#E4AE2F]/10">
-        <div className="flex items-center justify-between px-4 h-16">
-          <button onClick={() => navigate('/missioni')} className="p-2 text-[#E4AE2F] rounded-full hover:bg-white/5 transition-colors">
-            <ChevronLeft size={28} />
+        <div className="flex items-center justify-between px-4 h-14">
+          <button onClick={() => navigate('/missioni')} className="p-2 -ml-2 text-[#E4AE2F] rounded-full hover:bg-white/5 transition-colors">
+            <ChevronLeft size={24} />
           </button>
           <div className="text-center flex-1">
             <h1 className="text-[17px] font-bold text-white font-serif tracking-wide">{title}</h1>
@@ -245,20 +245,6 @@ export default function SagaDetail() {
 
       {/* FIXED BOTTOM ACTION CARD */}
       <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none px-4 pb-[env(safe-area-inset-bottom)] mb-6">
-
-        {/* Legendary Reward Tab sticking up */}
-        <div className="flex justify-center -mb-4 relative z-0 pointer-events-auto">
-          <div className="bg-[#E4AE2F] rounded-t-2xl px-6 pt-3 pb-6 flex flex-col items-center shadow-[0_-10px_20px_rgba(228,174,47,0.15)]">
-            <span className="text-[9px] text-black font-black uppercase tracking-widest mb-1.5">Legendary<br />Reward</span>
-            <div className="w-10 h-10 border-2 border-black/10 rounded-lg flex items-center justify-center">
-              {/* Fake reward card icon */}
-              <div className="w-8 h-8 bg-black/80 rounded flex flex-col items-center justify-center gap-0.5">
-                <div className="w-5 h-3 bg-[#E4AE2F] rounded-sm"></div>
-                <div className="w-5 h-1 bg-[#E4AE2F] opacity-50 rounded-sm"></div>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Dark Box */}
         {activeStep && (
