@@ -12,6 +12,6 @@ export function getLocalized(item, field, lang) {
         }
     }
 
-    // Fallback to original field (Italian)
-    return item[field] || ''
+    // Fallback to original field (if it exists) or Italian version
+    return item[field] || item[`${field}_it`] || ''
 }

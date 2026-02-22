@@ -95,20 +95,12 @@ const Missioni = () => {
       <div className={`px-6 pt-12 pb-6 sticky top-0 z-20 ${mainTab === 'sfide_grado' ? 'bg-[#1C1A14]' : 'bg-[#F9F9F7]'}`}>
 
         {/* Top Navbar */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center mb-6">
           <button
             onClick={() => navigate(-1)}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${mainTab === 'sfide_grado' ? 'bg-[#312B1B] text-[#E4AE2F]' : 'text-olive-dark'}`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${mainTab === 'sfide_grado' ? 'bg-[#312B1B] text-[#E4AE2F]' : 'bg-transparent text-slate-400'}`}
           >
             <ChevronLeft className="w-6 h-6" />
-          </button>
-
-          <h1 className={`text-2xl font-bold font-serif ${mainTab === 'sfide_grado' ? 'text-white' : 'text-olive-dark'}`}>
-            Mission Hub
-          </h1>
-
-          <button className="w-10 h-10 flex items-center justify-center">
-            <Award className={`w-6 h-6 ${mainTab === 'sfide_grado' ? 'text-[#E4AE2F]' : 'text-olive-dark'}`} strokeWidth={2.5} />
           </button>
         </div>
 
@@ -142,169 +134,85 @@ const Missioni = () => {
       {mainTab === 'saghe_storiche' && (
         <div className="animate-in fade-in duration-300">
 
-          {/* Sub-Tabs (Attive, Giornaliere, Completate) */}
-          <div className="flex px-6 bg-transparent border-b border-sand text-sm font-bold relative z-0">
-            <button
-              onClick={() => setActiveTab('attive')}
-              className={`flex-1 py-4 text-center border-b-[3px] transition-colors ${activeTab === 'attive' ? 'border-[#E4AE2F] text-olive-dark' : 'border-transparent text-slate-400'}`}
-            >
-              Attive
-            </button>
-            <button
-              onClick={() => setActiveTab('giornaliere')}
-              className={`flex-1 py-4 text-center border-b-[3px] transition-colors ${activeTab === 'giornaliere' ? 'border-[#E4AE2F] text-olive-dark' : 'border-transparent text-slate-400'}`}
-            >
-              Giornaliere
-            </button>
-            <button
-              onClick={() => setActiveTab('completate')}
-              className={`flex-1 py-4 text-center border-b-[3px] transition-colors ${activeTab === 'completate' ? 'border-[#E4AE2F] text-olive-dark' : 'border-transparent text-slate-400'}`}
-            >
-              Completate
-            </button>
-          </div>
-
           <div className="px-6 pt-6 space-y-10">
             {loading ? (
               <MissionSkeleton />
             ) : (
               <>
                 {/* ATTIVE */}
-                {activeTab === 'attive' && (
-                  <>
-                    <h2 className="text-[11px] font-bold text-[#E4AE2F] uppercase tracking-wider mb-3">
-                      {questSets.length > 1 ? 'Saghe Attive' : 'Saga Principale'}
-                    </h2>
+                <h2 className="text-[11px] font-bold text-[#E4AE2F] uppercase tracking-wider mb-3">
+                  {questSets.length > 1 ? 'Saghe Attive' : 'Saga Principale'}
+                </h2>
 
-                    {questSets.length > 0 ? (
-                      <div className="space-y-6">
-                        {questSets.map((set, index) => {
-                          let completedStepsCount = 0
-                          let totalStepsCount = 1
-                          if (set && questProgress) {
-                            totalStepsCount = set.steps?.length || 1
-                            const setStepIds = set.steps?.map(s => s.id) || []
-                            completedStepsCount = questProgress.completedSteps.filter(id => setStepIds.includes(id)).length
-                          }
-                          const progressPercent = Math.min(100, Math.round((completedStepsCount / totalStepsCount) * 100))
+                {questSets.length > 0 ? (
+                  <div className="space-y-6">
+                    {questSets.map((set, index) => {
+                      let completedStepsCount = 0
+                      let totalStepsCount = 1
+                      if (set && questProgress) {
+                        totalStepsCount = set.steps?.length || 1
+                        const setStepIds = set.steps?.map(s => s.id) || []
+                        completedStepsCount = questProgress.completedSteps.filter(id => setStepIds.includes(id)).length
+                      }
+                      const progressPercent = Math.min(100, Math.round((completedStepsCount / totalStepsCount) * 100))
 
-                          return (
-                            <section key={set.id}>
-                              <div className="relative rounded-[2rem] overflow-hidden shadow-xl shadow-stone-900/10 min-h-[340px] flex flex-col justify-between p-6 bg-stone-900 group">
-                                {/* Background Image */}
-                                <div
-                                  className="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-overlay transition-transform duration-1000 group-hover:scale-105"
-                                  style={{ backgroundImage: `url('${set.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format'}')` }}
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#1A2E44] via-[#1A2E44]/60 to-[#1A2E44]/10" />
+                      return (
+                        <section key={set.id}>
+                          <div className="relative rounded-[2rem] overflow-hidden shadow-xl shadow-stone-900/10 min-h-[340px] flex flex-col justify-between p-6 bg-stone-900 group">
+                            {/* Background Image */}
+                            <div
+                              className="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-overlay transition-transform duration-1000 group-hover:scale-105"
+                              style={{ backgroundImage: `url('${set.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format'}')` }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#1A2E44] via-[#1A2E44]/60 to-[#1A2E44]/10" />
 
-                                {/* Top Badges */}
-                                <div className="relative flex justify-between items-start">
-                                  <div className="bg-[#E4AE2F] text-olive-dark text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-md shadow-md">
-                                    Saga Leggendaria
-                                  </div>
-                                  <div className="bg-[#1A2E44] border border-[#2D3F55] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
-                                    <span className="text-[#E4AE2F] material-symbols-outlined text-[14px]">star</span> Premio Raro
-                                  </div>
+                            {/* Top Badges */}
+                            <div className="relative flex justify-between items-start">
+                              <div className="bg-[#E4AE2F] text-olive-dark text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-md shadow-md">
+                                Saga Leggendaria
+                              </div>
+                              <div className="bg-[#1A2E44] border border-[#2D3F55] text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md">
+                                <span className="text-[#E4AE2F] material-symbols-outlined text-[14px]">star</span> Premio Raro
+                              </div>
+                            </div>
+
+                            {/* Content */}
+                            <div className="relative mt-12 text-white">
+                              <h3 className="text-3xl font-bold font-serif leading-tight mb-2 text-white drop-shadow-md">
+                                {getLocalized(set, 'title', i18n?.language)}
+                              </h3>
+                              <p className="text-sm text-white/90 leading-relaxed mb-6 drop-shadow-sm">
+                                {getLocalized(set, 'description', i18n?.language) || "Esplora i segreti celati in questa saga leggendaria."}
+                              </p>
+
+                              {/* Progress */}
+                              <div className="mb-6">
+                                <div className="flex justify-between items-end mb-2">
+                                  <span className="text-xs text-white/80 font-medium">Progresso</span>
+                                  <span className="text-xs font-bold font-serif">{completedStepsCount} / {totalStepsCount} step</span>
                                 </div>
-
-                                {/* Content */}
-                                <div className="relative mt-12 text-white">
-                                  <h3 className="text-3xl font-bold font-serif leading-tight mb-2 text-white drop-shadow-md">
-                                    {getLocalized(set, 'title', i18n?.language)}
-                                  </h3>
-                                  <p className="text-sm text-white/90 leading-relaxed mb-6 drop-shadow-sm">
-                                    {getLocalized(set, 'description', i18n?.language) || "Esplora i segreti celati in questa saga leggendaria."}
-                                  </p>
-
-                                  {/* Progress */}
-                                  <div className="mb-6">
-                                    <div className="flex justify-between items-end mb-2">
-                                      <span className="text-xs text-white/80 font-medium">Progresso</span>
-                                      <span className="text-xs font-bold font-serif">{completedStepsCount} / {totalStepsCount} step</span>
-                                    </div>
-                                    <div className="h-2.5 w-full bg-white/20 rounded-full overflow-hidden shadow-inner backdrop-blur-sm">
-                                      <div
-                                        className="h-full bg-[#E4AE2F] rounded-full transition-all duration-1000"
-                                        style={{ width: `${progressPercent}%` }}
-                                      />
-                                    </div>
-                                  </div>
-
-                                  {/* Action Button */}
-                                  <Link to={`/saga/${set.id}`} className="w-full bg-[#E4AE2F] hover:bg-[#D4A02A] text-olive-dark font-bold text-base py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
-                                    Continua il Viaggio <ArrowRight className="w-5 h-5" />
-                                  </Link>
+                                <div className="h-2.5 w-full bg-white/20 rounded-full overflow-hidden shadow-inner backdrop-blur-sm">
+                                  <div
+                                    className="h-full bg-[#E4AE2F] rounded-full transition-all duration-1000"
+                                    style={{ width: `${progressPercent}%` }}
+                                  />
                                 </div>
                               </div>
-                            </section>
-                          )
-                        })}
-                      </div>
-                    ) : (
-                      <div className="text-center py-10 bg-white rounded-[2rem] border border-dashed border-sand">
-                        <span className="material-symbols-outlined text-4xl text-sand block mb-2">event_busy</span>
-                        <p className="text-olive-light text-sm">Nessuna Saga Leggendaria al momento.</p>
-                      </div>
-                    )}
-                  </>
-                )}
 
-                {/* GIORNALIERE */}
-                {activeTab === 'giornaliere' && (
-                  <section className="pb-10">
-                    <div className="flex justify-between items-end mb-3">
-                      <h2 className="text-[11px] font-bold text-[#E4AE2F] uppercase tracking-wider">Attività Giornaliere</h2>
-                      <span className="text-[11px] text-slate-400 font-medium">Reset tra 14h 22m</span>
-                    </div>
-
-                    <div className="space-y-4">
-                      {dailyActivities.map((activity) => (
-                        <div key={activity.id} className="bg-white rounded-[2rem] p-5 shadow-sm border border-sand/50 flex flex-col md:flex-row md:items-center gap-4">
-
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className="w-14 h-14 rounded-full border-2 border-[#E4AE2F] flex items-center justify-center bg-white shrink-0 relative">
-                              <activity.icon className={`w-6 h-6 text-[#E4AE2F]`} />
-                              {activity.current >= activity.max && (
-                                <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full text-white border-2 border-white">
-                                  <CheckCircle className="w-4 h-4" />
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-base font-bold text-olive-dark">{activity.title}</h3>
-                              <p className="text-xs text-slate-500 mt-0.5">{activity.desc}</p>
+                              {/* Action Button */}
+                              <Link to={`/saga/${set.id}`} className="w-full bg-[#E4AE2F] hover:bg-[#D4A02A] text-olive-dark font-bold text-base py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+                                Continua il Viaggio <ArrowRight className="w-5 h-5" />
+                              </Link>
                             </div>
                           </div>
-
-                          <div className="flex flex-col md:items-end justify-center w-full md:w-auto mt-2 md:mt-0">
-                            <div className="flex items-center gap-3 w-full md:w-48 mt-2 md:mt-0">
-                              <div className="h-1.5 flex-1 bg-sand/40 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-[#E4AE2F] rounded-full"
-                                  style={{ width: `${Math.min(100, (activity.current / activity.max) * 100)}%` }}
-                                />
-                              </div>
-                              <span className="text-[11px] font-bold text-slate-500 whitespace-nowrap">
-                                {activity.current} / {activity.max} {activity.unit}
-                              </span>
-                            </div>
-                          </div>
-
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                {/* COMPLETATE */}
-                {activeTab === 'completate' && (
-                  <div className="px-6 pt-10 text-center">
-                    <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-100">
-                      <CheckCircle className="w-10 h-10 text-green-500" />
-                    </div>
-                    <h2 className="text-xl font-bold font-serif text-olive-dark mb-2">Traguardi Raggiunti</h2>
-                    <p className="text-olive-light text-sm">Qui troverai lo storico di tutte le tue missioni completate.</p>
+                        </section>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="text-center py-10 bg-white rounded-[2rem] border border-dashed border-sand">
+                    <span className="material-symbols-outlined text-4xl text-sand block mb-2">event_busy</span>
+                    <p className="text-olive-light text-sm">Nessuna Saga Leggendaria al momento.</p>
                   </div>
                 )}
               </>
@@ -312,7 +220,6 @@ const Missioni = () => {
           </div>
         </div>
       )}
-
 
       {/* =======================================================
           TAB: SFIDE GRADO (Design Scuro - Come Screenshot)
@@ -421,9 +328,10 @@ const Missioni = () => {
           </div>
 
         </div>
-      )}
+      )
+      }
 
-    </div>
+    </div >
   )
 }
 
