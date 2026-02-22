@@ -131,43 +131,44 @@ const Layout = () => {
 
 
 
-        {/* Bottom Tab Bar */}
-        <nav className="bg-white border-t border-sand pb-[env(safe-area-inset-bottom)] pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.05)] relative">
-          <div className="flex justify-between items-center h-[70px] px-2 relative">
+        {/* Bottom Tab Bar (Premium Linear Design) */}
+        <div className="bg-white/95 backdrop-blur-xl border-t border-sand pb-[env(safe-area-inset-bottom)] pointer-events-auto shadow-[0_-20px_40px_rgba(0,0,0,0.03)] relative">
+          <nav className="flex justify-around items-center h-[76px] px-4 max-w-md mx-auto">
+            {[
+              { path: '/dashboard', icon: Home, label: 'Home' },
+              { path: '/mappa', icon: MapPin, label: 'Mappa' },
+              { path: '/missioni', icon: Target, label: 'Missioni' },
+              { path: '/album', icon: Grid, label: 'Album' },
+              { path: '/profilo', icon: Settings, label: 'Profilo' }
+            ].map((item) => {
+              const active = isActive(item.path);
+              const Icon = item.icon;
 
-            {/* Item 1: Dashboard */}
-            <Link to="/dashboard" className={`flex flex-col items-center justify-center w-1/5 h-full space-y-1 ${isActive('/dashboard') ? 'text-gold' : 'text-slate-400'}`}>
-              <Home size={24} strokeWidth={isActive('/dashboard') ? 2.5 : 2} className={isActive('/dashboard') ? 'fill-gold/20' : ''} />
-              <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/dashboard') ? 'text-gold' : 'text-slate-400'}`}>Dashboard</span>
-            </Link>
-
-            {/* Item 2: Mappa */}
-            <Link to="/mappa" className={`flex flex-col items-center justify-center w-1/5 h-full space-y-1 ${isActive('/mappa') ? 'text-gold' : 'text-slate-400'}`}>
-              <MapPin size={24} strokeWidth={isActive('/mappa') ? 2.5 : 2} className={isActive('/mappa') ? 'fill-gold/20' : ''} />
-              <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/mappa') ? 'text-gold' : 'text-slate-400'}`}>Mappa</span>
-            </Link>
-
-            {/* Item 3: Center Action Button (Missioni) */}
-            <div className="w-1/5 flex justify-center relative -top-6">
-              <Link to="/missioni" className="w-14 h-14 rounded-full bg-olive-dark text-white flex items-center justify-center shadow-lg shadow-olive-dark/40 active:scale-90 transition-transform border-4 border-[#F9F9F7]">
-                <Target size={28} strokeWidth={2.5} />
-              </Link>
-            </div>
-
-            {/* Item 4: Album */}
-            <Link to="/album" className={`flex flex-col items-center justify-center w-1/5 h-full space-y-1 ${isActive('/album') ? 'text-gold' : 'text-slate-400'}`}>
-              <Grid size={24} strokeWidth={isActive('/album') ? 2.5 : 2} className={isActive('/album') ? 'fill-gold/20' : ''} />
-              <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/album') ? 'text-gold' : 'text-slate-400'}`}>Album</span>
-            </Link>
-
-            {/* Item 5: Opzioni (Profilo/Menu) */}
-            <Link to="/profilo" className={`flex flex-col items-center justify-center w-1/5 h-full space-y-1 ${isActive('/profilo') ? 'text-gold' : 'text-slate-400'}`}>
-              <Settings size={24} strokeWidth={isActive('/profilo') ? 2.5 : 2} className={isActive('/profilo') ? 'fill-gold/20' : ''} />
-              <span className={`text-[9px] font-bold tracking-widest uppercase ${isActive('/profilo') ? 'text-gold' : 'text-slate-400'}`}>Opzioni</span>
-            </Link>
-
-          </div>
-        </nav>
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex flex-row items-center justify-center rounded-2xl transition-all duration-500 ease-out h-[46px] ${active
+                      ? 'bg-olive-dark text-[#E4AE2F] px-4 shadow-md'
+                      : 'text-slate-400 px-3 bg-transparent hover:text-slate-600'
+                    }`}
+                >
+                  <Icon
+                    size={22}
+                    strokeWidth={active ? 2.5 : 2}
+                    className="shrink-0"
+                  />
+                  {/* Testo appare solo se attivo */}
+                  <div className={`overflow-hidden transition-all duration-500 ease-out flex items-center ${active ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
+                    <span className="text-[11px] font-bold tracking-wider uppercase whitespace-nowrap">
+                      {item.label}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
       </div>
 
       {/* ░ SIDEBAR DESKTOP ░ */}
