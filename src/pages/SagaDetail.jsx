@@ -133,7 +133,7 @@ export default function SagaDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-[#161512] text-white pb-40 font-sans">
+    <div className="min-h-screen bg-[#161512] text-white pb-72 font-sans">
 
       {/* HEADER */}
       <header className="sticky top-0 z-40 bg-[#161512]/95 backdrop-blur-md pt-[env(safe-area-inset-top)] border-b border-[#E4AE2F]/10">
@@ -168,7 +168,7 @@ export default function SagaDetail() {
       </header>
 
       {/* TIMELINE */}
-      <div className="px-6 py-10 space-y-12 max-w-lg mx-auto overflow-hidden">
+      <div className="px-6 py-12 space-y-20 max-w-2xl mx-auto overflow-hidden">
         {steps.map((step, index) => {
           const isEven = index % 2 === 0; // 0 = Left, 1 = Right
           const isCompleted = step.status === 'completed';
@@ -178,7 +178,7 @@ export default function SagaDetail() {
           return (
             <div
               key={step.id}
-              className={`flex ${isEven ? 'flex-row' : 'flex-row-reverse'} items-center gap-6 relative ${isLocked ? 'opacity-70 grayscale-[0.5]' : 'cursor-pointer hover:scale-[1.02]'} transition-transform`}
+              className={`flex ${isEven ? 'flex-row' : 'flex-row-reverse'} items-center gap-8 relative ${isLocked ? 'opacity-70 grayscale-[0.5]' : 'cursor-pointer hover:scale-[1.02]'} transition-transform`}
               onClick={() => handleStepClick(step)}
             >
 
@@ -186,7 +186,7 @@ export default function SagaDetail() {
               <div className="relative flex-shrink-0 z-10 w-28 h-28">
                 {/* Dotted Line Tail */}
                 {index < steps.length - 1 && (
-                  <div className="absolute left-1/2 -translateX-1/2 top-full w-0.5 h-16 border-l-2 border-dotted border-[#E4AE2F]/30 -ml-[1px]" />
+                  <div className="absolute left-1/2 -translateX-1/2 top-full w-0.5 h-24 border-l-2 border-dotted border-[#E4AE2F]/30 -ml-[1px]" />
                 )}
 
                 {isCompleted && (
@@ -218,23 +218,23 @@ export default function SagaDetail() {
 
               {/* Text Area */}
               <div className={`flex-1 ${isEven ? 'text-left' : 'text-right'}`}>
-                <h4 className={`text-[10px] font-bold tracking-widest mb-1 ${isActive ? 'text-[#E4AE2F]' : 'text-[#8A8476]'}`}>
-                  STEP {step.step_order}
+                <h4 className={`text-xs font-bold tracking-widest mb-1 ${isActive ? 'text-[#E4AE2F]' : 'text-[#8A8476]'}`}>
+                  <span className="opacity-70">STEP</span> {step.step_order}
                 </h4>
-                <h3 className={`text-base font-bold mb-1 ${isLocked ? 'text-[#5A564C]' : 'text-white'}`}>
+                <h3 className={`text-xl leading-snug font-bold mb-2 ${isLocked ? 'text-[#5A564C]' : 'text-white'}`}>
                   {step.title}
                 </h3>
 
                 {isCompleted && (
-                  <p className="text-[12px] text-[#8A8476]">Completed {step.date}</p>
+                  <p className="text-sm text-[#8A8476]">Completato</p>
                 )}
 
                 {isActive && (
-                  <p className="text-[12px] text-[#E4AE2F] italic">{step.distance}</p>
+                  <p className="text-sm text-[#E4AE2F] italic font-medium">{step.distance}</p>
                 )}
 
                 {isLocked && (
-                  <p className="text-[12px] text-[#3A3A36]">Locked</p>
+                  <p className="text-sm text-[#3A3A36]">Bloccato</p>
                 )}
               </div>
 
@@ -244,7 +244,7 @@ export default function SagaDetail() {
       </div>
 
       {/* FIXED BOTTOM ACTION CARD */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none px-4 pb-[env(safe-area-inset-bottom)] mb-4">
+      <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none px-4 pb-[env(safe-area-inset-bottom)] mb-6">
 
         {/* Legendary Reward Tab sticking up */}
         <div className="flex justify-center -mb-4 relative z-0 pointer-events-auto">
