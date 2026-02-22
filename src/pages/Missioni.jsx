@@ -232,9 +232,9 @@ const Missioni = () => {
                                   </div>
 
                                   {/* Action Button */}
-                                  <button className="w-full bg-[#E4AE2F] hover:bg-[#D4A02A] text-olive-dark font-bold text-base py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+                                  <Link to={`/saga/${set.id}`} className="w-full bg-[#E4AE2F] hover:bg-[#D4A02A] text-olive-dark font-bold text-base py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
                                     Continua il Viaggio <ArrowRight className="w-5 h-5" />
-                                  </button>
+                                  </Link>
                                 </div>
                               </div>
                             </section>
