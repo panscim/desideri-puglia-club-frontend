@@ -95,9 +95,16 @@ export default function Album() {
         if (filterRarity !== 'all' && c.rarity !== filterRarity) return false;
         return true;
     }).sort((a, b) => {
+        // Show Coming Soon (no image_url) FIRST
+        const aComingSoon = !a.image_url;
+        const bComingSoon = !b.image_url;
+        if (aComingSoon && !bComingSoon) return -1;
+        if (!aComingSoon && bComingSoon) return 1;
+
         // Show unlocked logic
         if (a.isUnlocked && !b.isUnlocked) return -1;
         if (!a.isUnlocked && b.isUnlocked) return 1;
+
         // Then by title
         return a.title?.localeCompare(b.title || '');
     });

@@ -1,4 +1,4 @@
-import { Lock } from 'lucide-react';
+import { Lock, Clock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { formatDistance } from '../utils/geolocation';
 
@@ -31,9 +31,13 @@ export function AlbumCard({ card, onClick, userLocation }) {
                         loading="lazy"
                     />
                 ) : (
-                    <div className="w-full h-full bg-stone-800 flex items-center justify-center p-4 border-2 border-dashed border-stone-700 rounded-2xl">
-                        <span className="text-stone-500 font-bold uppercase tracking-widest text-center text-xs opacity-70">
-                            Coming Soon
+                    <div className="w-full h-full bg-[#1C1A14] flex flex-col items-center justify-center p-4 border-2 border-[#E4AE2F]/10 rounded-2xl relative overflow-hidden">
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#E4AE2F]/10 to-transparent pointer-events-none" />
+                        <div className="w-12 h-12 rounded-full border border-[#E4AE2F]/30 bg-[#2A2A26] flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(228,174,47,0.1)]">
+                            <Clock className="w-5 h-5 text-[#E4AE2F] opacity-90" />
+                        </div>
+                        <span className="text-[#E4AE2F] font-serif font-bold tracking-widest text-center text-[11px] uppercase z-10">
+                            Prossimamente
                         </span>
                     </div>
                 )}
