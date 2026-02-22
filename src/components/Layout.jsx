@@ -133,7 +133,7 @@ const Layout = () => {
 
         {/* Bottom Tab Bar (Premium Linear Design) */}
         <div className="bg-white/95 backdrop-blur-xl border-t border-sand pb-[env(safe-area-inset-bottom)] pointer-events-auto shadow-[0_-20px_40px_rgba(0,0,0,0.03)] relative">
-          <nav className="flex justify-around items-center h-[76px] px-4 max-w-md mx-auto">
+          <nav className="flex justify-around items-center h-[60px] px-4 max-w-md mx-auto">
             {[
               { path: '/dashboard', icon: Home, label: 'Home' },
               { path: '/mappa', icon: MapPin, label: 'Mappa' },
@@ -148,19 +148,19 @@ const Layout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex flex-row items-center justify-center rounded-2xl transition-all duration-500 ease-out h-[46px] ${active
-                      ? 'bg-olive-dark text-[#E4AE2F] px-4 shadow-md'
-                      : 'text-slate-400 px-3 bg-transparent hover:text-slate-600'
+                  className={`flex flex-row items-center justify-center rounded-2xl transition-all duration-500 ease-out h-[40px] ${active
+                    ? 'bg-olive-dark text-[#E4AE2F] px-4 shadow-md'
+                    : 'text-slate-400 px-3 bg-transparent hover:text-slate-600'
                     }`}
                 >
                   <Icon
-                    size={22}
+                    size={20}
                     strokeWidth={active ? 2.5 : 2}
                     className="shrink-0"
                   />
                   {/* Testo appare solo se attivo */}
                   <div className={`overflow-hidden transition-all duration-500 ease-out flex items-center ${active ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
-                    <span className="text-[11px] font-bold tracking-wider uppercase whitespace-nowrap">
+                    <span className="text-[10px] font-bold tracking-wider uppercase whitespace-nowrap">
                       {item.label}
                     </span>
                   </div>

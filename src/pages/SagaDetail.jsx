@@ -244,24 +244,24 @@ export default function SagaDetail() {
       </div>
 
       {/* FIXED BOTTOM ACTION CARD */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none px-4 pb-[env(safe-area-inset-bottom)] mb-6">
+      <div className="fixed bottom-[72px] md:bottom-6 left-0 right-0 z-40 pointer-events-none px-4 pb-[env(safe-area-inset-bottom)]">
 
         {/* Dark Box */}
         {activeStep && (
-          <div className="bg-[#1C1C18] border border-[#3A3A36] rounded-3xl p-5 shadow-2xl relative z-10 pointer-events-auto max-w-md mx-auto mb-6">
-            <div className="flex items-center gap-4 mb-5">
-              <div className="w-12 h-12 rounded-[14px] bg-[#2A2820] border border-[#3A3A36] flex items-center justify-center shrink-0">
+          <div className="bg-[#1C1C18] border border-[#3A3A36] rounded-2xl p-4 shadow-2xl relative z-10 pointer-events-auto max-w-md mx-auto">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-[12px] bg-[#2A2820] border border-[#3A3A36] flex items-center justify-center shrink-0">
                 <Navigation className="w-5 h-5 text-[#E4AE2F] rotate-45" fill="currentColor" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h4 className="text-white font-bold text-sm">Prossima Tappa</h4>
-                <p className="text-[#8A8476] text-xs mt-0.5">{activeStep.title}</p>
+                <p className="text-[#8A8476] text-xs mt-0.5 line-clamp-1">{activeStep.title}</p>
               </div>
             </div>
 
             <button
               onClick={() => handleStepClick(activeStep)}
-              className="w-full bg-[#E4AE2F] hover:bg-[#F2C24E] text-black font-black uppercase tracking-widest py-3.5 rounded-[14px] text-xs flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_5px_15px_rgba(228,174,47,0.3)]">
+              className="w-full bg-[#E4AE2F] hover:bg-[#F2C24E] text-black font-black uppercase tracking-widest py-3 rounded-[12px] text-[11px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-[0_5px_15px_rgba(228,174,47,0.3)]">
               <Navigation className="w-4 h-4 -rotate-45" fill="black" />
               Apri Dettagli
             </button>
