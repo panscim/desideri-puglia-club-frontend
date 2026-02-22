@@ -85,7 +85,7 @@ export const QuestService = {
             // 4. Fetch the actual card and partner data in parallel
             const fetchPromises = []
             if (cardIds.length > 0) {
-                fetchPromises.push(supabase.from('cards').select('id, image_url, title_it, title_en, latitude, longitude').in('id', cardIds))
+                fetchPromises.push(supabase.from('cards').select('id, image_url, latitude, longitude').in('id', cardIds))
             }
             if (partnerIds.length > 0) {
                 fetchPromises.push(supabase.from('partners').select('id, logo_url, nome, lat, lng').in('id', partnerIds))
