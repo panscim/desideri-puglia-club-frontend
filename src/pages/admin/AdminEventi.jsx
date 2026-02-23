@@ -421,7 +421,7 @@ export default function AdminEventi() {
                                     >
                                         <option value="">Nessuna Card In Palio</option>
                                         {cards.map(c => (
-                                            <option key={c.id} value={c.id}>{c.title_it}</option>
+                                            <option key={c.id} value={c.id}>{c.title}</option>
                                         ))}
                                     </select>
                                 </div>
