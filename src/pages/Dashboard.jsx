@@ -19,6 +19,48 @@ const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-sand/40 rounded-lg ${className}`} />
 )
 
+// --- TIMER COMPONENT ---
+const EventTimer = ({ startDate, endDate }) => {
+  const [timeLeft, setTimeLeft] = useState('')
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const now = new Date().getTime()
+      const start = new Date(startDate).getTime()
+      const end = new Date(endDate).getTime()
+
+      if (now < start) {
+        const distance = start - now
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        setTimeLeft(`Inizia tra: ${days}g ${hours}h ${minutes}m`)
+      } else if (now >= start && now <= end) {
+        const distance = end - now
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        setTimeLeft(`Termina tra: ${days}g ${hours}h ${minutes}m`)
+      } else {
+        setTimeLeft('Concluso')
+      }
+    }
+
+    calculateTimeLeft()
+    const timer = setInterval(calculateTimeLeft, 60000)
+    return () => clearInterval(timer)
+  }, [startDate, endDate])
+
+  if (!timeLeft) return null
+
+  return (
+    <div className="flex items-center gap-1 text-[10px] font-bold text-olive-dark bg-gold/20 px-2 py-1 rounded-md border border-gold/30 whitespace-nowrap">
+      <span className="material-symbols-outlined text-[12px]">timer</span>
+      {timeLeft}
+    </div>
+  )
+}
+
 // --- MAIN COMPONENT ---
 const Dashboard = () => {
   const { t, i18n } = useTranslation()
@@ -322,8 +364,11 @@ const Dashboard = () => {
                       </p>
 
                       <div className="flex items-center justify-between mt-auto pt-4 border-t border-sand/50">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex items-center gap-1 text-[10px] text-slate-500 font-medium">
+                        <div className="flex items-center gap-2">
+                          <EventTimer startDate={ev.data_inizio} endDate={ev.data_fine} />
+                        </div>
+                        <div className="flex flex-col gap-1 text-right">
+                          <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 font-medium whitespace-nowrap">
                             <span className="material-symbols-outlined text-[14px]">schedule</span>
                             {startDate.toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit' })}
                           </div>
