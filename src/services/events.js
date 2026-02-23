@@ -6,16 +6,18 @@ export const EventsService = {
      */
     async getActiveEvents() {
         try {
-            const { data, error } = await supabase
+            const query = supabase
                 .from('eventi_club')
                 .select(`
-          *,
-          partners ( id, nome, citta, logo_url ),
-          cards:ricompensa_card_id ( id, image_url, rarity, title_it )
-        `)
+                  *,
+                  partners ( id, nome, citta, logo_url ),
+                  cards:ricompensa_card_id ( id, image_url, rarity, title_it )
+                `)
                 .eq('disponibile', true)
                 .gte('data_fine', new Date().toISOString())
                 .order('data_inizio', { ascending: true })
+
+            const { data, error } = await query
 
             if (error) throw error
             return data || []
@@ -30,14 +32,16 @@ export const EventsService = {
      */
     async getAllEvents() {
         try {
-            const { data, error } = await supabase
+            const query = supabase
                 .from('eventi_club')
                 .select(`
-          *,
-          partners ( nome ),
-          cards:ricompensa_card_id ( title_it )
-        `)
+                  *,
+                  partners ( nome ),
+                  cards:ricompensa_card_id ( title_it )
+                `)
                 .order('data_creazione', { ascending: false })
+
+            const { data, error } = await query
 
             if (error) throw error
             return data || []
