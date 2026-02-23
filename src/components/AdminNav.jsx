@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Target, Users, Trophy } from 'lucide-react'
+import { LayoutDashboard, Target, Users, Trophy, Calendar } from 'lucide-react'
 
 const AdminNav = () => {
   const location = useLocation()
@@ -8,7 +8,8 @@ const AdminNav = () => {
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
     { path: '/admin/missions', icon: Target, label: 'Missioni' },
     { path: '/admin/users', icon: Users, label: 'Utenti' },
-    { path: '/admin/prizes', icon: Trophy, label: 'Premi' }
+    { path: '/admin/prizes', icon: Trophy, label: 'Premi' },
+    { path: '/admin/eventi', icon: Calendar, label: 'Eventi' }
   ]
 
   const isActive = (path, exact = false) => {
@@ -24,16 +25,15 @@ const AdminNav = () => {
         {navItems.map((item) => {
           const Icon = item.icon
           const active = isActive(item.path, item.exact)
-          
+
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${
-                active
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all ${active
                   ? 'bg-gold bg-opacity-20 text-gold'
                   : 'text-olive-light hover:bg-sand hover:text-olive-dark'
-              }`}
+                }`}
             >
               <Icon className="w-4 h-4" />
               <span>{item.label}</span>

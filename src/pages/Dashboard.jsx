@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
 import { AlbumService } from '../services/album'
+import { EventsService } from '../services/events'
 import {
   MapPin,
   Lock,
@@ -25,7 +26,7 @@ const Dashboard = () => {
 
   // State
   const [loading, setLoading] = useState(true)
-  const [missions, setMissions] = useState([])
+  const [events, setEvents] = useState([])
   const [cards, setCards] = useState([])
 
   // 1. DATA LOADING
@@ -38,23 +39,18 @@ const Dashboard = () => {
     setLoading(true)
 
     try {
-      // 1. Active Missions (Notizie ed Eventi)
-      const missionsPromise = supabase
-        .from('missioni_catalogo')
-        .select('*')
-        .eq('attiva', true)
-        .order('punti', { ascending: false })
-        .limit(2)
+      // 1. Active Events (Notizie ed Eventi)
+      const eventsPromise = EventsService.getActiveEvents()
 
       // 2. User Cards (Recent Discoveries & Collection Status)
       const cardsPromise = AlbumService.getAllCards()
 
-      const [missionsRes, cardsData] = await Promise.all([
-        missionsPromise,
+      const [eventsData, cardsData] = await Promise.all([
+        eventsPromise,
         cardsPromise
       ])
 
-      if (!missionsRes.error) setMissions(missionsRes.data || [])
+      setEvents(eventsData || [])
       setCards(cardsData || [])
 
     } catch (err) {
@@ -267,74 +263,90 @@ const Dashboard = () => {
             </div>
           </section>
 
-          {/* 5. NOTIZIE ED EVENTI (Missions - Left Main Column on Desktop under Card of the Day) */}
+          {/* 5. NOTIZIE ED EVENTI (Eventi Club - Left Main Column on Desktop under Card of the Day) */}
           <section className="order-5 lg:col-span-8 lg:col-start-1 lg:row-start-3 lg:mt-4">
             <div className="flex justify-between items-end mb-4 lg:mb-6 px-2 lg:px-0">
               <h3 className="text-xl lg:text-2xl font-bold font-serif text-olive-dark">Notizie ed Eventi</h3>
-              <Link to="/missioni" className="text-xs lg:text-sm font-bold text-gold uppercase tracking-widest hover:underline ml-4">Tutti gli eventi</Link>
             </div>
 
             <div className="flex overflow-x-auto gap-5 pb-4 lg:pb-0 no-scrollbar snap-x -mx-6 px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:overflow-visible">
-              {missions.length > 0 ? missions.map((mission) => (
-                <div key={mission.id} className="snap-center min-w-[300px] w-[85vw] max-w-sm lg:w-auto lg:min-w-0 lg:max-w-none bg-white rounded-[2rem] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-sand/40 shrink-0 transition-all hover:-translate-y-1 hover:shadow-xl group flex flex-col">
-                  {/* Event Image */}
-                  <div className="h-40 lg:h-48 bg-stone-900 relative overflow-hidden">
-                    <img src={mission.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={mission.titolo} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+              {events.length > 0 ? events.map((ev) => {
+                const startDate = new Date(ev.data_inizio)
+                const isPartner = !!ev.partners
+                const hasCard = !!ev.cards
 
-                    {/* Date Badge */}
-                    <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-xl text-center shadow-lg">
-                      <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-0.5">Sett</div>
-                      <div className="text-lg font-bold text-olive-dark leading-none">12</div>
-                    </div>
+                return (
+                  <div key={ev.id} className="snap-center min-w-[300px] w-[85vw] max-w-sm lg:w-auto lg:min-w-0 lg:max-w-none bg-white rounded-[2rem] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-sand/40 shrink-0 transition-all hover:-translate-y-1 hover:shadow-xl group flex flex-col">
+                    {/* Event Image */}
+                    <div className="h-40 lg:h-48 bg-stone-900 relative overflow-hidden">
+                      <img src={ev.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={ev.titolo} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
 
-                    {/* Mission Badge & Timer */}
-                    <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5">
-                      <div className="bg-gold px-3 py-1 rounded text-[10px] font-bold text-olive-dark uppercase tracking-widest shadow-md">
-                        Missione Attiva
-                      </div>
-                      <div className="bg-stone-900/80 backdrop-blur-md px-2.5 py-1 rounded text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md">
-                        <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                        Scade in: 2g 14h
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5">
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-gold mb-1">
-                      Limited Event
-                    </div>
-                    <h4 className="text-xl font-bold font-serif text-olive-dark mb-2 leading-tight">
-                      {getLocalized(mission, 'titolo', i18n?.language)}
-                    </h4>
-                    <p className="text-xs text-olive-light line-clamp-2 leading-relaxed mb-4">
-                      {getLocalized(mission, 'descrizione', i18n?.language)}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-sand/50">
-                      <div className="flex flex-col gap-1">
-                        {/* Mock Time */}
-                        <div className="flex items-center gap-1 text-[10px] text-slate-500 font-medium">
-                          <span className="material-symbols-outlined text-[14px]">schedule</span> 18:30 - 22:00
+                      {/* Date Badge */}
+                      <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-xl text-center shadow-lg">
+                        <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-0.5">
+                          {startDate.toLocaleString('it-IT', { month: 'short' })}
+                        </div>
+                        <div className="text-lg font-bold text-olive-dark leading-none">
+                          {startDate.getDate()}
                         </div>
                       </div>
-                      <div className="text-right">
-                        {/* Rimosso campo punti */}
+
+                      <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5">
+                        {/* Partner Badge */}
+                        {isPartner && (
+                          <div className="bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-olive-dark flex items-center gap-1.5 shadow-md border border-sand/50">
+                            <MapPin className="w-3 h-3 text-gold" />
+                            {ev.partners.nome}
+                          </div>
+                        )}
+
+                        {/* Card Reward Badge */}
+                        {hasCard && (
+                          <div className="bg-gold px-3 py-1 rounded text-[10px] font-bold text-olive-dark uppercase tracking-widest shadow-md flex items-center gap-1">
+                            🎁 Card in palio
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    <Link
-                      to={`/missione/${mission.id}`}
-                      className="mt-4 w-full bg-gold text-olive-dark font-bold rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-[#cda429] transition-colors shadow-md active:scale-95"
-                    >
-                      Partecipa <Rocket className="w-4 h-4 ml-1" />
-                    </Link>
+                    {/* Content */}
+                    <div className="p-5 flex flex-col flex-grow">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-[#D8B65A] mb-1">
+                        {ev.luogo}
+                      </div>
+                      <h4 className="text-xl font-bold font-serif text-olive-dark mb-2 leading-tight">
+                        {ev.titolo}
+                      </h4>
+                      <p className="text-xs text-olive-light line-clamp-3 leading-relaxed mb-4">
+                        {ev.descrizione}
+                      </p>
+
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-sand/50">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-1 text-[10px] text-slate-500 font-medium">
+                            <span className="material-symbols-outlined text-[14px]">schedule</span>
+                            {startDate.toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </div>
+                      </div>
+
+                      {ev.link_esterno && (
+                        <a
+                          href={ev.link_esterno}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-4 w-full bg-gold text-olive-dark font-bold rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-[#cda429] transition-colors shadow-md active:scale-95"
+                        >
+                          Scopri di più <Rocket className="w-4 h-4 ml-1" />
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )) : (
+                )
+              }) : (
                 <div className="min-w-full lg:col-span-2 p-8 lg:p-12 border-2 border-dashed border-sand rounded-[2rem] text-center text-olive-light text-sm lg:text-base italic">
                   <div className="text-4xl mb-3 opacity-50">🏖️</div>
-                  Nessun evento o missione attiva al momento.
+                  Nessun evento attivo al momento.
                 </div>
               )}
             </div>

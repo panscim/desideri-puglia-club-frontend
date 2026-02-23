@@ -64,6 +64,7 @@ const AdminPartners = lazy(() => import("./pages/admin/AdminPartners"));
 // (AdminOffers removed)
 const AdminTransazioni = lazy(() => import("./pages/admin/AdminTransazioni.jsx"));
 const AdminCards = lazy(() => import("./pages/admin/AdminCards.jsx"));
+const AdminEventi = lazy(() => import("./pages/admin/AdminEventi.jsx"));
 
 // ⭐️ NEW ALBUM PAGE
 const Album = lazy(() => import("./pages/Album"));
@@ -261,6 +262,7 @@ function App() {
               <Route path="/admin/cards" element={<AdminCards />} />
               {/* <Route path="/admin/offerte" element={<AdminOffers />} /> Removed legacy route */}
               <Route path="/admin/transazioni" element={<AdminTransazioni />} />
+              <Route path="/admin/eventi" element={<AdminEventi />} />
 
             </Route>
 
