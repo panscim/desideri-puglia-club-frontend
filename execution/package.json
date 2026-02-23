@@ -1,0 +1,17 @@
+{
+  "name": "execution",
+  "version": "1.0.0",
+  "description": "",
+  "main": "01_verify_and_seed_dual_unlock.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.97.0",
+    "dotenv": "^17.3.1"
+  }
+}
