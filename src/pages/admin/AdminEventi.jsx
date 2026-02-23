@@ -42,7 +42,7 @@ export default function AdminEventi() {
             const [eventsList, partnersResult, cardsResult] = await Promise.all([
                 EventsService.getAllEvents(),
                 supabase.from('partners').select('id, name').order('name'),
-                supabase.from('cards').select('id, title_it').order('title_it')
+                supabase.from('cards').select('id, title').order('title')
             ])
 
             setEvents(eventsList || [])
@@ -208,7 +208,7 @@ export default function AdminEventi() {
                                         </td>
                                         <td className="p-4">
                                             <span className="text-xs px-2 py-1 bg-gold/20 text-[#D8B65A] font-bold rounded-full">
-                                                {ev.cards?.title_it || 'Nessuna'}
+                                                {ev.cards?.title || 'Nessuna'}
                                             </span>
                                         </td>
                                         <td className="p-4 text-xs text-slate-500 whitespace-nowrap">
