@@ -29,6 +29,29 @@ const Missioni = () => {
   const [questProgress, setQuestProgress] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // Filtri UI
+  const [selectedCity, setSelectedCity] = useState('Tutte')
+  const [selectedType, setSelectedType] = useState('Tutti')
+
+  // Derivati Memos
+  const cities = useMemo(() => {
+    const allCities = questSets.map(s => s.city).filter(Boolean)
+    return ['Tutte', ...new Set(allCities)]
+  }, [questSets])
+
+  const types = useMemo(() => {
+    const allTypes = questSets.map(s => s.quest_type).filter(Boolean)
+    return ['Tutti', ...new Set(allTypes)]
+  }, [questSets])
+
+  const filteredSets = useMemo(() => {
+    return questSets.filter(set => {
+      const matchCity = selectedCity === 'Tutte' || set.city === selectedCity
+      const matchType = selectedType === 'Tutti' || set.quest_type === selectedType
+      return matchCity && matchType
+    })
+  }, [questSets, selectedCity, selectedType])
+
   useEffect(() => {
     loadData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,14 +124,55 @@ const Missioni = () => {
             <MissionSkeleton />
           ) : (
             <>
-              {/* ATTIVE */}
+              {/* FILTRI CHIPS */}
+              {questSets.length > 0 && (
+                <div className="space-y-4 mb-8 -mx-6 px-6 overflow-x-hidden">
+                  {/* Filtro Città */}
+                  {cities.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+                      {cities.map((city, idx) => (
+                        <button
+                          key={idx}
+                          className={`snap-start whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-bold transition-colors ${selectedCity === city
+                            ? 'bg-[#E4AE2F] text-[#14151B]'
+                            : 'bg-[#1E202B] text-slate-400 border border-white/5 hover:bg-white/10'
+                            }`}
+                          onClick={() => setSelectedCity(city)}
+                        >
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Filtro Tipo Quest */}
+                  {types.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x">
+                      {types.map((type, idx) => (
+                        <button
+                          key={idx}
+                          className={`snap-start whitespace-nowrap px-4 py-2 rounded-full text-[12px] font-bold uppercase tracking-wider transition-colors ${selectedType === type
+                            ? 'bg-slate-200 text-slate-900 border-slate-200'
+                            : 'bg-transparent text-slate-500 border border-slate-700 hover:text-white hover:border-slate-500'
+                            }`}
+                          onClick={() => setSelectedType(type)}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* LISTA SAGHE */}
               <h2 className="text-[11px] font-bold text-[#E4AE2F] uppercase tracking-wider mb-3">
-                {questSets.length > 1 ? 'Saghe Attive' : 'Saga Principale'}
+                {filteredSets.length > 1 ? 'Saghe Attive' : 'Saga Principale'}
               </h2>
 
-              {questSets.length > 0 ? (
+              {filteredSets.length > 0 ? (
                 <div className="space-y-6">
-                  {questSets.map((set, index) => {
+                  {filteredSets.map((set, index) => {
                     let completedStepsCount = 0
                     let totalStepsCount = 1
                     if (set && questProgress) {
@@ -146,6 +210,12 @@ const Missioni = () => {
                             </h3>
 
                             <div className="flex items-center gap-2 mb-4">
+                              {set.city && (
+                                <span className="flex items-center gap-1 text-[#E4AE2F] text-[13px] font-bold border border-[#E4AE2F]/30 bg-[#E4AE2F]/10 px-2.5 py-1 rounded-full">
+                                  <MapPin className="w-3.5 h-3.5" />
+                                  {set.city}
+                                </span>
+                              )}
                               <span className="text-slate-400 text-[14px]">
                                 {set.distance_km || '5.2'} km <span className="mx-1">|</span> {set.completions_count || '1911'} completate
                               </span>
