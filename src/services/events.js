@@ -10,7 +10,7 @@ export const EventsService = {
                 .from('eventi_club')
                 .select(`
                   *,
-                  partners ( id, nome, citta, logo_url ),
+                  partners ( id, name, citta, logo_url ),
                   cards:ricompensa_card_id ( id, image_url, rarity, title_it )
                 `)
                 .eq('disponibile', true)
@@ -36,7 +36,7 @@ export const EventsService = {
                 .from('eventi_club')
                 .select(`
                   *,
-                  partners ( nome ),
+                  partners ( name ),
                   cards:ricompensa_card_id ( title_it )
                 `)
                 .order('data_creazione', { ascending: false })

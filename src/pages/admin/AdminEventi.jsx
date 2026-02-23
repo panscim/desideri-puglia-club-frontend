@@ -41,7 +41,7 @@ export default function AdminEventi() {
         try {
             const [eventsList, partnersResult, cardsResult] = await Promise.all([
                 EventsService.getAllEvents(),
-                supabase.from('partners').select('id, nome').order('nome'),
+                supabase.from('partners').select('id, name').order('name'),
                 supabase.from('cards').select('id, title_it').order('title_it')
             ])
 
@@ -204,7 +204,7 @@ export default function AdminEventi() {
                                             </div>
                                         </td>
                                         <td className="p-4">
-                                            <span className="text-sm font-medium">{ev.partners?.nome || '-'}</span>
+                                            <span className="text-sm font-medium">{ev.partners?.name || '-'}</span>
                                         </td>
                                         <td className="p-4">
                                             <span className="text-xs px-2 py-1 bg-gold/20 text-[#D8B65A] font-bold rounded-full">
@@ -408,7 +408,7 @@ export default function AdminEventi() {
                                     >
                                         <option value="">Nessun Partner</option>
                                         {partners.map(p => (
-                                            <option key={p.id} value={p.id}>{p.nome}</option>
+                                            <option key={p.id} value={p.id}>{p.name}</option>
                                         ))}
                                     </select>
                                 </div>

@@ -296,7 +296,7 @@ const Dashboard = () => {
                         {isPartner && (
                           <div className="bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-olive-dark flex items-center gap-1.5 shadow-md border border-sand/50">
                             <MapPin className="w-3 h-3 text-gold" />
-                            {ev.partners.nome}
+                            {ev.partners.name}
                           </div>
                         )}
 
