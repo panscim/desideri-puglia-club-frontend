@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../services/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { QuestService } from '../services/quest'
-import { ChevronLeft, Info, CalendarClock, Shield, Footprints, Church, Navigation, CheckCircle, ArrowRight, Award, Share2, BookOpen } from 'lucide-react'
+import { ChevronLeft, Info, CalendarClock, Shield, Footprints, Church, Navigation, CheckCircle, ArrowRight, Award, Share2, BookOpen, MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLocalized } from '../utils/content'
 
