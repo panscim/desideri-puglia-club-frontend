@@ -13,6 +13,8 @@ import {
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLocalized } from '../utils/content'
+import EventUnlockModal from '../components/EventUnlockModal'
+import toast from 'react-hot-toast'
 
 // --- SKELETON UI COMPONENTS ---
 const Skeleton = ({ className }) => (
@@ -68,6 +70,7 @@ const Dashboard = () => {
 
   // State
   const [loading, setLoading] = useState(true)
+  const [selectedUnlockEvent, setSelectedUnlockEvent] = useState(null)
   const [events, setEvents] = useState([])
   const [cards, setCards] = useState([])
 
@@ -375,16 +378,25 @@ const Dashboard = () => {
                         </div>
                       </div>
 
-                      {ev.link_esterno && (
-                        <a
-                          href={ev.link_esterno}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-4 w-full bg-gold text-olive-dark font-bold rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-[#cda429] transition-colors shadow-md active:scale-95"
-                        >
-                          Scopri di più <Rocket className="w-4 h-4 ml-1" />
-                        </a>
-                      )}
+                      <div className="mt-4 flex flex-col gap-2">
+                        {hasCard ? (
+                          <button
+                            onClick={() => setSelectedUnlockEvent(ev)}
+                            className="w-full bg-olive-dark text-white font-bold rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-olive-800 transition-colors shadow-md active:scale-95"
+                          >
+                            Partecipa e Sblocca 🎁
+                          </button>
+                        ) : ev.link_esterno ? (
+                          <a
+                            href={ev.link_esterno}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full bg-gold text-olive-dark font-bold rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-[#cda429] transition-colors shadow-md active:scale-95"
+                          >
+                            Scopri di più <Rocket className="w-4 h-4 ml-1" />
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 )
@@ -398,6 +410,24 @@ const Dashboard = () => {
           </section>
         </div>
       </div>
+
+      {/* MODAL SBLOCCO EVENTO */}
+      <EventUnlockModal
+        isOpen={!!selectedUnlockEvent}
+        onClose={() => setSelectedUnlockEvent(null)}
+        event={selectedUnlockEvent}
+        onUnlockSuccess={async (event) => {
+          setSelectedUnlockEvent(null);
+          if (event.ricompensa_card_id) {
+            const result = await EventsService.unlockEventCard(event.ricompensa_card_id);
+            if (result.success) {
+              toast.success("Ricompensa sbloccata! La troverai ora nel tuo Album.");
+            } else {
+              toast.error(result.error || "Errore durante l'assegnazione della Card.");
+            }
+          }
+        }}
+      />
     </div>
   )
 }

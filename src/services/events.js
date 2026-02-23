@@ -106,5 +106,46 @@ export const EventsService = {
             console.error('Error deleting event:', err)
             return { success: false, error: err.message }
         }
+    },
+
+    /**
+     * Sblocca la card ricompensa associata a un evento per l'utente loggato.
+     */
+    async unlockEventCard(cardId) {
+        try {
+            const { data: session } = await supabase.auth.getSession()
+            const userId = session?.session?.user?.id
+
+            if (!userId) {
+                return { success: false, error: 'Devi effettuare il login per sbloccare i premi.' }
+            }
+
+            // Verifica se l'utente possiede già questa Card (evita doppi sblocchi)
+            const { data: existingCard } = await supabase
+                .from('user_cards')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('card_id', cardId)
+                .maybeSingle()
+
+            if (existingCard) {
+                return { success: false, error: 'Hai già sbloccato questa Card Premio!' }
+            }
+
+            // Assegna la Card al portafoglio dell'utente
+            const { data, error } = await supabase
+                .from('user_cards')
+                .insert([{ user_id: userId, card_id: cardId }])
+                .select()
+                .single()
+
+            if (error) throw error
+
+            return { success: true, data }
+
+        } catch (err) {
+            console.error('Error unlocking event card:', err)
+            return { success: false, error: err.message }
+        }
     }
 }
