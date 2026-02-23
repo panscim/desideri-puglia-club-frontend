@@ -15,11 +15,17 @@ export default function AdminEventi() {
     const [formData, setFormData] = useState({
         id: null,
         titolo: '',
+        titolo_en: '',
         descrizione: '',
+        descrizione_en: '',
         luogo: '',
+        latitudine: '',
+        longitudine: '',
         data_inizio: '',
         data_fine: '',
         immagine_url: '',
+        tipo_sblocco: 'gps',
+        pin_code: '',
         partner_id: '',
         ricompensa_card_id: '',
         link_esterno: '',
@@ -57,11 +63,17 @@ export default function AdminEventi() {
             setFormData({
                 id: ev.id,
                 titolo: ev.titolo || '',
+                titolo_en: ev.titolo_en || '',
                 descrizione: ev.descrizione || '',
+                descrizione_en: ev.descrizione_en || '',
                 luogo: ev.luogo || '',
+                latitudine: ev.latitudine || '',
+                longitudine: ev.longitudine || '',
                 data_inizio: formatDT(ev.data_inizio),
                 data_fine: formatDT(ev.data_fine),
                 immagine_url: ev.immagine_url || '',
+                tipo_sblocco: ev.tipo_sblocco || 'gps',
+                pin_code: ev.pin_code || '',
                 partner_id: ev.partner_id || '',
                 ricompensa_card_id: ev.ricompensa_card_id || '',
                 link_esterno: ev.link_esterno || '',
@@ -71,11 +83,17 @@ export default function AdminEventi() {
             setFormData({
                 id: null,
                 titolo: '',
+                titolo_en: '',
                 descrizione: '',
+                descrizione_en: '',
                 luogo: '',
+                latitudine: '',
+                longitudine: '',
                 data_inizio: '',
                 data_fine: '',
                 immagine_url: '',
+                tipo_sblocco: 'gps',
+                pin_code: '',
                 partner_id: '',
                 ricompensa_card_id: '',
                 link_esterno: '',
@@ -91,6 +109,10 @@ export default function AdminEventi() {
         const payload = { ...formData }
         if (!payload.partner_id) payload.partner_id = null
         if (!payload.ricompensa_card_id) payload.ricompensa_card_id = null
+        if (!payload.pin_code) payload.pin_code = null
+        if (payload.latitudine === '') payload.latitudine = null; else payload.latitudine = parseFloat(payload.latitudine)
+        if (payload.longitudine === '') payload.longitudine = null; else payload.longitudine = parseFloat(payload.longitudine)
+        if (payload.tipo_sblocco === 'gps') payload.pin_code = null
 
         // Converte datetime-local in timestamp ISO Postgres validi
         if (payload.data_inizio) payload.data_inizio = new Date(payload.data_inizio).toISOString()
@@ -190,8 +212,12 @@ export default function AdminEventi() {
                                             </span>
                                         </td>
                                         <td className="p-4 text-xs text-slate-500 whitespace-nowrap">
-                                            {new Date(ev.data_inizio).toLocaleDateString()} <br />
-                                            {new Date(ev.data_fine).toLocaleDateString()}
+                                            {new Date(ev.data_inizio).toLocaleDateString()} - {new Date(ev.data_fine).toLocaleDateString()}
+                                            <div className="mt-1">
+                                                <span className="bg-sand/30 font-bold px-1.5 py-0.5 rounded uppercase text-[9px] text-olive-dark">
+                                                    {ev.tipo_sblocco}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="p-4 text-center">
                                             {ev.disponibile ? (
@@ -249,7 +275,7 @@ export default function AdminEventi() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-sm font-bold text-olive-dark mb-1">Titolo *</label>
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Titolo (IT) *</label>
                                     <input
                                         type="text"
                                         required
@@ -258,6 +284,40 @@ export default function AdminEventi() {
                                         className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-sand/5"
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Titolo (EN)</label>
+                                    <input
+                                        type="text"
+                                        value={formData.titolo_en}
+                                        onChange={(e) => setFormData({ ...formData, titolo_en: e.target.value })}
+                                        className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-sand/5"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Descrizione (IT) *</label>
+                                    <textarea
+                                        required
+                                        rows="2"
+                                        value={formData.descrizione}
+                                        onChange={(e) => setFormData({ ...formData, descrizione: e.target.value })}
+                                        className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-sand/5 resize-none"
+                                    ></textarea>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Descrizione (EN)</label>
+                                    <textarea
+                                        rows="2"
+                                        value={formData.descrizione_en}
+                                        onChange={(e) => setFormData({ ...formData, descrizione_en: e.target.value })}
+                                        className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-sand/5 resize-none"
+                                    ></textarea>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 border-t border-sand/40 pt-3">
                                 <div>
                                     <label className="block text-sm font-bold text-olive-dark mb-1">Luogo *</label>
                                     <input
@@ -268,17 +328,28 @@ export default function AdminEventi() {
                                         className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-sand/5"
                                     />
                                 </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-bold text-olive-dark mb-1">Descrizione Breve *</label>
-                                <textarea
-                                    required
-                                    rows="2"
-                                    value={formData.descrizione}
-                                    onChange={(e) => setFormData({ ...formData, descrizione: e.target.value })}
-                                    className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-sand/5 resize-none"
-                                ></textarea>
+                                <div>
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Latitudine GPS</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        value={formData.latitudine}
+                                        onChange={(e) => setFormData({ ...formData, latitudine: e.target.value })}
+                                        className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-sand/5"
+                                        placeholder="es. 41.130"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Longitudine GPS</label>
+                                    <input
+                                        type="number"
+                                        step="any"
+                                        value={formData.longitudine}
+                                        onChange={(e) => setFormData({ ...formData, longitudine: e.target.value })}
+                                        className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-sand/5"
+                                        placeholder="es. 16.871"
+                                    />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -354,6 +425,35 @@ export default function AdminEventi() {
                                         ))}
                                     </select>
                                 </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-3 border-t border-sand/40 bg-[#eef1f6] p-4 rounded-xl border border-slate-200">
+                                <div>
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Metodo di Sblocco</label>
+                                    <select
+                                        value={formData.tipo_sblocco}
+                                        onChange={(e) => setFormData({ ...formData, tipo_sblocco: e.target.value })}
+                                        className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-white text-sm"
+                                    >
+                                        <option value="gps">GPS (Presenza sul luogo)</option>
+                                        <option value="pin">PIN Segreto</option>
+                                    </select>
+                                </div>
+
+                                {formData.tipo_sblocco === 'pin' && (
+                                    <div>
+                                        <label className="block text-sm font-bold text-olive-dark mb-1">Codice PIN Richiesto</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={formData.pin_code}
+                                            onChange={(e) => setFormData({ ...formData, pin_code: e.target.value })}
+                                            className="w-full border-sand focus:border-gold focus:ring-gold rounded-xl bg-white text-sm uppercase"
+                                            placeholder="Es: TARANTA24"
+                                            maxLength={15}
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex items-center mt-4">
