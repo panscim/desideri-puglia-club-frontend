@@ -92,36 +92,6 @@ export const AlbumService = {
 
         if (error) return { success: false, error };
 
-        // 3. Fetch card points value
-        const { data: cardRaw } = await supabase
-            .from('cards')
-            .select('points_value')
-            .eq('id', cardId)
-            .single();
-
-        const pointsToAward = cardRaw?.points_value || 100;
-
-        // 4. Award points by updating profile
-        try {
-            const { data: profile } = await supabase
-                .from('profiles')
-                .select('punti_totali, punti_mensili')
-                .eq('id', userId)
-                .single();
-
-            if (profile) {
-                await supabase
-                    .from('profiles')
-                    .update({
-                        punti_totali: (profile.punti_totali || 0) + pointsToAward,
-                        punti_mensili: (profile.punti_mensili || 0) + pointsToAward
-                    })
-                    .eq('id', userId);
-            }
-        } catch (e) {
-            console.error('Failed to award points', e);
-        }
-
         return { success: true, data };
     },
 

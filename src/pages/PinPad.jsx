@@ -10,7 +10,6 @@ import {
     XCircle,
     AlertTriangle,
     Lock,
-    Coins,
     Zap,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -75,7 +74,7 @@ export default function PinPad() {
             try {
                 const { data, error } = await supabase
                     .from("partners")
-                    .select("id, name, logo_url, city, category, saldo_punti, is_active")
+                    .select("id, name, logo_url, city, category, is_active")
                     .eq("id", partnerId)
                     .single();
 
@@ -112,7 +111,6 @@ export default function PinPad() {
 
     const isLocked =
         lockout.lockedUntil && new Date(lockout.lockedUntil) > new Date();
-    const isSaldoExhausted = partner && (partner.saldo_punti ?? 0) <= 0;
 
     // ── Time remaining label ──
     const lockoutRemaining = isLocked
@@ -127,7 +125,7 @@ export default function PinPad() {
     // ── Handle digit press ──
     const handleDigit = useCallback(
         (digit) => {
-            if (submitting || result?.success || isLocked || isSaldoExhausted) return;
+            if (submitting || result?.success || isLocked) return;
             hapticLight();
 
             setPin((prev) => {
@@ -141,7 +139,7 @@ export default function PinPad() {
                 return next;
             });
         },
-        [submitting, result, isLocked, isSaldoExhausted]
+        [submitting, result, isLocked]
     );
 
     // ── Handle delete ──
@@ -171,11 +169,6 @@ export default function PinPad() {
                 setResult(data);
                 clearLockoutState(partnerId);
                 refreshProfile();
-                // Update local partner saldo
-                setPartner((p) => ({
-                    ...p,
-                    saldo_punti: data.saldo_partner_rimanente,
-                }));
             } else {
                 hapticError();
                 setShakeAnimation(true);
@@ -257,31 +250,11 @@ export default function PinPad() {
                         </p>
                     </div>
                 </div>
-                {/* Saldo indicatore */}
-                <div className="text-right">
-                    <div className="flex items-center gap-1 justify-end">
-                        <Coins className="w-3.5 h-3.5 text-gold" />
-                        <span className="text-sm font-bold text-olive-dark">
-                            {partner?.saldo_punti ?? 0}
-                        </span>
-                    </div>
-                    <p className="text-[10px] text-olive-light">{t('pinpad.tokens')}</p>
-                </div>
             </div>
 
             {/* Main content */}
             <div className="flex-1 flex flex-col items-center justify-center px-4 pb-6 max-w-sm mx-auto w-full">
                 {/* Status messages */}
-                {isSaldoExhausted && !result?.success && (
-                    <div className="w-full mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center">
-                        <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
-                        <p className="font-semibold text-amber-800">{t('pinpad.errors.missions_exhausted')}</p>
-                        <p className="text-xs text-amber-600 mt-1">
-                            {t('pinpad.errors.missions_exhausted_desc')}
-                        </p>
-                    </div>
-                )}
-
                 {isLocked && (
                     <div className="w-full mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-center">
                         <Lock className="w-8 h-8 text-red-500 mx-auto mb-2" />
@@ -302,14 +275,8 @@ export default function PinPad() {
                             <CheckCircle2 className="w-20 h-20 text-emerald-500 mx-auto relative" />
                         </div>
                         <p className="font-bold text-xl text-olive-dark mt-4">
-                            {t('pinpad.success_points', { points: result.punti_assegnati })}
+                            Tappa sbloccata con successo!
                         </p>
-                        {result.moltiplicatore > 1 && (
-                            <div className="inline-flex items-center gap-1 mt-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
-                                <Zap className="w-3.5 h-3.5" />
-                                {t('pinpad.boost_active', { multiplier: result.moltiplicatore })}
-                            </div>
-                        )}
                         <p className="text-sm text-olive-light mt-3">{result.message}</p>
                         <button
                             onClick={() => navigate(`/partner/${partnerId}`)}
@@ -377,7 +344,7 @@ export default function PinPad() {
                                         <button
                                             key={i}
                                             onClick={handleDelete}
-                                            disabled={submitting || isLocked || isSaldoExhausted}
+                                            disabled={submitting || isLocked}
                                             className="aspect-square rounded-2xl flex items-center justify-center
                         bg-white/60 border border-sand hover:bg-sand/50
                         active:scale-95 transition-all disabled:opacity-40"
@@ -393,7 +360,6 @@ export default function PinPad() {
                                         disabled={
                                             submitting ||
                                             isLocked ||
-                                            isSaldoExhausted ||
                                             pin.length >= PIN_LENGTH
                                         }
                                         className="aspect-square rounded-2xl flex items-center justify-center

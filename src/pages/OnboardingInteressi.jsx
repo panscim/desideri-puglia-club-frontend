@@ -46,9 +46,9 @@ const OnboardingInteressi = () => {
   useEffect(() => {
     if (!profile) return
 
-    // Se ha già completato onboarding → portalo via (es. home o classifica)
+    // Se ha già completato onboarding → portalo via (es. home)
     if (profile.has_onboarding_completed) {
-      navigate('/classifica', { replace: true })
+      navigate('/dashboard', { replace: true })
       return
     }
 
@@ -94,7 +94,7 @@ const OnboardingInteressi = () => {
 
       toast.success('Preferenze salvate 🎯')
       await refreshProfile?.()
-      navigate('/classifica')
+      navigate('/dashboard')
     } catch (err) {
       console.error('Onboarding error:', err)
       toast.error('Errore nel salvataggio delle preferenze')
@@ -117,7 +117,7 @@ const OnboardingInteressi = () => {
 
       if (error) throw error
       await refreshProfile?.()
-      navigate('/classifica')
+      navigate('/dashboard')
     } catch (err) {
       console.error(err)
       toast.error('Errore nel proseguire')
@@ -186,11 +186,10 @@ const OnboardingInteressi = () => {
                   key={tag}
                   type="button"
                   onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1.5 rounded-full text-xs border transition ${
-                    active
-                      ? 'bg-olive-dark text-sand border-olive-dark'
-                      : 'bg-sand/70 text-olive-dark border-sand hover:bg-sand'
-                  }`}
+                  className={`px-3 py-1.5 rounded-full text-xs border transition ${active
+                    ? 'bg-olive-dark text-sand border-olive-dark'
+                    : 'bg-sand/70 text-olive-dark border-sand hover:bg-sand'
+                    }`}
                 >
                   {tag}
                 </button>
@@ -216,11 +215,10 @@ const OnboardingInteressi = () => {
                   key={style}
                   type="button"
                   onClick={() => setTravelStyle(style)}
-                  className={`text-left px-3 py-2 rounded-lg border text-xs transition ${
-                    active
-                      ? 'bg-olive-dark text-sand border-olive-dark'
-                      : 'bg-sand/60 text-olive-dark border-sand hover:bg-sand'
-                  }`}
+                  className={`text-left px-3 py-2 rounded-lg border text-xs transition ${active
+                    ? 'bg-olive-dark text-sand border-olive-dark'
+                    : 'bg-sand/60 text-olive-dark border-sand hover:bg-sand'
+                    }`}
                 >
                   {style}
                 </button>

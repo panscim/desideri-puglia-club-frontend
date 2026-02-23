@@ -228,7 +228,6 @@ export default function Register() {
             youtube_url: formData.youtube_url.trim() || null,
             avatar_url: avatarUrl,
             ruolo: "Utente",
-            livello: "Guest",
           },
         },
       });
@@ -254,9 +253,6 @@ export default function Register() {
               sesso: formData.sesso,
               telefono: formData.telefono.trim() || null,
               ruolo: "Utente",
-              punti_totali: 0,
-              punti_mensili: 0,
-              livello: "Guest",
               avatar_url: avatarUrl,
               instagram_url: formData.instagram_url.trim() || null,
               facebook_url: formData.facebook_url.trim() || null,

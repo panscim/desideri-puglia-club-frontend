@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
-import { getLevelByPoints, getProgressToNextLevel } from '../utils/levels'
+
 import {
   Edit,
   Save,
@@ -69,8 +69,7 @@ const Profilo = () => {
     ultimaMissioneData: null
   })
 
-  const currentLevel = getLevelByPoints(profile?.punti_totali || 0)
-  const progress = getProgressToNextLevel(profile?.punti_totali || 0)
+
 
   // Card stile “Airbnb”: bianca, ombra morbida
   const headerCardClasses =
@@ -98,7 +97,7 @@ const Profilo = () => {
       try {
         const { data, error } = await supabase
           .from('missioni_inviate')
-          .select('stato, punti_approvati, data_creazione, period_key')
+          .select('stato, data_creazione, period_key')
           .eq('id_utente', profile.id)
           .order('data_creazione', { ascending: false })
 
@@ -112,10 +111,6 @@ const Profilo = () => {
         )
 
         const missioniTotaliApprovate = approvate.length
-        const puntiTotaliMissioni = approvate.reduce(
-          (sum, row) => sum + (row.punti_approvati || 0),
-          0
-        )
 
         const meseKey =
           profile.mese_corrente_key || new Date().toISOString().slice(0, 7)
@@ -125,10 +120,6 @@ const Profilo = () => {
         )
 
         const missioniMeseApprovate = approvateMese.length
-        const puntiMeseMissioni = approvateMese.reduce(
-          (sum, row) => sum + (row.punti_approvati || 0),
-          0
-        )
 
         const ultimaMissioneData =
           approvate.length > 0 ? approvate[0].data_creazione : null
@@ -136,8 +127,6 @@ const Profilo = () => {
         setMissionStats({
           missioniTotaliApprovate,
           missioniMeseApprovate,
-          puntiTotaliMissioni,
-          puntiMeseMissioni,
           ultimaMissioneData
         })
       } catch (e) {
@@ -385,12 +374,6 @@ const Profilo = () => {
                 <p className="text-sm text-olive-light">
                   @{profile?.nickname}
                 </p>
-                <p className="text-sm text-olive-light mt-1">{cityLabel}</p>
-                <p className="text-xs text-olive-light mt-1">
-                  {t('dashboard.level')}:{' '}
-                  <span className="font-semibold">{currentLevel.name}</span> ·
-                  {t('profile.xp_total')}: {profile?.punti_totali ?? 0}
-                </p>
               </div>
             </div>
 
@@ -565,24 +548,7 @@ const Profilo = () => {
                 )}
               </div>
 
-              {/* Statistiche */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-                <div className="bg-sand/60 rounded-xl p-3">
-                  <p className="text-[11px] text-olive-light uppercase tracking-wide">
-                    {t('profile.stats_total_points')}
-                  </p>
-                  <p className="text-lg font-semibold text-olive-dark">
-                    {profile?.punti_totali ?? 0}
-                  </p>
-                </div>
-                <div className="bg-sand/60 rounded-xl p-3">
-                  <p className="text-[11px] text-olive-light uppercase tracking-wide">
-                    {t('profile.stats_month_points')}
-                  </p>
-                  <p className="text-lg font-semibold text-olive-dark">
-                    {profile?.punti_mensili ?? 0}
-                  </p>
-                </div>
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-3 mb-4">
                 <div className="bg-sand/60 rounded-xl p-3">
                   <p className="text-[11px] text-olive-light uppercase tracking-wide">
                     {t('profile.stats_month_missions')}
@@ -600,22 +566,7 @@ const Profilo = () => {
                   </p>
                 </div>
 
-                <div className="bg-sand/60 rounded-xl p-3">
-                  <p className="text-[11px] text-olive-light uppercase tracking-wide">
-                    {t('profile.stats_mission_points_tot')}
-                  </p>
-                  <p className="text-lg font-semibold text-olive-dark">
-                    {missionStats.puntiTotaliMissioni}
-                  </p>
-                </div>
-                <div className="bg-sand/60 rounded-xl p-3">
-                  <p className="text-[11px] text-olive-light uppercase tracking-wide">
-                    {t('profile.stats_mission_points_month')}
-                  </p>
-                  <p className="text-lg font-semibold text-olive-dark">
-                    {missionStats.puntiMeseMissioni}
-                  </p>
-                </div>
+
                 <div className="bg-sand/60 rounded-xl p-3">
                   <p className="text-[11px] text-olive-light uppercase tracking-wide">
                     {t('profile.stats_last_mission')}
@@ -1037,6 +988,27 @@ const Profilo = () => {
                         </a>
                       </p>
                     )}
+                    {/* Altri Contatti */}
+                    <div>
+                      <h3 className="text-xs font-semibold text-olive-dark mb-1">
+                        {t('profile.contact_info')}
+                      </h3>
+                      {profile?.telefono && (
+                        <p className="text-sm text-olive-light flex items-center gap-2 mb-1">
+                          📞 {profile.telefono}
+                        </p>
+                      )}
+                      {profile?.email && (
+                        <p className="text-sm text-olive-light flex items-center gap-2">
+                          ✉️ {profile.email}
+                        </p>
+                      )}
+                      {!profile?.telefono && !profile?.email && (
+                        <p className="text-sm text-olive-light">
+                          {t('profile.no_contact_info')}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1045,56 +1017,58 @@ const Profilo = () => {
         )}
       </div>
 
-      {/* Overlay cambio modalità con slide destra → sinistra e piccola vibrazione */}
-      {modeTransition.active && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
-          <div className="relative w-40 h-40 mb-6">
-            {/* Icona di partenza */}
-            <img
-              src={
-                modeTransition.target === 'partner'
-                  ? '/cambioview/utente.png'
-                  : '/cambioview/partner.png'
-              }
-              alt="Icona attuale"
-              className="absolute inset-0 w-full h-full object-contain transition-all duration-800 ease-out"
-              style={{
-                opacity: modeTransition.flip ? 0 : 1,
-                transform: modeTransition.flip
-                  ? 'translateX(-80px) scale(0.9)'
-                  : 'translateX(0) scale(1)'
-              }}
-            />
+      {/* OVERLAY DI TRANSIZIONE (per lo switch animato tra le due icone) */}
+      {
+        modeTransition.active && (
+          <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
+            <div className="relative w-40 h-40 mb-6">
+              {/* Icona di partenza */}
+              <img
+                src={
+                  modeTransition.target === 'partner'
+                    ? '/cambioview/utente.png'
+                    : '/cambioview/partner.png'
+                }
+                alt="Icona attuale"
+                className="absolute inset-0 w-full h-full object-contain transition-all duration-800 ease-out"
+                style={{
+                  opacity: modeTransition.flip ? 0 : 1,
+                  transform: modeTransition.flip
+                    ? 'translateX(-80px) scale(0.9)'
+                    : 'translateX(0) scale(1)'
+                }}
+              />
 
-            {/* Icona di arrivo */}
-            <img
-              src={
-                modeTransition.target === 'partner'
-                  ? '/cambioview/partner.png'
-                  : '/cambioview/utente.png'
-              }
-              alt="Nuova modalità"
-              className={`absolute inset-0 w-full h-full object-contain transition-all duration-800 ease-out ${modeTransition.flip ? 'animate-pulse' : ''
-                }`}
-              style={{
-                opacity: modeTransition.flip ? 1 : 0,
-                transform: modeTransition.flip
-                  ? 'translateX(0) scale(1)'
-                  : 'translateX(80px) scale(0.9)'
-              }}
-            />
+              {/* Icona di arrivo */}
+              <img
+                src={
+                  modeTransition.target === 'partner'
+                    ? '/cambioview/partner.png'
+                    : '/cambioview/utente.png'
+                }
+                alt="Nuova modalità"
+                className={`absolute inset-0 w-full h-full object-contain transition-all duration-800 ease-out ${modeTransition.flip ? 'animate-pulse' : ''
+                  }`}
+                style={{
+                  opacity: modeTransition.flip ? 1 : 0,
+                  transform: modeTransition.flip
+                    ? 'translateX(0) scale(1)'
+                    : 'translateX(80px) scale(0.9)'
+                }}
+              />
+            </div>
+
+            <p className="text-lg font-semibold text-olive-dark mb-1">
+              {modeTransition.target === 'partner'
+                ? 'Modalità Partner'
+                : 'Modalità Utente'}
+            </p>
+            <p className="text-sm text-olive-light">
+              Stiamo cambiando visuale, resta connesso…
+            </p>
           </div>
-
-          <p className="text-lg font-semibold text-olive-dark mb-1">
-            {modeTransition.target === 'partner'
-              ? 'Modalità Partner'
-              : 'Modalità Utente'}
-          </p>
-          <p className="text-sm text-olive-light">
-            Stiamo cambiando visuale, resta connesso…
-          </p>
-        </div>
-      )}
+        )
+      }
     </>
   )
 }

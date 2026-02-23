@@ -69,19 +69,18 @@ export function useAutoMissions() {
         id_utente: user.id,
         id_missione: mission.id,
         stato: 'Approvata',
-        punti_approvati: mission.punti,
         period_key: today
       }
     ])
 
-    toast.success(`+${mission.punti} punti per la missione ${mission.titolo}! 🎯`)
+    toast.success(`✅ Missione completata: ${mission.titolo}!`)
   }
 
   async function checkWeeklyLogins(requiredDays, rewardPoints, code) {
     const now = new Date()
     const weekStart = new Date(now)
     weekStart.setDate(now.getDate() - now.getDay()) // inizio settimana (domenica)
-    const weekKey = `${weekStart.getFullYear()}-${weekStart.getMonth()+1}-${weekStart.getDate()}`
+    const weekKey = `${weekStart.getFullYear()}-${weekStart.getMonth() + 1}-${weekStart.getDate()}`
 
     const { data: logins } = await supabase
       .from('missioni_inviate')
@@ -108,7 +107,6 @@ export function useAutoMissions() {
           {
             id_utente: user.id,
             stato: 'Approvata',
-            punti_approvati: rewardPoints,
             period_key: weekKey,
             codice_missione: code
           }

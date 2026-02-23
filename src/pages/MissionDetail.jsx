@@ -191,8 +191,7 @@ const MissionDetail = () => {
         period_key: periodKey,
         stato: 'In attesa',
         prova_url: provaUrl,
-        nota_utente: formData.nota_utente || null,
-        punti_approvati: 0
+        nota_utente: formData.nota_utente || null
       }
 
       if (existingSubmission?.stato === 'Rifiutata') {
@@ -201,7 +200,6 @@ const MissionDetail = () => {
           prova_url: basePayload.prova_url,
           nota_utente: basePayload.nota_utente,
           nota_admin: null,
-          punti_approvati: 0,
           data_creazione: new Date().toISOString()
         }).eq('id', existingSubmission.id)
         if (updErr) throw updErr
@@ -290,9 +288,6 @@ const MissionDetail = () => {
               <MainIcon className="w-8 h-8" />
             </div>
             <div className="flex flex-col items-end gap-1">
-              <span className="px-4 py-1.5 rounded-full bg-gold text-black text-sm font-bold shadow-sm">
-                +{mission.punti} Punti
-              </span>
               <div className="flex items-center gap-1.5 text-xs font-medium text-olive-light uppercase tracking-wider">
                 <Clock className="w-3.5 h-3.5" />
                 {mission.cadenza}
@@ -328,7 +323,7 @@ const MissionDetail = () => {
           <div>
             <h4 className="font-bold text-green-800">{t('mission.completed_title')}</h4>
             <p className="text-sm text-green-700 mt-1">
-              {t('mission.completed_desc', { points: existingSubmission.punti_approvati })}
+              Il tuo contributo alla missione è andato a buon fine.
             </p>
             {existingSubmission.nota_admin && (
               <div className="mt-2 text-xs bg-white/50 p-2 rounded text-green-800 border border-green-100">

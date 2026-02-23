@@ -31,9 +31,6 @@ const AdminDashboard = () => {
     totalMissions: 0,
     pendingSubmissions: 0,
     approvedSubmissions: 0,
-    totalPoints: 0,
-
-
 
     // Mercato
     totalMarketPurchases: 0,
@@ -102,13 +99,6 @@ const AdminDashboard = () => {
         .from('missioni_inviate')
         .select('*', { count: 'exact', head: true })
         .eq('stato', 'Approvata')
-
-      const { data: usersData } = await supabase
-        .from('utenti')
-        .select('punti_totali')
-
-      const totalPoints =
-        usersData?.reduce((sum, u) => sum + (u.punti_totali || 0), 0) || 0
 
 
 
@@ -193,11 +183,6 @@ const AdminDashboard = () => {
         .select('*', { count: 'exact', head: true })
         .eq('is_verified', true)
 
-      const { count: activeBoosts } = await supabase
-        .from('utenti')
-        .select('*', { count: 'exact', head: true })
-        .gt('boost_expires_at', new Date().toISOString())
-
       // --- SPONSORED MISSIONS ---
       const { count: sponsoredMissions } = await supabase
         .from('missioni_catalogo')
@@ -218,7 +203,6 @@ const AdminDashboard = () => {
         totalMissions: totalMissions || 0,
         pendingSubmissions: pendingSubmissionsCount || 0,
         approvedSubmissions: approvedSubmissionsCount || 0,
-        totalPoints,
 
 
 
@@ -237,7 +221,6 @@ const AdminDashboard = () => {
         totalOffers: totalOffers || 0,
         activeOffers: activeOffers || 0,
         verifiedPartners: verifiedPartners || 0,
-        activeBoosts: activeBoosts || 0,
         sponsoredMissions: sponsoredMissions || 0,
         sponsoredActive: sponsoredActive || 0
       })
@@ -256,7 +239,7 @@ const AdminDashboard = () => {
         .select(`
           *,
           utenti:id_utente (nickname, email),
-          missioni_catalogo:id_missione (titolo, punti)
+          missioni_catalogo:id_missione (titolo)
         `)
         .eq('stato', 'In attesa')
         .order('data_creazione', { ascending: false })
@@ -275,7 +258,6 @@ const AdminDashboard = () => {
         .from('missioni_inviate')
         .update({
           stato: 'Approvata',
-          punti_approvati: points ?? 0,
           data_revisione: new Date().toISOString(),
         })
         .eq('id', submissionId)
@@ -390,14 +372,6 @@ const AdminDashboard = () => {
         </div>
 
         <div className="card text-center">
-          <div className="text-2xl mb-2">⭐</div>
-          <p className="text-2xl font-bold text-olive-dark">
-            {stats.totalPoints}
-          </p>
-          <p className="text-sm text-olive-light">{t('admin.dashboard.total_points')}</p>
-        </div>
-
-        <div className="card text-center">
           <Star className="w-6 h-6 text-gold mx-auto mb-2" />
           <p className="text-2xl font-bold text-olive-dark">
             {stats.sponsoredMissions}
@@ -418,16 +392,6 @@ const AdminDashboard = () => {
           </div>
           <div className="p-3 rounded-full bg-blue-100 text-blue-600">
             <CheckCircle className="w-6 h-6" />
-          </div>
-        </div>
-
-        <div className="card flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-olive-light">{t('admin.dashboard.active_boosts')}</p>
-            <p className="text-2xl font-bold text-amber-600">{stats.activeBoosts}</p>
-          </div>
-          <div className="p-3 rounded-full bg-amber-100 text-amber-600">
-            <Zap className="w-6 h-6" />
           </div>
         </div>
 
@@ -599,9 +563,6 @@ const AdminDashboard = () => {
                       {new Date(s.data_creazione).toLocaleString('it-IT')}
                     </p>
                   </div>
-                  <span className="badge-gold">
-                    +{s.missioni_catalogo?.punti} pt
-                  </span>
                 </div>
 
                 {s.prova_url && (
@@ -626,7 +587,7 @@ const AdminDashboard = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() =>
-                      handleApprove(s.id, s.missioni_catalogo?.punti)
+                      handleApprove(s.id, 0)
                     }
                     className="flex-1 bg-olive-dark text-white px-4 py-2 rounded-lg hover:opacity-90 transition-colors text-sm font-medium"
                   >

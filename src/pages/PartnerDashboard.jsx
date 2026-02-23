@@ -427,37 +427,9 @@ export default function PartnerDashboard() {
         </button>
       </section>
 
-      {/* 💰 GETTONI & VERIFICATO CARDS */}
-      <section className="grid sm:grid-cols-2 gap-4">
-        {/* Saldo Gettoni */}
-        <div className="card bg-gradient-to-br from-amber-50 to-warm-white border-amber-200/50">
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <p className="text-xs text-olive-light mb-1">Saldo Gettoni</p>
-              <p className="text-3xl font-bold text-olive-dark">
-                {partner.saldo_punti ?? 0}
-              </p>
-              <p className="text-[11px] text-olive-light mt-1">
-                {Math.floor((partner.saldo_punti ?? 0) / 100)} visite disponibili
-              </p>
-            </div>
-            <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-              <Coins className="w-5 h-5 text-amber-600" />
-            </div>
-          </div>
-          {(partner.saldo_punti ?? 0) <= 200 && (
-            <p className="text-[11px] text-amber-600 mb-2 font-medium">
-              ⚠️ Saldo in esaurimento — ricarica per continuare a ricevere clienti
-            </p>
-          )}
-          <button
-            type="button"
-            onClick={() => navigate("/partner/acquista-gettoni")}
-            className="w-full py-2.5 rounded-xl bg-olive-dark text-white text-sm font-semibold hover:bg-olive-dark/90 transition active:scale-[0.98]"
-          >
-            Acquista Gettoni
-          </button>
-        </div>
+      {/* BADGE VERIFICATO */}
+      <section className="gap-4">
+
 
         {/* Badge Verificato */}
         <div className={`card ${partner.is_verified ? 'bg-gradient-to-br from-blue-50 to-warm-white border-blue-200/50' : ''}`}>

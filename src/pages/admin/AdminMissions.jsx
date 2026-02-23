@@ -31,7 +31,6 @@ const defaultForm = {
   descrizione: '',
   descrizione_en: '',   // NUOVO
   cadenza: 'giornaliera',
-  punti: 10,
   cooldown_ore: 0,
   tipo_verifica: 'galleria',
   linee_guida: '',
@@ -52,7 +51,6 @@ function sanitizeForm(f) {
     descrizione: (f.descrizione || '').trim(),
     descrizione_en: (f.descrizione_en || '').trim() || null, // NUOVO
     cadenza: CADENZE.includes(cadenza) ? cadenza : 'giornaliera',
-    punti: Number.isFinite(+f.punti) ? Math.max(0, parseInt(f.punti)) : 0,
     cooldown_ore: Number.isFinite(+f.cooldown_ore) ? Math.max(0, parseInt(f.cooldown_ore)) : 0,
     tipo_verifica_ui: VERIFICHE_UI.includes(tipo_verifica_ui) ? tipo_verifica_ui : 'galleria',
     tipo_verifica_db: mapVerificaToDb(tipo_verifica_ui),
@@ -110,7 +108,6 @@ const AdminMissions = () => {
       descrizione: m.descrizione || '',
       descrizione_en: m.descrizione_en || '', // NUOVO
       cadenza: m.cadenza || 'giornaliera',
-      punti: Number.isFinite(m.punti) ? m.punti : 0,
       cooldown_ore: Number.isFinite(m.cooldown_ore) ? m.cooldown_ore : 0,
       tipo_verifica: mapVerificaToUi(m.tipo_verifica),
       linee_guida: m.linee_guida || '',
@@ -158,7 +155,6 @@ const AdminMissions = () => {
         descrizione: s.descrizione,
         descrizione_en: s.descrizione_en, // NUOVO
         cadenza: s.cadenza,
-        punti: s.punti,
         cooldown_ore: s.cooldown_ore,
         tipo_verifica: s.tipo_verifica_db,
         linee_guida: s.linee_guida,
@@ -263,7 +259,6 @@ const AdminMissions = () => {
               <th className="text-left p-2">{t('admin.missions.table.code')}</th>
               <th className="text-left p-2">{t('admin.missions.table.frequency')}</th>
               <th className="text-left p-2">{t('admin.missions.table.verification')}</th>
-              <th className="text-center p-2">{t('admin.missions.table.points')}</th>
               <th className="text-center p-2">{t('admin.missions.table.status')}</th>
               <th className="text-center p-2">{t('admin.missions.table.actions')}</th>
             </tr>
@@ -285,7 +280,6 @@ const AdminMissions = () => {
                 <td className="py-2 px-2 font-mono text-xs">{m.codice}</td>
                 <td className="py-2 px-2 capitalize">{m.cadenza}</td>
                 <td className="py-2 px-2 capitalize">{mapVerificaToUi(m.tipo_verifica)}</td>
-                <td className="py-2 px-2 text-center text-gold font-bold">+{m.punti}</td>
                 <td className="py-2 px-2 text-center">
                   <button onClick={() => handleToggleActive(m)} title={m.attiva ? 'Disattiva' : 'Attiva'}>
                     {m.attiva ? <Power className="text-green-600" /> : <PowerOff className="text-gray-400" />}
@@ -318,7 +312,7 @@ const AdminMissions = () => {
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-3">
+              <div className="grid md:grid-cols-1 gap-3">
                 <input
                   className="input"
                   placeholder={t('admin.missions.form.code')}
@@ -326,15 +320,6 @@ const AdminMissions = () => {
                   onChange={e => setFormData({ ...formData, codice: e.target.value.toUpperCase() })}
                   required
                   disabled={!!editingMission}
-                />
-                <input
-                  type="number"
-                  className="input"
-                  placeholder={t('admin.missions.form.points')}
-                  value={formData.punti}
-                  onChange={e => setFormData({ ...formData, punti: parseInt(e.target.value) || 0 })}
-                  required
-                  min={0}
                 />
               </div>
 

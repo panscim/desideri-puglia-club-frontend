@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
 import { AlbumService } from '../services/album'
-import { getLevelByPoints } from '../utils/levels'
 import {
   MapPin,
   Lock,
@@ -88,10 +87,7 @@ const Dashboard = () => {
     return candidates[0] || cards[0]
   }, [cards])
 
-  const currentLevel = useMemo(
-    () => getLevelByPoints(profile?.punti_totali || 0) || { id: 1, name: 'Explorer', iconUrl: null },
-    [profile?.punti_totali]
-  )
+
 
 
   if (loading) {
@@ -118,16 +114,9 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
-            <div className="absolute -bottom-2 -right-2 bg-gold text-[10px] font-bold text-olive-dark px-2 py-0.5 rounded-full border-2 border-[#F9F9F7] shadow-sm">
-              Lvl {currentLevel.id}
-            </div>
           </div>
           <div>
             <h2 className="text-xl font-bold text-olive-dark font-serif leading-tight">Ciao, {profile?.nome || profile?.nickname || 'Esploratore'}!</h2>
-            <div className="text-[10px] font-bold text-gold uppercase tracking-widest flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px]">military_tech</span>
-              Collector Badge
-            </div>
           </div>
           <div className="ml-auto">
             <button className="w-10 h-10 rounded-full bg-white border border-sand shadow-sm flex items-center justify-center text-olive-dark hover:bg-stone-50 transition-colors relative">
@@ -330,7 +319,7 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] font-bold text-gold">Premio: +{mission.punti} pt</div>
+                        {/* Rimosso campo punti */}
                       </div>
                     </div>
 

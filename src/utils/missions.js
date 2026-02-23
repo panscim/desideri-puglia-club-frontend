@@ -33,7 +33,6 @@ export async function completeAutomaticMission(userId, codice) {
           id_utente: userId,
           id_missione: mission.id,
           stato: 'Approvata',
-          punti_approvati: mission.punti,
           prova_url: null,
           data_revisione: new Date().toISOString(),
           period_key: 'permanent'

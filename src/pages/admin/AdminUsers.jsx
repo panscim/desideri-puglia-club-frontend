@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../services/supabase'
 import { Search, Shield, Ban, TrendingUp, User, Trash2 } from 'lucide-react'
-import { getLevelByPoints } from '../../utils/levels'
 import AdminNav from '../../components/AdminNav'
 import toast from 'react-hot-toast'
 import { Navigate } from 'react-router-dom'
@@ -98,25 +97,6 @@ const AdminUsers = () => {
       loadUsers()
     } catch (error) {
       console.error('Error toggling user:', error)
-      toast.error(t('common.error'))
-    }
-  }
-
-  const handleResetMonthlyPoints = async (user) => {
-    if (!confirm(t('admin.users.messages.confirm_reset', { name: user.nickname }))) return
-
-    try {
-      const { error } = await supabase
-        .from('utenti')
-        .update({ punti_mensili: 0 })
-        .eq('id', user.id)
-
-      if (error) throw error
-
-      toast.success(t('admin.users.messages.points_reset'))
-      loadUsers()
-    } catch (error) {
-      console.error('Error resetting points:', error)
       toast.error(t('common.error'))
     }
   }
@@ -226,9 +206,6 @@ const AdminUsers = () => {
           <thead>
             <tr className="border-b border-sand">
               <th className="text-left py-3 px-2 text-sm font-semibold text-olive-dark">{t('admin.users.table.user')}</th>
-              <th className="text-center py-3 px-2 text-sm font-semibold text-olive-dark">{t('admin.users.table.level')}</th>
-              <th className="text-center py-3 px-2 text-sm font-semibold text-olive-dark">{t('admin.users.table.points_tot')}</th>
-              <th className="text-center py-3 px-2 text-sm font-semibold text-olive-dark">{t('admin.users.table.points_month')}</th>
               <th className="text-center py-3 px-2 text-sm font-semibold text-olive-dark">{t('admin.users.table.role')}</th>
               <th className="text-center py-3 px-2 text-sm font-semibold text-olive-dark">{t('admin.users.table.status')}</th>
               <th className="text-center py-3 px-2 text-sm font-semibold text-olive-dark">{t('admin.users.table.actions')}</th>
@@ -236,7 +213,6 @@ const AdminUsers = () => {
           </thead>
           <tbody>
             {filteredUsers.map((user) => {
-              const level = getLevelByPoints(user.punti_totali)
               const isActive = new Date() - new Date(user.ultima_attivita) < 7 * 24 * 60 * 60 * 1000
 
               return (
@@ -251,18 +227,6 @@ const AdminUsers = () => {
                         <p className="text-xs text-olive-light">{user.email}</p>
                       </div>
                     </div>
-                  </td>
-                  <td className="py-3 px-2 text-center">
-                    <div className="flex flex-col items-center">
-                      <span className="text-xl">{level.icon}</span>
-                      <span className="text-xs text-olive-light">{user.livello}</span>
-                    </div>
-                  </td>
-                  <td className="py-3 px-2 text-center font-bold text-olive-dark">
-                    {user.punti_totali}
-                  </td>
-                  <td className="py-3 px-2 text-center font-bold text-gold">
-                    {user.punti_mensili}
                   </td>
                   <td className="py-3 px-2 text-center">
                     <select
@@ -297,13 +261,6 @@ const AdminUsers = () => {
                         title={user.attivo ? t('admin.users.actions.block') : t('admin.users.actions.unblock')}
                       >
                         <Ban className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleResetMonthlyPoints(user)}
-                        className="p-1 text-olive-light hover:text-olive-dark"
-                        title={t('admin.users.actions.reset_points')}
-                      >
-                        <TrendingUp className="w-4 h-4" />
                       </button>
                       {/* NUOVO: Elimina */}
                       <button

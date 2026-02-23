@@ -24,7 +24,6 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Missioni = lazy(() => import("./pages/Missioni"));
 const MissionDetail = lazy(() => import("./pages/MissionDetail"));
 const SagaDetail = lazy(() => import("./pages/SagaDetail.jsx"));
-const Classifica = lazy(() => import("./pages/Classifica"));
 const Profilo = lazy(() => import("./pages/Profilo.jsx"));
 const VoucherList = lazy(() => import("./pages/VoucherList"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
@@ -38,8 +37,7 @@ const PartnerDetail = lazy(() => import("./pages/PartnerDetail.jsx"));
 const PartnerJoin = lazy(() => import("./pages/PartnerJoin.jsx"));
 const PartnerDashboard = lazy(() => import("./pages/PartnerDashboard.jsx"));
 const PinPad = lazy(() => import("./pages/PinPad.jsx"));
-const AcquistaGettoni = lazy(() => import("./pages/AcquistaGettoni.jsx"));
-const BoostAcquista = lazy(() => import("./pages/BoostAcquista.jsx"));
+
 
 // Mappa (lazy loaded)
 const Mappa = lazy(() => import("./pages/Mappa"));
@@ -62,7 +60,6 @@ const Premi = lazy(() => import("./pages/Premi"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminMissions = lazy(() => import("./pages/admin/AdminMissions"));
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
-const AdminPrizes = lazy(() => import("./pages/admin/AdminPrizes"));
 const AdminPartners = lazy(() => import("./pages/admin/AdminPartners"));
 // (AdminOffers removed)
 const AdminTransazioni = lazy(() => import("./pages/admin/AdminTransazioni.jsx"));
@@ -212,7 +209,6 @@ function App() {
               <Route path="/missioni" element={<Missioni />} />
               <Route path="/missione/:id" element={<MissionDetail />} />
               <Route path="/saga/:id" element={<SagaDetail />} />
-              <Route path="/classifica" element={<Classifica />} />
               <Route path="/profilo" element={<Profilo />} />
 
               {/* Pagina Premi Mensili */}
@@ -230,8 +226,6 @@ function App() {
               <Route path="/partner/join" element={<PartnerJoin />} />
               <Route path="/partner/dashboard" element={<PartnerDashboard />} />
               <Route path="/partner/:id/pin" element={<PinPad />} />
-              <Route path="/partner/acquista-gettoni" element={<AcquistaGettoni />} />
-              <Route path="/boost" element={<BoostAcquista />} />
 
 
               {/* Mercato */}
@@ -263,7 +257,6 @@ function App() {
               {/* Admin */}
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/missions" element={<AdminMissions />} />
-              <Route path="/admin/premi" element={<AdminPrizes />} />
               <Route path="/admin/partner" element={<AdminPartners />} />
               <Route path="/admin/cards" element={<AdminCards />} />
               {/* <Route path="/admin/offerte" element={<AdminOffers />} /> Removed legacy route */}

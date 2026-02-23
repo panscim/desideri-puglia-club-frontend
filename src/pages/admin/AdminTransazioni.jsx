@@ -1,4 +1,4 @@
-// src/pages/admin/AdminTransazioni.jsx — Log Transazioni (Punti & Boost)
+// src/pages/admin/AdminTransazioni.jsx — Log Transazioni
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase";
 import { Search, RotateCcw, ArrowRight, Zap, Coins } from "lucide-react";
@@ -67,21 +67,18 @@ export default function AdminTransazioni() {
                                 <th className="px-6 py-4">{t('admin.transactions.table.date')}</th>
                                 <th className="px-6 py-4">{t('admin.transactions.table.user')}</th>
                                 <th className="px-6 py-4">{t('admin.transactions.table.action')}</th>
-                                <th className="px-6 py-4 text-right">{t('admin.transactions.table.points')}</th>
-                                <th className="px-6 py-4 text-center">{t('admin.transactions.table.boost')}</th>
-                                <th className="px-6 py-4 text-right">{t('admin.transactions.table.total')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-sand/50">
                             {loading && logs.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="p-8 text-center text-olive-light">
+                                    <td colSpan="3" className="p-8 text-center text-olive-light">
                                         {t('common.loading')}
                                     </td>
                                 </tr>
                             ) : logs.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="p-8 text-center text-olive-light">
+                                    <td colSpan="3" className="p-8 text-center text-olive-light">
                                         {t('admin.transactions.empty')}
                                     </td>
                                 </tr>
@@ -119,21 +116,6 @@ export default function AdminTransazioni() {
                                                     {log.note}
                                                 </p>
                                             )}
-                                        </td>
-                                        <td className="px-6 py-4 text-right font-mono text-olive-dark">
-                                            {log.punti}
-                                        </td>
-                                        <td className="px-6 py-4 text-center">
-                                            {(log.moltiplicatore || 1) > 1 ? (
-                                                <span className="inline-flex items-center gap-1 font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md">
-                                                    <Zap className="w-3 h-3" /> x{log.moltiplicatore}
-                                                </span>
-                                            ) : (
-                                                <span className="text-olive-light/50">-</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 text-right font-bold text-emerald-600">
-                                            +{log.punti_effettivi}
                                         </td>
                                     </tr>
                                 ))

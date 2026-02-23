@@ -26,7 +26,6 @@ export default function AdminPartners() {
   // Modal state
   const [selectedPartner, setSelectedPartner] = useState(null);
   const [editForm, setEditForm] = useState({
-    saldo_punti: 0,
     pin_code: "",
     is_verified: false,
   });
@@ -42,7 +41,7 @@ export default function AdminPartners() {
       const { data, error } = await supabase
         .from("partners")
         .select(
-          "id, name, logo_url, city, category, is_active, visits_month, saldo_punti, is_verified, pin_code"
+          "id, name, logo_url, city, category, is_active, visits_month, is_verified, pin_code"
         )
         .order("name", { ascending: true });
 
@@ -59,7 +58,6 @@ export default function AdminPartners() {
   const handleEdit = (partner) => {
     setSelectedPartner(partner);
     setEditForm({
-      saldo_punti: partner.saldo_punti || 0,
       pin_code: partner.pin_code || "",
       is_verified: partner.is_verified || false,
       whatsapp_number: partner.whatsapp_number || "",
@@ -73,7 +71,6 @@ export default function AdminPartners() {
       const { error } = await supabase
         .from("partners")
         .update({
-          saldo_punti: parseInt(editForm.saldo_punti) || 0,
           pin_code: editForm.pin_code,
           is_verified: editForm.is_verified,
           whatsapp_number: editForm.whatsapp_number,
@@ -158,9 +155,6 @@ export default function AdminPartners() {
                     {p.city} · {p.category}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="px-2 py-0.5 rounded-md bg-amber-100 text-amber-700 text-[10px] font-bold flex items-center gap-1">
-                      <Coins className="w-3 h-3" /> {p.saldo_punti ?? 0}
-                    </span>
                     <span className="px-2 py-0.5 rounded-md bg-gray-100 text-gray-600 text-[10px] font-mono flex items-center gap-1">
                       <KeyRound className="w-3 h-3" />{" "}
                       {p.pin_code || "NO PIN"}
@@ -196,48 +190,6 @@ export default function AdminPartners() {
             </div>
 
             <div className="p-6 space-y-4">
-              {/* Saldo */}
-              <div>
-                <label className="block text-xs font-bold text-olive-dark uppercase mb-1">
-                  {t('admin.partners.balance')}
-                </label>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() =>
-                      setEditForm((f) => ({
-                        ...f,
-                        saldo_punti: Math.max(0, f.saldo_punti - 100),
-                      }))
-                    }
-                    className="w-10 h-10 rounded-lg bg-red-100 text-red-600 font-bold hover:bg-red-200"
-                  >
-                    -100
-                  </button>
-                  <input
-                    type="number"
-                    value={editForm.saldo_punti}
-                    onChange={(e) =>
-                      setEditForm((f) => ({
-                        ...f,
-                        saldo_punti: parseInt(e.target.value) || 0,
-                      }))
-                    }
-                    className="flex-1 text-center py-2 rounded-lg border border-sand font-mono text-lg font-bold"
-                  />
-                  <button
-                    onClick={() =>
-                      setEditForm((f) => ({
-                        ...f,
-                        saldo_punti: f.saldo_punti + 100,
-                      }))
-                    }
-                    className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 font-bold hover:bg-emerald-200"
-                  >
-                    +100
-                  </button>
-                </div>
-              </div>
-
               {/* PIN */}
               <div>
                 <label className="block text-xs font-bold text-olive-dark uppercase mb-1">
