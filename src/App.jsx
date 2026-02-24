@@ -80,7 +80,7 @@ const EventiSuccess = lazy(() => import("./pages/EventiSuccess"));
 import Layout from "./components/Layout";
 
 // 📲 PWA install banner - Keep eager as it's small and important
-import PwaInstallPrompt from "./components/PwaInstallPrompt";
+
 
 // Loading fallback component
 const PageLoader = () => (
@@ -273,9 +273,6 @@ function App() {
           </Routes>
         </Suspense>
 
-
-        {/* Popup install PWA (Android: prompt nativo, iOS: istruzioni) */}
-        <PwaInstallPrompt />
       </BrowserRouter>
     </AuthProvider>
   );

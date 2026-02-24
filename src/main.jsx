@@ -4,13 +4,11 @@ import './index.css'
 import './i18n' // Startup i18n
 import '@fontsource/geist-sans'
 import App from './App.jsx'
-import { registerServiceWorker, setupInstallPrompt } from './utils/pwa'
+import { registerServiceWorker } from './utils/pwa'
 
 // Register Service Worker per PWA
 registerServiceWorker()
 
-// Setup install prompt
-setupInstallPrompt()
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

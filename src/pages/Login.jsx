@@ -135,17 +135,32 @@ const Login = () => {
               {loading ? t('auth.login_loading') : 'Log In'}
             </button>
 
-            {/* CTA Secondaria (Facebook mock) */}
-            <button
-              type="button"
-              className="w-full bg-white text-zinc-950 font-medium text-[15px] py-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.15)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-              onClick={() => toast('Facebook login coming soon')}
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M13.397 20.997v-8.196h2.765l.411-3.209h-3.176V7.548c0-.926.258-1.56 1.587-1.56h1.684V3.127A22.336 22.336 0 0 0 14.201 3c-2.444 0-4.122 1.492-4.122 4.231v2.355H7.332v3.209h2.753v8.196h3.312z" />
-              </svg>
-              Log in with Facebook
-            </button>
+            {/* CTA Secondaria (Social Login mock) */}
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                className="w-full bg-white text-zinc-950 font-medium text-[14px] py-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.15)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                onClick={() => toast('Apple login coming soon')}
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16.365 21.43c-1.127.818-2.27 1.229-3.435 1.229-1.09 0-2.311-.47-3.66-1.408-1.579-1.077-3.235-2.887-4.965-5.431C2.564 13.255 1.693 10.662 1.693 8.04c0-2.585.805-4.636 2.417-6.152C5.69 1.492 7.55.733 9.682.733c1.071 0 2.227.355 3.468 1.066 1.144.664 1.838 1.002 2.08 1.014.244-.012.973-.362 2.188-1.05 1.156-.665 2.247-1.012 3.275-1.04 1.578-.046 2.972.4 4.184 1.339.814.638 1.5 1.458 2.054 2.46-.388.24-.764.498-1.127.773a4.707 4.707 0 00-1.748 3.96c0 1.86.666 3.425 2.001 4.694.464.437.954.786 1.472 1.047-.394 1.168-.946 2.37-1.655 3.606-1.053 1.821-2.183 3.327-3.39 4.516-.761.758-1.653 1.282-2.673 1.57zm-4.14-15.003c-1.42 0-2.627-.514-3.619-1.542-.991-1.029-1.487-2.243-1.487-3.643 0-1.4.52-2.643 1.56-3.729 1.041-1.085 2.296-1.628 3.765-1.628 1.48 0 2.7.534 3.663 1.604.962 1.07 1.443 2.316 1.443 3.738 0 1.426-.502 2.656-1.503 3.69-.999 1.034-2.274 1.51-3.822 1.51z" />
+                </svg>
+                Apple
+              </button>
+              <button
+                type="button"
+                className="w-full bg-white text-zinc-950 font-medium text-[14px] py-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.15)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                onClick={() => toast('Google login coming soon')}
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                </svg>
+                Google
+              </button>
+            </div>
           </div>
         </form>
 
