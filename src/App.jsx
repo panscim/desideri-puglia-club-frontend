@@ -24,6 +24,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Missioni = lazy(() => import("./pages/Missioni"));
 const MissionDetail = lazy(() => import("./pages/MissionDetail"));
 const SagaDetail = lazy(() => import("./pages/SagaDetail.jsx"));
+const SagaIntro = lazy(() => import("./pages/SagaIntro.jsx"));
 const Profilo = lazy(() => import("./pages/Profilo.jsx"));
 const VoucherList = lazy(() => import("./pages/VoucherList"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
@@ -209,6 +210,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/missioni" element={<Missioni />} />
               <Route path="/missione/:id" element={<MissionDetail />} />
+              <Route path="/saga/:id/intro" element={<SagaIntro />} />
               <Route path="/saga/:id" element={<SagaDetail />} />
               <Route path="/profilo" element={<Profilo />} />
 

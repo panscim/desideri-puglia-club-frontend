@@ -183,7 +183,7 @@ const Missioni = () => {
                     const progressPercent = Math.min(100, Math.round((completedStepsCount / totalStepsCount) * 100))
 
                     return (
-                      <Link to={`/saga/${set.id}`} key={set.id} className="block active:scale-[0.98] transition-all pb-4">
+                      <Link to={`/saga/${set.id}/intro`} key={set.id} className="block active:scale-[0.98] transition-all pb-4">
                         <div className="bg-[#1E202B] rounded-3xl overflow-hidden shadow-lg border border-white/5 flex flex-col group">
 
                           {/* TOP: Image */}
