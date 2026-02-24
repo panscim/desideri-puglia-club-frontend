@@ -48,14 +48,14 @@ const Mappa = lazy(() => import("./pages/Mappa"));
 const OnboardingInteressi = lazy(() => import("./pages/OnboardingInteressi"));
 
 // Chat
-const Chat = lazy(() => import("./pages/Chat"));
+
 
 // NUOVE PAGINE PROFILO
 const Contatti = lazy(() => import("./pages/Contatti.jsx"));
 
 
 // ⭐️ PAGINA PREMI MENSILI
-const Premi = lazy(() => import("./pages/Premi"));
+
 
 // Admin
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
@@ -215,13 +215,13 @@ function App() {
               <Route path="/profilo" element={<Profilo />} />
 
               {/* Pagina Premi Mensili */}
-              <Route path="/premi" element={<Premi />} />
+
 
               {/* Onboarding interessi */}
               <Route path="/onboarding" element={<OnboardingInteressi />} />
 
               {/* Chat */}
-              <Route path="/chat" element={<Chat />} />
+
 
               {/* Partner */}
               <Route path="/partner" element={<Partner />} />
