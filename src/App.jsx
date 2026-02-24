@@ -21,8 +21,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword.jsx"));
 
 // Pages (protette)
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Missioni = lazy(() => import("./pages/Missioni"));
-const MissionDetail = lazy(() => import("./pages/MissionDetail"));
+
 const SagaDetail = lazy(() => import("./pages/SagaDetail.jsx"));
 const SagaIntro = lazy(() => import("./pages/SagaIntro.jsx"));
 const Profilo = lazy(() => import("./pages/Profilo.jsx"));
@@ -51,7 +50,7 @@ const OnboardingInteressi = lazy(() => import("./pages/OnboardingInteressi"));
 
 
 // NUOVE PAGINE PROFILO
-const Contatti = lazy(() => import("./pages/Contatti.jsx"));
+
 
 
 // ⭐️ PAGINA PREMI MENSILI
@@ -59,22 +58,20 @@ const Contatti = lazy(() => import("./pages/Contatti.jsx"));
 
 // Admin
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
-const AdminMissions = lazy(() => import("./pages/admin/AdminMissions"));
+
 const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminPartners = lazy(() => import("./pages/admin/AdminPartners"));
 // (AdminOffers removed)
 const AdminTransazioni = lazy(() => import("./pages/admin/AdminTransazioni.jsx"));
 const AdminCards = lazy(() => import("./pages/admin/AdminCards.jsx"));
-const AdminEventi = lazy(() => import("./pages/admin/AdminEventi.jsx"));
+
 
 // ⭐️ NEW ALBUM PAGE
 const Album = lazy(() => import("./pages/Album"));
 
 
 // ⭐️ EVENTI CLUB
-const Eventi = lazy(() => import("./pages/Eventi"));
-const EventiDetail = lazy(() => import("./pages/EventiDetail.jsx"));
-const EventiSuccess = lazy(() => import("./pages/EventiSuccess"));
+
 
 // Layout - Keep layout eager for better UX
 import Layout from "./components/Layout";
@@ -208,8 +205,7 @@ function App() {
             >
               {/* Dashboard utente */}
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/missioni" element={<Missioni />} />
-              <Route path="/missione/:id" element={<MissionDetail />} />
+
               <Route path="/saga/:id/intro" element={<SagaIntro />} />
               <Route path="/saga/:id" element={<SagaDetail />} />
               <Route path="/profilo" element={<Profilo />} />
@@ -245,7 +241,7 @@ function App() {
               <Route path="/orders" element={<MyOrders />} />
 
               {/* Contatti */}
-              <Route path="/contatti" element={<Contatti />} />
+
 
 
 
@@ -253,18 +249,16 @@ function App() {
               <Route path="/voucher" element={<VoucherList />} />
 
               {/* ⭐️ EVENTI CLUB */}
-              <Route path="/eventi" element={<Eventi />} />
-              <Route path="/eventi/:eventId" element={<EventiDetail />} />
-              <Route path="/eventi/success" element={<EventiSuccess />} />
+
 
               {/* Admin */}
               <Route path="/admin" element={<AdminDashboard />} />
-              <Route path="/admin/missions" element={<AdminMissions />} />
+
               <Route path="/admin/partner" element={<AdminPartners />} />
               <Route path="/admin/cards" element={<AdminCards />} />
               {/* <Route path="/admin/offerte" element={<AdminOffers />} /> Removed legacy route */}
               <Route path="/admin/transazioni" element={<AdminTransazioni />} />
-              <Route path="/admin/eventi" element={<AdminEventi />} />
+
 
             </Route>
 
