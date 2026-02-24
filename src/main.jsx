@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'
 import './i18n' // Startup i18n
+import '@fontsource/geist-sans'
 import App from './App.jsx'
 import { registerServiceWorker, setupInstallPrompt } from './utils/pwa'
 

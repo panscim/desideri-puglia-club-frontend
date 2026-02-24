@@ -1,7 +1,7 @@
 // src/pages/SagaIntro.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft, MapPin, Clock, Footprints, Route, Star, Play, Compass, Sparkles, Droplets, BatteryMedium, Sun, Camera } from 'lucide-react';
+import { ChevronLeft, MapPin, Clock, Footprints, Route, Star, Play, Compass, Sparkles, Droplets, BatteryMedium, Sun, Camera, Unlock, PauseCircle, Gamepad2, Gift } from 'lucide-react';
 import { QuestService } from '../services/quest';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +40,7 @@ const SagaIntro = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#0C0D10] flex items-center justify-center">
+            <div className="min-h-[100dvh] bg-zinc-950 flex items-center justify-center">
                 <div className="w-10 h-10 border-4 border-[#E4AE2F] border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
@@ -48,7 +48,7 @@ const SagaIntro = () => {
 
     if (!saga) {
         return (
-            <div className="min-h-screen bg-[#0C0D10] text-white flex flex-col items-center justify-center p-6">
+            <div className="min-h-[100dvh] bg-zinc-950 text-white flex flex-col items-center justify-center p-6">
                 <h2 className="text-xl font-bold font-serif mb-2">Saga non trovata</h2>
                 <button onClick={() => navigate('/missioni')} className="text-[#E4AE2F] underline">Torna indietro</button>
             </div>
@@ -80,7 +80,7 @@ const SagaIntro = () => {
     const timeLabel = hours > 0 ? `${hours}h ${mins > 0 ? mins + ' min' : ''}` : `${mins} min`;
 
     return (
-        <div className="min-h-screen bg-[#0C0D10] text-white font-sans pb-6">
+        <div className="min-h-[100dvh] bg-zinc-950 text-white font-sans pb-6">
 
             {/* ========== HERO IMAGE ========== */}
             <div className="relative h-[55vh] w-full overflow-hidden">
@@ -91,7 +91,7 @@ const SagaIntro = () => {
                 />
 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0C0D10] via-[#0C0D10]/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent" />
 
                 {/* Back Button */}
                 <button
@@ -126,10 +126,10 @@ const SagaIntro = () => {
 
                 {/* Social Proof */}
                 {completionsCount > 0 && (
-                    <div className="flex items-center gap-3 mb-6 py-3 px-4 bg-[#1A1B22] rounded-2xl border border-white/5">
+                    <div className="flex items-center gap-3 mb-6 py-3 px-4 bg-zinc-900 rounded-2xl border border-white/10 shadow-inner">
                         <div className="flex -space-x-2">
                             {[...Array(Math.min(4, completionsCount))].map((_, i) => (
-                                <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-[#E4AE2F] to-[#B8860B] border-2 border-[#1A1B22] flex items-center justify-center text-[9px] font-bold text-[#0C0D10]">
+                                <div key={i} className="w-7 h-7 rounded-full bg-gradient-to-br from-[#E4AE2F] to-[#B8860B] border-2 border-zinc-900 flex items-center justify-center text-[9px] font-bold text-zinc-950">
                                     {String.fromCharCode(65 + i)}
                                 </div>
                             ))}
@@ -200,7 +200,7 @@ const SagaIntro = () => {
                                 </div>
                             ))}
                             {saga.steps.length > 5 && (
-                                <div className="w-24 h-28 shrink-0 rounded-2xl bg-[#1A1B22] border border-white/5 flex flex-col items-center justify-center snap-start">
+                                <div className="w-24 h-28 shrink-0 rounded-2xl bg-zinc-900 border border-white/10 shadow-inner flex flex-col items-center justify-center snap-start">
                                     <span className="text-[#E4AE2F] font-bold">+{saga.steps.length - 5}</span>
                                     <span className="text-[10px] text-slate-400">altre tappe</span>
                                 </div>
@@ -210,7 +210,7 @@ const SagaIntro = () => {
                 )}
 
                 {/* ========== TIPS & RECOMMENDATIONS ========== */}
-                <div className="mb-10 p-5 bg-gradient-to-b from-[#13141A] to-[#0A0B0E] rounded-[2rem] border border-[#1E202B]">
+                <div className="mb-10 p-5 bg-gradient-to-b from-zinc-900 to-zinc-950 rounded-[2rem] border border-white/10 shadow-inner">
                     <h3 className="text-[18px] font-bold font-serif text-white mb-5 text-center">Tips & Recommendations</h3>
 
                     <div className="space-y-4">
@@ -244,15 +244,15 @@ const SagaIntro = () => {
 
                 {/* ========== FEATURES ========== */}
                 <div className="space-y-3 mb-10">
-                    <FeatureRow icon="🔓" text="Accesso immediato. Nessuna guida necessaria." />
-                    <FeatureRow icon="⏸️" text="Flessibilità totale. Inizia, pausa e riprendi quando vuoi." />
-                    <FeatureRow icon="🌟" text="Scoperta Gamificata. Sblocca storie nascoste e luoghi segreti." />
-                    <FeatureRow icon="🎁" text="Card Premio Esclusiva al completamento della saga." />
+                    <FeatureRow icon={<Unlock className="w-5 h-5 text-emerald-400" />} text="Accesso immediato. Nessuna guida necessaria." />
+                    <FeatureRow icon={<PauseCircle className="w-5 h-5 text-blue-400" />} text="Flessibilità totale. Inizia, pausa e riprendi quando vuoi." />
+                    <FeatureRow icon={<Gamepad2 className="w-5 h-5 text-purple-400" />} text="Scoperta Gamificata. Sblocca storie nascoste e luoghi segreti." />
+                    <FeatureRow icon={<Gift className="w-5 h-5 text-pink-400" />} text="Card Premio Esclusiva al completamento della saga." />
                 </div>
 
                 {/* ========== PROGRESS (se già iniziata) ========== */}
                 {hasStarted && (
-                    <div className="mb-8 p-4 bg-[#1A1B22] rounded-2xl border border-white/5">
+                    <div className="mb-8 p-4 bg-zinc-900 rounded-2xl border border-white/10 shadow-inner">
                         <div className="flex items-center justify-between mb-2">
                             <span className="text-[11px] font-bold text-[#E4AE2F] uppercase tracking-wider">
                                 Il tuo progresso

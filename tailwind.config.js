@@ -17,7 +17,7 @@ export default {
         'coral': '#D47B7B',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Geist', 'sans-serif'],
         serif: ['"Libre Baskerville"', 'serif'],
       },
     },
