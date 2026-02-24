@@ -1,7 +1,7 @@
 // src/pages/SagaIntro.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft, MapPin, Clock, Footprints, Route, Star, Play, Compass, Sparkles } from 'lucide-react';
+import { ChevronLeft, MapPin, Clock, Footprints, Route, Star, Play, Compass, Sparkles, Droplets, BatteryMedium, Sun, Camera } from 'lucide-react';
 import { QuestService } from '../services/quest';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -178,8 +178,72 @@ const SagaIntro = () => {
                     />
                 </div>
 
+                {/* ========== SAGA PREVIEW IMAGES ========== */}
+                {saga.steps && saga.steps.length > 0 && (
+                    <div className="mb-10">
+                        <h3 className="text-[16px] font-bold font-serif mb-4 flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-[#E4AE2F]" />
+                            Percorso che esplorerai
+                        </h3>
+                        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x">
+                            {saga.steps.slice(0, 5).map((step, idx) => (
+                                <div key={idx} className="relative w-40 h-28 shrink-0 rounded-2xl overflow-hidden snap-start border border-white/5">
+                                    <img
+                                        src={step.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=300&auto=format'}
+                                        alt={step.description_it || 'Tappa della saga'}
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                                    <span className="absolute bottom-2 left-3 right-2 text-xs font-bold text-white truncate drop-shadow-md">
+                                        Tappa {step.step_order}
+                                    </span>
+                                </div>
+                            ))}
+                            {saga.steps.length > 5 && (
+                                <div className="w-24 h-28 shrink-0 rounded-2xl bg-[#1A1B22] border border-white/5 flex flex-col items-center justify-center snap-start">
+                                    <span className="text-[#E4AE2F] font-bold">+{saga.steps.length - 5}</span>
+                                    <span className="text-[10px] text-slate-400">altre tappe</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* ========== TIPS & RECOMMENDATIONS ========== */}
+                <div className="mb-10 p-5 bg-gradient-to-b from-[#13141A] to-[#0A0B0E] rounded-[2rem] border border-[#1E202B]">
+                    <h3 className="text-[18px] font-bold font-serif text-white mb-5 text-center">Tips & Recommendations</h3>
+
+                    <div className="space-y-4">
+                        <TipRow
+                            icon={<Footprints className="w-4 h-4 text-slate-300" />}
+                            title="Scarpe Comode"
+                            text="Camminerai per la città, quindi indossa calzature comode per goderti l'avventura al massimo."
+                        />
+                        <TipRow
+                            icon={<BatteryMedium className="w-4 h-4 text-green-400" />}
+                            title="Carica il Telefono"
+                            text="Assicurati di avere almeno il 60% di batteria. L'app guida la tua esplorazione e il GPS consuma energia."
+                        />
+                        <TipRow
+                            icon={<Sun className="w-4 h-4 text-yellow-400" />}
+                            title="Controlla il Meteo"
+                            text="Essendo un'attività all'aperto, porta un ombrello o crema solare a seconda delle previsioni."
+                        />
+                        <TipRow
+                            icon={<Camera className="w-4 h-4 text-blue-300" />}
+                            title="Porta una Macchina Fotografica"
+                            text="Scoprirai gemme nascoste ed angoli della città perfetti per catturare ricordi."
+                        />
+                        <TipRow
+                            icon={<Droplets className="w-4 h-4 text-cyan-400" />}
+                            title="Rimani Idrato"
+                            text="Porta dell'acqua con te, specialmente nei mesi caldi o nelle missioni più lunghe."
+                        />
+                    </div>
+                </div>
+
                 {/* ========== FEATURES ========== */}
-                <div className="space-y-3 mb-8">
+                <div className="space-y-3 mb-10">
                     <FeatureRow icon="🔓" text="Accesso immediato. Nessuna guida necessaria." />
                     <FeatureRow icon="⏸️" text="Flessibilità totale. Inizia, pausa e riprendi quando vuoi." />
                     <FeatureRow icon="🌟" text="Scoperta Gamificata. Sblocca storie nascoste e luoghi segreti." />
@@ -227,21 +291,33 @@ const SagaIntro = () => {
 
 // --- SUB-COMPONENTS ---
 const StatCard = ({ icon, label, value }) => (
-    <div className="bg-[#1A1B22] rounded-2xl p-4 border border-white/5 flex items-start gap-3">
-        <div className="p-2 bg-[#E4AE2F]/10 rounded-xl text-[#E4AE2F] shrink-0">
+    <div className="bg-[#1A1B22] rounded-2xl p-4 border border-white/5 flex flex-col gap-2">
+        <div className="w-8 h-8 flex flex-col justify-center items-center bg-[#E4AE2F]/10 rounded-full text-[#E4AE2F]">
             {icon}
         </div>
         <div>
-            <p className="text-[11px] text-slate-400 leading-tight">{label}</p>
-            <p className="text-white font-bold text-[15px] mt-0.5">{value}</p>
+            <p className="text-[11px] text-slate-400 leading-tight mb-0.5">{label}</p>
+            <p className="text-white font-bold text-[14px]">{value}</p>
         </div>
     </div>
 );
 
 const FeatureRow = ({ icon, text }) => (
-    <div className="flex items-center gap-3 py-3 px-4 bg-[#1A1B22]/60 rounded-xl border border-white/5">
-        <span className="text-lg shrink-0">{icon}</span>
-        <p className="text-[13px] text-slate-300">{text}</p>
+    <div className="flex items-start gap-3 py-3.5 px-4 bg-[#1A1B22]/60 rounded-2xl border border-white/5">
+        <span className="text-lg shrink-0 mt-0.5">{icon}</span>
+        <p className="text-[13px] text-slate-300 leading-snug">{text}</p>
+    </div>
+);
+
+const TipRow = ({ icon, title, text }) => (
+    <div className="flex items-start gap-4">
+        <div className="mt-1 w-8 h-8 shrink-0 bg-[#2A2B36] rounded-full flex items-center justify-center border border-white/10 shadow-inner">
+            {icon}
+        </div>
+        <div>
+            <h4 className="text-white text-[14px] font-bold mb-1">{title}</h4>
+            <p className="text-[#8E93A6] text-[12px] leading-relaxed pr-2">{text}</p>
+        </div>
     </div>
 );
 
