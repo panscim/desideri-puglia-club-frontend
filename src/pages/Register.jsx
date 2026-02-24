@@ -279,292 +279,220 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-warm-white to-sand relative">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-start px-6 py-12 relative overflow-x-hidden bg-gradient-to-br from-[#D9D3CA] via-[#EAE5DF] to-[#C9C2B7]">
+      {/* Soft blurred shapes to mimic the reference background */}
+      <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format')] bg-cover bg-center opacity-40 mix-blend-overlay fixed"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#D9D3CA]/30 to-[#C9C2B7]/80 backdrop-blur-[2px] fixed pointer-events-none"></div>
+
+      <div className="absolute top-6 right-6 z-20">
         <LanguageSwitcher />
       </div>
-      <div className="max-w-2xl w-full">
-        <div className="text-center mb-8">
-          <img
-            src="/logo.png"
-            alt="Desideri di Puglia"
-            className="w-16 h-16 rounded-full object-cover mx-auto mb-4"
-          />
-          <h1 className="text-3xl font-bold text-olive-dark mb-2">{t('auth.join_title')}</h1>
-          <p className="text-olive-light">{t('auth.join_subtitle')}</p>
+
+      <div className="w-full max-w-sm w-full z-10 flex flex-col">
+
+        {/* Intestazione */}
+        <div className="mt-12 mb-10 text-left">
+          <h1 className="text-[32px] font-bold text-white leading-tight font-sans drop-shadow-sm">
+            Create<br />your account
+          </h1>
         </div>
 
-        <div className="card">
-          <h2 className="text-2xl font-bold text-olive-dark mb-6">{t('auth.create_account')}</h2>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* FOTO PROFILO */}
-            <div className="flex items-center gap-4 mb-2">
-              <div className="w-16 h-16 rounded-full bg-sand flex items-center justify-center overflow-hidden border border-olive-light/40">
-                {avatarPreview ? (
-                  <img
-                    src={avatarPreview}
-                    alt="Foto profilo"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                ) : (
-                  <User className="w-7 h-7 text-olive-light" />
-                )}
-              </div>
-
-              <div className="flex-1">
-                <label className="block text-sm font-medium text-olive-dark mb-1">
-                  {t('auth.profile_photo')} *
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarChange}
-                  className="block w-full text-sm text-olive-dark
-                             file:mr-3 file:py-2 file:px-4
-                             file:rounded-md file:border-0
-                             file:text-sm file:font-semibold
-                             file:bg-olive-dark file:text-sand
-                             hover:file:bg-olive-light"
-                  required
-                />
-                <p className="text-xs text-olive-light mt-1">
-                  {t('auth.profile_photo_desc')}
-                </p>
-              </div>
-            </div>
-
-            {/* DATI */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.name')} *</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                  <input
-                    type="text"
-                    value={formData.nome}
-                    onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                    placeholder="Mario"
-                    required
-                  />
+        <form onSubmit={handleSubmit} className="space-y-6 pb-20">
+          {/* Avatar Upload Container Glass */}
+          <div className="flex flex-col items-center mb-8 relative">
+            <div className="w-24 h-24 rounded-full overflow-hidden mb-4 border-2 border-white/60 shadow-[0_4px_20px_rgb(0,0,0,0.1)] relative group cursor-pointer">
+              {avatarPreview ? (
+                <img src={avatarPreview} alt="Preview" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-white/20 flex flex-col items-center justify-center text-white backdrop-blur-md">
+                  <User className="w-8 h-8 mb-1 opacity-80" />
+                  <span className="text-[10px] uppercase font-bold tracking-wider opacity-80">Foto</span>
                 </div>
+              )}
+              {/* Overlay on hover */}
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="text-white text-[10px] font-bold">Modifica</span>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.surname')} *</label>
-                <input
-                  type="text"
-                  value={formData.cognome}
-                  onChange={(e) => setFormData({ ...formData, cognome: e.target.value })}
-                  className="w-full px-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                  placeholder="Rossi"
-                  required
-                />
-              </div>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarChange}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+              />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-olive-dark mb-2">Nickname *</label>
+          {/* Form Fields: Anagrafica */}
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-4">
               <input
                 type="text"
-                value={formData.nickname}
-                onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                className="w-full px-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                placeholder="puglialover"
+                value={formData.nome}
+                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-2 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+                placeholder={t('common.name') + " *"}
                 required
               />
-              <p className="text-xs text-olive-light mt-1">
-                {t('auth.nickname_desc')}
-              </p>
+              <input
+                type="text"
+                value={formData.cognome}
+                onChange={(e) => setFormData({ ...formData, cognome: e.target.value })}
+                className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-2 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+                placeholder={t('common.surname') + " *"}
+                required
+              />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.country')} *</label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                <input
-                  type="text"
-                  value={formData.paese}
-                  onChange={(e) => setFormData({ ...formData, paese: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                  placeholder="Italia"
-                  required
-                />
-              </div>
+            <input
+              type="text"
+              value={formData.nickname}
+              onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+              className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-3 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+              placeholder={t('common.nickname') + ' *'}
+              required
+            />
+
+            <input
+              type="text"
+              value={formData.paese}
+              onChange={(e) => setFormData({ ...formData, paese: e.target.value })}
+              className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-3 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+              placeholder={t('common.country') + " *"}
+              required
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                type="text"
+                value={formData.citta}
+                onChange={(e) => setFormData({ ...formData, citta: e.target.value })}
+                className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-2 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+                placeholder={t('common.city') + " *"}
+                required
+              />
+              <select
+                value={formData.sesso}
+                onChange={(e) => setFormData({ ...formData, sesso: e.target.value })}
+                className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-2 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px] [&>option]:text-zinc-900"
+                required
+              >
+                <option value="">{t('auth.gender_select')}</option>
+                <option value="M">{t('auth.gender_male')}</option>
+                <option value="F">{t('auth.gender_female')}</option>
+                <option value="Altro">{t('auth.gender_other')}</option>
+              </select>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.city')} *</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                  <input
-                    type="text"
-                    value={formData.citta}
-                    onChange={(e) => setFormData({ ...formData, citta: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                    placeholder="Bari"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-olive-dark mb-2">{t('auth.gender_select')} *</label>
-                <select
-                  value={formData.sesso}
-                  onChange={(e) => setFormData({ ...formData, sesso: e.target.value })}
-                  className="w-full px-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                  required
-                >
-                  <option value="">{t('auth.gender_select')}</option>
-                  <option value="M">{t('auth.gender_male')}</option>
-                  <option value="F">{t('auth.gender_female')}</option>
-                  <option value="Altro">{t('auth.gender_other')}</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.address')} *</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                  <input
-                    type="text"
-                    value={formData.via}
-                    onChange={(e) => setFormData({ ...formData, via: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                    placeholder="Via Roma"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.zip')} *</label>
-                <input
-                  type="text"
-                  value={formData.cap}
-                  onChange={(e) => setFormData({ ...formData, cap: e.target.value })}
-                  className="w-full px-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                  placeholder="70121"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.civico') || 'Numero Civico'} *</label>
+            <div className="grid grid-cols-3 gap-4">
+              <input
+                type="text"
+                value={formData.via}
+                onChange={(e) => setFormData({ ...formData, via: e.target.value })}
+                className="col-span-3 w-full bg-transparent border-0 border-b border-white/60 px-0 py-2 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+                placeholder={t('common.address') + " *"}
+                required
+              />
               <input
                 type="text"
                 value={formData.numero_civico}
                 onChange={(e) => setFormData({ ...formData, numero_civico: e.target.value })}
-                className="w-full px-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                placeholder="10"
+                className="col-span-1 w-full bg-transparent border-0 border-b border-white/60 px-0 py-2 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+                placeholder="Civico"
+                required
+              />
+              <input
+                type="text"
+                value={formData.cap}
+                onChange={(e) => setFormData({ ...formData, cap: e.target.value })}
+                className="col-span-2 w-full bg-transparent border-0 border-b border-white/60 px-0 py-2 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+                placeholder={t('common.zip') + " *"}
                 required
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-olive-dark mb-2">
-                {t('common.phone')}
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                <input
-                  type="tel"
-                  inputMode="tel"
-                  value={formData.telefono}
-                  onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                  placeholder="+39 3XX XXX XXXX"
-                />
-              </div>
-            </div>
+            <input
+              type="tel"
+              inputMode="tel"
+              value={formData.telefono}
+              onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+              className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-3 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+              placeholder={t('common.phone') + " (Opzionale)"}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.email')} *</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-3 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+              placeholder="Email *"
+              required
+            />
+
+            <input
+              type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-3 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+              placeholder="Password *"
+              required
+            />
+            <input
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-3 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+              placeholder={t('auth.confirm_password') + " *"}
+              required
+            />
+          </div>
+
+          <div className="pt-2">
+            <label className="flex items-start gap-3 cursor-pointer group">
+              <div className="relative flex shrink-0 items-center justify-center w-5 h-5 mt-0.5">
                 <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                  placeholder="tua@email.com"
+                  type="checkbox"
                   required
+                  className="peer appearance-none w-4 h-4 rounded-sm border border-white/80 bg-white/20 checked:bg-white checked:border-white transition-all cursor-pointer"
                 />
+                <svg className="absolute w-3 h-3 text-zinc-900 pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
               </div>
-              <p className="text-xs text-olive-light mt-1">
-                {t('auth.email_allowed')}
-              </p>
-            </div>
+              <span className="text-[12px] leading-snug text-white/90 group-hover:text-white transition-colors">
+                By signing up you agree to the terms of service and privacy policy. We only accept Gmail, iCloud, Outlook, Libero, Hotmail.
+              </span>
+            </label>
+          </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-olive-dark mb-2">{t('common.password')} *</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                  <input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                    placeholder="••••••••"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-olive-dark mb-2">
-                  {t('auth.confirm_password')} *
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                  <input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) =>
-                      setFormData({ ...formData, confirmPassword: e.target.value })
-                    }
-                    className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                    placeholder="••••••••"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
+          <div className="pt-8 space-y-4">
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-zinc-950 text-white font-medium text-[15px] py-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? t('auth.register_loading') : t('auth.register_submit')}
+              {loading ? t('auth.register_loading') : 'Sign Up'}
             </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-olive-light">
-              {t('auth.has_account')}{" "}
-              <Link
-                to="/login"
-                className="text-olive-dark font-medium hover:text-gold transition-colors"
-              >
-                {t('auth.login_link')}
-              </Link>
-            </p>
+            <button
+              type="button"
+              className="w-full bg-white text-zinc-950 font-medium text-[15px] py-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.15)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              onClick={() => toast('Facebook login coming soon')}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13.397 20.997v-8.196h2.765l.411-3.209h-3.176V7.548c0-.926.258-1.56 1.587-1.56h1.684V3.127A22.336 22.336 0 0 0 14.201 3c-2.444 0-4.122 1.492-4.122 4.231v2.355H7.332v3.209h2.753v8.196h3.312z" />
+              </svg>
+              Sign up with Facebook
+            </button>
           </div>
-        </div>
+        </form>
 
-        <p className="text-center text-xs text-olive-light mt-8">
-          {t('auth.terms')}
-        </p>
+        <div className="pb-4 text-center mt-auto">
+          <p className="text-[14px] text-white/80">
+            Already have an account?{' '}
+            <Link to="/login" className="text-white font-medium hover:underline underline-offset-4">
+              Log In
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

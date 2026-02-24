@@ -56,100 +56,107 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-br from-warm-white to-sand relative">
-      <div className="absolute top-4 right-4">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-between px-6 py-12 relative overflow-hidden bg-gradient-to-br from-[#D9D3CA] via-[#EAE5DF] to-[#C9C2B7]">
+      {/* Soft blurred shapes to mimic the reference background */}
+      <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[120%] bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#D9D3CA]/30 to-[#C9C2B7]/80 backdrop-blur-[2px]"></div>
+
+      <div className="absolute top-6 right-6 z-20">
         <LanguageSwitcher />
       </div>
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <img
-            src="/logo.png"
-            alt="Desideri di Puglia"
-            className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
-          />
-          <h1 className="text-2xl font-bold text-olive-dark">{t('auth.login_title')}</h1>
+
+      <div className="w-full max-w-sm w-full z-10 flex flex-col flex-1">
+
+        {/* Intestazione */}
+        <div className="mt-20 mb-12">
+          <h1 className="text-[32px] font-bold text-white leading-tight font-sans drop-shadow-sm">
+            Log into<br />your account
+          </h1>
         </div>
 
-        {/* Card Login */}
-        <section className="card">
-          <h2 className="text-xl font-bold text-olive-dark mb-6">{t('common.login')}</h2>
+        {/* Form Astratto Base/Glass */}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Email */}
+          <div className="relative">
+            <input
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-3 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+              placeholder="Username/Email"
+              autoComplete="email"
+            />
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-olive-dark mb-2">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                <input
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                  placeholder="tua@email.com"
-                  autoComplete="email"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-olive-dark mb-2">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-olive-light" />
-                <input
-                  type="password"
-                  required
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-sand rounded-lg focus:outline-none focus:ring-2 focus:ring-olive-light"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                />
-              </div>
-            </div>
-
-            {/* Resta connesso */}
-            <label className="flex items-center gap-2 text-sm text-olive-dark">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-sand"
-              />
-              {t('auth.remember_me')}
-            </label>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? t('auth.login_loading') : t('auth.login_submit')}
-            </button>
-          </form>
-
-          <div className="mt-3 text-center">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-olive-dark font-medium hover:text-gold transition-colors"
-            >
-              {t('auth.forgot_password')}
+          {/* Password */}
+          <div className="relative">
+            <input
+              type="password"
+              required
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              className="w-full bg-transparent border-0 border-b border-white/60 px-0 py-3 text-white placeholder-white/80 focus:ring-0 focus:border-white transition-colors text-[15px]"
+              placeholder="Password"
+              autoComplete="current-password"
+            />
+            <Link to="/forgot-password" className="absolute right-0 top-1/2 -translate-y-1/2 text-white/80 text-[13px] hover:text-white transition-colors">
+              Forgot?
             </Link>
           </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-sm text-olive-light">
-              {t('auth.no_account')}{' '}
-              <Link to="/register" className="text-olive-dark font-medium hover:text-gold transition-colors">
-                {t('auth.register_link')}
-              </Link>
-            </p>
+          {/* Resta connesso */}
+          <div className="pt-2">
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <div className="relative flex items-center justify-center w-5 h-5">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="peer appearance-none w-4 h-4 rounded-sm border border-white/80 bg-white/20 checked:bg-white checked:border-white transition-all cursor-pointer"
+                />
+                <svg className="absolute w-3 h-3 text-zinc-900 pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </div>
+              <span className="text-[13px] text-white/90 group-hover:text-white transition-colors">
+                Remember me
+              </span>
+            </label>
           </div>
 
-          <p className="text-center text-xs text-olive-light mt-6">
-            {t('auth.terms')}
+          {/* CTA Principale Zinc-950 */}
+          <div className="pt-8 space-y-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-zinc-950 text-white font-medium text-[15px] py-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? t('auth.login_loading') : 'Log In'}
+            </button>
+
+            {/* CTA Secondaria (Facebook mock) */}
+            <button
+              type="button"
+              className="w-full bg-white text-zinc-950 font-medium text-[15px] py-4 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.15)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              onClick={() => toast('Facebook login coming soon')}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M13.397 20.997v-8.196h2.765l.411-3.209h-3.176V7.548c0-.926.258-1.56 1.587-1.56h1.684V3.127A22.336 22.336 0 0 0 14.201 3c-2.444 0-4.122 1.492-4.122 4.231v2.355H7.332v3.209h2.753v8.196h3.312z" />
+              </svg>
+              Log in with Facebook
+            </button>
+          </div>
+        </form>
+
+        <div className="mt-auto pb-4 text-center">
+          <p className="text-[14px] text-white/80">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-white font-medium hover:underline underline-offset-4">
+              Sign Up
+            </Link>
           </p>
-        </section>
+        </div>
       </div>
     </div>
   )
