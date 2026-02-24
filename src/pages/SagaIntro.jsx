@@ -80,7 +80,7 @@ const SagaIntro = () => {
     const timeLabel = hours > 0 ? `${hours}h ${mins > 0 ? mins + ' min' : ''}` : `${mins} min`;
 
     return (
-        <div className="min-h-[100dvh] bg-zinc-950 text-white font-sans pb-6">
+        <div className="min-h-[100dvh] bg-zinc-950 text-white font-sans pb-32">
 
             {/* ========== HERO IMAGE ========== */}
             <div className="relative h-[55vh] w-full overflow-hidden">
