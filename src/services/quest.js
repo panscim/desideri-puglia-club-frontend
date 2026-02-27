@@ -53,65 +53,80 @@ export const QuestService = {
 
     // Fetch the user's active (in-progress) sagas with step completion count
     async getUserActiveSagas(userId) {
-        if (!userId) return []
+        if (!userId) {
+            console.warn('getUserActiveSagas: No userId provided');
+            return [];
+        }
         try {
-            // 1. Fetch user quest sets that are in progress (not completed)
+            // 1. Fetch user quest sets that are in progress
+            // Note: status is strictly 'in_progress' or 'active' for this widget
             const { data: userSets, error: setsError } = await supabase
                 .from('user_quest_sets')
                 .select(`
                     *,
-                    saga:quest_sets(
+                    quest_sets (
                         id, title, title_it, title_en, image_url, city,
-                        steps:quest_set_steps(id)
+                        quest_set_steps (id)
                     )
                 `)
                 .eq('user_id', userId)
                 .neq('status', 'completed')
-                .order('started_at', { ascending: false })
+                .order('started_at', { ascending: false });
 
-            if (setsError) throw setsError
-            if (!userSets || userSets.length === 0) return []
+            if (setsError) {
+                console.error('Error fetching user_quest_sets:', setsError);
+                throw setsError;
+            }
+
+            if (!userSets || userSets.length === 0) return [];
 
             // 2. Fetch completed steps for this user
-            const sagaIds = userSets.map(s => s.quest_set_id)
-            const { data: completedSteps } = await supabase
+            const sagaIds = userSets.map(s => s.quest_set_id).filter(id => !!id);
+            if (sagaIds.length === 0) return [];
+
+            const { data: completedSteps, error: stepsError } = await supabase
                 .from('user_quest_set_steps')
                 .select('step_id, quest_set_steps!inner(quest_set_id)')
                 .eq('user_id', userId)
-                .in('quest_set_steps.quest_set_id', sagaIds)
+                .in('quest_set_steps.quest_set_id', sagaIds);
+
+            if (stepsError) {
+                console.error('Error fetching completed steps for active sagas:', stepsError);
+                // We don't throw here, just proceed with 0 done steps for now if this fails
+            }
 
             // 3. Build a map of completed step counts per saga
-            const completedCountMap = {}
+            const completedCountMap = {};
             for (const row of (completedSteps || [])) {
-                const setId = row.quest_set_steps?.quest_set_id
+                const setId = row.quest_set_steps?.quest_set_id;
                 if (setId) {
-                    completedCountMap[setId] = (completedCountMap[setId] || 0) + 1
+                    completedCountMap[setId] = (completedCountMap[setId] || 0) + 1;
                 }
             }
 
             // 4. Merge into result objects
             return userSets.map(us => {
-                const saga = us.saga || {}
-                const totalSteps = saga.steps?.length || 0
-                const doneSteps = completedCountMap[us.quest_set_id] || 0
-                const percent = totalSteps > 0 ? Math.round((doneSteps / totalSteps) * 100) : 0
+                const saga = us.quest_sets || {};
+                const totalSteps = saga.quest_set_steps?.length || 0;
+                const doneSteps = completedCountMap[us.quest_set_id] || 0;
+                const percent = totalSteps > 0 ? Math.round((doneSteps / totalSteps) * 100) : 0;
 
                 return {
                     userSetId: us.id,
                     questSetId: us.quest_set_id,
                     startedAt: us.started_at,
                     status: us.status,
-                    sagaTitle: saga.title_it || saga.title,
+                    sagaTitle: saga.title_it || saga.title || 'Saga Senza Titolo',
                     sagaImage: saga.image_url,
                     sagaCity: saga.city,
                     totalSteps,
                     doneSteps,
                     percent,
-                }
-            })
+                };
+            });
         } catch (err) {
-            console.error('Error fetching user active sagas:', err)
-            return []
+            console.error('getUserActiveSagas failure:', err);
+            return [];
         }
     },
 

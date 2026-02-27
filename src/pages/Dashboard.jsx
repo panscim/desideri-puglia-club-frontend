@@ -83,7 +83,7 @@ const Dashboard = () => {
       );
     }
     loadData();
-  }, []);
+  }, [profile?.id]); // Ricarica quando il profilo è pronto
 
   const handleScroll = (e) => {
     if (!carouselRef.current || heroItems.length === 0) return;
