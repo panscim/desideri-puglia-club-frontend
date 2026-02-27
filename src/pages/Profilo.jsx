@@ -9,7 +9,7 @@ import {
   UserCircle, PencilSimple, SignOut, ShareNetwork, ShieldCheck,
   Trash, Lock, MapPin, Medal, Path, Books, X, CardsThree, Compass, Key,
   ArrowRight, Warning, Camera, FloppyDisk, InstagramLogo, TiktokLogo,
-  FacebookLogo, YoutubeLogo
+  FacebookLogo, YoutubeLogo, BookOpenText
 } from '@phosphor-icons/react'
 
 export default function Profilo() {
@@ -35,8 +35,6 @@ export default function Profilo() {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
   const [deletingAccount, setDeletingAccount] = useState(false)
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false)
-  const [showTermsModal, setShowTermsModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [passwordSending, setPasswordSending] = useState(false)
   const [modeTransition, setModeTransition] = useState({ active: false, target: null, flip: false })
@@ -182,7 +180,7 @@ export default function Profilo() {
 
         <div className="flex items-center gap-2 mt-3 z-10">
           <span className="px-3 py-1 rounded-full bg-white/10 text-[10px] font-bold text-white/60 uppercase tracking-widest backdrop-blur-md">Passaporto Digitale</span>
-          {partner && <button onClick={() => handleModeSwitch('partner')} className="px-3 py-1 rounded-full bg-amber-400/20 border border-amber-400/30 text-[10px] font-bold text-amber-300 uppercase tracking-widest active:scale-95 transition">Partner HUB</button>}
+          {partner && <button onClick={() => handleModeSwitch('partner')} className="px-3 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/30 text-[11px] font-bold text-amber-300 uppercase tracking-widest active:scale-95 transition shadow-[0_0_15px_rgba(251,191,36,0.2)]">HUB Partner</button>}
         </div>
       </div>
 
@@ -283,9 +281,10 @@ export default function Profilo() {
 
         {/* ── SICUREZZA E LEGAL ── */}
         <div className="grid sm:grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-white border border-zinc-200/60 p-2 shadow-sm">
+          <div className="rounded-2xl bg-white border border-zinc-200/60 p-2 shadow-sm space-y-1">
             <ActionRow icon={<Lock weight="duotone" />} color="text-zinc-600" label="Reimposta Password" onClick={() => setShowPasswordModal(true)} />
-            <ActionRow icon={<ShieldCheck weight="duotone" />} color="text-zinc-600" label="Privacy e Termini" onClick={() => setShowPrivacyModal(true)} />
+            <ActionRow icon={<ShieldCheck weight="duotone" />} color="text-emerald-500" label="Informativa sulla Privacy" onClick={() => navigate('/privacy')} />
+            <ActionRow icon={<BookOpenText weight="duotone" />} color="text-orange-500" label="Termini e Condizioni" onClick={() => navigate('/termini')} />
           </div>
           <div className="rounded-2xl bg-rose-50 border border-rose-200/60 p-2 shadow-sm">
             <ActionRow icon={<Warning weight="fill" />} color="text-rose-600" label="Elimina Account" onClick={() => setShowDeleteModal(true)} />
@@ -297,14 +296,6 @@ export default function Profilo() {
       <BottomModal open={showPasswordModal} onClose={() => setShowPasswordModal(false)} title="Reset Password">
         <p className="text-[12px] text-zinc-500 mb-5 leading-relaxed">Riceverai un'email su <strong className="text-zinc-800">{profile?.email}</strong> per reimpostare la tua password.</p>
         <button onClick={handleResetPassword} disabled={passwordSending} className="w-full py-3 rounded-xl bg-zinc-950 text-white text-[13px] font-bold active:scale-95 transition disabled:opacity-50">{passwordSending ? 'Invio in corso...' : 'Invia Modulo Reset'}</button>
-      </BottomModal>
-
-      <BottomModal open={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} title="Privacy & Termini">
-        <div className="text-[12px] text-zinc-600 space-y-3 max-h-[50vh] overflow-y-auto pr-2 pb-4 -mr-2">
-          <p><strong>Desideri di Puglia CSRL</strong> - Trattiamo i dati nel rispetto del GDPR (UE 2016/679) limitatamente all'esperienza in-app. Il tracciamento GPS avviene solo su richiesta (bottoni manuali) e non in background.</p>
-          <p>I dati utente, posizione GPS e cards sbloccate sono protetti nel nostro database. Non vendiamo dati a terzi. Cliccando sui Partner, acconsenti al redirect ai loro portali in formato WebView.</p>
-          <button onClick={() => setShowTermsModal(true)} className="mt-2 text-zinc-950 font-bold underline">Leggi tutti i Termini di Servizio completi</button>
-        </div>
       </BottomModal>
 
       <BottomModal open={showDeleteModal} onClose={() => { setShowDeleteModal(false); setDeleteConfirmText('') }} title={<span className="text-rose-600 flex items-center gap-2"><Warning weight="fill" /> Danger Zone</span>}>
@@ -377,12 +368,18 @@ function BottomModal({ open, onClose, title, children }) {
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-zinc-950/40 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
-      <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5">
+      {/* 
+        Aggiungiamo mb-20 sm:mb-0 al contenitore del modale in modo che si alzi sopra la navbar 
+        del layout globale, che fissa in basso la navigazione su mobile. 
+      */}
+      <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 flex flex-col max-h-[80vh] mb-24 sm:mb-0" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5 shrink-0">
           <h3 className="text-[16px] font-bold text-zinc-950">{title}</h3>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200"><X weight="bold" /></button>
         </div>
-        {children}
+        <div className="overflow-y-auto overflow-x-hidden pr-2 -mr-2 pb-2">
+          {children}
+        </div>
       </div>
     </div>
   )

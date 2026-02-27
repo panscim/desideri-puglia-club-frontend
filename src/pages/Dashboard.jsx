@@ -1,435 +1,410 @@
 // src/pages/Dashboard.jsx
-import { useEffect, useState, useMemo } from 'react'
-import { Link } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
-import { supabase } from '../services/supabase'
-import { AlbumService } from '../services/album'
-import { EventsService } from '../services/events'
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../services/supabase';
+import { QuestService } from '../services/quest';
+import { EventsService } from '../services/events';
 import {
-  MapPin,
-  Lock,
-  Eye,
-  Rocket
-} from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { getLocalized } from '../utils/content'
-import EventUnlockModal from '../components/EventUnlockModal'
-import toast from 'react-hot-toast'
+  Bell,
+  MagnifyingGlass,
+  Heart,
+  Bank,
+  ForkKnife,
+  Tree,
+  Waves
+} from '@phosphor-icons/react';
+import { useTranslation } from 'react-i18next';
+import SearchModal from '../components/SearchModal';
 
-// --- SKELETON UI COMPONENTS ---
-const Skeleton = ({ className }) => (
-  <div className={`animate-pulse bg-sand/40 rounded-lg ${className}`} />
-)
-
-// --- TIMER COMPONENT ---
 const EventTimer = ({ startDate, endDate }) => {
-  const [timeLeft, setTimeLeft] = useState('')
+  const [timeLeft, setTimeLeft] = useState('');
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const now = new Date().getTime()
-      const start = new Date(startDate).getTime()
-      const end = new Date(endDate).getTime()
+      const now = new Date().getTime();
+      const start = new Date(startDate).getTime();
+      const end = new Date(endDate).getTime();
 
       if (now < start) {
-        const distance = start - now
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24))
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-        setTimeLeft(`Inizia tra: ${days}g ${hours}h ${minutes}m`)
+        const distance = start - now;
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        setTimeLeft(`Inizia tra: ${days}g ${hours}h ${minutes} m`);
       } else if (now >= start && now <= end) {
-        const distance = end - now
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24))
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-        setTimeLeft(`Termina tra: ${days}g ${hours}h ${minutes}m`)
+        const distance = end - now;
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        setTimeLeft(`Termina tra: ${days}g ${hours}h ${minutes} m`);
       } else {
-        setTimeLeft('Concluso')
+        setTimeLeft('Concluso');
       }
-    }
+    };
 
-    calculateTimeLeft()
-    const timer = setInterval(calculateTimeLeft, 60000)
-    return () => clearInterval(timer)
-  }, [startDate, endDate])
+    calculateTimeLeft();
+    const timer = setInterval(calculateTimeLeft, 60000);
+    return () => clearInterval(timer);
+  }, [startDate, endDate]);
 
-  if (!timeLeft) return null
+  if (!timeLeft) return null;
 
   return (
-    <div className="flex items-center gap-1 text-[10px] font-bold text-olive-dark bg-gold/20 px-2 py-1 rounded-md border border-gold/30 whitespace-nowrap">
-      <span className="material-symbols-outlined text-[12px]">timer</span>
+    <div className="flex items-center gap-1.5 text-[10px] font-bold text-red-500 bg-red-500/10 px-2.5 py-1.5 rounded-md border border-red-500/20 whitespace-nowrap">
+      <span className="text-[13px]">⏳</span>
       {timeLeft}
     </div>
-  )
-}
+  );
+};
 
-// --- MAIN COMPONENT ---
 const Dashboard = () => {
-  const { t, i18n } = useTranslation()
-  const { profile } = useAuth()
+  const { profile } = useAuth();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
-  // State
-  const [loading, setLoading] = useState(true)
-  const [selectedUnlockEvent, setSelectedUnlockEvent] = useState(null)
-  const [events, setEvents] = useState([])
-  const [cards, setCards] = useState([])
+  const [loading, setLoading] = useState(true);
+  const [heroItems, setHeroItems] = useState([]);
+  const [saghe, setSaghe] = useState([]);
+  const [experiences, setExperiences] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [userLoc, setUserLoc] = useState(null);
+  const carouselRef = useRef(null);
 
-  // 1. DATA LOADING
   useEffect(() => {
-    loadDashboardData()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.id])
-
-  const loadDashboardData = async () => {
-    setLoading(true)
-
-    try {
-      // 1. Active Events (Notizie ed Eventi)
-      const eventsPromise = EventsService.getActiveEvents()
-
-      // 2. User Cards (Recent Discoveries & Collection Status)
-      const cardsPromise = AlbumService.getAllCards()
-
-      const [eventsData, cardsData] = await Promise.all([
-        eventsPromise,
-        cardsPromise
-      ])
-
-      setEvents(eventsData || [])
-      setCards(cardsData || [])
-
-    } catch (err) {
-      console.error('[Dashboard] Error loading data', err)
-    } finally {
-      setLoading(false)
+    // Try to get user location for proximity sorting
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (err) => console.warn('GPS denied for proximity', err)
+      );
     }
-  }
+    loadData();
+  }, []);
 
-  // --- DERIVED DATA ---
-  const unlockedCards = useMemo(() => cards.filter(c => c.isUnlocked), [cards])
-  const stats = {
-    total: cards.length || 50, // Default to 50 if empty for demo purposes
-    unlocked: unlockedCards.length
-  }
-  const collectionPercentage = stats.total > 0 ? Math.round((stats.unlocked / stats.total) * 100) : 0
+  const handleScroll = (e) => {
+    if (!carouselRef.current || heroItems.length === 0) return;
+    const scrollLeft = e.target.scrollLeft;
+    const itemWidth = carouselRef.current.scrollWidth / heroItems.length;
+    const newIndex = Math.round(scrollLeft / itemWidth);
+    if (newIndex !== activeHeroIndex) {
+      setActiveHeroIndex(newIndex);
+    }
+  };
 
-  // Recent Discoveries (Top 5 Unlocked + First 3 Locked)
-  const recentDiscoveries = useMemo(() => {
-    const unl = unlockedCards.slice(0, 5) // In a real app, sort by unlocked_at desc
-    const loc = cards.filter(c => !c.isUnlocked).slice(0, 3)
-    return [...unl, ...loc]
-  }, [unlockedCards, cards])
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      // Fetch Dashboard Hero Slides
+      const { data: heroData } = await supabase
+        .from('dashboard_hero')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
 
-  // Card of the Day (Random unlocked or locked card for demo)
-  const cardOfTheDay = useMemo(() => {
-    if (cards.length === 0) return null
-    // Prefer unlocked for better demo, otherwise first card
-    const candidates = cards.filter(c => c.image_url)
-    return candidates[0] || cards[0]
-  }, [cards])
+      // Fetch some missions for Experience Slider (missioni_catalogo)
+      const { data: missionsData } = await supabase
+        .from('missioni_catalogo')
+        .select('*')
+        .eq('attiva', true)
+        .limit(10);
 
+      // Fetch Active Events for News Slider (eventi_club)
+      const activeEvents = await EventsService.getActiveEvents();
 
+      // Fetch Saghe Storiche for Missioni Vicine
+      const activeSaghe = await QuestService.getActiveSets();
 
+      setHeroItems(heroData || []);
+      setExperiences(missionsData || []);
+      setEvents(activeEvents || []);
+      setSaghe(activeSaghe || []);
+    } catch (err) {
+      console.error('Error loading dashboard data', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const categories = [
+    { id: 'cultura', icon: <Bank size={24} weight="regular" />, label: 'Cultura' },
+    { id: 'gastronomia', icon: <ForkKnife size={24} weight="regular" />, label: 'Gastronomia' },
+    { id: 'natura', icon: <Tree size={24} weight="regular" />, label: 'Natura' },
+    { id: 'spiagge', icon: <Waves size={24} weight="regular" />, label: 'Spiagge' },
+  ];
 
   if (loading) {
-    return <div className="p-6 lg:p-10 space-y-6 max-w-7xl mx-auto w-full">
-      <Skeleton className="h-32 w-full rounded-2xl" />
-      <Skeleton className="h-40 w-full rounded-2xl" />
-      <Skeleton className="h-[400px] w-full rounded-2xl" />
+    return <div className="h-[100dvh] bg-zinc-950 flex items-center justify-center">
+      <div className="animate-pulse bg-zinc-800 w-12 h-12 rounded-full border border-white/10"></div>
     </div>
   }
 
   return (
-    <div className="pb-32 lg:pb-12 bg-[#F9F9F7] min-h-screen font-sans flex justify-center">
-      <div className="w-full max-w-7xl px-6 lg:px-10">
+    <div className="h-[100dvh] max-h-[100dvh] w-full bg-zinc-950 flex flex-col font-satoshi text-white overflow-hidden relative">
 
-        {/* HEADER: Profile Info */}
-        <div className="pt-8 px-6 pb-6 flex items-center gap-4">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-full bg-sand overflow-hidden border-2 border-white shadow-md">
-              {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gold text-white font-bold text-xl">
-                  {profile?.nickname?.[0] || 'U'}
+      {/* 1. TOP HEADER (Statico) */}
+      <header className="flex-none px-4 py-3 pb-4 flex items-center justify-between z-20 bg-gradient-to-b from-zinc-950 via-zinc-950/80 to-transparent">
+        <div className="flex items-center gap-2 shrink-0">
+          <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shadow-lg bg-white p-0.5">
+            <img src="/logo.png" alt="DDP" className="w-full h-full object-cover rounded-full" />
+          </div>
+        </div>
+
+        <div className="flex-1 mx-3">
+          <button
+            onClick={() => setIsSearchModalOpen(true)}
+            className="w-full bg-zinc-900/90 backdrop-blur-md border border-white/10 hover:bg-zinc-800 transition-colors rounded-full py-2.5 px-4 flex items-center gap-2 text-zinc-400 text-sm shadow-xl active:scale-[0.98]"
+          >
+            <MagnifyingGlass size={18} weight="bold" />
+            <span className="font-geist truncate font-medium">Trova luoghi e cose da fare</span>
+          </button>
+        </div>
+
+        <button className="relative p-2 text-white shrink-0 hover:bg-white/10 rounded-full transition-colors drop-shadow-md">
+          <Bell size={26} weight="fill" />
+          <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-zinc-950"></span>
+        </button>
+      </header>
+
+      {/* SCROLLABLE CONTENT AREA */}
+      <main className="flex-1 overflow-y-auto pb-24 no-scrollbar -mt-[72px]">
+
+        {/* 2. HERO CAROUSEL (Dinamico) */}
+        <section className="relative w-full h-[65vh] md:h-[70vh]">
+          {heroItems.length > 0 ? (
+            <div className="relative w-full h-full">
+              <div
+                ref={carouselRef}
+                onScroll={handleScroll}
+                className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
+              >
+                {heroItems.map((hero, idx) => (
+                  <div
+                    key={hero.id}
+                    onClick={() => hero.button_link ? navigate(hero.button_link) : null}
+                    className="w-full h-full shrink-0 snap-center relative cursor-pointer group"
+                  >
+                    <img
+                      src={hero.image_url}
+                      alt={hero.title}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                    />
+                    {/* Overlay Leggero Solo in Basso */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-zinc-950/20 to-transparent pointer-events-none" />
+
+                    {/* Testo In Basso a Sinistra - Stile GetYourGuide */}
+                    <div className="absolute inset-0 p-5 pb-8 flex flex-col justify-end text-left">
+                      <h1 className="text-[26px] md:text-[30px] leading-[1.1] font-black font-satoshi text-white mb-2.5 tracking-tight drop-shadow-md">
+                        {hero.title}
+                      </h1>
+
+                      {/* Branding Badge */}
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <div className="w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm shrink-0">D</div>
+                        <span className="text-[13px] font-geist font-bold text-white drop-shadow-md">Originals by Desideri di Puglia</span>
+                      </div>
+
+                      {hero.subtitle && (
+                        <p className="text-[15px] font-geist font-medium text-white mb-3 drop-shadow-md leading-snug">
+                          {hero.subtitle}
+                        </p>
+                      )}
+
+                      {hero.button_link && (
+                        <button className="flex items-center gap-1 text-[15px] font-semibold text-white w-fit drop-shadow-md hover:underline active:opacity-70">
+                          Scopri di più <span className="text-xl leading-none">›</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Dots Indicator */}
+              {heroItems.length > 1 && (
+                <div className="absolute bottom-6 w-full flex justify-center gap-2 z-10">
+                  {heroItems.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${activeHeroIndex === idx ? 'w-6 bg-white' : 'w-2 bg-white/40'}`}
+                    />
+                  ))}
                 </div>
               )}
             </div>
+          ) : (
+            <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-500">
+              Nessuna esperienza.
+            </div>
+          )}
+        </section >
+
+        {/* 4. EXPERIENCE SLIDER */}
+        < section className="mt-8 px-4 mb-4" >
+          <h3 className="text-[26px] font-black font-satoshi text-white mb-5 leading-tight tracking-tight">
+            Esperienze di viaggio<br />indimenticabili
+          </h3>
+
+          <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x -mx-4 px-4">
+            {experiences.map(exp => (
+              <div key={exp.id} className="snap-start shrink-0 w-[240px] md:w-[280px] group">
+                <div className="relative w-full h-[320px] rounded-2xl bg-zinc-900 border border-white/10 overflow-hidden mb-3">
+                  <img
+                    src={exp.immagine_url || "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=400&auto=format"}
+                    alt={exp.titolo}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent pointer-events-none" />
+
+                  <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-zinc-950/60 backdrop-blur-md px-2 py-1 rounded-full border border-white/10 shadow-sm">
+                    <div className="w-3.5 h-3.5 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white">D</div>
+                    <span className="text-[10px] font-geist font-medium text-white tracking-wide">Originals</span>
+                  </div>
+
+                  <button className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-zinc-900 shadow-md hover:scale-110 active:scale-95 transition-transform">
+                    <Heart size={16} weight="bold" />
+                  </button>
+                </div>
+
+                <h4 className="font-satoshi font-bold text-white text-[15px] line-clamp-2 leading-snug">
+                  {exp.titolo}
+                </h4>
+                <div className="flex items-center gap-1 mt-1 text-zinc-400 text-xs font-geist">
+                  <span className="text-red-500 text-sm">★</span>
+                  <span className="font-bold text-white">{(Math.random() * (5 - 4.2) + 4.2).toFixed(1)}</span>
+                  <span>({Math.floor(Math.random() * 300) + 12} valutazioni)</span>
+                </div>
+              </div>
+            ))}
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-olive-dark font-serif leading-tight">Ciao, {profile?.nome || profile?.nickname || 'Esploratore'}!</h2>
-          </div>
-          <div className="ml-auto">
-            <button className="w-10 h-10 rounded-full bg-white border border-sand shadow-sm flex items-center justify-center text-olive-dark hover:bg-stone-50 transition-colors relative">
-              <span className="material-symbols-outlined text-xl">notifications</span>
-              <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
+        </section >
+
+        {/* 5. MISSIONI VICINE SLIDER */}
+        <section className="mt-8 px-4 mb-4">
+          <div className="flex items-end justify-between mb-5">
+            <h3 className="text-[28px] font-black font-satoshi text-white leading-tight tracking-tight">
+              Missioni Vicine
+            </h3>
+            <button
+              onClick={() => navigate('/missioni')}
+              className="text-zinc-400 font-medium text-sm hover:text-white transition-colors flex items-center gap-1 group pb-1"
+            >
+              Scopri di più <span className="group-hover:translate-x-1 transition-transform">›</span>
             </button>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-10 lg:grid lg:grid-cols-12 lg:gap-10 lg:items-start pb-10 mt-6 lg:mt-10">
+          <div className="flex overflow-x-auto gap-4 pb-6 no-scrollbar snap-x -mx-4 px-4">
+            {saghe.slice(0, 5).map((saga) => (
+              <div
+                key={`vicina-${saga.id}`}
+                onClick={() => navigate(`/saga/${saga.id}/intro`)}
+                className="snap-center w-[280px] md:w-[320px] shrink-0 bg-zinc-900 rounded-[1.5rem] overflow-hidden shadow-xl border border-white/10 group flex flex-col cursor-pointer"
+              >
+                {/* Image */}
+                <div className="h-40 bg-zinc-950 relative overflow-hidden border-b border-white/5">
+                  <img src={saga.image_url || saga.map_image_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={saga.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
 
-          {/* 1. COLLECTION STATUS */}
-          <section className="order-1 lg:col-span-12 bg-white rounded-[2rem] p-6 lg:p-8 shadow-sm border border-sand/50 flex items-center justify-between transition-shadow hover:shadow-md">
-            <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-olive-light mb-1">Collection Status</h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-serif font-bold text-olive-dark leading-none">{stats.unlocked}</span>
-                <span className="text-xl font-serif text-olive-light font-medium">/ {stats.total}</span>
-              </div>
-              <p className="text-xs text-olive-light mt-1">Monuments discovered</p>
-            </div>
-
-            {/* Circular Progress (CSS Trick) */}
-            <div className="relative w-20 h-20 flex items-center justify-center">
-              <svg className="w-full h-full transform -rotate-90">
-                <circle cx="40" cy="40" r="36" fill="transparent" stroke="#f0f0eb" strokeWidth="8" />
-                <circle
-                  cx="40" cy="40" r="36"
-                  fill="transparent"
-                  stroke="#d4af37"
-                  strokeWidth="8"
-                  strokeDasharray="226"
-                  strokeDashoffset={226 - (226 * collectionPercentage) / 100}
-                  className="transition-all duration-1000 ease-out"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute font-bold text-xs text-olive-dark">{collectionPercentage}%</div>
-            </div>
-          </section>
-
-          {/* 2. DAILY CHALLENGES (Right Sidebar on Desktop) */}
-          <section className="order-2 lg:col-span-4 lg:col-start-9 lg:row-start-2">
-            <h3 className="text-xl lg:text-2xl font-bold font-serif text-olive-dark mb-4 lg:mb-6 px-2 lg:px-0">Daily Challenges</h3>
-
-            <div className="flex overflow-x-auto lg:flex-col lg:overflow-visible gap-4 lg:gap-5 pb-4 lg:pb-0 no-scrollbar -mx-6 px-6 lg:mx-0 lg:px-0">
-              {/* Card 1: Active Quest */}
-              <div className="min-w-[280px] lg:w-full bg-[#FEF6E4] rounded-[1.5rem] p-5 shadow-sm border border-[#FBE5B4] relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-md">
-                <div className="absolute right-0 bottom-0 opacity-10 text-[100px] leading-none text-gold pointer-events-none translate-x-4 translate-y-4 font-serif">
-                  🏰
-                </div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#D49800] mb-1">Active Quest</div>
-                <h4 className="text-lg font-bold text-olive-dark mb-6">Visit 3 Castles</h4>
-
-                <div className="relative w-full h-1.5 bg-[#FBE5B4] rounded-full overflow-hidden mb-2">
-                  <div className="absolute top-0 left-0 h-full bg-[#D49800] w-1/3 rounded-full"></div>
-                </div>
-                <p className="text-xs text-olive-dark/60 font-medium">1 of 3 completed</p>
-              </div>
-
-              {/* Card 2: Side Quest */}
-              <div className="min-w-[280px] lg:w-full bg-[#F0F4F8] rounded-[1.5rem] p-5 shadow-sm border border-[#DCE4EC] transition-transform hover:-translate-y-1 hover:shadow-md">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Side Quest</div>
-                <h4 className="text-lg font-bold text-olive-dark mb-6">Ancient Steps</h4>
-
-                <div className="relative w-full h-1.5 bg-[#DCE4EC] rounded-full overflow-hidden mb-2">
-                  <div className="absolute top-0 left-0 h-full bg-slate-400 w-0 rounded-full"></div>
-                </div>
-                <p className="text-xs text-olive-dark/60 font-medium">Discover your first staircase</p>
-              </div>
-            </div>
-          </section>
-
-          {/* 3. CARD OF THE DAY (Left Main Column on Desktop) */}
-          {cardOfTheDay && (
-            <section className="order-3 lg:col-span-8 lg:col-start-1 lg:row-start-2">
-              <h3 className="text-xl lg:text-2xl font-bold font-serif text-olive-dark mb-4 lg:mb-6 px-2 lg:px-0">Card of the Day</h3>
-              <div className="relative w-full aspect-[4/5] lg:aspect-video lg:h-[420px] rounded-[2rem] overflow-hidden shadow-2xl shadow-stone-900/10 group">
-                <div
-                  className="absolute inset-0 bg-cover bg-center transition-transform duration-[2000ms] group-hover:scale-110"
-                  style={{ backgroundImage: `url('${cardOfTheDay.image_url}')` }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-                <div className="absolute bottom-0 w-full p-6 text-white pb-8">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="bg-gold px-2.5 py-1 rounded text-[10px] font-bold text-olive-dark uppercase tracking-widest leading-none">
-                      {cardOfTheDay.rarity === 'legendary' ? 'LEGENDARY' : cardOfTheDay.rarity === 'rare' ? 'RARE' : 'COMMON'}
-                    </span>
-                    <span className="text-xs font-medium flex items-center gap-1 text-white/90">
-                      <MapPin className="w-3 h-3" /> {cardOfTheDay.city}, Italy
-                    </span>
+                  {/* Distance Badge */}
+                  <div className="absolute top-3 right-3 bg-zinc-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md border border-white/10">
+                    <span className="text-zinc-400 mb-[1px]">📍</span>
+                    {saga.city || 'Puglia'}
                   </div>
+                </div>
 
-                  <h2 className="text-4xl font-serif font-bold leading-tight mb-2 drop-shadow-lg">
-                    {getLocalized(cardOfTheDay, 'title', i18n?.language)}
-                  </h2>
-
-                  <p className="text-sm text-white/80 line-clamp-2 leading-relaxed mb-6 font-light">
-                    {getLocalized(cardOfTheDay, 'description', i18n?.language)}
+                {/* Content */}
+                <div className="p-5 flex flex-col flex-grow">
+                  <h4 className="font-satoshi font-black text-white text-[18px] leading-snug mb-2 group-hover:text-zinc-200 transition-colors">
+                    {saga.title || saga.titolo}
+                  </h4>
+                  <p className="text-sm font-geist text-zinc-400 line-clamp-2 leading-relaxed">
+                    {saga.description || saga.descrizione || "Scopri questa incredibile avventura a passi lenti nel cuore della Puglia."}
                   </p>
-
-                  <Link
-                    to="/album"
-                    className="w-full bg-white text-olive-dark font-bold rounded-xl py-3.5 flex items-center justify-center gap-2 hover:bg-stone-100 transition-colors shadow-lg active:scale-95"
-                  >
-                    <Eye className="w-5 h-5" />
-                    View Card Details
-                  </Link>
                 </div>
               </div>
-            </section>
-          )}
+            ))}
+          </div>
+        </section>
 
-          {/* 4. RECENT DISCOVERIES (Right Sidebar on Desktop under Daily Challenges) */}
-          <section className="order-4 lg:col-span-4 lg:col-start-9 lg:row-start-3 lg:mt-4">
-            <div className="flex justify-between items-end mb-4 lg:mb-6 px-2 lg:px-0">
-              <h3 className="text-xl lg:text-2xl font-bold font-serif text-olive-dark">Recent Discoveries</h3>
-              <Link to="/album" className="text-xs lg:text-sm font-bold text-gold uppercase tracking-widest hover:underline whitespace-nowrap ml-4">See all</Link>
-            </div>
+        {/* 6. NEWS AND EVENTS SLIDER */}
+        <section className="mt-8 px-4 mb-4">
+          <div className="flex items-end justify-between mb-5">
+            <h3 className="text-[28px] font-black font-satoshi text-white leading-tight tracking-tight">
+              Notizie ed Eventi
+            </h3>
+            <button
+              onClick={() => navigate('/eventi')}
+              className="text-zinc-400 font-medium text-sm hover:text-white transition-colors flex items-center gap-1 group pb-1"
+            >
+              Scopri di più <span className="group-hover:translate-x-1 transition-transform">›</span>
+            </button>
+          </div>
 
-            <div className="flex overflow-x-auto gap-4 pb-4 lg:pb-0 no-scrollbar snap-x -mx-6 px-6 lg:mx-0 lg:px-0 lg:flex-col lg:overflow-visible">
-              {recentDiscoveries.map((card, idx) => (
-                <div key={card.id || `lock-${idx}`} className="snap-start flex flex-col lg:flex-row lg:items-center lg:bg-white lg:p-3 lg:rounded-2xl lg:shadow-[0_2px_10px_rgba(0,0,0,0.02)] lg:border lg:border-sand/40 min-w-[120px] lg:w-full lg:min-w-0 transition-transform lg:hover:-translate-y-1">
-                  {card.isUnlocked ? (
-                    <>
-                      <div className="w-[120px] h-[120px] lg:w-16 lg:h-16 rounded-2xl lg:rounded-xl overflow-hidden mb-2 lg:mb-0 lg:mr-4 bg-stone-800 shadow-md shrink-0 relative group">
-                        <img src={card.image_url} alt={card.title} className="w-full h-full object-cover opacity-90 group-hover:scale-110 transition-transform" />
-                        {/* Simplified Discovery Icon overlay if wanted, keeping it clean for now */}
+          <div className="flex overflow-x-auto gap-4 pb-6 no-scrollbar snap-x -mx-4 px-4">
+            {events.length > 0 ? events.map((ev) => {
+              const startDate = new Date(ev.data_inizio)
+              const isPartner = !!ev.partners
+
+              return (
+                <div key={ev.id} className="snap-center w-[280px] md:w-[320px] shrink-0 bg-zinc-900 rounded-[1.5rem] overflow-hidden shadow-xl border border-white/10 group flex flex-col">
+                  {/* Event Image */}
+                  <div className="h-40 bg-zinc-950 relative overflow-hidden border-b border-white/5">
+                    <img src={ev.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={ev.titolo} className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700" />
+
+                    {/* Date Badge */}
+                    <div className="absolute top-3 left-3 bg-zinc-950/80 backdrop-blur border border-white/10 px-3 py-1.5 rounded-xl text-center shadow-lg">
+                      <div className="text-[9px] font-bold uppercase tracking-widest text-red-500 leading-none mb-1">
+                        {startDate.toLocaleString('it-IT', { month: 'short' })}
                       </div>
-                      <h4 className="font-bold text-sm text-olive-dark truncate w-[120px]">
-                        {getLocalized(card, 'title', i18n?.language)}
-                      </h4>
-                      <p className="text-[10px] text-olive-light">
-                        {card.unlockedAt ? new Date(card.unlockedAt).toLocaleDateString() : 'Recently'}
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-[120px] h-[120px] rounded-2xl bg-[#E2E8F0] border border-dashed border-[#CBD5E1] flex items-center justify-center mb-2">
-                        <Lock className="w-6 h-6 text-slate-400" />
-                      </div>
-                      <h4 className="font-bold text-sm text-slate-400 truncate w-[120px]">Locked</h4>
-                    </>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* 5. NOTIZIE ED EVENTI (Eventi Club - Left Main Column on Desktop under Card of the Day) */}
-          <section className="order-5 lg:col-span-8 lg:col-start-1 lg:row-start-3 lg:mt-4">
-            <div className="flex justify-between items-end mb-4 lg:mb-6 px-2 lg:px-0">
-              <h3 className="text-xl lg:text-2xl font-bold font-serif text-olive-dark">Notizie ed Eventi</h3>
-            </div>
-
-            <div className="flex overflow-x-auto gap-5 pb-4 lg:pb-0 no-scrollbar snap-x -mx-6 px-6 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:overflow-visible">
-              {events.length > 0 ? events.map((ev) => {
-                const startDate = new Date(ev.data_inizio)
-                const isPartner = !!ev.partners
-                const hasCard = !!ev.cards
-
-                return (
-                  <div key={ev.id} className="snap-center min-w-[300px] w-[85vw] max-w-sm lg:w-auto lg:min-w-0 lg:max-w-none bg-white rounded-[2rem] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-sand/40 shrink-0 transition-all hover:-translate-y-1 hover:shadow-xl group flex flex-col">
-                    {/* Event Image */}
-                    <div className="h-40 lg:h-48 bg-stone-900 relative overflow-hidden">
-                      <img src={ev.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={ev.titolo} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
-
-                      {/* Date Badge */}
-                      <div className="absolute top-4 left-4 bg-white px-3 py-1.5 rounded-xl text-center shadow-lg">
-                        <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-0.5">
-                          {startDate.toLocaleString('it-IT', { month: 'short' })}
-                        </div>
-                        <div className="text-lg font-bold text-olive-dark leading-none">
-                          {startDate.getDate()}
-                        </div>
-                      </div>
-
-                      <div className="absolute top-4 right-4 flex flex-col items-end gap-1.5">
-                        {/* Partner Badge */}
-                        {isPartner && (
-                          <div className="bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-olive-dark flex items-center gap-1.5 shadow-md border border-sand/50">
-                            <MapPin className="w-3 h-3 text-gold" />
-                            {ev.partners.name}
-                          </div>
-                        )}
-
-                        {/* Card Reward Badge */}
-                        {hasCard && (
-                          <div className="bg-gold px-3 py-1 rounded text-[10px] font-bold text-olive-dark uppercase tracking-widest shadow-md flex items-center gap-1">
-                            🎁 Card in palio
-                          </div>
-                        )}
+                      <div className="text-lg font-black text-white leading-none">
+                        {startDate.getDate()}
                       </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="p-5 flex flex-col flex-grow">
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-[#D8B65A] mb-1">
-                        {ev.luogo}
+                    {isPartner && (
+                      <div className="absolute top-3 right-3 bg-zinc-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md border border-red-500/30">
+                        <span className="text-red-500 mb-[1px]">📍</span>
+                        {ev.partners.name}
                       </div>
-                      <h4 className="text-xl font-bold font-serif text-olive-dark mb-2 leading-tight">
-                        {ev.titolo}
-                      </h4>
-                      <p className="text-xs text-olive-light line-clamp-3 leading-relaxed mb-4">
-                        {ev.descrizione}
-                      </p>
+                    )}
+                  </div>
 
-                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-sand/50">
-                        <div className="flex items-center gap-2">
-                          <EventTimer startDate={ev.data_inizio} endDate={ev.data_fine} />
-                        </div>
-                        <div className="flex flex-col gap-1 text-right">
-                          <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 font-medium whitespace-nowrap">
-                            <span className="material-symbols-outlined text-[14px]">schedule</span>
-                            {startDate.toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit' })}
-                          </div>
-                        </div>
-                      </div>
+                  {/* Content */}
+                  <div className="p-5 flex flex-col flex-grow">
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2 flex items-center gap-1.5">
+                      📍 {ev.luogo}
+                    </div>
+                    <h4 className="text-[19px] font-bold font-satoshi text-white mb-2 leading-tight">
+                      {ev.titolo}
+                    </h4>
+                    <p className="text-[13px] text-zinc-400 line-clamp-2 leading-relaxed mb-4">
+                      {ev.descrizione}
+                    </p>
 
-                      <div className="mt-4 flex flex-col gap-2">
-                        {hasCard ? (
-                          <button
-                            onClick={() => setSelectedUnlockEvent(ev)}
-                            className="w-full bg-olive-dark text-white font-bold rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-olive-800 transition-colors shadow-md active:scale-95"
-                          >
-                            Partecipa e Sblocca 🎁
-                          </button>
-                        ) : ev.link_esterno ? (
-                          <a
-                            href={ev.link_esterno}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full bg-gold text-olive-dark font-bold rounded-xl py-3 flex items-center justify-center gap-2 hover:bg-[#cda429] transition-colors shadow-md active:scale-95"
-                          >
-                            Scopri di più <Rocket className="w-4 h-4 ml-1" />
-                          </a>
-                        ) : null}
-                      </div>
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+                      <EventTimer startDate={ev.data_inizio} endDate={ev.data_fine} />
                     </div>
                   </div>
-                )
-              }) : (
-                <div className="min-w-full lg:col-span-2 p-8 lg:p-12 border-2 border-dashed border-sand rounded-[2rem] text-center text-olive-light text-sm lg:text-base italic">
-                  <div className="text-4xl mb-3 opacity-50">🏖️</div>
-                  Nessun evento attivo al momento.
                 </div>
-              )}
-            </div>
-          </section>
-        </div>
-      </div>
+              )
+            }) : (
+              <div className="w-full py-8 text-center text-zinc-500 italic border border-white/10 rounded-2xl bg-zinc-900/50">
+                Nessun evento attivo al momento.
+              </div>
+            )}
+          </div>
+        </section >
 
-      {/* MODAL SBLOCCO EVENTO */}
-      <EventUnlockModal
-        isOpen={!!selectedUnlockEvent}
-        onClose={() => setSelectedUnlockEvent(null)}
-        event={selectedUnlockEvent}
-        onUnlockSuccess={async (event) => {
-          setSelectedUnlockEvent(null);
-          if (event.ricompensa_card_id) {
-            const result = await EventsService.unlockEventCard(event.ricompensa_card_id);
-            if (result.success) {
-              toast.success("Ricompensa sbloccata! La troverai ora nel tuo Album.");
-            } else {
-              toast.error(result.error || "Errore durante l'assegnazione della Card.");
-            }
-          }
-        }}
+      </main >
+
+      <SearchModal
+        isOpen={isSearchModalOpen}
+        onClose={() => setIsSearchModalOpen(false)}
+        saghe={heroItems}
       />
-    </div>
-  )
-}
+    </div >
+  );
+};
 
-export default Dashboard
+export default Dashboard;

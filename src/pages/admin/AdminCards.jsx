@@ -15,6 +15,7 @@ export default function AdminCards() {
         title: '',
         title_en: '',
         image_url: '',
+        card_image_url: '',
         type: 'monument', // monument, partner
         rarity: 'common', // common, rare, legendary
         city: '',
@@ -34,6 +35,7 @@ export default function AdminCards() {
         curiosity3_en: '',
         audio_track: '',
         audio_track_en: '',
+        card_benefits: '',
         points_value: 100
     });
 
@@ -62,6 +64,7 @@ export default function AdminCards() {
             title: card.title || '',
             title_en: card.title_en || '',
             image_url: card.image_url || '',
+            card_image_url: card.card_image_url || '',
             type: card.type,
             rarity: card.rarity,
             city: card.city || '',
@@ -81,6 +84,7 @@ export default function AdminCards() {
             curiosity3_en: card.curiosity3_en || '',
             audio_track: card.audio_track || '',
             audio_track_en: card.audio_track_en || '',
+            card_benefits: card.card_benefits || '',
             points_value: card.points_value || 100
         });
         setShowModal(true);
@@ -92,6 +96,7 @@ export default function AdminCards() {
             title: '',
             title_en: '',
             image_url: '',
+            card_image_url: '',
             type: 'monument',
             rarity: 'common',
             city: '',
@@ -111,6 +116,7 @@ export default function AdminCards() {
             curiosity3_en: '',
             audio_track: '',
             audio_track_en: '',
+            card_benefits: '',
             points_value: 100
         });
         setShowModal(true);
@@ -284,8 +290,14 @@ export default function AdminCards() {
                                 </div>
 
                                 <div className="col-span-2">
-                                    <label className="block text-sm font-bold text-olive-dark mb-1">Immagine URL</label>
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Immagine Gallery URL (Hero/Foto)</label>
                                     <input className="w-full p-2 border rounded-lg" value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." />
+                                </div>
+
+                                <div className="col-span-2">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Immagine Design Card URL (La figurina vera e propria)</label>
+                                    <input className="w-full p-2 border rounded-lg bg-amber-50" value={formData.card_image_url} onChange={e => setFormData({ ...formData, card_image_url: e.target.value })} placeholder="https://..." />
+                                    <p className="text-[10px] text-amber-600 mt-1 italic">* Questo è il design grafico della figurina che apparirà nell'album.</p>
                                 </div>
 
                                 <div>
@@ -370,6 +382,17 @@ export default function AdminCards() {
                                 <div className="col-span-1">
                                     <label className="block text-sm font-bold text-olive-dark mb-1">Traccia Audio URL (EN)</label>
                                     <input className="w-full p-2 border rounded-lg" value={formData.audio_track_en} onChange={e => setFormData({ ...formData, audio_track_en: e.target.value })} placeholder="https://..." />
+                                </div>
+
+                                <div className="col-span-2">
+                                    <label className="block text-sm font-bold text-olive-dark mb-1">Vantaggi Card (Solo Partner)</label>
+                                    <textarea
+                                        className="w-full p-2 border rounded-lg h-20 bg-amber-50"
+                                        value={formData.card_benefits}
+                                        onChange={e => setFormData({ ...formData, card_benefits: e.target.value })}
+                                        placeholder="Inserisci i vantaggi esclusivi (es: Aperitivo omaggio, Sconto 10%, ecc...)"
+                                    />
+                                    <p className="text-[10px] text-amber-600 mt-1 italic">* Questi vantaggi saranno visibili nell'app solo dopo lo sblocco della figurina tramite PIN.</p>
                                 </div>
 
                                 {/* Curiosità IT */}

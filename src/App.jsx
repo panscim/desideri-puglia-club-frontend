@@ -25,6 +25,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const SagaDetail = lazy(() => import("./pages/SagaDetail.jsx"));
 const SagaIntro = lazy(() => import("./pages/SagaIntro.jsx"));
 const Profilo = lazy(() => import("./pages/Profilo.jsx"));
+const Missioni = lazy(() => import("./pages/Missioni.jsx"));
 const VoucherList = lazy(() => import("./pages/VoucherList"));
 const MyOrders = lazy(() => import("./pages/MyOrders"));
 
@@ -50,6 +51,8 @@ const OnboardingInteressi = lazy(() => import("./pages/OnboardingInteressi"));
 
 
 // NUOVE PAGINE PROFILO
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.jsx"));
+const TerminiCondizioni = lazy(() => import("./pages/TerminiCondizioni.jsx"));
 
 
 
@@ -71,7 +74,7 @@ const Album = lazy(() => import("./pages/Album"));
 
 
 // ⭐️ EVENTI CLUB
-
+const Eventi = lazy(() => import("./pages/Eventi"));
 
 // Layout - Keep layout eager for better UX
 import Layout from "./components/Layout";
@@ -195,6 +198,9 @@ function App() {
               }
             />
 
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/termini" element={<TerminiCondizioni />} />
+
             {/* PROTECTED */}
             <Route
               element={
@@ -209,6 +215,7 @@ function App() {
               <Route path="/saga/:id/intro" element={<SagaIntro />} />
               <Route path="/saga/:id" element={<SagaDetail />} />
               <Route path="/profilo" element={<Profilo />} />
+              <Route path="/missioni" element={<Missioni />} />
 
               {/* Pagina Premi Mensili */}
 
@@ -230,6 +237,7 @@ function App() {
               {/* Mercato */}
               <Route path="/mappa" element={<Mappa />} />
               <Route path="/album" element={<Album />} />
+              <Route path="/eventi" element={<Eventi />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/shop/:itemId" element={<MarketItemDetail />} />
               <Route

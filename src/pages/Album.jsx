@@ -1,16 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search } from 'lucide-react'; import confetti from 'canvas-confetti';
+import { Search, Compass, MapPin } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import { AlbumService } from '../services/album';
 import { useGeolocation } from '../hooks/useGeolocation';
-
-import { AlbumCardWrapper as AlbumCard } from '../components/AlbumCard'; // Import wrapper as AlbumCard for easier replacement
-
+import { AlbumCardWrapper as AlbumCard } from '../components/AlbumCard';
 import { UnlockOverlay } from '../components/UnlockOverlay';
 import { UnlockedCardDetail } from '../components/UnlockedCardDetail';
 import { LockedCardDetail } from '../components/LockedCardDetail';
-// We might need a generic Modal component or build one inline for PIN
-import { toast } from 'react-hot-toast'; // Assuming we have toast
+import { toast } from 'react-hot-toast';
 
 export default function Album() {
     const { t } = useTranslation();
@@ -18,8 +16,7 @@ export default function Album() {
 
     const [cards, setCards] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filterCity, setFilterCity] = useState('all');
-    const [filterRarity, setFilterRarity] = useState('all');
+    const [activeCategory, setActiveCategory] = useState('all');
 
     // Selected card for details
     const [selectedCard, setSelectedCard] = useState(null);
@@ -32,7 +29,7 @@ export default function Album() {
     // 1. Initial Load
     useEffect(() => {
         loadCards();
-        startWatching(); // Start GPS immediately
+        startWatching();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -42,22 +39,15 @@ export default function Album() {
             setCards(data);
         } catch (err) {
             console.error(err);
-            toast.error('Errore caricamento album');
+            toast.error('Errore caricamento passaporto');
         } finally {
             setLoading(false);
         }
     };
 
-    // 2. Main Unlock Logic (Confetti + Sound)
+    // 2. Main Unlock Logic (Confetti)
     const triggerUnlockCelebration = (isLegendary) => {
-        // 1. Sound (Placeholder - Browser Policy often blocks auto-audio without user interaction, 
-        // but since this is triggered by a click, it might work if we had an Audio object)
-        // const audio = new Audio('/sounds/unlock.mp3'); 
-        // audio.play().catch(e => console.log('Audio muted'));
-
-        // 2. Confetti
         if (isLegendary) {
-            // Intense confetti for Legendaries
             var duration = 3 * 1000;
             var animationEnd = Date.now() + duration;
             var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
@@ -66,53 +56,66 @@ export default function Album() {
 
             var interval = setInterval(function () {
                 var timeLeft = animationEnd - Date.now();
-
-                if (timeLeft <= 0) {
-                    return clearInterval(interval);
-                }
+                if (timeLeft <= 0) return clearInterval(interval);
 
                 var particleCount = 50 * (timeLeft / duration);
                 confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
                 confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
             }, 250);
         } else {
-            // Standard confetti pop
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 },
-                zIndex: 9999
-            });
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, zIndex: 9999 });
         }
     };
 
-
     // 3. Filtering and Sorting
-    const cities = [...new Set(cards.map(c => c.city).filter(Boolean))].sort();
+    // Categorie Hardcoded per ora, potremmo estrarle dinamicamente dai metadati se presenti
+    const categories = [
+        { id: 'all', label: 'Tutto' },
+        { id: 'castello', label: 'Castelli' },
+        { id: 'chiesa', label: 'Chiese' },
+        { id: 'statua', label: 'Statue' },
+        { id: 'palazzo', label: 'Palazzi' },
+        { id: 'altro', label: 'Altro' }
+    ];
 
-    const filteredCards = cards.filter(c => {
-        if (filterCity !== 'all' && c.city !== filterCity) return false;
-        if (filterRarity !== 'all' && c.rarity !== filterRarity) return false;
-        return true;
-    }).sort((a, b) => {
-        // Show Coming Soon (no image_url) FIRST
-        const aComingSoon = !a.image_url;
-        const bComingSoon = !b.image_url;
-        if (aComingSoon && !bComingSoon) return -1;
-        if (!aComingSoon && bComingSoon) return 1;
+    const filteredCards = useMemo(() => {
+        return cards.filter(c => {
+            if (activeCategory === 'all') return true;
 
-        // Show unlocked logic
-        if (a.isUnlocked && !b.isUnlocked) return -1;
-        if (!a.isUnlocked && b.isUnlocked) return 1;
+            // Logica semplificata: Cerchiamo la parola chiave nel titolo o descrizione.
+            // In un'app reale si userebbe un campo 'category' dedicato nel DB.
+            const query = activeCategory.toLowerCase();
+            const textToSearch = `${c.title} ${c.description} ${c.categoria || ''}`.toLowerCase();
 
-        // Then by title
-        return a.title?.localeCompare(b.title || '');
-    });
+            if (activeCategory === 'altro') {
+                // Escludiamo se contiene le altre parole chiave
+                const keywords = ['castell', 'chiesa', 'cattedrale', 'basilica', 'statu', 'monument', 'palazz', 'vill'];
+                return !keywords.some(k => textToSearch.includes(k));
+            }
+
+            if (query === 'chiesa') return textToSearch.includes('chies') || textToSearch.includes('cattedral') || textToSearch.includes('basilic');
+            if (query === 'statua') return textToSearch.includes('statu') || textToSearch.includes('monument');
+
+            return textToSearch.includes(query.replace('o', '').replace('a', '')); // basic stemming
+        }).sort((a, b) => {
+            const aComingSoon = !a.image_url;
+            const bComingSoon = !b.image_url;
+            if (aComingSoon && !bComingSoon) return -1;
+            if (!aComingSoon && bComingSoon) return 1;
+
+            if (a.isUnlocked && !b.isUnlocked) return -1;
+            if (!a.isUnlocked && b.isUnlocked) return 1;
+
+            return a.title?.localeCompare(b.title || '');
+        });
+    }, [cards, activeCategory]);
 
     const stats = {
         total: cards.length,
         unlocked: cards.filter(c => c.isUnlocked).length
     };
+    const collectionPercentage = stats.total > 0 ? Math.round((stats.unlocked / stats.total) * 100) : 0;
+
 
     // 4. Manual PIN Unlock
     const handlePinSubmit = async (e) => {
@@ -144,7 +147,6 @@ export default function Album() {
             triggerUnlockCelebration(card.rarity === 'legendary');
             toast.success(`Hai sbloccato: ${card.title}!`, { duration: 5000, icon: '🎉' });
 
-            // IMMEDIATELY update the selected card state so the UI switches to the Unlocked View
             setSelectedCard({
                 ...card,
                 isUnlocked: true,
@@ -152,116 +154,123 @@ export default function Album() {
                 justUnlocked: true
             });
 
-            // Refresh the full list in the background
             loadCards();
         } else {
             toast.error(res.error || 'Errore durante lo sblocco');
         }
     }
 
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#0C0D10] flex items-center justify-center">
+                <div className="w-10 h-10 border-4 border-[#E4AE2F] border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
     return (
-        <div className="pb-24 bg-[#F9F9F7] min-h-screen font-sans">
+        <div className="pb-24 bg-[#0C0D10] min-h-screen font-sans flex flex-col items-center overflow-x-hidden relative">
+
+            {/* Global Ambient Glow */}
+            <div className="fixed top-0 left-0 w-full h-[40vh] bg-gradient-to-b from-[#1C1C18] to-transparent pointer-events-none z-0" />
+
             {/* Unlock Animation Overlay */}
             {selectedCard && selectedCard.justUnlocked && (
                 <UnlockOverlay card={selectedCard} onClose={() => setSelectedCard(null)} />
             )}
 
-            {/* HEADER & PROGRESS SECTION */}
-            <div className="px-6 pt-8 pb-6">
-                {/* Top Header */}
-                <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h4 className="text-xs font-bold text-gold uppercase tracking-widest mb-1">Collezione</h4>
-                        <h1 className="text-2xl font-serif font-bold text-olive-dark tracking-wide">RELIQUIE</h1>
+            <div className="w-full max-w-7xl relative z-10 flex flex-col">
+
+                {/* HEADER & PROGRESS SECTION */}
+                <div className="px-6 pt-10 pb-6 shrink-0">
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h4 className="text-[10px] font-bold text-[#E4AE2F] uppercase tracking-[0.3em] mb-1">Passaporto</h4>
+                            <h1 className="text-2xl font-serif font-bold text-white tracking-wide">LE TUE SCOPERTE</h1>
+                        </div>
                     </div>
-                </div>
 
-                {/* Progress Card */}
-                <div className="relative w-full rounded-3xl overflow-hidden shadow-xl shadow-stone-900/20">
-                    {/* Background with Gradient & Noise */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#5A554E] to-[#3E3B36] z-0" />
-                    <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] z-0 mix-blend-overlay" />
+                    {/* Progress Card (Premium Dark) */}
+                    <div className="relative w-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5 bg-[#1C1C18]">
+                        {/* Background Decoration */}
+                        <div className="absolute right-0 top-0 bottom-0 w-2/3 opacity-5 pointer-events-none"
+                            style={{ backgroundImage: 'radial-gradient(circle at center, #E4AE2F 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
 
-                    <div className="relative z-10 p-6 text-white">
-                        <div className="flex justify-between items-start mb-8">
+                        <div className="relative z-10 p-6 text-white flex items-center justify-between">
                             <div>
-                                <h3 className="text-[10px] font-bold tracking-[0.2em] text-white/60 mb-1 uppercase">Progresso Album</h3>
+                                <h3 className="text-[10px] font-bold tracking-[0.2em] text-slate-400 mb-1 uppercase">Stato Collezione</h3>
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-serif font-medium text-white shadow-black/50 drop-shadow-sm">{stats.unlocked}</span>
-                                    <span className="text-lg font-serif text-white/50">/ {stats.total}</span>
+                                    <span className="text-4xl font-serif font-bold text-white drop-shadow-md">{stats.unlocked}</span>
+                                    <span className="text-lg font-serif text-[#E4AE2F]">/ {stats.total}</span>
                                 </div>
                             </div>
-                            <div className="text-right">
-                                <div className="text-[10px] font-bold text-gold uppercase tracking-widest mb-0.5">Maggio 2024</div>
-                                <div className="text-xs text-white/70">8 Missioni Attive</div>
-                            </div>
-                        </div>
 
-                        {/* Gold Progress Bar */}
-                        <div className="h-2 w-full bg-black/20 rounded-full overflow-hidden backdrop-blur-sm border border-white/5">
-                            <div
-                                className="h-full bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-200 shadow-[0_0_10px_rgba(250,204,21,0.5)] transition-all duration-1000"
-                                style={{ width: `${(stats.unlocked / stats.total) * 100}%` }}
-                            />
+                            {/* Circular Progress */}
+                            <div className="relative w-16 h-16 flex items-center justify-center">
+                                <svg className="w-full h-full transform -rotate-90 drop-shadow-lg">
+                                    <circle cx="32" cy="32" r="28" fill="transparent" stroke="#0C0D10" strokeWidth="6" />
+                                    <circle
+                                        cx="32" cy="32" r="28"
+                                        fill="transparent"
+                                        stroke="#E4AE2F"
+                                        strokeWidth="6"
+                                        strokeDasharray="175.9"
+                                        strokeDashoffset={175.9 - (175.9 * collectionPercentage) / 100}
+                                        className="transition-all duration-1000 ease-out"
+                                        strokeLinecap="round"
+                                    />
+                                </svg>
+                                <div className="absolute font-black text-[11px] text-white">{collectionPercentage}%</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* FILTERS */}
-            <div className="px-6 mb-8 flex flex-col gap-3 relative z-10">
-                <div className="flex gap-3">
-                    <select
-                        className="flex-1 p-3 rounded-xl bg-white border border-sand/50 shadow-sm text-sm font-medium text-olive-dark outline-none focus:border-gold appearance-none"
-                        value={filterCity}
-                        onChange={(e) => setFilterCity(e.target.value)}
-                    >
-                        <option value="all">Tutte le città</option>
-                        {cities.map(city => (
-                            <option key={city} value={city}>{city}</option>
+                {/* FILTERS (Pill format) */}
+                <div className="px-6 mb-8 shrink-0">
+                    <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar px-1 -mx-1">
+                        {categories.map(cat => (
+                            <button
+                                key={cat.id}
+                                onClick={() => setActiveCategory(cat.id)}
+                                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-[12px] font-bold tracking-widest uppercase transition-all duration-300 border ${activeCategory === cat.id
+                                        ? 'bg-[#E4AE2F] text-[#0C0D10] border-[#E4AE2F] shadow-[0_0_15px_rgba(228,174,47,0.3)]'
+                                        : 'bg-[#1C1C18] text-slate-400 border-white/5 hover:border-white/20 hover:text-white'
+                                    }`}
+                            >
+                                {cat.label}
+                            </button>
                         ))}
-                    </select>
-
-                    <select
-                        className="flex-1 p-3 rounded-xl bg-white border border-sand/50 shadow-sm text-sm font-medium text-olive-dark outline-none focus:border-gold appearance-none"
-                        value={filterRarity}
-                        onChange={(e) => setFilterRarity(e.target.value)}
-                    >
-                        <option value="all">Tutte le rarità</option>
-                        <option value="common">Comuni</option>
-                        <option value="rare">Rare</option>
-                        <option value="legendary">Leggendarie</option>
-                        <option value="time_limited">A Tempo</option>
-                    </select>
+                    </div>
                 </div>
-            </div>
 
-            {/* GRID */}
-            <div className="px-6 grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 pb-20">
-                {/* 1. Unlocked & Locked Cards */}
-                {loading ? (
-                    <p className="col-span-full text-center py-10 text-olive-light">Caricamento...</p>
-                ) : (
-                    <>
-                        {filteredCards.map(card => (
+                {/* GRID */}
+                <div className="px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 pb-10 flex-grow content-start">
+                    {filteredCards.length > 0 ? (
+                        filteredCards.map(card => (
                             <AlbumCard
                                 key={card.id}
                                 card={card}
                                 userLocation={location}
                                 onClick={(c) => setSelectedCard(c)}
                             />
-                        ))}
-                    </>
-                )}
+                        ))
+                    ) : (
+                        <div className="col-span-full py-16 flex flex-col items-center justify-center opacity-50">
+                            <Compass className="w-12 h-12 text-slate-500 mb-4" />
+                            <p className="text-slate-400 font-medium">Nessun segreto in questa categoria.</p>
+                        </div>
+                    )}
+                </div>
+
             </div>
 
-            {/* Modals remain the same ... */}
             {/* PIN Modal */}
             {showPinModal && (
-                <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-                    <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-pop-in">
-                        <h3 className="text-xl font-bold font-serif text-olive-dark mb-2 text-center">Codice Partner</h3>
-                        <p className="text-sm text-olive-light text-center mb-6">Inserisci il codice di 4 cifre che ti ha dato il gestore per sbloccare la figurina.</p>
+                <div className="fixed inset-0 z-50 bg-[#0C0D10]/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="bg-[#1C1C18] border border-white/10 rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-300">
+                        <h3 className="text-xl font-bold font-serif text-white mb-2 text-center drop-shadow-md">Codice Segreto</h3>
+                        <p className="text-xs text-slate-400 text-center mb-6 px-4">Inserisci il cifrario a 4 cifre fornito dal custode del luogo.</p>
 
                         <form onSubmit={handlePinSubmit}>
                             <input
@@ -270,21 +279,21 @@ export default function Album() {
                                 placeholder="0000"
                                 value={pinCode}
                                 onChange={(e) => setPinCode(e.target.value)}
-                                className="w-full text-center text-4xl font-mono tracking-[0.5em] py-4 border-b-2 border-sand focus:border-gold outline-none bg-transparent mb-8 text-olive-dark placeholder:text-sand/50"
+                                className="w-full text-center text-5xl font-mono tracking-[0.5em] py-4 border-b border-white/10 focus:border-[#E4AE2F] outline-none bg-transparent mb-8 text-white placeholder:text-white/10 transition-colors"
                                 autoFocus
                             />
                             <div className="flex gap-3">
                                 <button
                                     type="button"
                                     onClick={() => setShowPinModal(false)}
-                                    className="flex-1 py-3 rounded-xl bg-sand/30 text-olive-dark font-bold hover:bg-sand/50 transition-colors"
+                                    className="flex-1 py-3.5 rounded-xl bg-white/5 text-slate-300 font-bold hover:bg-white/10 transition-colors border border-white/5 text-sm uppercase tracking-widest"
                                 >
-                                    Annulla
+                                    Fuggi
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={pinCode.length !== 4 || unlocking}
-                                    className="flex-1 py-3 rounded-xl bg-gold text-white font-bold shadow-lg shadow-gold/30 hover:bg-gold/90 transition-all disabled:opacity-50 disabled:shadow-none"
+                                    className="flex-1 py-3.5 rounded-xl bg-[#E4AE2F] text-[#0C0D10] font-bold shadow-[0_0_15px_rgba(228,174,47,0.3)] hover:bg-[#F2C24E] hover:shadow-[0_0_25px_rgba(228,174,47,0.5)] transition-all disabled:opacity-50 disabled:shadow-none text-sm uppercase tracking-widest active:scale-[0.98]"
                                 >
                                     {unlocking ? '...' : 'Sblocca'}
                                 </button>
@@ -293,8 +302,6 @@ export default function Album() {
                     </div>
                 </div>
             )}
-
-
 
             {/* Card Detail Modal - UPDATED PRO */}
             {selectedCard && (
@@ -316,7 +323,4 @@ export default function Album() {
         </div>
     );
 }
-
-
-// ... LockedCardContent remains the same ...
 

@@ -3,19 +3,18 @@ import { useState, useEffect } from 'react'
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
-  Home,
+  Compass,
+  MapTrifold,
   Target,
-  Trophy,
+  BookOpen,
   User,
+  Gear,
+  SignOut,
+  Handshake
+} from '@phosphor-icons/react'
+import {
   Settings,
   LogOut,
-  Handshake,
-  TicketPercent,
-  MessageCircle,   // 👈 NUOVA ICONA CHAT
-  MapPin,          // 👈 NUOVA ICONA MAPPA
-  Grid,            // 👈 NUOVA ICONA ALBUM
-  Plus,            // 👈 NUOVA ICONA FAB
-  Menu,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../services/supabase'
@@ -49,20 +48,18 @@ const Layout = () => {
 
   // 🔹 Sidebar Navigation (Desktop)
   const navItems = [
-    { path: '/dashboard', icon: Home, label: t('nav.home') },
-    { path: '/missioni', icon: Target, label: t('nav.missions') || 'Missioni' },
-    { path: '/chat', icon: MessageCircle, label: t('nav.chat') },
+    { path: '/dashboard', icon: Compass, label: t('nav.home') || 'Scopri' },
     { path: '/partner', icon: Handshake, label: 'Partner' },
-    { icon: MapPin, label: t('nav.map'), path: '/mappa' },
-    { icon: Grid, label: 'Album', path: '/album' },
-    { path: '/profilo', icon: User, label: t('nav.profile') },
+    { path: '/mappa', icon: MapTrifold, label: t('nav.map') || 'Mappa' },
+    { path: '/album', icon: BookOpen, label: 'Album' },
+    { path: '/profilo', icon: User, label: t('nav.profile') || 'Profilo' },
   ]
 
   const isActive = (path) =>
     location.pathname === path || location.pathname.startsWith(path + '/')
 
   return (
-    <div className="min-h-screen flex flex-col md:pb-0 bg-[#F9F9F7]">
+    <div className="min-h-[100dvh] flex flex-col md:pb-0 bg-zinc-950 font-satoshi">
       {typeof window !== 'undefined' && <Splash />}
 
       {/* ░ HEADER ░ */}
@@ -125,20 +122,16 @@ const Layout = () => {
         <Outlet />
       </main>
 
-      {/* ░ NEW NAV MOBILE (Premium Custom Layout) ░ */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
-
-
-
-        {/* Bottom Tab Bar (Premium Linear Design) */}
-        <div className="bg-white/95 backdrop-blur-xl border-t border-sand pb-[env(safe-area-inset-bottom)] pointer-events-auto shadow-[0_-20px_40px_rgba(0,0,0,0.03)] relative">
-          <nav className="flex justify-around items-center h-[60px] px-4 max-w-md mx-auto">
+      {/* ░ NEW NAV MOBILE (GetYourGuide Clone Bottom Tab Nav) ░ */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+        <div className="bg-zinc-950/90 backdrop-blur-md border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
+          <nav className="flex justify-around items-center h-[64px] px-2 max-w-md mx-auto">
             {[
-              { path: '/dashboard', icon: Home, label: 'Home' },
-              { path: '/mappa', icon: MapPin, label: 'Mappa' },
-              { path: '/missioni', icon: Target, label: 'Missioni' },
-              { path: '/album', icon: Grid, label: 'Album' },
-              { path: '/profilo', icon: Settings, label: 'Profilo' }
+              { path: '/dashboard', icon: Compass, label: 'Scopri' },
+              { path: '/partner', icon: Handshake, label: 'Partner' },
+              { path: '/mappa', icon: MapTrifold, label: 'Mappa' },
+              { path: '/album', icon: BookOpen, label: 'Album' },
+              { path: '/profilo', icon: User, label: 'Profilo' }
             ].map((item) => {
               const active = isActive(item.path);
               const Icon = item.icon;
@@ -147,22 +140,16 @@ const Layout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex flex-row items-center justify-center rounded-2xl transition-all duration-500 ease-out h-[40px] ${active
-                    ? 'bg-olive-dark text-[#E4AE2F] px-4 shadow-md'
-                    : 'text-slate-400 px-3 bg-transparent hover:text-slate-600'
-                    }`}
+                  className="flex flex-col items-center justify-center w-[20%] h-full gap-1"
                 >
                   <Icon
-                    size={20}
-                    strokeWidth={active ? 2.5 : 2}
-                    className="shrink-0"
+                    size={24}
+                    weight={active ? "fill" : "regular"}
+                    className={`transition-colors duration-200 ${active ? 'text-white' : 'text-zinc-500'}`}
                   />
-                  {/* Testo appare solo se attivo */}
-                  <div className={`overflow-hidden transition-all duration-500 ease-out flex items-center ${active ? 'max-w-[100px] opacity-100 ml-2' : 'max-w-0 opacity-0 ml-0'}`}>
-                    <span className="text-[10px] font-bold tracking-wider uppercase whitespace-nowrap">
-                      {item.label}
-                    </span>
-                  </div>
+                  <span className={`text-[10px] font-geist transition-colors duration-200 ${active ? 'text-white font-medium' : 'text-zinc-500'}`}>
+                    {item.label}
+                  </span>
                 </Link>
               );
             })}
@@ -171,8 +158,8 @@ const Layout = () => {
       </div>
 
       {/* ░ SIDEBAR DESKTOP ░ */}
-      < div className="hidden md:block fixed left-0 top-20 bottom-0 w-64 bg-white border-r border-sand p-4 z-40" >
-        < nav className="space-y-2 h-full overflow-y-auto pb-20" >
+      <div className="hidden md:block fixed left-0 top-20 bottom-0 w-64 bg-zinc-950 border-r border-white/10 p-4 z-40">
+        <nav className="space-y-2 h-full overflow-y-auto pb-20">
           {
             navItems.map((item) => {
               const Icon = item.icon
@@ -182,8 +169,8 @@ const Layout = () => {
                   key={item.path}
                   to={item.path}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${active
-                    ? 'bg-olive-light bg-opacity-20 text-olive-dark font-medium'
-                    : 'text-olive-light hover:bg-sand'
+                    ? 'bg-white/10 text-white font-medium'
+                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
                     }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -197,13 +184,13 @@ const Layout = () => {
           {
             isAdmin && (
               <>
-                <div className="my-4 border-t border-sand"></div>
+                <div className="my-4 border-t border-white/10"></div>
 
                 <Link
                   to="/admin"
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${location.pathname === '/admin' || location.pathname === '/admin/'
-                    ? 'bg-gold bg-opacity-20 text-gold font-medium'
-                    : 'text-olive-light hover:bg-sand'
+                    ? 'bg-red-500/20 text-red-500 font-medium'
+                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
                     }`}
                 >
                   <Settings className="w-5 h-5" />
@@ -213,8 +200,8 @@ const Layout = () => {
                 <Link
                   to="/admin/partners"
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${location.pathname.startsWith('/admin/partners')
-                    ? 'bg-gold bg-opacity-20 text-gold font-medium'
-                    : 'text-olive-light hover:bg-sand'
+                    ? 'bg-red-500/20 text-red-500 font-medium'
+                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
                     }`}
                 >
                   <Handshake className="w-5 h-5" />
@@ -225,16 +212,16 @@ const Layout = () => {
           }
 
           {/* Logout */}
-          <div className="my-4 border-t border-sand"></div>
+          <div className="my-4 border-t border-white/10"></div>
           <button
             onClick={handleLogout}
-            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-coral hover:bg-sand transition-all w-full text-left"
+            className="flex items-center space-x-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-all w-full text-left"
           >
             <LogOut className="w-5 h-5" />
             <span>{t('common.logout')}</span>
           </button>
 
-          <div className="mt-4 pt-4 border-t border-sand flex justify-center">
+          <div className="mt-4 pt-4 border-t border-white/10 flex justify-center">
             <LanguageSwitcher />
           </div>
         </nav >

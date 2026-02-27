@@ -1,4 +1,4 @@
-const CACHE_NAME = 'desideri-puglia-v3'
+const CACHE_NAME = 'desideri-puglia-v4'
 const urlsToCache = [
   '/',
   '/index.html',

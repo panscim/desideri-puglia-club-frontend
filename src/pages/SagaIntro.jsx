@@ -1,7 +1,10 @@
 // src/pages/SagaIntro.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ChevronLeft, MapPin, Clock, Footprints, Route, Star, Play, Compass, Sparkles, Droplets, BatteryMedium, Sun, Camera, Unlock, PauseCircle, Gamepad2, Gift } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ChevronLeft, MapPin, Clock, Footprints, Star, Play, Compass, Sparkles, Droplets, BatteryMedium, Sun, Camera, Unlock, PauseCircle, Gamepad2, Gift, Route, ChevronRight } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { QuestService } from '../services/quest';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +20,7 @@ const SagaIntro = () => {
     const [saga, setSaga] = useState(null);
     const [loading, setLoading] = useState(true);
     const [questProgress, setQuestProgress] = useState(null);
+    const [showItinerary, setShowItinerary] = useState(false);
 
     useEffect(() => {
         async function loadSaga() {
@@ -66,13 +70,13 @@ const SagaIntro = () => {
     const difficulty = saga.difficulty || 'Medium';
 
     // Progress if user already started
-    let completedSteps = 0;
+    let completedStepsCount = 0;
     if (questProgress) {
         const stepIds = saga.steps?.map(s => s.id) || [];
-        completedSteps = questProgress.completedSteps.filter(sid => stepIds.includes(sid)).length;
+        completedStepsCount = questProgress.completedSteps.filter(sid => stepIds.includes(sid)).length;
     }
-    const hasStarted = completedSteps > 0;
-    const progressPercent = Math.round((completedSteps / stepsCount) * 100);
+    const hasStarted = completedStepsCount > 0;
+    const progressPercent = Math.round((completedStepsCount / stepsCount) * 100);
 
     // Format estimated time
     const hours = Math.floor(estimatedTime / 60);
@@ -178,33 +182,20 @@ const SagaIntro = () => {
                     />
                 </div>
 
-                {/* ========== SAGA PREVIEW IMAGES ========== */}
+                {/* ========== ITINERARY SUMMARY & TOGGLE ========== */}
                 {saga.steps && saga.steps.length > 0 && (
-                    <div className="mb-10">
-                        <h3 className="text-[16px] font-bold font-serif mb-4 flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-[#E4AE2F]" />
-                            Percorso che esplorerai
-                        </h3>
-                        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x">
-                            {saga.steps.slice(0, 5).map((step, idx) => (
-                                <div key={idx} className="relative w-40 h-28 shrink-0 rounded-2xl overflow-hidden snap-start border border-white/5">
-                                    <img
-                                        src={step.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=300&auto=format'}
-                                        alt={step.description_it || 'Tappa della saga'}
-                                        className="w-full h-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                                    <span className="absolute bottom-2 left-3 right-2 text-xs font-bold text-white truncate drop-shadow-md">
-                                        Tappa {step.step_order}
-                                    </span>
-                                </div>
-                            ))}
-                            {saga.steps.length > 5 && (
-                                <div className="w-24 h-28 shrink-0 rounded-2xl bg-zinc-900 border border-white/10 shadow-inner flex flex-col items-center justify-center snap-start">
-                                    <span className="text-[#E4AE2F] font-bold">+{saga.steps.length - 5}</span>
-                                    <span className="text-[10px] text-slate-400">altre tappe</span>
-                                </div>
-                            )}
+                    <div className="mb-10 w-full p-6 rounded-[2rem] bg-zinc-900 border border-white/10 shadow-inner">
+                        <div className="flex flex-col gap-3">
+                            <span className="text-[10px] text-[#E4AE2F] font-bold uppercase tracking-widest">Tappe del viaggio</span>
+                            <p className="text-sm text-slate-400 line-clamp-2 leading-relaxed">
+                                {saga.steps.map(s => s.description_it || s.title).join(' • ')}
+                            </p>
+                            <button
+                                onClick={() => setShowItinerary(true)}
+                                className="mt-4 flex items-center gap-2 text-[#E4AE2F] text-[14px] font-bold hover:underline group"
+                            >
+                                <Route size={16} /> Vedi itinerario completo <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                            </button>
                         </div>
                     </div>
                 )}
@@ -266,7 +257,7 @@ const SagaIntro = () => {
                             />
                         </div>
                         <p className="text-[11px] text-slate-400 mt-2">
-                            {completedSteps}/{stepsCount} tappe completate
+                            {completedStepsCount}/{stepsCount} tappe completate
                         </p>
                     </div>
                 )}
@@ -285,11 +276,118 @@ const SagaIntro = () => {
                     Nessun acquisto richiesto • Completamente gratuito
                 </p>
             </div>
+
+            {/* ITINERARY DRAWER OVERLAY */}
+            {showItinerary && saga.steps && (
+                <div className="fixed inset-0 z-[100] flex flex-col bg-zinc-950/90 backdrop-blur-xl animate-in fade-in duration-300">
+                    <div className="flex-1" onClick={() => setShowItinerary(false)} />
+                    <div className="bg-zinc-900 border-t border-white/10 rounded-t-[2.5rem] flex flex-col max-h-[92vh] w-full max-w-2xl mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-500 overflow-hidden">
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-6 border-b border-white/5 bg-zinc-900">
+                            <div>
+                                <h3 className="text-xl font-bold font-serif text-white">Il tuo Itinerario</h3>
+                                <p className="text-[11px] text-[#E4AE2F] font-bold uppercase tracking-widest mt-1">Esplora il percorso a tappe</p>
+                            </div>
+                            <button
+                                onClick={() => setShowItinerary(false)}
+                                className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-slate-300 hover:bg-white/10 transition-colors"
+                            >
+                                <ChevronLeft className="w-6 h-6 -rotate-90" />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto pb-[calc(24px+env(safe-area-inset-bottom))]">
+                            {/* MINI MAP */}
+                            <div className="w-full h-64 relative bg-zinc-950">
+                                <PropsSafeMap steps={saga.steps} />
+                                <div className="absolute inset-0 pointer-events-none shadow-[inset_0_0_60px_rgba(0,0,0,0.8)]" />
+                            </div>
+
+                            {/* TIMELINE LIST */}
+                            <div className="px-8 pt-10 relative">
+                                {/* Vertical Line */}
+                                <div className="absolute left-[39px] top-12 bottom-12 w-0.5 border-l-2 border-dashed border-white/10" />
+
+                                <div className="space-y-12">
+                                    {saga.steps.map((step, idx) => {
+                                        const isFirst = idx === 0;
+                                        const isLast = idx === saga.steps.length - 1;
+
+                                        return (
+                                            <div key={step.id} className="flex gap-6 relative group">
+                                                {/* Milestone Circle */}
+                                                <div className="relative z-10 w-6 h-6 rounded-full shrink-0 flex items-center justify-center border-2 border-[#E4AE2F] bg-zinc-950 transition-all duration-500 mt-1.5 shadow-[0_0_15px_rgba(228,174,47,0.2)]">
+                                                    <span className="text-[10px] font-black text-[#E4AE2F]">{idx + 1}</span>
+                                                </div>
+
+                                                <div className="flex-1 pb-2">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#E4AE2F]/80">
+                                                            {isFirst ? 'Partenza' : isLast ? 'Destinazione' : `Tappa ${idx + 1}`}
+                                                        </span>
+                                                    </div>
+                                                    <h4 className="text-[17px] font-bold leading-tight text-white mb-2">
+                                                        {step.description_it || step.title}
+                                                    </h4>
+                                                    <p className="text-[13px] text-slate-400 leading-relaxed italic opacity-80">
+                                                        "{step.narrative_hint_it || "Un luogo misterioso attende di essere svelato..."}"
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
 // --- SUB-COMPONENTS ---
+const PropsSafeMap = ({ steps }) => {
+    // We isolate this to avoid re-rendering the whole page if map bounds change internally
+    const center = [steps[0]?._latitude || 41.1171, steps[0]?._longitude || 16.8719];
+
+    return (
+        <MapContainer
+            center={center}
+            zoom={12}
+            zoomControl={false}
+            className="w-full h-full"
+            style={{ minHeight: '100%' }}
+        >
+            <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+            {steps.map((s, idx) => (
+                s._latitude && s._longitude && (
+                    <Marker
+                        key={s.id}
+                        position={[s._latitude, s._longitude]}
+                        icon={L.divIcon({
+                            className: 'custom-div-icon',
+                            html: `<div style="background-color: #E4AE2F; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 800; font-size: 11px; border: 2px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.5);">${idx + 1}</div>`,
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        })}
+                    />
+                )
+            ))}
+            {steps.length > 1 && (
+                <Polyline
+                    positions={steps.map(s => [s._latitude, s._longitude]).filter(p => p[0] && p[1])}
+                    color="#E4AE2F"
+                    weight={2}
+                    dashArray="5, 10"
+                    opacity={0.6}
+                />
+            )}
+        </MapContainer>
+    );
+};
+
 const StatCard = ({ icon, label, value }) => (
     <div className="bg-[#1A1B22] rounded-2xl p-4 border border-white/5 flex flex-col gap-2">
         <div className="w-8 h-8 flex flex-col justify-center items-center bg-[#E4AE2F]/10 rounded-full text-[#E4AE2F]">
