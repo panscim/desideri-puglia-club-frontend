@@ -130,6 +130,7 @@ export const QuestService = {
                     questSetId: us.set_id,  // the actual FK is set_id
                     startedAt: us.created_at,
                     status: us.status,
+                    isOriginal: saga.is_original,
                     sagaTitle: saga.title_it || saga.title || 'Saga Senza Titolo',
                     sagaImage: saga.image_url,
                     sagaCity: saga.city,

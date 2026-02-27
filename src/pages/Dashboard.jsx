@@ -286,12 +286,16 @@ const Dashboard = () => {
                   className="flex items-center gap-4 bg-zinc-900 border border-white/10 rounded-2xl p-4 cursor-pointer active:scale-[0.98] transition-transform group hover:border-[#E4AE2F]/30"
                 >
                   {/* Thumbnail */}
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-white/10">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-white/10 relative">
                     <img
                       src={saga.sagaImage || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=200'}
                       alt={saga.sagaTitle}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
+                    {/* Tiny Badge Indicator on thumbnail */}
+                    {saga.isOriginal && (
+                      <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-[#E4AE2F] rounded-md flex items-center justify-center text-[8px] font-black text-zinc-900 border border-[#FFD700]/30 shadow-sm">D</div>
+                    )}
                   </div>
 
                   {/* Info */}
@@ -361,8 +365,8 @@ const Dashboard = () => {
                   </div>
 
                   {/* Badge: Originals vs Certificato */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
-                    {saga.is_original ? (
+                  <div className="absolute top-3 left-3 flex flex-col gap-2 z-10 pointer-events-none">
+                    {(saga.is_original === true || saga.isOriginal === true) ? (
                       <div className="flex items-center gap-2 bg-[#E4AE2F] px-2.5 py-1.5 rounded-xl shadow-lg border border-[#FFD700]/30">
                         <div className="w-5 h-5 rounded-lg bg-zinc-900 flex items-center justify-center text-[10px] font-black text-[#E4AE2F]">D</div>
                         <div className="flex flex-col">

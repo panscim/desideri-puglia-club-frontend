@@ -240,11 +240,11 @@ const Missioni = () => {
                                   <div className="absolute inset-0 bg-gradient-to-t from-[#1E202B] via-transparent to-transparent opacity-80" />
 
                                   {/* Floating Badge top-left */}
-                                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+                                  <div className="absolute top-4 left-4 flex flex-col gap-2 z-10 pointer-events-none">
                                     <div className="w-fit bg-[#6A2B1C]/80 border border-[#B34524]/60 backdrop-blur-md text-orange-50 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
                                       {index % 2 === 0 ? 'Step Into The Story' : 'Squad Challenge'}
                                     </div>
-                                    {set.is_original ? (
+                                    {(set.is_original === true || set.isOriginal === true) ? (
                                       <div className="flex items-center gap-2 bg-[#E4AE2F] px-2.5 py-1.5 rounded-xl shadow-lg border border-[#FFD700]/30 w-fit">
                                         <div className="w-5 h-5 rounded-lg bg-zinc-900 flex items-center justify-center text-[10px] font-black text-[#E4AE2F]">D</div>
                                         <div className="flex flex-col">
