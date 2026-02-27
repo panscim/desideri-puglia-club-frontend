@@ -53,6 +53,16 @@ export const getCurrentPosition = async () => {
     }
 };
 
+export const requestGeolocationPermissions = async () => {
+    try {
+        const status = await Geolocation.requestPermissions();
+        return status.location === 'granted';
+    } catch (error) {
+        console.error('Errore durante la richiesta permessi:', error);
+        return false;
+    }
+};
+
 export const isUserWithinRadius = async (targetLat, targetLon, radiusMeters = 50) => {
     if (!targetLat || !targetLon) {
         throw new Error('Coordinate del target mancanti o non valide.');
