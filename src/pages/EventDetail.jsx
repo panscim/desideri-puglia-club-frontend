@@ -10,24 +10,75 @@ import {
   ShareNetwork,
   Info,
   Trophy,
-  ArrowRight
+  ArrowRight,
+  NavigationArrow,
+  Gift
 } from '@phosphor-icons/react';
+import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 
 const EventDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const fetchEvent = async () => {
       setLoading(true);
       const data = await EventsService.getEventById(id);
       setEvent(data);
+      
+      // Check if user already has the card
+      if (user && data?.ricompensa_card_id) {
+         // Note: We'd ideally have a checkCardOwnership in EventsService
+         // but we can check it here or adjust EventsService later.
+         // For now, let's assume we fetch it or the unlockEventCard handles the check.
+      }
+      
       setLoading(false);
     };
     fetchEvent();
-  }, [id]);
+
+    // Update current time every minute
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, [id, user]);
+
+  const handleOpenMaps = () => {
+    if (!event.latitudine || !event.longitudine) {
+      toast.error("Posizione non disponibile");
+      return;
+    }
+    const url = `https://www.google.com/maps/search/?api=1&query=${event.latitudine},${event.longitudine}`;
+    window.open(url, '_blank');
+  };
+
+  const handleUnlockCard = async () => {
+    if (!user) {
+      toast.error("Devi accedere per sbloccare i premi");
+      navigate('/login');
+      return;
+    }
+
+    setIsUnlocking(true);
+    const result = await EventsService.unlockEventCard(event.ricompensa_card_id);
+    
+    if (result.success) {
+      toast.success("Card Sbloccata con Successo! 🏆");
+      setIsUnlocked(true);
+    } else {
+      toast.error(result.error || "Errore nello sblocco");
+      if (result.error?.includes("già sbloccato")) {
+        setIsUnlocked(true);
+      }
+    }
+    setIsUnlocking(false);
+  };
 
   if (loading) {
     return (
@@ -58,6 +109,9 @@ const EventDetail = () => {
 
   const startDate = new Date(event.data_inizio);
   const endDate = new Date(event.data_fine);
+  const isEventActive = currentTime >= startDate && currentTime <= endDate;
+  const isEventFuture = currentTime < startDate;
+  const isEventPast = currentTime > endDate;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white font-satoshi pb-20">
@@ -88,8 +142,8 @@ const EventDetail = () => {
         <div className="absolute bottom-0 left-0 w-full p-6 z-20">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-               <span className="bg-orange-600 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg">
-                Evento Live
+               <span className={`text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg ${isEventActive ? 'bg-green-600' : 'bg-orange-600'}`}>
+                {isEventActive ? 'Evento In Corso' : isEventFuture ? 'Prossimamente' : 'Evento Terminato'}
               </span>
               {event.partners && (
                 <span className="bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
@@ -142,7 +196,9 @@ const EventDetail = () => {
                 <div>
                   <h3 className="text-xl font-black text-white leading-tight">Ottieni un premio esclusivo!</h3>
                   <p className="text-zinc-400 text-sm mt-1">
-                    Partecipa all'evento e sblocca la collezione.
+                    {isEventActive 
+                      ? "Sei sul posto? Sblocca ora la tua ricompensa!" 
+                      : "Partecipa all'evento nelle date indicate per sbloccare la card."}
                   </p>
                 </div>
               </div>
@@ -165,12 +221,33 @@ const EventDetail = () => {
                 </div>
               </div>
 
-              <button 
-                onClick={() => navigate('/mappa')}
-                className="w-full mt-6 bg-white text-black py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 group shadow-xl active:scale-[0.98] transition-all"
-              >
-                Vai alla posizione <ArrowRight size={18} weight="bold" className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              {/* Unlock Button */}
+              {isEventActive ? (
+                <button 
+                  disabled={isUnlocking || isUnlocked}
+                  onClick={handleUnlockCard}
+                  className={`w-full mt-6 py-4 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-xl active:scale-[0.98] transition-all
+                    ${isUnlocked 
+                      ? 'bg-green-600/20 text-green-500 border border-green-500/30 cursor-default' 
+                      : 'bg-white text-black hover:bg-zinc-100'}`}
+                >
+                  {isUnlocked ? (
+                    <><Trophy size={20} weight="fill" /> Card Sbloccata</>
+                  ) : isUnlocking ? (
+                    <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <><Gift size={20} weight="bold" /> Sblocca Card Reward</>
+                  )}
+                </button>
+              ) : isEventFuture ? (
+                <div className="w-full mt-6 bg-zinc-950/50 border border-white/10 text-zinc-500 py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                  <Clock size={20} /> Sblocco disponibile a breve
+                </div>
+              ) : (
+                <div className="w-full mt-6 bg-zinc-950/50 border border-white/10 text-zinc-500 py-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2">
+                  Evento Terminato
+                </div>
+              )}
             </div>
           </section>
         )}
@@ -199,6 +276,21 @@ const EventDetail = () => {
         <section className="mb-12">
           <h3 className="text-[11px] font-black uppercase tracking-widest text-zinc-500 mb-4 px-1">Dettagli Utili</h3>
           <div className="space-y-4">
+            {/* Map Navigation Button */}
+            <button 
+              onClick={handleOpenMaps}
+              className="w-full flex items-center gap-4 bg-zinc-900 border border-white/10 p-5 rounded-3xl active:scale-[0.98] transition-all hover:bg-zinc-800/80 group"
+            >
+              <div className="w-12 h-12 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
+                <NavigationArrow size={24} weight="fill" />
+              </div>
+              <div className="flex-1 text-left">
+                <p className="text-[11px] text-zinc-500 font-black uppercase tracking-widest mb-0.5">Indicazioni</p>
+                <p className="text-md font-bold text-white">Apri su Mappe</p>
+              </div>
+              <ArrowRight size={20} className="text-zinc-600 group-hover:translate-x-1 transition-transform" />
+            </button>
+
             <div className="flex items-center gap-4 bg-zinc-900/30 p-4 rounded-2xl border border-white/5">
               <Clock size={24} className="text-orange-500" weight="fill" />
               <div>
