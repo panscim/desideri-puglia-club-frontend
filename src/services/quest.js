@@ -3,6 +3,8 @@ import { supabase } from './supabase'
 
 /**
  * Service to handle Quest Sets and user progress
+ * NOTE: user_quest_sets columns are: id, user_id, set_id, status
+ * (NOT quest_set_id, NOT started_at)
  */
 export const QuestService = {
 
@@ -27,7 +29,8 @@ export const QuestService = {
         }
     },
 
-    // Start (or resume) a saga for a user — saves record in user_quest_sets
+    // Start (or resume) a saga for a user — inserts record in user_quest_sets
+    // Correct columns: user_id, set_id, status
     async startSaga(userId, sagaId) {
         if (!userId || !sagaId) return { success: false, error: 'Missing params' }
         try {
@@ -38,23 +41,21 @@ export const QuestService = {
                 .from('user_quest_sets')
                 .select('id')
                 .eq('user_id', userId)
-                .eq('quest_set_id', sagaId)
+                .eq('set_id', sagaId)
                 .maybeSingle();
 
             if (existing) {
-                // Already started — do nothing, just return success
                 console.log('[QuestService] Saga already started, id=', existing.id);
                 return { success: true };
             }
 
-            // 2. Insert new record
+            // 2. Insert new record with correct column names
             const { error: insertError } = await supabase
                 .from('user_quest_sets')
                 .insert({
                     user_id: userId,
-                    quest_set_id: sagaId,
+                    set_id: sagaId,
                     status: 'in_progress',
-                    started_at: new Date().toISOString()
                 });
 
             if (insertError) {
@@ -79,16 +80,15 @@ export const QuestService = {
         try {
             console.log('[QuestService] getUserActiveSagas: userId=', userId);
 
-            // Use simplest select to avoid 400 on missing columns
+            // Correct FK column is set_id (not quest_set_id)
             const { data: userSets, error: setsError } = await supabase
                 .from('user_quest_sets')
                 .select('*, quest_sets(*)')
                 .eq('user_id', userId)
-                .neq('status', 'completed')
-                .order('started_at', { ascending: false });
+                .neq('status', 'completed');
 
             if (setsError) {
-                console.error('[QuestService] getUserActiveSagas (userSets) ERROR:', setsError);
+                console.error('[QuestService] getUserActiveSagas ERROR:', setsError);
                 return [];
             }
 
@@ -97,25 +97,29 @@ export const QuestService = {
                 return [];
             }
 
-            // 2. Fetch completed steps separately to calculate percentage
-            const { data: userSteps, error: stepsError } = await supabase
+            console.log('[QuestService] raw userSets:', userSets);
+
+            // Fetch completed steps for this user
+            const { data: userSteps } = await supabase
                 .from('user_quest_set_steps')
                 .select('step_id')
                 .eq('user_id', userId);
 
             const completedStepIds = new Set((userSteps || []).map(s => s.step_id));
 
-            // 3. For each userSet we need the steps to count total
-            // Since we didn't specify steps in the join above (to stay safe), we'll do it separately or rely on quest_sets(*) if it worked
+            // Build result for each active saga
             const results = await Promise.all(userSets.map(async (us) => {
                 const saga = Array.isArray(us.quest_sets) ? us.quest_sets[0] : us.quest_sets;
-                if (!saga) return null;
+                if (!saga) {
+                    console.warn('[QuestService] No quest_sets data for set_id:', us.set_id);
+                    return null;
+                }
 
-                // Fetch steps count for this specific saga
+                // Fetch step count for this saga
                 const { data: steps } = await supabase
                     .from('quest_set_steps')
                     .select('id')
-                    .eq('quest_set_id', us.quest_set_id);
+                    .eq('quest_set_id', us.set_id);
 
                 const totalSteps = steps?.length || 0;
                 const doneSteps = (steps || []).filter(s => completedStepIds.has(s.id)).length;
@@ -123,8 +127,8 @@ export const QuestService = {
 
                 return {
                     userSetId: us.id,
-                    questSetId: us.quest_set_id,
-                    startedAt: us.started_at,
+                    questSetId: us.set_id,  // the actual FK is set_id
+                    startedAt: us.created_at,
                     status: us.status,
                     sagaTitle: saga.title_it || saga.title || 'Saga Senza Titolo',
                     sagaImage: saga.image_url,
