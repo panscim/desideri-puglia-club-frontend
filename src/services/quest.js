@@ -27,8 +27,95 @@ export const QuestService = {
         }
     },
 
+    // Start (or resume) a saga for a user — upserts a record in user_quest_sets
+    async startSaga(userId, sagaId) {
+        if (!userId || !sagaId) return { success: false, error: 'Missing params' }
+        try {
+            const { error } = await supabase
+                .from('user_quest_sets')
+                .upsert(
+                    {
+                        user_id: userId,
+                        quest_set_id: sagaId,
+                        status: 'in_progress',
+                        started_at: new Date().toISOString(),
+                    },
+                    { onConflict: 'user_id,quest_set_id' }
+                )
+
+            if (error) throw error
+            return { success: true }
+        } catch (err) {
+            console.error('Error starting saga:', err)
+            return { success: false, error: err.message }
+        }
+    },
+
+    // Fetch the user's active (in-progress) sagas with step completion count
+    async getUserActiveSagas(userId) {
+        if (!userId) return []
+        try {
+            // 1. Fetch user quest sets that are in progress (not completed)
+            const { data: userSets, error: setsError } = await supabase
+                .from('user_quest_sets')
+                .select(`
+                    *,
+                    saga:quest_sets(
+                        id, title, title_it, title_en, image_url, city,
+                        steps:quest_set_steps(id)
+                    )
+                `)
+                .eq('user_id', userId)
+                .neq('status', 'completed')
+                .order('started_at', { ascending: false })
+
+            if (setsError) throw setsError
+            if (!userSets || userSets.length === 0) return []
+
+            // 2. Fetch completed steps for this user
+            const sagaIds = userSets.map(s => s.quest_set_id)
+            const { data: completedSteps } = await supabase
+                .from('user_quest_set_steps')
+                .select('step_id, quest_set_steps!inner(quest_set_id)')
+                .eq('user_id', userId)
+                .in('quest_set_steps.quest_set_id', sagaIds)
+
+            // 3. Build a map of completed step counts per saga
+            const completedCountMap = {}
+            for (const row of (completedSteps || [])) {
+                const setId = row.quest_set_steps?.quest_set_id
+                if (setId) {
+                    completedCountMap[setId] = (completedCountMap[setId] || 0) + 1
+                }
+            }
+
+            // 4. Merge into result objects
+            return userSets.map(us => {
+                const saga = us.saga || {}
+                const totalSteps = saga.steps?.length || 0
+                const doneSteps = completedCountMap[us.quest_set_id] || 0
+                const percent = totalSteps > 0 ? Math.round((doneSteps / totalSteps) * 100) : 0
+
+                return {
+                    userSetId: us.id,
+                    questSetId: us.quest_set_id,
+                    startedAt: us.started_at,
+                    status: us.status,
+                    sagaTitle: saga.title_it || saga.title,
+                    sagaImage: saga.image_url,
+                    sagaCity: saga.city,
+                    totalSteps,
+                    doneSteps,
+                    percent,
+                }
+            })
+        } catch (err) {
+            console.error('Error fetching user active sagas:', err)
+            return []
+        }
+    },
+
     // Fetch user progress for a specific user
-    // Returns user set progress and completed steps
     async getUserProgress(userId) {
         if (!userId) return { sets: [], completedSteps: [] }
 
@@ -57,10 +144,9 @@ export const QuestService = {
         }
     },
 
-    // Fetch detailed info for a single Quest Set including hydrated steps (with card/partner images)
+    // Fetch detailed info for a single Quest Set including hydrated steps
     async getSagaDetail(setId) {
         try {
-            // 1. Fetch the saga and its steps
             const { data: saga, error } = await supabase
                 .from('quest_sets')
                 .select(`
@@ -73,16 +159,13 @@ export const QuestService = {
             if (error) throw error
             if (!saga) return null
 
-            // 2. Sort steps by order
             if (saga.steps) {
                 saga.steps.sort((a, b) => a.step_order - b.step_order)
             }
 
-            // 3. Extract IDs to fetch references
             const cardIds = saga.steps.filter(s => s.reference_table === 'cards' && s.reference_id).map(s => s.reference_id)
             const partnerIds = saga.steps.filter(s => s.reference_table === 'partners' && s.reference_id).map(s => s.reference_id)
 
-            // 4. Fetch the actual card and partner data in parallel
             const fetchPromises = []
             if (cardIds.length > 0) {
                 fetchPromises.push(supabase.from('cards').select('*').in('id', cardIds))
@@ -93,7 +176,6 @@ export const QuestService = {
 
             const results = await Promise.all(fetchPromises)
 
-            // Map the results back into a lookup dictionary
             const referencesMap = {}
             for (const result of results) {
                 if (result.data) {
@@ -103,7 +185,6 @@ export const QuestService = {
                 }
             }
 
-            // 5. Hydrate the steps with images and coordinates
             saga.steps = saga.steps.map(step => {
                 const ref = referencesMap[step.reference_id] || {}
                 return {

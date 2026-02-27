@@ -264,7 +264,12 @@ const SagaIntro = () => {
 
                 {/* ========== CTA BUTTON ========== */}
                 <button
-                    onClick={() => navigate(`/saga/${id}`)}
+                    onClick={async () => {
+                        if (profile?.id) {
+                            await QuestService.startSaga(profile.id, id);
+                        }
+                        navigate(`/saga/${id}`);
+                    }}
                     className="w-full py-4 bg-[#E4AE2F] hover:bg-[#cda429] text-[#0C0D10] font-bold text-[15px] uppercase tracking-wider rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-[#E4AE2F]/20 active:scale-[0.97]"
                 >
                     <Play className="w-5 h-5 fill-current" />

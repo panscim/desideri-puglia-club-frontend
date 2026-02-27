@@ -66,6 +66,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [heroItems, setHeroItems] = useState([]);
   const [saghe, setSaghe] = useState([]);
+  const [activeSagas, setActiveSagas] = useState([]);
   const [experiences, setExperiences] = useState([]);
   const [events, setEvents] = useState([]);
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
@@ -104,23 +105,29 @@ const Dashboard = () => {
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
-      // Fetch some missions for Experience Slider (missioni_catalogo)
+      // Fetch some missions for Experience Slider
       const { data: missionsData } = await supabase
         .from('missioni_catalogo')
         .select('*')
         .eq('attiva', true)
         .limit(10);
 
-      // Fetch Active Events for News Slider (eventi_club)
+      // Fetch Active Events
       const activeEvents = await EventsService.getActiveEvents();
 
       // Fetch Saghe Storiche for Missioni Vicine
       const activeSaghe = await QuestService.getActiveSets();
 
+      // Fetch user's active (in-progress) sagas
+      const userActiveSagas = profile?.id
+        ? await QuestService.getUserActiveSagas(profile.id)
+        : [];
+
       setHeroItems(heroData || []);
       setExperiences(missionsData || []);
       setEvents(activeEvents || []);
       setSaghe(activeSaghe || []);
+      setActiveSagas(userActiveSagas || []);
     } catch (err) {
       console.error('Error loading dashboard data', err);
     } finally {
@@ -240,6 +247,71 @@ const Dashboard = () => {
             </div>
           )}
         </section >
+
+        {/* 3. LE MIE SAGHE IN CORSO */}
+        {activeSagas.length > 0 && (
+          <section className="mt-8 px-4 mb-2">
+            <div className="flex items-end justify-between mb-4">
+              <h3 className="text-[22px] font-black font-satoshi text-white leading-tight tracking-tight">
+                Le Mie Saghe 🗺️
+              </h3>
+              <button
+                onClick={() => navigate('/missioni')}
+                className="text-zinc-400 font-medium text-sm hover:text-white transition-colors flex items-center gap-1 group pb-1"
+              >
+                Vedi tutte <span className="group-hover:translate-x-1 transition-transform">›</span>
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {activeSagas.map((saga) => (
+                <div
+                  key={saga.questSetId}
+                  onClick={() => navigate(`/saga/${saga.questSetId}/intro`)}
+                  className="flex items-center gap-4 bg-zinc-900 border border-white/10 rounded-2xl p-4 cursor-pointer active:scale-[0.98] transition-transform group hover:border-[#E4AE2F]/30"
+                >
+                  {/* Thumbnail */}
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-white/10">
+                    <img
+                      src={saga.sagaImage || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=200'}
+                      alt={saga.sagaTitle}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-[#E4AE2F] bg-[#E4AE2F]/10 px-2 py-0.5 rounded-full border border-[#E4AE2F]/20 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#E4AE2F] animate-pulse inline-block" />
+                        In Corso
+                      </span>
+                      {saga.sagaCity && (
+                        <span className="text-[9px] text-zinc-500 font-medium">📍 {saga.sagaCity}</span>
+                      )}
+                    </div>
+                    <h4 className="text-[15px] font-bold text-white leading-snug truncate mb-2">
+                      {saga.sagaTitle}
+                    </h4>
+                    {/* Progress bar */}
+                    <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-[#E4AE2F] to-[#FFD700] rounded-full transition-all duration-700"
+                        style={{ width: `${saga.percent}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-zinc-500 mt-1">
+                      {saga.doneSteps}/{saga.totalSteps} tappe · {saga.percent}%
+                    </p>
+                  </div>
+
+                  {/* Arrow */}
+                  <span className="text-zinc-600 group-hover:text-[#E4AE2F] transition-colors text-lg shrink-0">›</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* 4. EXPERIENCE SLIDER */}
         < section className="mt-8 px-4 mb-4" >
