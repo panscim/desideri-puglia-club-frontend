@@ -67,7 +67,6 @@ const Dashboard = () => {
   const [heroItems, setHeroItems] = useState([]);
   const [saghe, setSaghe] = useState([]);
   const [activeSagas, setActiveSagas] = useState([]);
-  const [experiences, setExperiences] = useState([]);
   const [events, setEvents] = useState([]);
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -105,13 +104,6 @@ const Dashboard = () => {
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
-      // Fetch some missions for Experience Slider (fallback to quest_sets since missioni_catalogo is 404)
-      const { data: missionsData } = await supabase
-        .from('quest_sets')
-        .select('*')
-        .eq('is_active', true)
-        .limit(10);
-
       // Fetch Active Events
       const activeEvents = await EventsService.getActiveEvents();
 
@@ -124,7 +116,6 @@ const Dashboard = () => {
         : [];
 
       setHeroItems(heroData || []);
-      setExperiences(missionsData || []);
       setEvents(activeEvents || []);
       setSaghe(activeSaghe || []);
       setActiveSagas(userActiveSagas || []);
@@ -313,45 +304,6 @@ const Dashboard = () => {
           </section>
         )}
 
-        {/* 4. EXPERIENCE SLIDER */}
-        < section className="mt-8 px-4 mb-4" >
-          <h3 className="text-[26px] font-black font-satoshi text-white mb-5 leading-tight tracking-tight">
-            Esperienze di viaggio<br />indimenticabili
-          </h3>
-
-          <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x -mx-4 px-4">
-            {experiences.map(exp => (
-              <div key={exp.id} className="snap-start shrink-0 w-[240px] md:w-[280px] group">
-                <div className="relative w-full h-[320px] rounded-2xl bg-zinc-900 border border-white/10 overflow-hidden mb-3">
-                  <img
-                    src={exp.immagine_url || "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=400&auto=format"}
-                    alt={exp.titolo}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 via-transparent to-transparent pointer-events-none" />
-
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5 bg-zinc-950/60 backdrop-blur-md px-2 py-1 rounded-full border border-white/10 shadow-sm">
-                    <div className="w-3.5 h-3.5 rounded-full bg-red-600 flex items-center justify-center text-[8px] font-bold text-white">D</div>
-                    <span className="text-[10px] font-geist font-medium text-white tracking-wide">Originals</span>
-                  </div>
-
-                  <button className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white flex items-center justify-center text-zinc-900 shadow-md hover:scale-110 active:scale-95 transition-transform">
-                    <Heart size={16} weight="bold" />
-                  </button>
-                </div>
-
-                <h4 className="font-satoshi font-bold text-white text-[15px] line-clamp-2 leading-snug">
-                  {exp.title_it || exp.titolo || exp.title}
-                </h4>
-                <div className="flex items-center gap-1 mt-1 text-zinc-400 text-xs font-geist">
-                  <span className="text-red-500 text-sm">★</span>
-                  <span className="font-bold text-white">{(Math.random() * (5 - 4.2) + 4.2).toFixed(1)}</span>
-                  <span>({Math.floor(Math.random() * 300) + 12} valutazioni)</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section >
 
         {/* 5. MISSIONI VICINE SLIDER */}
         <section className="mt-8 px-4 mb-4">

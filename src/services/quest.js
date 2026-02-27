@@ -27,40 +27,45 @@ export const QuestService = {
         }
     },
 
-    // Start (or resume) a saga for a user — upserts a record in user_quest_sets
+    // Start (or resume) a saga for a user — saves record in user_quest_sets
     async startSaga(userId, sagaId) {
         if (!userId || !sagaId) return { success: false, error: 'Missing params' }
         try {
             console.log('[QuestService] startSaga: userId=', userId, ' sagaId=', sagaId);
-            const { data, error } = await supabase
+
+            // 1. Check if a record already exists
+            const { data: existing } = await supabase
                 .from('user_quest_sets')
-                .upsert({
+                .select('id')
+                .eq('user_id', userId)
+                .eq('quest_set_id', sagaId)
+                .maybeSingle();
+
+            if (existing) {
+                // Already started — do nothing, just return success
+                console.log('[QuestService] Saga already started, id=', existing.id);
+                return { success: true };
+            }
+
+            // 2. Insert new record
+            const { error: insertError } = await supabase
+                .from('user_quest_sets')
+                .insert({
                     user_id: userId,
                     quest_set_id: sagaId,
                     status: 'in_progress',
                     started_at: new Date().toISOString()
-                }, { onConflict: 'user_id,quest_set_id' }); // Assuming this composite key or constraint exists
+                });
 
-            if (error) {
-                console.error('[QuestService] startSaga ERROR:', error);
-                // If the error is about onConflict, try without it
-                if (error.message && error.message.includes('on_conflict')) {
-                    const { error: retryError } = await supabase
-                        .from('user_quest_sets')
-                        .upsert({
-                            user_id: userId,
-                            quest_set_id: sagaId,
-                            status: 'in_progress',
-                            started_at: new Date().toISOString()
-                        });
-                    if (retryError) throw retryError;
-                } else {
-                    throw error;
-                }
+            if (insertError) {
+                console.error('[QuestService] startSaga INSERT error:', insertError);
+                throw insertError;
             }
-            return { success: true, data }
+
+            console.log('[QuestService] startSaga: saved successfully');
+            return { success: true };
         } catch (err) {
-            console.error('[QuestService] startSaga CRITICAL FAILURE:', err)
+            console.error('[QuestService] startSaga FAILURE:', err)
             return { success: false, error: err.message || err }
         }
     },
