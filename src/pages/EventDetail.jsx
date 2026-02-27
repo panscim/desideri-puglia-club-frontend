@@ -32,7 +32,7 @@ const EventDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 space-y-4">
-        <div className="w-16 h-16 border-4 border-red-500/20 border-t-red-500 rounded-full animate-spin" />
+        <div className="w-16 h-16 border-4 border-orange-500/20 border-t-orange-500 rounded-full animate-spin" />
         <p className="text-zinc-500 font-medium animate-pulse">Caricamento evento...</p>
       </div>
     );
@@ -88,7 +88,7 @@ const EventDetail = () => {
         <div className="absolute bottom-0 left-0 w-full p-6 z-20">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-               <span className="bg-red-500 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg">
+               <span className="bg-orange-600 text-white text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg">
                 Evento Live
               </span>
               {event.partners && (
@@ -109,7 +109,7 @@ const EventDetail = () => {
         {/* Info Grid */}
         <div className="grid grid-cols-2 gap-3 mb-8">
           <div className="bg-zinc-900/50 backdrop-blur-md border border-white/5 p-4 rounded-3xl">
-            <div className="flex items-center gap-3 mb-1 text-red-500">
+            <div className="flex items-center gap-3 mb-1 text-orange-500">
               <Calendar size={20} weight="fill" />
               <span className="text-[11px] font-black uppercase tracking-tighter">Quando</span>
             </div>
@@ -131,12 +131,12 @@ const EventDetail = () => {
         {/* 3. REWARD SECTION (IMPORTANT) */}
         {event.cards && (
           <section className="mb-10 animate-fade-in-up">
-            <div className="bg-gradient-to-br from-red-600/20 to-orange-500/10 border border-red-500/30 rounded-[2.5rem] p-6 relative overflow-hidden group">
+            <div className="bg-gradient-to-br from-orange-600/20 to-gold/10 border border-orange-500/30 rounded-[2.5rem] p-6 relative overflow-hidden group">
               {/* Background Glow */}
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-red-600 rounded-full blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity" />
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-orange-600 rounded-full blur-[60px] opacity-20 group-hover:opacity-40 transition-opacity" />
               
               <div className="flex items-start gap-4 mb-3 relative z-10">
-                <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-red-600/20">
+                <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-orange-600/20">
                   <Trophy size={28} weight="fill" className="text-white" />
                 </div>
                 <div>
@@ -200,7 +200,7 @@ const EventDetail = () => {
           <h3 className="text-[11px] font-black uppercase tracking-widest text-zinc-500 mb-4 px-1">Dettagli Utili</h3>
           <div className="space-y-4">
             <div className="flex items-center gap-4 bg-zinc-900/30 p-4 rounded-2xl border border-white/5">
-              <Clock size={24} className="text-red-500" weight="fill" />
+              <Clock size={24} className="text-orange-500" weight="fill" />
               <div>
                 <p className="text-[11px] text-zinc-500 font-black uppercase tracking-widest">Orario</p>
                 <p className="text-sm font-bold">Inizia alle {startDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</p>
