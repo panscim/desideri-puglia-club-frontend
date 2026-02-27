@@ -355,26 +355,26 @@ const Dashboard = () => {
                   <img src={saga.image_url || saga.map_image_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={saga.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
 
                   {/* Distance Badge */}
-                  <div className="absolute top-3 left-3 bg-zinc-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md border border-white/10">
-                    <span className="text-zinc-400 mb-[1px]">📍</span>
+                  <div className="absolute top-3 right-3 bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-full text-[11px] font-bold text-white flex items-center gap-1.5 shadow-md border border-white/10 z-10">
+                    <span className="text-red-500 mb-[1px]">📍</span>
                     {saga.city || 'Puglia'}
                   </div>
 
                   {/* Badge: Originals vs Certificato */}
-                  <div className="absolute bottom-3 left-3 right-3 flex justify-start pointer-events-none">
+                  <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                     {saga.is_original ? (
-                      <div className="flex items-center gap-1.5 bg-zinc-950/70 backdrop-blur-md px-2 py-1 rounded-lg border border-[#E4AE2F]/30 shadow-lg group-hover:border-[#E4AE2F]/60 transition-colors">
-                        <div className="w-5 h-5 rounded-md bg-[#E4AE2F] flex items-center justify-center text-[10px] font-black text-zinc-900 shadow-inner">D</div>
+                      <div className="flex items-center gap-2 bg-[#E4AE2F] px-2.5 py-1.5 rounded-xl shadow-lg border border-[#FFD700]/30">
+                        <div className="w-5 h-5 rounded-lg bg-zinc-900 flex items-center justify-center text-[10px] font-black text-[#E4AE2F]">D</div>
                         <div className="flex flex-col">
-                          <span className="text-[8px] font-black uppercase tracking-[0.1em] text-[#E4AE2F] leading-none">Originals</span>
-                          <span className="text-[5px] font-medium text-white/50 uppercase tracking-[0.05em] leading-none mt-0.5">by Desideri di Puglia</span>
+                          <span className="text-[9px] font-black uppercase tracking-wider text-zinc-950 leading-none">Originals</span>
+                          <span className="text-[6px] font-bold text-zinc-800 uppercase tracking-tight leading-none mt-0.5">by Desideri di Puglia</span>
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-1.5 bg-zinc-950/60 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 shadow-lg">
-                        <div className="text-[7px] font-bold text-zinc-400 flex flex-col uppercase tracking-tighter leading-tight">
-                          <span className="text-white/80">Certificato da</span>
-                          <span>Desideri di Puglia</span>
+                      <div className="flex items-center gap-2 bg-zinc-950/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
+                        <div className="text-[8px] font-bold text-zinc-400 flex flex-col uppercase tracking-tight leading-tight">
+                          <span className="text-white/90">Certificato da</span>
+                          <span className="text-[7px]">Desideri di Puglia</span>
                         </div>
                       </div>
                     )}

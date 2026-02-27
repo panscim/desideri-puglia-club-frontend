@@ -241,22 +241,22 @@ const Missioni = () => {
 
                                   {/* Floating Badge top-left */}
                                   <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-                                    <div className="bg-[#6A2B1C]/80 border border-[#B34524]/60 backdrop-blur-md text-orange-50 text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-full">
+                                    <div className="w-fit bg-[#6A2B1C]/80 border border-[#B34524]/60 backdrop-blur-md text-orange-50 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
                                       {index % 2 === 0 ? 'Step Into The Story' : 'Squad Challenge'}
                                     </div>
                                     {set.is_original ? (
-                                      <div className="flex items-center gap-1.5 bg-zinc-950/70 backdrop-blur-md px-2 py-1 rounded-lg border border-[#E4AE2F]/30 shadow-lg">
-                                        <div className="w-5 h-5 rounded-md bg-[#E4AE2F] flex items-center justify-center text-[10px] font-black text-zinc-900 shadow-inner">D</div>
+                                      <div className="flex items-center gap-2 bg-[#E4AE2F] px-2.5 py-1.5 rounded-xl shadow-lg border border-[#FFD700]/30 w-fit">
+                                        <div className="w-5 h-5 rounded-lg bg-zinc-900 flex items-center justify-center text-[10px] font-black text-[#E4AE2F]">D</div>
                                         <div className="flex flex-col">
-                                          <span className="text-[8px] font-black uppercase tracking-[0.1em] text-[#E4AE2F] leading-none">Originals</span>
-                                          <span className="text-[5px] font-medium text-white/50 uppercase tracking-[0.05em] leading-none mt-0.5">by Desideri di Puglia</span>
+                                          <span className="text-[9px] font-black uppercase tracking-wider text-zinc-950 leading-none">Originals</span>
+                                          <span className="text-[6px] font-bold text-zinc-800 uppercase tracking-tight leading-none mt-0.5">by Desideri di Puglia</span>
                                         </div>
                                       </div>
                                     ) : (
-                                      <div className="flex items-center gap-1.5 bg-zinc-950/60 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 shadow-lg w-fit">
-                                        <div className="text-[7px] font-bold text-zinc-400 flex flex-col uppercase tracking-tighter leading-tight">
-                                          <span className="text-white/80">Certificato da</span>
-                                          <span>Desideri di Puglia</span>
+                                      <div className="flex items-center gap-2 bg-zinc-950/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-lg w-fit">
+                                        <div className="text-[8px] font-bold text-zinc-400 flex flex-col uppercase tracking-tight leading-tight">
+                                          <span className="text-white/90">Certificato da</span>
+                                          <span className="text-[7px]">Desideri di Puglia</span>
                                         </div>
                                       </div>
                                     )}
