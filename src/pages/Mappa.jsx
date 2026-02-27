@@ -28,7 +28,7 @@ const MARKER_COLORS = {
     trekking: { bg: '#111c14', border: '#6aa66a', glow: 'rgba(106,166,106,0.35)' },
     gastro: { bg: '#1c1410', border: '#c47a2e', glow: 'rgba(196,122,46,0.35)' },  // muted amber
     gastronomia: { bg: '#1c1410', border: '#c47a2e', glow: 'rgba(196,122,46,0.35)' },
-    evento: { bg: '#2b1014', border: '#e11d48', glow: 'rgba(225,29,72,0.45)' },   // ruby red for events
+    evento: { bg: '#231410', border: '#ea580c', glow: 'rgba(234,88,12,0.35)' },   // brand orange for events
     default: { bg: '#18181b', border: '#52525b', glow: 'rgba(82,82,91,0.3)' },     // zinc
 };
 
@@ -336,9 +336,13 @@ export default function Mappa() {
                             icon={createCustomMarker(item.quest_type, selectedItem?.id === item.id, item.__itemType === 'evento')}
                             eventHandlers={{
                                 click: () => {
-                                    setSelectedItem(item);
-                                    setMapCenter([item.lat, item.lng]);
-                                    setMapZoom(14);
+                                    if (item.__itemType === 'evento') {
+                                        navigate(`/eventi/${item.id}`);
+                                    } else {
+                                        setSelectedItem(item);
+                                        setMapCenter([item.lat, item.lng]);
+                                        setMapZoom(14);
+                                    }
                                 }
                             }}
                         />
@@ -435,7 +439,13 @@ export default function Mappa() {
                                 </button>
                             </div>
 
-                            <div className="w-full h-40 rounded-xl overflow-hidden relative shadow-inner">
+                            <div 
+                                onClick={() => {
+                                    if (selectedItem.__itemType === 'evento') navigate(`/eventi/${selectedItem.id}`);
+                                    else navigate(`/saga/${selectedItem.id}/intro`);
+                                }}
+                                className="w-full h-40 rounded-xl overflow-hidden relative shadow-inner cursor-pointer active:scale-[0.99] transition-transform"
+                            >
                                 <img
                                     src={selectedItem._image || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"}
                                     alt={selectedItem._title}
@@ -457,7 +467,7 @@ export default function Mappa() {
 
                             <button
                                 onClick={() => {
-                                    if (selectedItem.__itemType === 'evento') navigate('/eventi');
+                                    if (selectedItem.__itemType === 'evento') navigate(`/eventi/${selectedItem.id}`);
                                     else navigate(`/saga/${selectedItem.id}/intro`);
                                 }}
                                 className={`w-full text-zinc-950 font-bold py-3.5 rounded-xl text-md active:scale-[0.98] transition-transform shadow-lg ${selectedItem.__itemType === 'evento' ? 'bg-rose-500 text-white' : 'bg-white shadow-white/10'}`}
