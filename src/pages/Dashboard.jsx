@@ -108,6 +108,9 @@ const Dashboard = () => {
       // Fetch Active Events
       const activeEvents = await EventsService.getActiveEvents();
 
+      // Fetch Saghe Storiche for Missioni Vicine
+      const activeSaghe = await QuestService.getActiveSets();
+
       // Fetch user's active (in-progress) sagas
       const userActiveSagas = profile?.id
         ? await QuestService.getUserActiveSagas(profile.id)
