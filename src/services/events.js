@@ -147,5 +147,28 @@ export const EventsService = {
             console.error('Error unlocking event card:', err)
             return { success: false, error: err.message }
         }
+    },
+
+    /**
+     * Recupera un singolo evento per ID con dettagli partner e card.
+     */
+    async getEventById(id) {
+        try {
+            const { data, error } = await supabase
+                .from('eventi_club')
+                .select(`
+                    *,
+                    partners ( id, name, city, logo_url, description ),
+                    cards:ricompensa_card_id ( id, image_url, rarity, title, description )
+                `)
+                .eq('id', id)
+                .single()
+
+            if (error) throw error
+            return data
+        } catch (err) {
+            console.error('Error fetching event by id:', err)
+            return null
+        }
     }
 }

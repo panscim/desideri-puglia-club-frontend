@@ -425,7 +425,11 @@ const Dashboard = () => {
               const isPartner = !!ev.partners
 
               return (
-                <div key={ev.id} className="snap-center w-[280px] md:w-[320px] shrink-0 bg-zinc-900 rounded-[1.5rem] overflow-hidden shadow-xl border border-white/10 group flex flex-col">
+                <div
+                  key={ev.id}
+                  onClick={() => navigate(`/eventi/${ev.id}`)}
+                  className="snap-center w-[280px] md:w-[320px] shrink-0 bg-zinc-900 rounded-[1.5rem] overflow-hidden shadow-xl border border-white/10 group flex flex-col cursor-pointer active:scale-[0.98] transition-all"
+                >
                   {/* Event Image */}
                   <div className="h-40 bg-zinc-950 relative overflow-hidden border-b border-white/5">
                     <img src={ev.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={ev.titolo} className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700" />

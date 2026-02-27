@@ -75,6 +75,7 @@ const Album = lazy(() => import("./pages/Album"));
 
 // ⭐️ EVENTI CLUB
 const Eventi = lazy(() => import("./pages/Eventi"));
+const EventDetail = lazy(() => import("./pages/EventDetail"));
 
 // Layout - Keep layout eager for better UX
 import Layout from "./components/Layout";
@@ -238,6 +239,7 @@ function App() {
               <Route path="/mappa" element={<Mappa />} />
               <Route path="/album" element={<Album />} />
               <Route path="/eventi" element={<Eventi />} />
+              <Route path="/eventi/:id" element={<EventDetail />} />
               <Route path="/shop" element={<Shop />} />
               <Route path="/shop/:itemId" element={<MarketItemDetail />} />
               <Route
