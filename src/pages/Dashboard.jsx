@@ -67,6 +67,7 @@ const Dashboard = () => {
   const [heroItems, setHeroItems] = useState([]);
   const [saghe, setSaghe] = useState([]);
   const [activeSagas, setActiveSagas] = useState([]);
+  const [favorites, setFavorites] = useState([]);
   const [events, setEvents] = useState([]);
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -107,22 +108,42 @@ const Dashboard = () => {
       // Fetch Active Events
       const activeEvents = await EventsService.getActiveEvents();
 
-      // Fetch Saghe Storiche for Missioni Vicine
-      const activeSaghe = await QuestService.getActiveSets();
-
       // Fetch user's active (in-progress) sagas
       const userActiveSagas = profile?.id
         ? await QuestService.getUserActiveSagas(profile.id)
+        : [];
+
+      // Fetch user favorites
+      const userFavorites = profile?.id
+        ? await QuestService.getUserFavorites(profile.id)
         : [];
 
       setHeroItems(heroData || []);
       setEvents(activeEvents || []);
       setSaghe(activeSaghe || []);
       setActiveSagas(userActiveSagas || []);
+      setFavorites(userFavorites || []);
     } catch (err) {
       console.error('Error loading dashboard data', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleFavorite = async (e, setId) => {
+    e.stopPropagation();
+    if (!profile?.id) {
+      // Potresti voler mostrare un toast o reindirizzare al login
+      return;
+    }
+
+    const res = await QuestService.toggleFavorite(profile.id, setId);
+    if (res.success) {
+      if (res.isFavorite) {
+        setFavorites(prev => [...prev, setId]);
+      } else {
+        setFavorites(prev => prev.filter(id => id !== setId));
+      }
     }
   };
 
@@ -331,10 +352,22 @@ const Dashboard = () => {
                   <img src={saga.image_url || saga.map_image_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={saga.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
 
                   {/* Distance Badge */}
-                  <div className="absolute top-3 right-3 bg-zinc-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md border border-white/10">
+                  <div className="absolute top-3 left-3 bg-zinc-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md border border-white/10">
                     <span className="text-zinc-400 mb-[1px]">📍</span>
                     {saga.city || 'Puglia'}
                   </div>
+
+                  {/* Favorite Heart Button */}
+                  <button
+                    onClick={(e) => handleToggleFavorite(e, saga.id)}
+                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-zinc-950/60 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-transform"
+                  >
+                    <Heart
+                      size={18}
+                      weight={favorites.includes(saga.id) ? "fill" : "bold"}
+                      className={favorites.includes(saga.id) ? "text-red-500" : "text-white"}
+                    />
+                  </button>
                 </div>
 
                 {/* Content */}

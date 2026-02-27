@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../services/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { QuestService } from '../services/quest'
-import { CaretLeft, MapPin, Compass } from '@phosphor-icons/react'
+import { CaretLeft, MapPin, Compass, Heart } from '@phosphor-icons/react'
 import { useTranslation } from 'react-i18next'
 import { getLocalized } from '../utils/content'
 
@@ -26,6 +26,7 @@ const Missioni = () => {
 
   const [questSets, setQuestSets] = useState([])
   const [questProgress, setQuestProgress] = useState(null)
+  const [favorites, setFavorites] = useState([])
   const [loading, setLoading] = useState(true)
 
   // Filtri UI
@@ -74,12 +75,31 @@ const Missioni = () => {
       if (profile?.id) {
         const progress = await QuestService.getUserProgress(profile.id)
         setQuestProgress(progress)
+
+        // 4. Fetch user favorites
+        const favs = await QuestService.getUserFavorites(profile.id)
+        setFavorites(favs)
       }
 
     } catch (error) {
       console.error(error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleToggleFavorite = async (e, setId) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!profile?.id) return
+
+    const res = await QuestService.toggleFavorite(profile.id, setId)
+    if (res.success) {
+      if (res.isFavorite) {
+        setFavorites(prev => [...prev, setId])
+      } else {
+        setFavorites(prev => prev.filter(id => id !== setId))
+      }
     }
   }
 
@@ -132,8 +152,8 @@ const Missioni = () => {
                           <button
                             key={idx}
                             className={`snap-start whitespace-nowrap pl-3 pr-4 py-2 rounded-full text-[13px] font-geist font-medium transition-all flex items-center gap-2 border shadow-sm ${selectedCity === city
-                                ? 'bg-white text-zinc-950 border-white scale-100'
-                                : 'bg-zinc-900 border-white/10 text-zinc-400 hover:bg-zinc-800'
+                              ? 'bg-white text-zinc-950 border-white scale-100'
+                              : 'bg-zinc-900 border-white/10 text-zinc-400 hover:bg-zinc-800'
                               }`}
                             onClick={() => setSelectedCity(city)}
                           >
@@ -157,8 +177,8 @@ const Missioni = () => {
                           <button
                             key={idx}
                             className={`snap-start whitespace-nowrap px-4 py-2 rounded-xl text-[13px] font-geist font-medium transition-all border ${selectedType === type
-                                ? 'bg-zinc-800 text-white border-zinc-600 shadow-sm'
-                                : 'bg-transparent text-zinc-500 border-white/5 hover:border-white/20'
+                              ? 'bg-zinc-800 text-white border-zinc-600 shadow-sm'
+                              : 'bg-transparent text-zinc-500 border-white/5 hover:border-white/20'
                               }`}
                             onClick={() => setSelectedType(type)}
                           >
@@ -220,9 +240,21 @@ const Missioni = () => {
                                   <div className="absolute inset-0 bg-gradient-to-t from-[#1E202B] via-transparent to-transparent opacity-80" />
 
                                   {/* Floating Badge top-right */}
-                                  <div className="absolute top-4 right-4 bg-[#6A2B1C]/80 border border-[#B34524]/60 backdrop-blur-md text-orange-50 text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-full z-10">
+                                  <div className="absolute top-4 left-4 bg-[#6A2B1C]/80 border border-[#B34524]/60 backdrop-blur-md text-orange-50 text-[10px] font-bold uppercase tracking-widest px-3 py-2 rounded-full z-10">
                                     {index % 2 === 0 ? 'Step Into The Story' : 'Squad Challenge'}
                                   </div>
+
+                                  {/* Heart Button */}
+                                  <button
+                                    onClick={(e) => handleToggleFavorite(e, set.id)}
+                                    className="absolute top-4 right-4 w-10 h-10 rounded-full bg-zinc-950/60 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-transform z-20"
+                                  >
+                                    <Heart
+                                      size={22}
+                                      weight={favorites.includes(set.id) ? "fill" : "bold"}
+                                      className={favorites.includes(set.id) ? "text-red-500" : "text-white"}
+                                    />
+                                  </button>
 
                                   {/* Progress Bar Override on Image */}
                                   <div className="absolute bottom-0 left-0 w-full h-1.5 bg-[#1E202B]/50 backdrop-blur-sm">

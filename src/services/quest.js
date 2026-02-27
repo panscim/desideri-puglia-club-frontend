@@ -251,6 +251,59 @@ export const QuestService = {
             console.error('Error unlocking quest step:', err)
             return { success: false, error: err.message }
         }
+    },
+
+    // Toggle favorite status for a mission
+    async toggleFavorite(userId, setId) {
+        if (!userId || !setId) return { success: false, error: 'Missing params' }
+        try {
+            // Check if already favorite
+            const { data: existing, error: checkError } = await supabase
+                .from('user_quest_favorites')
+                .select('id')
+                .eq('user_id', userId)
+                .eq('set_id', setId)
+                .maybeSingle();
+
+            if (checkError) throw checkError;
+
+            if (existing) {
+                // Remove if exists
+                const { error: deleteError } = await supabase
+                    .from('user_quest_favorites')
+                    .delete()
+                    .eq('id', existing.id);
+                if (deleteError) throw deleteError;
+                return { success: true, isFavorite: false };
+            } else {
+                // Add if not exists
+                const { error: insertError } = await supabase
+                    .from('user_quest_favorites')
+                    .insert({ user_id: userId, set_id: setId });
+                if (insertError) throw insertError;
+                return { success: true, isFavorite: true };
+            }
+        } catch (err) {
+            console.error('[QuestService] toggleFavorite error:', err);
+            return { success: false, error: err.message };
+        }
+    },
+
+    // Fetch all user favorites
+    async getUserFavorites(userId) {
+        if (!userId) return [];
+        try {
+            const { data, error } = await supabase
+                .from('user_quest_favorites')
+                .select('set_id')
+                .eq('user_id', userId);
+
+            if (error) throw error;
+            return (data || []).map(f => f.set_id);
+        } catch (err) {
+            console.error('[QuestService] getUserFavorites error:', err);
+            return [];
+        }
     }
 
 }
