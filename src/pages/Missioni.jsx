@@ -244,20 +244,18 @@ const Missioni = () => {
                                     <div className="w-fit bg-[#6A2B1C]/80 border border-[#B34524]/60 backdrop-blur-md text-orange-50 text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
                                       {index % 2 === 0 ? 'Step Into The Story' : 'Squad Challenge'}
                                     </div>
+                                  </div>
+
+                                  {/* Badge: Originals vs Certificato - BOTTOM LEFT */}
+                                  <div className="absolute bottom-4 left-4 right-4 flex justify-start pointer-events-none z-10">
                                     {(set.is_original === true || set.isOriginal === true) ? (
-                                      <div className="flex items-center gap-2 bg-[#E4AE2F] px-2.5 py-1.5 rounded-xl shadow-lg border border-[#FFD700]/30 w-fit">
-                                        <div className="w-5 h-5 rounded-lg bg-zinc-900 flex items-center justify-center text-[10px] font-black text-[#E4AE2F]">D</div>
-                                        <div className="flex flex-col">
-                                          <span className="text-[9px] font-black uppercase tracking-wider text-zinc-950 leading-none">Originals</span>
-                                          <span className="text-[6px] font-bold text-zinc-800 uppercase tracking-tight leading-none mt-0.5">by Desideri di Puglia</span>
-                                        </div>
+                                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2.5 py-1.5 rounded-full border border-white/5">
+                                        <div className="w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm shrink-0">D</div>
+                                        <span className="text-[12px] font-geist font-bold text-white drop-shadow-md">Originals by Desideri di Puglia</span>
                                       </div>
                                     ) : (
-                                      <div className="flex items-center gap-2 bg-zinc-950/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-lg w-fit">
-                                        <div className="text-[8px] font-bold text-zinc-400 flex flex-col uppercase tracking-tight leading-tight">
-                                          <span className="text-white/90">Certificato da</span>
-                                          <span className="text-[7px]">Desideri di Puglia</span>
-                                        </div>
+                                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2.5 py-1.5 rounded-full border border-white/5">
+                                        <span className="text-[11px] font-bold text-zinc-300 drop-shadow-md">Certificato da Desideri di Puglia</span>
                                       </div>
                                     )}
                                   </div>

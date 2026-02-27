@@ -293,8 +293,8 @@ const Dashboard = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {/* Tiny Badge Indicator on thumbnail */}
-                    {saga.isOriginal && (
-                      <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-[#E4AE2F] rounded-md flex items-center justify-center text-[8px] font-black text-zinc-900 border border-[#FFD700]/30 shadow-sm">D</div>
+                    {(saga.is_original === true || saga.isOriginal === true) && (
+                      <div className="absolute top-1 left-1 w-4 h-4 bg-orange-600 rounded-full flex items-center justify-center text-[7px] font-black text-white shadow-sm border border-white/10">D</div>
                     )}
                   </div>
 
@@ -364,22 +364,16 @@ const Dashboard = () => {
                     {saga.city || 'Puglia'}
                   </div>
 
-                  {/* Badge: Originals vs Certificato */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-2 z-10 pointer-events-none">
+                  {/* Badge: Originals vs Certificato - BOTTOM LEFT */}
+                  <div className="absolute bottom-3 left-3 right-3 flex justify-start pointer-events-none z-10">
                     {(saga.is_original === true || saga.isOriginal === true) ? (
-                      <div className="flex items-center gap-2 bg-[#E4AE2F] px-2.5 py-1.5 rounded-xl shadow-lg border border-[#FFD700]/30">
-                        <div className="w-5 h-5 rounded-lg bg-zinc-900 flex items-center justify-center text-[10px] font-black text-[#E4AE2F]">D</div>
-                        <div className="flex flex-col">
-                          <span className="text-[9px] font-black uppercase tracking-wider text-zinc-950 leading-none">Originals</span>
-                          <span className="text-[6px] font-bold text-zinc-800 uppercase tracking-tight leading-none mt-0.5">by Desideri di Puglia</span>
-                        </div>
+                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/5">
+                        <div className="w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm shrink-0">D</div>
+                        <span className="text-[11px] font-geist font-bold text-white drop-shadow-md">Originals by Desideri di Puglia</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 bg-zinc-950/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-white/10 shadow-lg">
-                        <div className="text-[8px] font-bold text-zinc-400 flex flex-col uppercase tracking-tight leading-tight">
-                          <span className="text-white/90">Certificato da</span>
-                          <span className="text-[7px]">Desideri di Puglia</span>
-                        </div>
+                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/5">
+                        <span className="text-[10px] font-bold text-zinc-300 drop-shadow-md">Certificato da Desideri di Puglia</span>
                       </div>
                     )}
                   </div>
