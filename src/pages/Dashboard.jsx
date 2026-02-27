@@ -105,11 +105,11 @@ const Dashboard = () => {
         .eq('is_active', true)
         .order('display_order', { ascending: true });
 
-      // Fetch some missions for Experience Slider
+      // Fetch some missions for Experience Slider (fallback to quest_sets since missioni_catalogo is 404)
       const { data: missionsData } = await supabase
-        .from('missioni_catalogo')
+        .from('quest_sets')
         .select('*')
-        .eq('attiva', true)
+        .eq('is_active', true)
         .limit(10);
 
       // Fetch Active Events
@@ -341,7 +341,7 @@ const Dashboard = () => {
                 </div>
 
                 <h4 className="font-satoshi font-bold text-white text-[15px] line-clamp-2 leading-snug">
-                  {exp.titolo}
+                  {exp.title_it || exp.titolo || exp.title}
                 </h4>
                 <div className="flex items-center gap-1 mt-1 text-zinc-400 text-xs font-geist">
                   <span className="text-red-500 text-sm">★</span>

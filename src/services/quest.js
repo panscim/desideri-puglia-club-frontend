@@ -31,95 +31,89 @@ export const QuestService = {
     async startSaga(userId, sagaId) {
         if (!userId || !sagaId) return { success: false, error: 'Missing params' }
         try {
-            console.log('[QuestService] Starting saga:', sagaId, 'for user:', userId);
-            const { error } = await supabase
+            console.log('[QuestService] startSaga: userId=', userId, ' sagaId=', sagaId);
+            const { data, error } = await supabase
                 .from('user_quest_sets')
-                .upsert(
-                    {
-                        user_id: userId,
-                        quest_set_id: sagaId,
-                        status: 'in_progress',
-                        started_at: new Date().toISOString(),
-                    },
-                    { onConflict: 'user_id,quest_set_id' }
-                )
+                .upsert({
+                    user_id: userId,
+                    quest_set_id: sagaId,
+                    status: 'in_progress',
+                    started_at: new Date().toISOString()
+                }, { onConflict: 'user_id,quest_set_id' }); // Assuming this composite key or constraint exists
 
-            if (error) throw error
-            return { success: true }
+            if (error) {
+                console.error('[QuestService] startSaga ERROR:', error);
+                // If the error is about onConflict, try without it
+                if (error.message && error.message.includes('on_conflict')) {
+                    const { error: retryError } = await supabase
+                        .from('user_quest_sets')
+                        .upsert({
+                            user_id: userId,
+                            quest_set_id: sagaId,
+                            status: 'in_progress',
+                            started_at: new Date().toISOString()
+                        });
+                    if (retryError) throw retryError;
+                } else {
+                    throw error;
+                }
+            }
+            return { success: true, data }
         } catch (err) {
-            console.error('[QuestService] Error starting saga:', err)
-            return { success: false, error: err.message }
+            console.error('[QuestService] startSaga CRITICAL FAILURE:', err)
+            return { success: false, error: err.message || err }
         }
     },
 
     // Fetch the user's active (in-progress) sagas with step completion count
     async getUserActiveSagas(userId) {
         if (!userId) {
-            console.warn('[QuestService] getUserActiveSagas: No userId provided');
+            console.warn('[QuestService] getUserActiveSagas: No userId');
             return [];
         }
         try {
-            console.log('[QuestService] Fetching active sagas for user:', userId);
+            console.log('[QuestService] getUserActiveSagas: userId=', userId);
 
-            // 1. Fetch user quest sets that are in progress
+            // Use simplest select to avoid 400 on missing columns
             const { data: userSets, error: setsError } = await supabase
                 .from('user_quest_sets')
-                .select(`
-                    *,
-                    quest_sets (
-                        id, 
-                        title, 
-                        title_it, 
-                        title_en, 
-                        image_url, 
-                        city,
-                        quest_set_steps (id)
-                    )
-                `)
+                .select('*, quest_sets(*)')
                 .eq('user_id', userId)
                 .neq('status', 'completed')
                 .order('started_at', { ascending: false });
 
             if (setsError) {
-                console.error('[QuestService] Error fetching user_quest_sets:', setsError);
-                throw setsError;
-            }
-
-            if (!userSets || userSets.length === 0) {
-                console.log('[QuestService] No active user_quest_sets found in DB.');
+                console.error('[QuestService] getUserActiveSagas (userSets) ERROR:', setsError);
                 return [];
             }
 
-            console.log('[QuestService] Raw userSets data:', userSets);
+            if (!userSets || userSets.length === 0) {
+                console.log('[QuestService] No active user_quest_sets found.');
+                return [];
+            }
 
-            // 2. Fetch ALL completed steps for this user to match in-memory (safer than complex join)
+            // 2. Fetch completed steps separately to calculate percentage
             const { data: userSteps, error: stepsError } = await supabase
                 .from('user_quest_set_steps')
                 .select('step_id')
                 .eq('user_id', userId);
 
-            if (stepsError) {
-                console.error('[QuestService] Error fetching user_quest_set_steps:', stepsError);
-            }
-
             const completedStepIds = new Set((userSteps || []).map(s => s.step_id));
 
-            // 3. Merge and format
-            const activeSagas = userSets.map(us => {
-                // Handle cases where Supabase might return quest_sets as an array or object
+            // 3. For each userSet we need the steps to count total
+            // Since we didn't specify steps in the join above (to stay safe), we'll do it separately or rely on quest_sets(*) if it worked
+            const results = await Promise.all(userSets.map(async (us) => {
                 const saga = Array.isArray(us.quest_sets) ? us.quest_sets[0] : us.quest_sets;
+                if (!saga) return null;
 
-                if (!saga) {
-                    console.warn(`[QuestService] No quest_sets data found for quest_set_id: ${us.quest_set_id}`);
-                    return null;
-                }
+                // Fetch steps count for this specific saga
+                const { data: steps } = await supabase
+                    .from('quest_set_steps')
+                    .select('id')
+                    .eq('quest_set_id', us.quest_set_id);
 
-                const totalSteps = saga.quest_set_steps?.length || 0;
-                // Count which steps of this saga are in the completedStepIds set
-                const doneSteps = (saga.quest_set_steps || [])
-                    .filter(step => completedStepIds.has(step.id))
-                    .length;
-
+                const totalSteps = steps?.length || 0;
+                const doneSteps = (steps || []).filter(s => completedStepIds.has(s.id)).length;
                 const percent = totalSteps > 0 ? Math.round((doneSteps / totalSteps) * 100) : 0;
 
                 return {
@@ -134,12 +128,13 @@ export const QuestService = {
                     doneSteps,
                     percent,
                 };
-            }).filter(s => s !== null);
+            }));
 
-            console.log('[QuestService] Final processed activeSagas:', activeSagas);
-            return activeSagas;
+            const final = results.filter(Boolean);
+            console.log('[QuestService] getUserActiveSagas FINAL:', final);
+            return final;
         } catch (err) {
-            console.error('[QuestService] getUserActiveSagas failure:', err);
+            console.error('[QuestService] getUserActiveSagas EXCEPTION:', err);
             return [];
         }
     },
