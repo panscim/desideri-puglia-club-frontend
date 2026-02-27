@@ -360,6 +360,26 @@ const Dashboard = () => {
                     {saga.city || 'Puglia'}
                   </div>
 
+                  {/* Badge: Originals vs Certificato */}
+                  <div className="absolute bottom-3 left-3 right-3 flex justify-start pointer-events-none">
+                    {saga.is_original ? (
+                      <div className="flex items-center gap-1.5 bg-zinc-950/70 backdrop-blur-md px-2 py-1 rounded-lg border border-[#E4AE2F]/30 shadow-lg group-hover:border-[#E4AE2F]/60 transition-colors">
+                        <div className="w-5 h-5 rounded-md bg-[#E4AE2F] flex items-center justify-center text-[10px] font-black text-zinc-900 shadow-inner">D</div>
+                        <div className="flex flex-col">
+                          <span className="text-[8px] font-black uppercase tracking-[0.1em] text-[#E4AE2F] leading-none">Originals</span>
+                          <span className="text-[5px] font-medium text-white/50 uppercase tracking-[0.05em] leading-none mt-0.5">by Desideri di Puglia</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 bg-zinc-950/60 backdrop-blur-md px-2 py-1 rounded-lg border border-white/10 shadow-lg">
+                        <div className="text-[7px] font-bold text-zinc-400 flex flex-col uppercase tracking-tighter leading-tight">
+                          <span className="text-white/80">Certificato da</span>
+                          <span>Desideri di Puglia</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Favorite Heart Button */}
                   <button
                     onClick={(e) => handleToggleFavorite(e, saga.id)}
