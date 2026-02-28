@@ -271,14 +271,15 @@ const PlanDetail = () => {
                 onClick={() => setIsRainMode(v => !v)}
                 className={`h-10 px-5 rounded-full flex items-center gap-2 border font-black text-[8px] uppercase tracking-[0.2em] transition-all duration-500 ${
                   isRainMode
-                    ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/25'
-                    : 'bg-white border-zinc-100 text-zinc-600 hover:border-zinc-200'
+                    ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/25'
+                    : 'bg-white/15 border-white/20 backdrop-blur-md'
                 }`}
+                style={{ color: 'white' }}
               >
                 <AnimatePresence mode="wait">
                   {isRainMode
-                    ? <motion.span key="r" initial={{ opacity:0, rotate:-90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><CloudRain size={15} weight="duotone" /></motion.span>
-                    : <motion.span key="s" initial={{ opacity:0, rotate:90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><Sun size={15} weight="duotone" /></motion.span>
+                    ? <motion.span key="r" initial={{ opacity:0, rotate:-90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><CloudRain size={15} weight="duotone" style={{ color: 'white' }} /></motion.span>
+                    : <motion.span key="s" initial={{ opacity:0, rotate:90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><Sun size={15} weight="duotone" style={{ color: 'white' }} /></motion.span>
                   }
                 </AnimatePresence>
                 {isRainMode ? 'Piano B' : 'Meteo'}
@@ -295,11 +296,18 @@ const PlanDetail = () => {
                   {/* Timeline node */}
                   <div className="shrink-0 flex flex-col items-center gap-2 z-10">
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-500 shadow-sm ${
-                      isRainMode ? 'bg-blue-600 border-blue-500 text-white' : 'bg-white border-zinc-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)]'
+                      isRainMode ? 'bg-blue-600 border-blue-500' : 'bg-white border-zinc-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)]'
                     }`}>
-                      <Clock size={18} weight="duotone" className={isRainMode ? 'text-white' : 'text-zinc-700'} />
+                      <Clock
+                        size={18}
+                        weight="duotone"
+                        style={{ color: isRainMode ? 'white' : '#18181b' }}
+                      />
                     </div>
-                    <span className="text-[7px] font-black uppercase tracking-widest text-zinc-300">{slot.time_label}</span>
+                    <span
+                      className="text-[7px] font-black uppercase tracking-widest"
+                      style={{ color: 'white', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}
+                    >{slot.time_label}</span>
                   </div>
 
                   {/* Card */}
