@@ -1,12 +1,139 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
+/* ─────────────────────────────────────────────────
+   THEME SYSTEM — CSS Custom Properties
+   Applied via data-theme="light|dark" on <html>
+───────────────────────────────────────────────── */
+
+/* LIGHT (default) */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --bg-base:      #F9F9F7;
+  --bg-surface:   #FFFFFF;
+  --bg-elevated:  #F3F3F0;
+  --bg-inverse:   #18181b;      /* zinc-950 equivalent */
+  --bg-inverse-2: #27272a;      /* zinc-900 */
+
+  /* Text */
+  --text-primary:   #0f0f0f;
+  --text-secondary: #71717a;
+  --text-muted:     #a1a1aa;
+  --text-inverse:   #FFFFFF;
+
+  /* Borders */
+  --border:       rgba(0, 0, 0, 0.07);
+  --border-strong: rgba(0, 0, 0, 0.14);
+
+  /* Brand */
+  --accent:       #f97316;     /* orange-500 */
+  --accent-subtle: rgba(249,115,22, 0.10);
+
+  /* Cards component */
+  --card-bg:      #FFFFFF;
+  --card-border:  rgba(0,0,0,0.06);
+  --card-shadow:  0 4px 24px rgba(0,0,0,0.06);
+}
+
+/* DARK */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Backgrounds */
+  --bg-base:      #0f0f0f;
+  --bg-surface:   #18181b;
+  --bg-elevated:  #27272a;
+  --bg-inverse:   #f4f4f5;
+  --bg-inverse-2: #e4e4e7;
+
+  /* Text */
+  --text-primary:   #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted:     #52525b;
+  --text-inverse:   #18181b;
+
+  /* Borders */
+  --border:       rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Brand (same) */
+  --accent:       #f97316;
+  --accent-subtle: rgba(249,115,22, 0.15);
+
+  /* Cards */
+  --card-bg:      #18181b;
+  --card-border:  rgba(255,255,255,0.07);
+  --card-shadow:  0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ─────────────────────────────────────────────────
+   THEME-AWARE GLOBAL OVERRIDES
+   These flip the "hardcoded" bg/text values used
+   in Dashboard, Profilo, DailyPlans, etc.
+───────────────────────────────────────────────── */
+
+/* Root background follows theme */
+body {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* The main app shell bg-zinc-950 used in Dashboard */
+[data-theme="light"] .theme-surface-dark {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .theme-surface-dark {
+  background-color: #0f0f0f !important;
+}
+
+/* Cards that use bg-white */
+[data-theme="dark"] .bg-white {
+  background-color: var(--card-bg) !important;
+}
+[data-theme="dark"] .border-black\/5,
+[data-theme="dark"] .border-zinc-200\/60,
+[data-theme="dark"] .border-zinc-200 {
+  border-color: var(--card-border) !important;
+}
+[data-theme="dark"] .text-zinc-950,
+[data-theme="dark"] .text-slate-900 {
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] .text-zinc-500,
+[data-theme="dark"] .text-zinc-400,
+[data-theme="dark"] .text-slate-400,
+[data-theme="dark"] .text-slate-500 {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] .bg-zinc-100,
+[data-theme="dark"] .bg-zinc-50,
+[data-theme="dark"] .bg-slate-100,
+[data-theme="dark"] .bg-\[\#F9F9F7\] {
+  background-color: var(--bg-surface) !important;
+}
+[data-theme="dark"] .bg-zinc-900 {
+  background-color: var(--bg-elevated) !important;
+}
+[data-theme="dark"] .bg-zinc-950 {
+  background-color: #0f0f0f !important;
+}
+
+/* Smooth transition for theme switch */
+*, *::before, *::after {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply bg-warm-white text-olive-dark font-sans antialiased;
+    @apply font-sans antialiased;
   }
 
   h1,
@@ -16,6 +143,7 @@
     @apply font-serif;
   }
 }
+
 
 @layer components {
   .btn-primary {

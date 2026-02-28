@@ -10,6 +10,8 @@ import {
 
 import { Toaster } from "react-hot-toast";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
+
 
 // 🚀 LAZY LOADED PAGES - Only loaded when needed
 // Pages (pubbliche)
@@ -147,7 +149,9 @@ const PublicRoute = ({ children }) => {
 
 function App() {
   return (
-    <AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+
       <BrowserRouter>
         <Toaster
           position="top-center"
@@ -290,7 +294,8 @@ function App() {
         </Suspense>
 
       </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

@@ -9,12 +9,16 @@ import {
   UserCircle, PencilSimple, SignOut, ShareNetwork, ShieldCheck,
   Trash, Lock, MapPin, Medal, Path, Books, X, CardsThree, Compass, Key,
   ArrowRight, Warning, Camera, FloppyDisk, InstagramLogo, TiktokLogo,
-  FacebookLogo, YoutubeLogo, BookOpenText
+  FacebookLogo, YoutubeLogo, BookOpenText, Sun, Moon
 } from '@phosphor-icons/react'
+import { useTheme } from '../contexts/ThemeContext'
+
 
 export default function Profilo() {
   const navigate = useNavigate()
   const { profile, refreshProfile, isAdmin } = useAuth()
+  const { theme, toggleTheme } = useTheme()
+
 
   const [loading, setLoading] = useState(true)
   const [partner, setPartner] = useState(null)
@@ -282,6 +286,31 @@ export default function Profilo() {
         {/* ── SICUREZZA E LEGAL ── */}
         <div className="grid sm:grid-cols-2 gap-3">
           <div className="rounded-2xl bg-white border border-zinc-200/60 p-2 shadow-sm space-y-1">
+            {/* ─── THEME TOGGLE ─── */}
+            <div className="w-full flex items-center justify-between p-3 rounded-xl group">
+              <div className="flex items-center gap-3 text-violet-600">
+                {theme === 'dark' ? <Moon weight="duotone" className="w-5 h-5" /> : <Sun weight="duotone" className="w-5 h-5" />}
+                <span className="text-[13px] font-bold text-zinc-800">Tema {theme === 'dark' ? 'Scuro' : 'Chiaro'}</span>
+              </div>
+              {/* Pill Toggle */}
+              <button
+                onClick={toggleTheme}
+                aria-label="Cambia tema"
+                className={`relative w-14 h-7 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-violet-400/40 ${
+                  theme === 'dark' ? 'bg-violet-600' : 'bg-zinc-200'
+                }`}
+              >
+                <span
+                  className={`absolute top-[3px] left-[3px] w-[22px] h-[22px] rounded-full bg-white shadow-md flex items-center justify-center transition-transform duration-300 ${
+                    theme === 'dark' ? 'translate-x-7' : 'translate-x-0'
+                  }`}
+                >
+                  {theme === 'dark'
+                    ? <Moon size={12} weight="fill" className="text-violet-600" />
+                    : <Sun size={12} weight="fill" className="text-amber-500" />}
+                </span>
+              </button>
+            </div>
             <ActionRow icon={<Lock weight="duotone" />} color="text-zinc-600" label="Reimposta Password" onClick={() => setShowPasswordModal(true)} />
             <ActionRow icon={<ShieldCheck weight="duotone" />} color="text-emerald-500" label="Informativa sulla Privacy" onClick={() => navigate('/privacy')} />
             <ActionRow icon={<BookOpenText weight="duotone" />} color="text-orange-500" label="Termini e Condizioni" onClick={() => navigate('/termini')} />
@@ -290,6 +319,7 @@ export default function Profilo() {
             <ActionRow icon={<Warning weight="fill" />} color="text-rose-600" label="Elimina Account" onClick={() => setShowDeleteModal(true)} />
           </div>
         </div>
+
       </div>
 
       {/* ════ MODALI ════ */}
