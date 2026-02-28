@@ -59,8 +59,8 @@ const PlanDetail = () => {
 
   const { scrollY } = useScroll();
   const heroScale    = useTransform(scrollY, [0, 400], [1.0, 1.15]);
-  const navBg        = useTransform(scrollY, [140, 220], ['rgba(249,249,247,0)', 'rgba(249,249,247,0.92)']);
-  const navBorder    = useTransform(scrollY, [140, 220], ['rgba(0,0,0,0)', 'rgba(0,0,0,0.05)']);
+  const navBg        = useTransform(scrollY, [140, 220], ['rgba(15,15,15,0)', 'rgba(15,15,15,0.95)']);
+  const navBorder    = useTransform(scrollY, [140, 220], ['rgba(255,255,255,0)', 'rgba(255,255,255,0.1)']);
   const titleOpacity = useTransform(scrollY, [200, 280], [0, 1]);
 
   useEffect(() => { loadPlan(); fetchVibes(); window.scrollTo(0, 0); }, [id, user]);
@@ -131,19 +131,19 @@ const PlanDetail = () => {
       {/* ╔══ NAV ══════════════════════════════════════════╗ */}
       <motion.nav
         style={{ backgroundColor: navBg, borderBottomColor: navBorder }}
-        className="fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between border-b backdrop-blur-3xl"
+        className="no-theme-flip fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between border-b backdrop-blur-3xl"
       >
-        <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-zinc-950 border border-zinc-800 shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+        <button onClick={() => navigate(-1)} className="no-theme-flip w-10 h-10 rounded-full bg-zinc-950 border border-zinc-800 shadow-lg flex items-center justify-center active:scale-90 transition-transform">
           <CaretLeft size={18} weight="bold" className="text-white" />
         </button>
 
-        <motion.p style={{ opacity: titleOpacity }} className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-700 truncate max-w-[50%] text-center">
+        <motion.p style={{ opacity: titleOpacity }} className="no-theme-flip text-[10px] font-black uppercase tracking-[0.3em] text-white truncate max-w-[50%] text-center">
           {plan.title_it}
         </motion.p>
 
         <div className="flex items-center gap-1">
           <button className="w-10 h-10 flex items-center justify-center active:scale-90 transition-transform opacity-50 hover:opacity-100">
-            <Star size={20} weight="duotone" className="text-zinc-900" />
+            <Star size={20} weight="duotone" className="no-theme-flip text-white" />
           </button>
         </div>
       </motion.nav>
