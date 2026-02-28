@@ -83,68 +83,57 @@ body {
 
 /* ─────────────────────────────────────────────────
    LIGHT MODE — flip dark-by-default structural elements
-   Dashboard uses bg-zinc-950 as shell.
-   NOTE: text-white is NOT overridden globally — only
-   structural (non-image) wrappers get flipped via bg.
-   Use `.text-on-image` to protect white text on photos.
 ───────────────────────────────────────────────── */
 
-/* Utility: protect white text on photo overlays from any theme override */
-.text-on-image,
-.text-on-image * {
-  color: white !important;
-}
-
-[data-theme="light"] .bg-zinc-950 {
+[data-theme="light"] .bg-zinc-950:not(.no-theme-flip) {
   background-color: var(--bg-base) !important;
 }
-[data-theme="light"] .bg-zinc-900 {
+[data-theme="light"] .bg-zinc-900:not(.no-theme-flip) {
   background-color: var(--bg-elevated) !important;
 }
-[data-theme="light"] .bg-zinc-800 {
+[data-theme="light"] .bg-zinc-800:not(.no-theme-flip) {
   background-color: #e4e4e7 !important;
 }
 
-/* Only flip isolated text-white on non-image UI panels */
-[data-theme="light"] nav .text-white,
-[data-theme="light"] header .text-white,
-[data-theme="light"] .theme-flip-text.text-white {
+/* Broad text-white flip: ensure titles and labels are visible in light mode */
+[data-theme="light"] .text-white:not(.no-theme-flip, .text-on-image, .text-on-image *) {
   color: var(--text-primary) !important;
 }
-[data-theme="light"] nav .text-zinc-400,
-[data-theme="light"] nav .text-zinc-500,
-[data-theme="light"] .theme-flip-text .text-zinc-400,
-[data-theme="light"] .theme-flip-text .text-zinc-500 {
+
+[data-theme="light"] .text-zinc-400:not(.no-theme-flip),
+[data-theme="light"] .text-zinc-300:not(.no-theme-flip),
+[data-theme="light"] .text-zinc-500:not(.no-theme-flip) {
   color: var(--text-secondary) !important;
 }
 
-/* Borders that look fine on dark but need help on light */
-[data-theme="light"] nav .border-white\/10,
-[data-theme="light"] nav .border-white\/5,
-[data-theme="light"] nav .border-white\/20,
-[data-theme="light"] .theme-flip-text .border-white\/10 {
+/* Glassmorphism/Transparent elements in light mode */
+[data-theme="light"] .bg-white\/10:not(.no-theme-flip) {
+  background-color: rgba(0,0,0,0.06) !important;
+}
+[data-theme="light"] .border-white\/10,
+[data-theme="light"] .border-white\/5,
+[data-theme="light"] .border-white\/20 {
   border-color: var(--border) !important;
 }
 
-/* Bottom nav bar & search bar glassmorphism on dark */
-[data-theme="light"] .bg-zinc-900\/90 {
-  background-color: rgba(255,255,255,0.9) !important;
-}
-[data-theme="light"] .bg-zinc-950\/80,
-[data-theme="light"] .bg-zinc-950\/40 {
-  background-color: rgba(255,255,255,0.85) !important;
-}
+/* ─────────────────────────────────────────────────
+   UTILITIES & PROTECTION
+───────────────────────────────────────────────── */
 
-/* White/10 overlays (icon buttons on dark bg) — only within non-image nav */
-[data-theme="light"] nav .bg-white\/10 {
-  background-color: rgba(0,0,0,0.07) !important;
+/* Force white text on photos regardless of theme */
+.text-on-image,
+.text-on-image *,
+.no-theme-flip.text-white {
+  color: white !important;
 }
 
-
+/* Prevent backgrounds from flipping (useful for gradients on photos) */
+.no-theme-flip {
+  /* Utility class to keep original dark appearance */
+}
 
 /* ─────────────────────────────────────────────────
    DARK MODE — flip light-by-default components
-   DailyPlans, Profilo, etc. use bg-white / bg-zinc-50
 ───────────────────────────────────────────────── */
 [data-theme="dark"] .bg-white {
   background-color: var(--card-bg) !important;
@@ -177,10 +166,11 @@ body {
   background-color: #0f0f0f !important;
 }
 
-/* Smooth transition for ALL elements on theme switch */
-*, *::before, *::after {
-  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
+/* Global Transition */
+* {
+  transition: background-color 0.4s ease, border-color 0.4s ease, color 0.3s ease;
 }
+
 
 
 @tailwind base;

@@ -174,7 +174,7 @@ const Dashboard = () => {
     <div className="h-[100dvh] max-h-[100dvh] w-full bg-zinc-950 flex flex-col font-satoshi text-white overflow-hidden relative">
 
       {/* 1. TOP HEADER (Statico) */}
-      <header className="flex-none px-4 py-3 pb-4 flex items-center justify-between z-20 bg-gradient-to-b from-zinc-950 via-zinc-950/80 to-transparent">
+      <header className="flex-none px-4 py-3 pb-4 flex items-center justify-between z-20 bg-gradient-to-b from-zinc-950 via-zinc-950/80 to-transparent no-theme-flip">
         <div className="flex items-center gap-2 shrink-0">
           <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shadow-lg bg-white p-0.5">
             <img src="/logo.png" alt="DDP" className="w-full h-full object-cover rounded-full" />
@@ -221,7 +221,7 @@ const Dashboard = () => {
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                     {/* Overlay Leggero Solo in Basso */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-zinc-950/20 to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-zinc-950/20 to-transparent pointer-events-none no-theme-flip" />
 
                     {/* Testo In Basso a Sinistra - Stile GetYourGuide */}
                     <div className="text-on-image absolute inset-0 p-5 pb-8 flex flex-col justify-end text-left">
@@ -282,7 +282,7 @@ const Dashboard = () => {
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60"
               alt=""
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/40 to-transparent no-theme-flip" />
             
             <div className="text-on-image absolute inset-0 p-6 flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-2">

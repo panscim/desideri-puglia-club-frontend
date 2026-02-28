@@ -160,7 +160,7 @@ export default function Profilo() {
   return (
     <div className="min-h-[100dvh] bg-[#f9f9f7] font-sans pb-32">
       {/* ── HERO ── */}
-      <div className="relative w-full bg-zinc-950 pt-12 pb-16 px-6 flex flex-col items-center text-center overflow-hidden">
+      <div className="relative w-full bg-zinc-950 pt-12 pb-16 px-6 flex flex-col items-center text-center overflow-hidden transition-colors duration-400">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-20 -left-20 w-72 h-72 bg-orange-400/10 rounded-full blur-[80px]" />
           <div className="absolute -bottom-10 -right-20 w-56 h-56 bg-emerald-400/10 rounded-full blur-[60px]" />
@@ -201,7 +201,8 @@ export default function Profilo() {
             <p className="text-2xl font-bold font-mono tracking-tighter text-zinc-950 mt-2">{loading ? '...' : stats.km}</p>
             <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mt-0.5">Km Percorsi</p>
           </div>
-          <div className="rounded-2xl bg-zinc-950 border border-zinc-900 p-4 shadow-sm text-center flex flex-col justify-center relative overflow-hidden">
+          <div className="rounded-2xl bg-zinc-950 border border-zinc-900 p-4 shadow-sm text-center flex flex-col justify-center relative overflow-hidden no-theme-flip">
+
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500/20 to-transparent pointer-events-none" />
             <Medal weight="duotone" className="w-6 h-6 text-orange-400 mx-auto relative z-10" />
             <p className="text-2xl font-bold font-mono tracking-tighter text-white mt-2 relative z-10">{loading ? '...' : stats.xp}</p>
