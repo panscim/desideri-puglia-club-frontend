@@ -147,14 +147,16 @@ img.no-theme-flip {
   opacity: 1 !important;
 }
 
-/* Prevent backgrounds from flipping (keep them dark) */
-.no-theme-flip,
-[data-theme="light"] .bg-zinc-950.no-theme-flip,
-[data-theme="light"] .bg-zinc-900.no-theme-flip,
-[data-theme="light"] .bg-stone-900.no-theme-flip,
-[data-theme="light"] .bg-black.no-theme-flip {
-  background-color: inherit; /* Keeps original dark class value */
+/* Force dark backgrounds for protected containers in light mode */
+[data-theme="light"] .no-theme-flip,
+[data-theme="light"] .no-theme-flip.bg-zinc-950,
+[data-theme="light"] .no-theme-flip.bg-zinc-900,
+[data-theme="light"] .no-theme-flip.bg-stone-900,
+[data-theme="light"] .no-theme-flip.bg-black {
+  background-color: #09090b !important;
+  color: white !important;
 }
+
 
 
 /* ─────────────────────────────────────────────────
