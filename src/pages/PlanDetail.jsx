@@ -122,7 +122,7 @@ const PlanDetail = () => {
       </motion.nav>
 
       {/* Immersive Header Image */}
-      <div className="relative h-[65vh] w-full overflow-hidden">
+      <div className="relative h-[65vh] w-full overflow-hidden bg-zinc-900">
         <motion.img 
           style={{ scale: 1.1, opacity: headerOpacity }}
           src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
@@ -131,36 +131,51 @@ const PlanDetail = () => {
         <div className="absolute inset-0 header-scrim" />
         
         <div className="absolute inset-x-0 bottom-0 p-8 pt-20">
-           <div className="flex items-center gap-2 text-orange-400 mb-3">
+           <div className="flex items-center gap-2 text-orange-400 mb-4">
              <MapPin size={18} weight="fill" />
-             <span className="text-[10px] font-black uppercase tracking-[0.3em]">{plan.city}, Puglia</span>
+             <span className="text-[10px] font-black uppercase tracking-[0.3em] brightness-125">{plan.city}, Puglia</span>
            </div>
-           <h1 className="text-5xl font-black text-zinc-900 leading-[0.9] lowercase first-letter:uppercase mb-6">
+           <h1 className="text-5xl font-black text-white leading-[0.95] lowercase first-letter:uppercase mb-6 drop-shadow-xl">
              {plan.title_it}
            </h1>
-           <p className="text-zinc-600 font-medium leading-relaxed max-w-sm">
+           <p className="text-white/70 font-medium leading-relaxed max-w-sm text-sm">
              {plan.description_it}
            </p>
         </div>
       </div>
 
-      <main className="px-6 -mt-4 relative z-10">
+      <main className="px-6 -mt-10 relative z-10">
         
-        {/* Verification Widget */}
-        <div className="app-native-card p-6 flex items-center justify-between mb-12 shadow-sm border-zinc-100">
+        {/* Locator / Verification Widget */}
+        <div className="app-native-card p-6 flex items-center justify-between mb-12 shadow-xl border-white/10">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-orange-500 border border-zinc-100">
-               <CheckCircle size={28} weight="duotone" />
+            <div className="relative">
+              {plan.creator?.avatar_url ? (
+                <img 
+                  src={plan.creator.avatar_url} 
+                  className="w-14 h-14 rounded-2xl object-cover border-2 border-orange-500/20 shadow-inner"
+                  alt={plan.creator.nickname || 'Locator'}
+                />
+              ) : (
+                <div className="w-14 h-14 bg-zinc-50 rounded-2xl flex items-center justify-center text-orange-500 border border-zinc-100 italic font-black">
+                  {plan.creator?.nickname?.[0] || 'L'}
+                </div>
+              )}
+              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md">
+                <CheckCircle size={16} weight="fill" className="text-orange-500" />
+              </div>
             </div>
             <div>
-               <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Verificato</p>
-               <p className="text-sm font-bold">Resident Insider Puglia</p>
+               <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Locator Verificato</p>
+               <p className="text-base font-black text-zinc-900">
+                 {plan.creator ? `${plan.creator.nome || ''} ${plan.creator.cognome || ''}`.trim() || plan.creator.nickname : 'Resident Desideri'}
+               </p>
             </div>
           </div>
-          <div className="h-6 w-[1px] bg-zinc-100" />
+          <div className="h-8 w-[1px] bg-zinc-100 mx-2" />
           <div className="text-right">
              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Rating</p>
-             <p className="text-sm font-bold">4.9/5.0</p>
+             <p className="text-base font-black text-zinc-900">{plan.rating_avg?.toFixed(1) || '4.9'}/5.0</p>
           </div>
         </div>
 
