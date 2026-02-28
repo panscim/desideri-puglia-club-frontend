@@ -303,97 +303,62 @@ html {
 }
 
 /* ─────────────────────────────────────────────────
-   HIGH-FIDELITY SCRAPBOOK UTILITIES (Diario di Viaggio)
+   APPLE NOTES UTILITIES (Stile Note iPhone)
 ───────────────────────────────────────────────── */
 
-.font-sketch {
+.font-pencil {
   font-family: 'Gochi Hand', cursive !important;
+  font-weight: 500;
 }
 
-.font-hand {
-  font-family: 'Caveat', cursive !important;
-}
-
-.text-biro {
-  color: #1a4d8a !important; /* Blue ink */
-}
-
-.bg-paper {
-  background-color: #fdfaf0;
+.apple-note-bg {
+  background-color: #fcfcfc;
   background-image: 
-    url("https://www.transparenttextures.com/patterns/cardboard.png"); 
-  background-attachment: fixed;
+    radial-gradient(#e5e5e5 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
 }
 
-.highlighter {
-  background: linear-gradient(100deg, rgba(254, 240, 138, 0.5) 0%, rgba(254, 240, 138, 0.8) 50%, rgba(254, 240, 138, 0.4) 100%);
-  padding: 0 4px;
-  border-radius: 2px;
+.note-paper-texture {
+  background-color: #fcfcfc;
+  background-image: url("https://www.transparenttextures.com/patterns/clean-gray-paper.png");
 }
 
-/* Scrapbook Elements */
-.tape {
-  position: absolute;
-  width: 80px;
-  height: 25px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(1px);
-  border: 1px solid rgba(0,0,0,0.05);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  transform: rotate(-3deg);
-  z-index: 20;
+.note-attachment {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+  overflow: hidden;
 }
 
-.tape-vertical {
-  width: 20px;
-  height: 60px;
-}
-
-.receipt-card {
-  background: #fcfcfc;
-  color: #333;
-  padding: 2rem 1.5rem;
-  border: 1px solid #e5e5e5;
-  box-shadow: 2px 5px 15px rgba(0,0,0,0.05);
-  font-family: 'Courier New', Courier, monospace;
-}
-
-.ticket-card {
-  background: #fff5e6;
-  border: 2px dashed #d99a5b;
-  border-radius: 4px;
-  position: relative;
-}
-
-.ticket-card::before, .ticket-card::after {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: #fdfaf0; /* Matches pg-paper */
+.checklist-circle {
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid #d1d1d6;
   border-radius: 50%;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 2px dashed #d99a5b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
-.ticket-card::before { left: -12px; }
-.ticket-card::after { right: -12px; }
-
-.polaroid {
-  background: white;
-  padding: 10px 10px 40px 10px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  border: 1px solid rgba(0,0,0,0.05);
+.checklist-circle.checked {
+  background-color: #ffcc00; /* Apple Notes Yellow */
+  border-color: #ffcc00;
 }
 
-.doodle {
-  filter: opacity(0.4) grayscale(1);
-  pointer-events: none;
+.note-hr {
+  height: 1px;
+  background: rgba(0,0,0,0.05);
+  margin: 1.5rem 0;
 }
 
-/* Wobbly path for timeline */
-.wobbly-path {
-  stroke-dasharray: 5, 5;
-  filter: url(#wobble);
+.text-pencil-graphite {
+  color: #3a3a3c !important;
+}
+
+.scribble-accent {
+  background: rgba(255, 204, 0, 0.2);
+  padding: 0 2px;
+  border-radius: 2px;
 }
