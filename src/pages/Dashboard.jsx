@@ -252,7 +252,16 @@ export default function Dashboard() {
                       )}
 
                       {hero.button_link && (
-                        <button className="flex items-center gap-1 text-[15px] font-semibold text-white w-fit drop-shadow-md hover:underline active:opacity-70">
+                        <button 
+                          onClick={() => {
+                            if (hero.button_link.startsWith('http')) {
+                              window.open(hero.button_link, '_blank');
+                            } else {
+                              navigate(hero.button_link);
+                            }
+                          }}
+                          className="flex items-center gap-1 text-[15px] font-semibold text-white w-fit drop-shadow-md hover:underline active:opacity-70"
+                        >
                           Scopri di più <span className="text-xl leading-none">›</span>
                         </button>
                       )}
