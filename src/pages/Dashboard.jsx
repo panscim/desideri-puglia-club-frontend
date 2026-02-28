@@ -14,9 +14,11 @@ import {
   Tree,
   Waves,
   Sparkle,
+  ArrowRight,
   MapTrifold,
   NavigationArrow
 } from '@phosphor-icons/react';
+
 
 import { useTranslation } from 'react-i18next';
 import SearchModal from '../components/SearchModal';
