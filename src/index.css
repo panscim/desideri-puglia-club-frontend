@@ -147,13 +147,8 @@ img.no-theme-flip {
   opacity: 1 !important;
 }
 
-/* Force dark backgrounds for protected containers in light mode */
-[data-theme="light"] .no-theme-flip,
-[data-theme="light"] .no-theme-flip.bg-zinc-950,
-[data-theme="light"] .no-theme-flip.bg-zinc-900,
-[data-theme="light"] .no-theme-flip.bg-stone-900,
-[data-theme="light"] .no-theme-flip.bg-black {
-  background-color: #09090b !important;
+/* Keep text white inside no-theme-flip containers */
+[data-theme="light"] .no-theme-flip {
   color: white !important;
 }
 
