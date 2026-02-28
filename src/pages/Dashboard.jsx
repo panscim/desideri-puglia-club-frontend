@@ -397,7 +397,7 @@ const Dashboard = () => {
                   <img src={saga.image_url || saga.map_image_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={saga.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
 
                   {/* Distance Badge */}
-                  <div className="absolute top-3 right-3 bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-full text-[11px] font-bold text-white flex items-center gap-1.5 shadow-md border border-white/10 z-10">
+                  <div className="text-on-image no-theme-flip absolute top-3 left-3 bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-full text-[11px] font-bold text-white flex items-center gap-1.5 shadow-md border border-white/10 z-10">
                     <span className="text-red-500 mb-[1px]">📍</span>
                     {saga.city || 'Puglia'}
                   </div>
@@ -405,12 +405,12 @@ const Dashboard = () => {
                   {/* Badge: Originals vs Certificato - BOTTOM LEFT */}
                   <div className="absolute bottom-3 left-3 right-3 flex justify-start pointer-events-none z-10">
                     {(saga.is_original === true || saga.isOriginal === true) ? (
-                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/5">
+                      <div className="text-on-image no-theme-flip flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/5">
                         <div className="w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm shrink-0">D</div>
                         <span className="text-[11px] font-geist font-bold text-white drop-shadow-md">Originals by Desideri di Puglia</span>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/5">
+                      <div className="text-on-image no-theme-flip flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/5">
                         <span className="text-[10px] font-bold text-zinc-300 drop-shadow-md">Certificato da Desideri di Puglia</span>
                       </div>
                     )}
@@ -419,7 +419,7 @@ const Dashboard = () => {
                   {/* Favorite Heart Button */}
                   <button
                     onClick={(e) => handleToggleFavorite(e, saga.id)}
-                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-zinc-950/60 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-transform"
+                    className="no-theme-flip absolute top-3 right-3 w-8 h-8 rounded-full bg-zinc-950/60 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-transform"
                   >
                     <Heart
                       size={18}
@@ -473,7 +473,7 @@ const Dashboard = () => {
                     <img src={ev.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={ev.titolo} className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700" />
 
                     {/* Date Badge */}
-                    <div className="absolute top-3 left-3 bg-zinc-950/80 backdrop-blur border border-white/10 px-3 py-1.5 rounded-xl text-center shadow-lg">
+                    <div className="text-on-image no-theme-flip absolute top-3 left-3 bg-zinc-950/80 backdrop-blur border border-white/10 px-3 py-1.5 rounded-xl text-center shadow-lg">
                       <div className="text-[9px] font-bold uppercase tracking-widest text-red-500 leading-none mb-1">
                         {startDate.toLocaleString('it-IT', { month: 'short' })}
                       </div>
@@ -483,7 +483,7 @@ const Dashboard = () => {
                     </div>
 
                     {isPartner && (
-                      <div className="absolute top-3 right-3 bg-zinc-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md border border-red-500/30">
+                      <div className="text-on-image no-theme-flip absolute top-3 right-3 bg-zinc-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white flex items-center gap-1.5 shadow-md border border-red-500/30">
                         <span className="text-red-500 mb-[1px]">📍</span>
                         {ev.partners.name}
                       </div>
