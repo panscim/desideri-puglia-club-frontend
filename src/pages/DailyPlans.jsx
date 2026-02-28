@@ -41,11 +41,13 @@ const item = {
 };
 
 const Pill = ({ children, className = '', active = false }) => (
-  <span className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-xl border transition-all duration-300 ${
-    active 
-      ? 'bg-zinc-950 text-white border-zinc-900 shadow-lg shadow-black/10' 
-      : 'bg-white/50 backdrop-blur-sm border-zinc-100/50 text-zinc-500 hover:border-zinc-200'
-  } ${className}`}>
+  <span 
+    className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-xl border transition-all duration-300 ${className}`}
+    style={active 
+      ? { backgroundColor: 'var(--text-primary)', color: 'var(--bg-base)', borderColor: 'var(--text-primary)' }
+      : { backgroundColor: 'var(--bg-surface)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }
+    }
+  >
     {children}
   </span>
 );
@@ -268,8 +270,8 @@ const DailyPlans = () => {
                             <div className="w-11 h-11 rounded-2xl border border-white/30 overflow-hidden bg-white/10 p-0.5 group-hover:border-orange-500/50 transition-colors">
                               <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover rounded-[0.8rem]" alt="" />
                             </div>
-                            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg">
-                              <CheckCircle size={13} weight="fill" className="text-orange-500" />
+                            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center shadow-lg" style={{ backgroundColor: '#f97316' }}>
+                              <CheckCircle size={13} weight="fill" style={{ color: 'white' }} />
                             </div>
                           </div>
                           <div>
