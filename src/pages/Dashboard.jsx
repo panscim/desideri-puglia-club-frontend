@@ -199,9 +199,15 @@ export default function Dashboard() {
 
         </div>
 
-        <button className="relative p-2 text-white shrink-0 hover:bg-white/10 rounded-full transition-colors drop-shadow-md">
-          <Bell size={26} weight="fill" />
-          <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-zinc-950"></span>
+        <button
+          className="relative p-2 shrink-0 rounded-full transition-colors hover:bg-white/10"
+          style={{ color: 'white' }}
+        >
+          <Bell size={26} weight="fill" style={{ color: 'white' }} />
+          <span
+            className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2"
+            style={{ borderColor: '#0f0f0f' }}
+          ></span>
         </button>
       </header>
 
