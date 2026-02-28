@@ -226,7 +226,7 @@ const DailyPlans = () => {
                   onClick={() => navigate(`/plan/${plan.id}`)}
                   className="group cursor-pointer"
                 >
-                  <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.12)] mb-7 bg-zinc-950 no-theme-flip">
+                  <div className="relative aspect-[4/5] rounded-[3rem] overflow-hidden shadow-[0_24px_80px_rgba(0,0,0,0.12)] mb-7 bg-zinc-950 no-theme-flip text-on-image">
                     <img 
                       src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-90 group-hover:opacity-100"
