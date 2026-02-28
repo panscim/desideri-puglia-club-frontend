@@ -12,48 +12,17 @@ import {
   Clock,
   Quotes,
   Pencil,
-  Wine
+  Wine,
+  Sparkle,
+  ArrowRight
 } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
-
-// --- Scratch Animation Component ---
-const RainScratch = ({ isRain }) => (
-  <motion.svg 
-    className="scratch-overlay" 
-    viewBox="0 0 100 100" 
-    preserveAspectRatio="none"
-    initial={false}
-    animate={{ opacity: isRain ? 0.7 : 0 }}
-  >
-    <motion.path
-      d="M0,10 L100,20 M100,40 L0,50 M0,70 L100,80 M100,95 L0,100"
-      fill="transparent"
-      stroke="#111"
-      strokeWidth="12"
-      strokeLinecap="round"
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: isRain ? 1 : 0 }}
-      transition={{ duration: 0.6, ease: "easeInOut" }}
-    />
-    <motion.path
-      d="M10,0 L20,100 M40,100 L50,0 M70,0 L80,100 M95,100 L100,0"
-      fill="transparent"
-      stroke="#111"
-      strokeWidth="8"
-      strokeLinecap="round"
-      initial={{ pathLength: 0 }}
-      animate={{ pathLength: isRain ? 1 : 0 }}
-      transition={{ duration: 0.5, delay: 0.2, ease: "easeInOut" }}
-    />
-  </motion.svg>
-);
 
 const PlanDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const scratchSound = useRef(new Audio('/pen-scratch.mp3')); // Placeholder path as requested
   
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -65,6 +34,7 @@ const PlanDetail = () => {
   useEffect(() => {
     loadPlan();
     fetchVibes();
+    window.scrollTo(0, 0);
   }, [id, user]);
 
   const loadPlan = async () => {
@@ -82,7 +52,6 @@ const PlanDetail = () => {
   const fetchVibes = async () => {
     const vibes = await ConciergeService.getLiveVibes();
     if (vibes && vibes.length > 0) {
-      // Logic for "Radar Movida": find most recent report for this city
       const recentVibe = vibes[0];
       const levels = ['Tranquillo', 'Vivace', '🔥 Pieno Murato'];
       setVibeStatus(levels[recentVibe.vibe_level - 1] || 'Live');
@@ -91,235 +60,272 @@ const PlanDetail = () => {
     }
   };
 
-  const toggleRainMode = () => {
-    const nextMode = !isRainMode;
-    setIsRainMode(nextMode);
-
-    if (nextMode) {
-      // Sound & Haptics
-      scratchSound.current.volume = 0.3;
-      scratchSound.current.play().catch(() => {}); // Browser might block if no interaction
-      if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    }
-  };
-
   const handlePurchase = async () => {
     if (!user) {
-      toast.error('Accedi per sbloccare il taccuino');
+      toast.error('Accedi per sbloccare l\'itinerario');
       navigate('/login');
       return;
     }
     setIsBuying(true);
     const result = await ConciergeService.purchasePlan(user.id, id);
     if (result.success) {
-      toast.success('Taccuino sbloccato! Inizia il viaggio.');
+      toast.success('Pianificatore sbloccato!');
       setIsPurchased(true);
     }
     setIsBuying(false);
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-paper flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center">
       <motion.div 
-        animate={{ rotate: [0, 5, -5, 0] }} 
-        transition={{ repeat: Infinity, duration: 2 }}
-        className="w-16 h-16 text-biro mb-4"
+        animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }} 
+        transition={{ repeat: Infinity, duration: 1.5 }}
+        className="w-12 h-12 bg-orange-500 rounded-2xl flex items-center justify-center shadow-xl shadow-orange-500/20"
       >
-        <Pencil size={64} weight="fill" />
+        <Sparkle size={24} weight="fill" className="text-white" />
       </motion.div>
-      <p className="font-sketch text-lg text-biro">Sfogliando gli appunti...</p>
     </div>
   );
 
   if (!plan) return null;
 
   return (
-    <div className="min-h-screen bg-paper pb-24 overflow-x-hidden selection:bg-yellow-200">
+    <div className="min-h-screen bg-zinc-50 pb-32 font-sans selection:bg-orange-500/20">
       
-      {/* Notebook Header */}
-      <header className="fixed top-0 left-0 right-0 z-[100] p-6 flex items-center justify-between">
-        <button 
-          onClick={() => navigate(-1)}
-          className="w-12 h-12 rounded-full bg-white shadow-md border-2 border-biro/10 flex items-center justify-center text-biro active:scale-90 transition-all"
-        >
-          <CaretLeft size={24} weight="bold" />
-        </button>
-
-        {isPurchased && (
+      {/* Header Bar */}
+      <header className="fixed top-0 left-0 right-0 z-[100] p-6 pointer-events-none">
+        <div className="max-w-lg mx-auto flex items-center justify-between">
           <button 
-            onClick={toggleRainMode}
-            className={`h-12 px-6 rounded-full shadow-md flex items-center gap-3 transition-all border-2 ${
-              isRainMode 
-                ? 'bg-blue-600 text-white border-blue-400' 
-                : 'bg-white text-orange-600 border-orange-200'
-            }`}
+            onClick={() => navigate(-1)}
+            className="pointer-events-auto w-12 h-12 rounded-2xl bg-white/80 backdrop-blur-xl shadow-sm border border-black/5 flex items-center justify-center text-slate-900 active:scale-95 transition-all"
           >
-            {isRainMode ? <CloudRain size={20} weight="fill" /> : <Sun size={20} weight="fill" />}
-            <span className="font-sketch text-sm uppercase">
-              {isRainMode ? 'Piove!' : 'C\'è il sole'}
-            </span>
+            <CaretLeft size={24} weight="bold" />
           </button>
-        )}
+
+          {isPurchased && (
+            <button 
+              onClick={() => setIsRainMode(!isRainMode)}
+              className={`pointer-events-auto h-12 px-5 rounded-2xl shadow-sm backdrop-blur-xl flex items-center gap-3 transition-all border ${
+                isRainMode 
+                  ? 'bg-blue-600 text-white border-blue-400' 
+                  : 'bg-white/80 text-orange-600 border-black/5'
+              }`}
+            >
+              {isRainMode ? <CloudRain size={20} weight="fill" /> : <Sun size={20} weight="fill" />}
+              <span className="text-[10px] font-black uppercase tracking-[0.1em]">
+                {isRainMode ? 'Outdoor Off' : 'Outdoor On'}
+              </span>
+            </button>
+          )}
+        </div>
       </header>
 
-      {/* Hero: Polaroids Style */}
-      <div className="pt-24 px-6 mb-8 flex flex-col items-center">
-        <div className="bg-white p-3 pt-3 pb-12 shadow-2xl rotate-[-2deg] max-w-[320px] border border-black/5 hover:rotate-0 transition-transform duration-500">
-          <img 
-            src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
-            className="w-full aspect-square object-cover"
-            alt=""
-          />
-        </div>
+      {/* Hero Section */}
+      <section className="relative h-[65vh] w-full overflow-hidden">
+        <img 
+          src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
+          className="w-full h-full object-cover"
+          alt=""
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-zinc-50 via-transparent to-transparent" />
         
-        <div className="text-center mt-8 space-y-2">
-          <h1 className="font-sketch text-4xl text-biro leading-tight max-w-[15ch] rotate-[1deg]">
-            {plan.title_it}
-          </h1>
-          <p className="font-hand text-xl text-biro/60 italic">
-            Appunti da {plan.city}
-          </p>
+        <div className="absolute bottom-0 left-0 right-0 p-8 max-w-lg mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/70 backdrop-blur-2xl p-8 rounded-[2.5rem] shadow-2xl border border-white/50"
+          >
+            <div className="flex items-center gap-2 mb-3">
+              <MapPin size={16} weight="fill" className="text-orange-500" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">{plan.city}</span>
+            </div>
+            <h1 className="text-4xl font-black font-satoshi text-slate-900 leading-[0.9] tracking-tight mb-4">
+              {plan.title_it}
+            </h1>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full overflow-hidden border border-black/10">
+                  <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
+                </div>
+                <span className="text-xs font-bold text-slate-500">{plan.creator?.nickname}</span>
+              </div>
+              <div className="w-1 h-1 bg-zinc-300 rounded-full" />
+              <span className="text-xs font-bold text-slate-400 capitalize">{plan.season.replace('_', ' ')}</span>
+            </div>
+          </motion.div>
         </div>
-      </div>
+      </section>
 
-      <main className="px-6 max-w-lg mx-auto">
+      <main className="px-6 max-w-lg mx-auto mt-8">
         
-        {/* Intro Note */}
-        <section className="relative mb-16 px-4">
-          <Quotes size={40} className="text-yellow-400/30 absolute -top-4 -left-2 rotate-12" />
-          <p className="font-hand text-2xl text-biro leading-tight text-center px-4">
-            <span className="highlighter italic">"{plan.description_it}"</span>
-          </p>
-          <div className="mt-6 flex flex-col items-center gap-2">
-             <div className="w-12 h-12 rounded-full border-2 border-biro/10 overflow-hidden shadow-sm">
-                <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
-             </div>
-             <p className="font-sketch text-biro/70 text-sm">Consigli di {plan.creator?.nickname}</p>
+        {/* Description Card */}
+        <section className="mb-12">
+          <div className="relative p-6 bg-white rounded-3xl border border-black/5 shadow-sm overflow-hidden">
+            <Quotes size={64} weight="fill" className="absolute -top-6 -right-6 text-zinc-100 rotate-12" />
+            <p className="font-lora text-lg leading-relaxed text-slate-700 italic relative z-10">
+              {plan.description_it}
+            </p>
           </div>
         </section>
 
-        {/* Timeline Lock Overlay */}
+        {/* Purchase CTA Overlay */}
         {!isPurchased && (
-          <div className="py-12 flex flex-col items-center">
-            <div className="w-20 h-20 bg-white rounded-full shadow-lg border-2 border-dashed border-biro/30 flex items-center justify-center mb-6">
-               <LockKey size={32} weight="bold" className="text-biro/30" />
+          <div className="relative mb-12">
+            <div className="absolute -inset-4 bg-zinc-50/80 backdrop-blur-md z-20 flex flex-col items-center justify-center p-8 text-center rounded-3xl border border-black/5 shadow-xl">
+              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-black/5 flex items-center justify-center mb-6">
+                <LockKey size={32} weight="duotone" className="text-orange-500" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 mb-2">Pianificatore Digitale</h3>
+              <p className="text-sm text-slate-500 mb-8 max-w-[28ch] leading-relaxed font-medium">
+                Sblocca l'itinerario completo ottimizzato per ogni condizione meteo.
+              </p>
+              
+              <button 
+                onClick={handlePurchase}
+                disabled={isBuying}
+                className="w-full bg-slate-900 text-white h-16 rounded-2xl font-black text-sm uppercase tracking-widest flex items-center justify-center gap-4 shadow-2xl shadow-slate-900/20 active:scale-95 disabled:opacity-50 transition-all"
+              >
+                {isBuying ? "Elaborazione..." : `Acquista ora — €${plan.price.toFixed(2)}`}
+              </button>
             </div>
-            <h3 className="font-sketch text-2xl text-biro mb-2">Taccuino Sigillato</h3>
-            <p className="font-hand text-lg text-biro/50 text-center max-w-[24ch] mb-8 leading-snug">
-              Sblocca l'itinerario completo e la modalità pioggia per non farti cogliere impreparato.
-            </p>
             
-            <button 
-              onClick={handlePurchase}
-              disabled={isBuying}
-              className="w-full bg-biro text-white h-16 rounded-full font-sketch text-xl flex items-center justify-center gap-4 shadow-xl active:scale-95 disabled:opacity-50"
-            >
-              {isBuying ? "Sbloccando..." : `Sblocca per €${plan.price.toFixed(2)}`}
-            </button>
+            {/* Blurred background content */}
+            <div className="opacity-40 grayscale pointer-events-none blur-[2px]">
+              {[1, 2].map(i => (
+                <div key={i} className="mb-8 p-6 bg-white rounded-3xl border border-black/5">
+                  <div className="w-24 h-4 bg-zinc-200 rounded-full mb-4" />
+                  <div className="w-full h-20 bg-zinc-100 rounded-xl" />
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
         {/* The Timeline */}
-        <section className={`transition-all duration-700 ${!isPurchased ? 'blur-sm grayscale opacity-30 select-none' : ''}`}>
-          <div className="flex flex-col gap-12 relative pb-20">
-            
-            {/* Hand-drawn connector */}
-            <div className="absolute left-[20px] top-6 bottom-10 w-1 bg-biro/10 rounded-full border-l-2 border-dashed border-biro/20" />
+        {isPurchased && (
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-1.5 h-6 bg-orange-500 rounded-full" />
+              <h2 className="text-xl font-black font-satoshi text-slate-900 uppercase tracking-tight">Timeline</h2>
+            </div>
 
-            {plan.slots?.map((slot, index) => (
-              <div key={slot.id} className="flex gap-4 items-start relative">
-                
-                {/* Time Indicator */}
-                <div className="w-10 flex flex-col items-center pt-2">
-                  <div className={`w-10 h-10 rounded-full border-2 border-biro flex items-center justify-center bg-white shadow-sm z-10 transition-colors ${isRainMode ? 'bg-blue-100' : ''}`}>
-                    <Clock size={18} className="text-biro" />
+            <div className="relative border-l-2 border-zinc-100 ml-4 pl-8 space-y-12">
+              {plan.slots?.map((slot, index) => (
+                <motion.div 
+                  key={slot.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="relative group"
+                >
+                  {/* Timeline Dot */}
+                  <div className="absolute -left-[41px] top-4">
+                    <div className={`w-5 h-5 rounded-full border-4 border-zinc-50 transition-colors duration-500 shadow-sm ${isRainMode ? 'bg-blue-500' : 'bg-orange-500'}`} />
                   </div>
-                  <span className="font-sketch text-[10px] text-biro mt-2 rotate-[-5deg]">
-                    {slot.time_label}
-                  </span>
-                </div>
 
-                {/* Notebook Card */}
-                <div className="flex-1">
-                  <div className="relative bg-white/50 border border-biro/10 p-4 rounded-2xl shadow-sm min-h-[140px] overflow-hidden">
+                  {/* Slot Card */}
+                  <div className="relative bg-white rounded-[2rem] p-6 shadow-sm border border-black/5 overflow-hidden">
                     
-                    {/* Scratch animation triggered by isRain */}
-                    <RainScratch isRain={isRainMode && !!slot.alt_activity_title_it} />
-                    
-                    {/* Activity A */}
-                    <div className="transition-all duration-500">
-                       <h4 className="font-sketch text-xl text-biro mb-1">{slot.activity_title_it}</h4>
-                       <p className="font-hand text-lg text-biro/70 leading-tight">
-                         {slot.activity_description_it}
-                       </p>
+                    {/* Activity Container */}
+                    <div className="relative min-h-[120px]">
+                      <AnimatePresence mode="wait">
+                        {!isRainMode || !slot.alt_activity_title_it ? (
+                          <motion.div
+                            key="activity-a"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="transition-all"
+                          >
+                            <span className="text-[10px] font-black uppercase tracking-widest text-orange-500 mb-3 block">
+                              {slot.time_label}
+                            </span>
+                            <h4 className="text-2xl font-black font-satoshi text-slate-900 leading-tight mb-2">
+                              {slot.activity_title_it}
+                            </h4>
+                            <p className="text-[15px] font-medium leading-relaxed text-zinc-500">
+                              {slot.activity_description_it}
+                            </p>
+                          </motion.div>
+                        ) : (
+                          <motion.div
+                            key="activity-b"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="bg-blue-50 -mx-6 -mt-6 p-6 transition-all"
+                          >
+                            <div className="flex items-center gap-2 mb-3">
+                              <CloudRain size={16} weight="fill" className="text-blue-500" />
+                              <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">
+                                Piano B • {slot.time_label}
+                              </span>
+                            </div>
+                            <h4 className="text-2xl font-black font-satoshi text-blue-900 leading-tight mb-2">
+                              {slot.alt_activity_title_it}
+                            </h4>
+                            <p className="text-[15px] font-medium leading-relaxed text-blue-700/70">
+                              {slot.alt_activity_description_it}
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      <button 
+                        onClick={() => {
+                          const url = `https://www.google.com/maps/search/?api=1&query=${slot.latitude},${slot.longitude}`;
+                          window.open(url, '_blank');
+                        }}
+                        className="mt-6 w-full h-14 rounded-2xl bg-zinc-50 border border-black/5 flex items-center justify-between px-6 text-slate-900 group-hover:bg-slate-900 group-hover:text-white transition-all duration-300"
+                      >
+                         <span className="text-[10px] font-black uppercase tracking-widest">Vai alla posizione</span>
+                         <Compass size={20} weight="bold" />
+                      </button>
                     </div>
-
-                    {/* Activity B (Piano Pioggia) */}
-                    <AnimatePresence>
-                      {isRainMode && slot.alt_activity_title_it && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-4 pt-4 border-t border-dashed border-biro/20"
-                        >
-                           <header className="flex items-center gap-2 mb-1">
-                             <CloudRain size={16} className="text-blue-600" />
-                             <span className="font-sketch text-xs text-blue-600">Cambio piano (Piove!)</span>
-                           </header>
-                           <h4 className="font-sketch text-xl text-blue-800">{slot.alt_activity_title_it}</h4>
-                           <p className="font-hand text-lg text-blue-800/70 leading-tight italic highlighter">
-                             {slot.alt_activity_description_it}
-                           </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Navigation Circle Button */}
-                    <button 
-                      onClick={() => {
-                        const url = `https://www.google.com/maps/search/?api=1&query=${slot.latitude},${slot.longitude}`;
-                        window.open(url, '_blank');
-                      }}
-                       className="absolute bottom-3 right-3 w-12 h-12 rounded-full border-2 border-biro flex items-center justify-center text-biro bg-white/80 backdrop-blur-sm active:scale-90 transition-all hover:bg-biro hover:text-white"
-                       title="Portami qui"
-                    >
-                      <Compass size={24} weight="bold" />
-                    </button>
                   </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Radar Movida Card */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              className="mt-16 p-8 bg-zinc-900 rounded-[2.5rem] relative overflow-hidden shadow-2xl"
+            >
+              <div className="absolute top-0 right-0 p-8 flex flex-col gap-2 items-end">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping" />
+                <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">Live Pulse</span>
+              </div>
+
+              <Wine size={120} weight="duotone" className="absolute -bottom-10 -right-10 text-white/5 rotate-12" />
+              
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkle size={18} weight="fill" className="text-orange-500" />
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Radar della Movida</h4>
+                </div>
+                
+                <h3 className="text-3xl font-black text-white mb-2 font-satoshi">
+                  Status: <span className="text-orange-500">{vibeStatus}</span>
+                </h3>
+                <p className="text-sm text-zinc-400 font-medium leading-relaxed">
+                  Basato sui report in tempo reale dei residenti del Desideri Puglia Club.
+                </p>
+
+                <div className="mt-8 flex gap-2">
+                   {[1,2,3,4,5].map(i => (
+                     <div key={i} className={`h-1 flex-1 rounded-full ${i <= 3 ? 'bg-orange-500' : 'bg-zinc-800'}`} />
+                   ))}
                 </div>
               </div>
-            ))}
+            </motion.div>
 
-            {/* RADAR MOVIDA (Last Stage Sketch) */}
-            {isPurchased && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
-                className="mt-12 p-8 border-2 border-dashed border-biro/20 rounded-3xl flex flex-col items-center bg-white/20"
-              >
-                <motion.div
-                  animate={{ 
-                    scale: [1, 1.1, 1],
-                    rotate: [0, 5, -5, 0]
-                  }}
-                  transition={{ repeat: Infinity, duration: 3 }}
-                  className="w-20 h-20 text-biro/40 mb-4"
-                >
-                  <Wine size={80} weight="light" />
-                </motion.div>
-                <h4 className="font-sketch text-2xl text-biro mb-1 highlighter">Vibe Check: {vibeStatus}</h4>
-                <p className="font-hand text-lg text-biro/60 text-center italic">
-                  Radar della Movida attivo. Status riportato dai residenti.
-                </p>
-              </motion.div>
-            )}
-
-            {/* Notebook Footer */}
-            <div className="py-12 border-t-2 border-dashed border-biro/10 flex flex-col items-center opacity-30">
-               <span className="font-sketch text-biro text-xl">- Fine Appunti -</span>
+            <div className="py-20 text-center">
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-300">Buon Viaggio</span>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
     </div>
   );
