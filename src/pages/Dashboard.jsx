@@ -12,8 +12,12 @@ import {
   Bank,
   ForkKnife,
   Tree,
-  Waves
+  Waves,
+  Sparkle,
+  MapTrifold,
+  NavigationArrow
 } from '@phosphor-icons/react';
+
 import { useTranslation } from 'react-i18next';
 import SearchModal from '../components/SearchModal';
 
@@ -151,11 +155,12 @@ const Dashboard = () => {
   };
 
   const categories = [
+    { id: 'concierge', icon: <Sparkle size={24} weight="fill" className="text-orange-500" />, label: 'Concierge', path: '/daily-plans' },
+    { id: 'vibe', icon: <NavigationArrow size={24} weight="fill" className="text-blue-500" />, label: 'Radar Live', path: '/vibe-radar' },
     { id: 'cultura', icon: <Bank size={24} weight="regular" />, label: 'Cultura' },
-    { id: 'gastronomia', icon: <ForkKnife size={24} weight="regular" />, label: 'Gastronomia' },
-    { id: 'natura', icon: <Tree size={24} weight="regular" />, label: 'Natura' },
-    { id: 'spiagge', icon: <Waves size={24} weight="regular" />, label: 'Spiagge' },
+    { id: 'gastronomia', icon: <ForkKnife size={24} weight="regular" />, label: 'Cibo' },
   ];
+
 
   if (loading) {
     return <div className="h-[100dvh] bg-zinc-950 flex items-center justify-center">
@@ -262,6 +267,35 @@ const Dashboard = () => {
             </div>
           )}
         </section >
+
+        {/* 2b. CONCIERGE BANNER */}
+        <section className="mt-8 px-4 mb-2">
+          <div 
+            onClick={() => navigate('/daily-plans')}
+            className="relative w-full h-40 rounded-[2rem] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 active:scale-[0.98] transition-all"
+          >
+            <img 
+              src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=1200" 
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60"
+              alt=""
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/40 to-transparent" />
+            
+            <div className="absolute inset-0 p-6 flex flex-col justify-center">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkle size={20} weight="fill" className="text-orange-500" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Local Concierge</span>
+              </div>
+              <h3 className="text-2xl font-black text-white leading-tight mb-2 max-w-[15ch]">
+                Cosa facciamo oggi in Puglia?
+              </h3>
+              <p className="text-xs text-zinc-400 font-medium">Itinerari curati dai residenti per te.</p>
+            </div>
+            <div className="absolute bottom-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 text-white">
+               <ArrowRight size={20} weight="bold" />
+            </div>
+          </div>
+        </section>
 
         {/* 3. LE MIE SAGHE IN CORSO */}
         {activeSagas.length > 0 && (
@@ -477,6 +511,36 @@ const Dashboard = () => {
             )}
           </div>
         </section >
+
+        {/* 7. RADAR DELLA MOVIDA */}
+        <section className="mt-8 px-4 mb-20">
+          <div className="bg-zinc-900 rounded-[2rem] p-8 border border-white/10 relative overflow-hidden group shadow-2xl">
+            <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 rounded-full blur-[80px] -mr-20 -mt-20" />
+            
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2">Social Heatmap</h3>
+                <h2 className="text-2xl font-black text-white leading-tight">Radar della Movida</h2>
+              </div>
+              <div className="w-14 h-14 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-400 border border-blue-500/20 shadow-xl">
+                 <NavigationArrow size={32} weight="fill" className="animate-pulse" />
+              </div>
+            </div>
+            
+            <p className="text-sm text-zinc-400 leading-relaxed mb-8 font-medium italic">
+              "Dove c'è gente stasera?"<br/>
+              Scoprilo in tempo reale con le segnalazioni del club.
+            </p>
+
+            <button 
+              onClick={() => navigate('/vibe-radar')}
+              className="w-full h-14 bg-white text-zinc-950 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl hover:bg-zinc-100 transition-colors active:scale-95"
+            >
+              Apri Radar Live <ArrowRight size={18} weight="bold" />
+            </button>
+          </div>
+        </section>
+
 
       </main >
 

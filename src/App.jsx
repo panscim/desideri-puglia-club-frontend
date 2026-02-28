@@ -77,6 +77,12 @@ const Album = lazy(() => import("./pages/Album"));
 const Eventi = lazy(() => import("./pages/Eventi"));
 const EventDetail = lazy(() => import("./pages/EventDetail"));
 
+// 🗺️ LOCAL CONCIERGE
+const DailyPlans = lazy(() => import("./pages/DailyPlans"));
+const PlanDetail = lazy(() => import("./pages/PlanDetail"));
+const VibeRadar = lazy(() => import("./pages/VibeRadar"));
+
+
 // Layout - Keep layout eager for better UX
 import Layout from "./components/Layout";
 
@@ -249,6 +255,12 @@ function App() {
 
               {/* Ordini */}
               <Route path="/orders" element={<MyOrders />} />
+
+              {/* 🗺️ LOCAL CONCIERGE */}
+              <Route path="/daily-plans" element={<DailyPlans />} />
+              <Route path="/plan/:id" element={<PlanDetail />} />
+              <Route path="/vibe-radar" element={<VibeRadar />} />
+
 
               {/* Contatti */}
 
