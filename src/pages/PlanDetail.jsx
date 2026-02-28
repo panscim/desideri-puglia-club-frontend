@@ -134,7 +134,7 @@ const PlanDetail = () => {
         className="fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between border-b backdrop-blur-3xl"
       >
         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white border border-zinc-100 shadow-sm flex items-center justify-center active:scale-90 transition-transform">
-          <CaretLeft size={18} weight="bold" />
+          <CaretLeft size={18} weight="bold" className="text-zinc-900" style={{ color: '#18181b' }} />
         </button>
 
         <motion.p style={{ opacity: titleOpacity }} className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-700 truncate max-w-[50%] text-center">
@@ -143,7 +143,7 @@ const PlanDetail = () => {
 
         <div className="flex items-center gap-1">
           <button className="w-10 h-10 flex items-center justify-center active:scale-90 transition-transform opacity-50 hover:opacity-100">
-            <Star size={20} weight="duotone" />
+            <Star size={20} weight="duotone" className="text-zinc-900" style={{ color: '#18181b' }} />
           </button>
         </div>
       </motion.nav>
@@ -191,13 +191,13 @@ const PlanDetail = () => {
             <span className="text-[9px] font-black uppercase tracking-[0.45em] opacity-90">{plan.city}, Puglia</span>
           </motion.div>
 
-          {/* Title — heavy contrast */}
+          {/* Title — heavy contrast, immune to theme switches */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12, ease: [0.16, 1, 0.3, 1], duration: 0.8 }}
-            className="text-[3.4rem] font-black text-white leading-[0.88] mb-6 lowercase first-letter:uppercase"
-            style={{ letterSpacing: '-0.04em', textShadow: '0 2px 24px rgba(0,0,0,0.6), 0 8px 48px rgba(0,0,0,0.4)' }}
+            className="text-[3.4rem] font-black leading-[0.88] mb-6 lowercase first-letter:uppercase"
+            style={{ letterSpacing: '-0.04em', textShadow: '0 2px 24px rgba(0,0,0,0.6), 0 8px 48px rgba(0,0,0,0.4)', color: 'white' }}
           >
             {plan.title_it}
           </motion.h1>
