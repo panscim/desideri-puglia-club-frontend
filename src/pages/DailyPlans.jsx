@@ -232,7 +232,7 @@ const DailyPlans = () => {
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-90 group-hover:opacity-100"
                       alt={plan.title_it}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent opacity-90 group-hover:opacity-80 transition-opacity" />
+                    <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.97) 0%, rgba(0,0,0,0.85) 35%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.15) 80%, transparent 100%)' }} />
                     
                     {/* Badge Price / Tag */}
                     <div className="absolute top-7 right-7 flex flex-col items-end gap-2">
@@ -250,15 +250,15 @@ const DailyPlans = () => {
                     {/* Content */}
                     <div className="absolute bottom-0 left-0 p-9 w-full">
                       <div className="flex items-center gap-3 mb-5">
-                        <span className="px-3.5 py-1.5 bg-white/10 text-white text-[9px] font-black uppercase tracking-[0.25em] rounded-xl border border-white/20 backdrop-blur-md">
+                        <span className="px-3.5 py-1.5 bg-black/40 text-white text-[9px] font-black uppercase tracking-[0.25em] rounded-xl border border-white/20 backdrop-blur-md" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
                           {plan.city}
                         </span>
-                        <div className="flex items-center gap-1.5 text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">
-                           <Calendar size={13} weight="fill" className="text-orange-500/70" /> {seasonLabels[plan.season] || plan.season}
+                        <div className="flex items-center gap-1.5 text-[9px] font-black text-white/70 uppercase tracking-[0.2em]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+                           <Calendar size={13} weight="fill" className="text-orange-400" /> {seasonLabels[plan.season] || plan.season}
                         </div>
                       </div>
                       
-                      <h3 className="text-[2.6rem] font-black text-white leading-[0.95] mb-7 lowercase first-letter:uppercase tracking-tighter group-hover:translate-x-1 transition-transform duration-500">
+                      <h3 className="text-[2.2rem] font-black text-white leading-[1] mb-7 lowercase first-letter:uppercase group-hover:translate-x-1 transition-transform duration-500" style={{ letterSpacing: '-0.03em', textShadow: '0 2px 16px rgba(0,0,0,0.8), 0 6px 32px rgba(0,0,0,0.5)' }}>
                         {plan.title_it}
                       </h3>
 
@@ -273,8 +273,8 @@ const DailyPlans = () => {
                             </div>
                           </div>
                           <div>
-                            <p className="text-[7.5px] font-black uppercase tracking-[0.3em] text-white/40 mb-1">Creato da</p>
-                            <p className="text-[13px] font-black text-white leading-none tracking-tight">
+                            <p className="text-[7.5px] font-black uppercase tracking-[0.3em] text-white/60 mb-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>Creato da</p>
+                            <p className="text-[13px] font-black text-white leading-none tracking-tight" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.6)' }}>
                               {plan.creator?.nome} {plan.creator?.cognome?.charAt(0)}.
                             </p>
                           </div>
@@ -287,7 +287,7 @@ const DailyPlans = () => {
                             ))}
                             <span className="text-[13px] font-black text-white ml-0.5">{(plan.rating_avg || 4.9).toFixed(1)}</span>
                           </div>
-                          <p className="text-[7.5px] font-black uppercase tracking-[0.2em] text-white/40 italic">Global Rating</p>
+                          <p className="text-[7.5px] font-black uppercase tracking-[0.2em] text-white/60 italic" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>Global Rating</p>
                         </div>
                       </div>
                     </div>
