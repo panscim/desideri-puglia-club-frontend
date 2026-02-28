@@ -144,38 +144,41 @@ const PlanDetail = () => {
         </div>
       </div>
 
-      <main className="px-6 -mt-10 relative z-10">
+      <main className="px-6 -mt-8 relative z-10">
         
-        {/* Locator / Verification Widget */}
-        <div className="app-native-card p-6 flex items-center justify-between mb-12 shadow-xl border-white/10">
-          <div className="flex items-center gap-4">
+        {/* Locator Widget: Micro-Elegance */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-[2rem] px-5 py-3 flex items-center justify-between mb-10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-white/40 active:scale-[0.98] transition-all">
+          <div className="flex items-center gap-3">
             <div className="relative">
               {plan.creator?.avatar_url ? (
                 <img 
                   src={plan.creator.avatar_url} 
-                  className="w-14 h-14 rounded-2xl object-cover border-2 border-orange-500/20 shadow-inner"
+                  className="w-11 h-11 rounded-2xl object-cover border border-orange-500/10 shadow-sm"
                   alt={plan.creator.nickname || 'Locator'}
                 />
               ) : (
-                <div className="w-14 h-14 bg-zinc-50 rounded-2xl flex items-center justify-center text-orange-500 border border-zinc-100 italic font-black">
+                <div className="w-11 h-11 bg-zinc-50 rounded-2xl flex items-center justify-center text-orange-500 border border-zinc-100 text-[10px] font-black">
                   {plan.creator?.nickname?.[0] || 'L'}
                 </div>
               )}
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md">
-                <CheckCircle size={16} weight="fill" className="text-orange-500" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-sm">
+                <CheckCircle size={14} weight="fill" className="text-orange-500" />
               </div>
             </div>
-            <div>
-               <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Locator Verificato</p>
-               <p className="text-base font-black text-zinc-900">
+            <div className="flex flex-col">
+               <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 leading-none mb-1">Locator Verificato</span>
+               <span className="text-sm font-black text-zinc-900 leading-none">
                  {plan.creator ? `${plan.creator.nome || ''} ${plan.creator.cognome || ''}`.trim() || plan.creator.nickname : 'Resident Desideri'}
-               </p>
+               </span>
             </div>
           </div>
-          <div className="h-8 w-[1px] bg-zinc-100 mx-2" />
-          <div className="text-right">
-             <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Rating</p>
-             <p className="text-base font-black text-zinc-900">{plan.rating_avg?.toFixed(1) || '4.9'}/5.0</p>
+          
+          <div className="flex items-center gap-4">
+             <div className="h-6 w-[1px] bg-zinc-200/50" />
+             <div className="flex flex-col items-end">
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-zinc-400 leading-none mb-1">Rating</span>
+                <span className="text-sm font-black text-zinc-900 leading-none">{plan.rating_avg?.toFixed(1) || '4.9'} <span className="text-[10px] text-zinc-300">/ 5</span></span>
+             </div>
           </div>
         </div>
 
