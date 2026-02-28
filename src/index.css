@@ -112,7 +112,8 @@ body {
 }
 [data-theme="light"] .border-white\/10,
 [data-theme="light"] .border-white\/5,
-[data-theme="light"] .border-white\/20 {
+[data-theme="light"] .border-white\/20,
+[data-theme="light"] .border-zinc-800 {
   border-color: var(--border) !important;
 }
 
@@ -120,19 +121,14 @@ body {
    SHADOW REFINEMENT (Remove "white glow" effect)
 ───────────────────────────────────────────────── */
 [data-theme="light"] {
-  /* Override Tailwind shadow variables for a cleaner light look */
-  --tw-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
-  --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -2px var(--tw-shadow-color) !important;
+  --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
 }
-
 [data-theme="light"] .shadow-xl {
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02) !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
 }
-
 [data-theme="light"] .shadow-2xl {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08) !important;
 }
-
 
 /* ─────────────────────────────────────────────────
    UTILITIES & PROTECTION
@@ -145,10 +141,21 @@ body {
   color: white !important;
 }
 
-/* Prevent backgrounds from flipping (useful for gradients on photos) */
-.no-theme-flip {
-  /* Utility class to keep original dark appearance */
+/* Protect images from "washing out" */
+.no-theme-flip img,
+img.no-theme-flip {
+  opacity: 1 !important;
 }
+
+/* Prevent backgrounds from flipping (keep them dark) */
+.no-theme-flip,
+[data-theme="light"] .bg-zinc-950.no-theme-flip,
+[data-theme="light"] .bg-zinc-900.no-theme-flip,
+[data-theme="light"] .bg-stone-900.no-theme-flip,
+[data-theme="light"] .bg-black.no-theme-flip {
+  background-color: inherit; /* Keeps original dark class value */
+}
+
 
 /* ─────────────────────────────────────────────────
    DARK MODE — flip light-by-default components

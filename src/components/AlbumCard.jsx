@@ -17,12 +17,13 @@ export function AlbumCard({ card, onClick, userLocation }) {
         <div
             onClick={() => onClick(card)}
             className={`
-        relative aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer group bg-stone-900 shadow-lg
-        ${card.isUnlocked ? 'hover:-translate-y-2 hover:shadow-2xl' : 'opacity-90 border-2 border-stone-800'}
+        relative aspect-[3/4] rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer group bg-zinc-950 shadow-lg no-theme-flip
+        ${card.isUnlocked ? 'hover:-translate-y-2 hover:shadow-2xl' : 'border-2 border-stone-800'}
       `}
         >
             {/* Image Layer - Full bleed for unlocked */}
-            <div className={`w-full h-full transition-transform duration-700 ${card.isUnlocked ? 'group-hover:scale-105' : 'grayscale brightness-50 contrast-125'}`}>
+            <div className={`w-full h-full transition-transform duration-700 no-theme-flip ${card.isUnlocked ? 'group-hover:scale-105' : 'grayscale brightness-50 contrast-125'}`}>
+
                 {card.image_url ? (
                     <img
                         src={card.image_url}

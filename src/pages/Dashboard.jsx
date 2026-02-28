@@ -334,7 +334,8 @@ export default function Dashboard() {
                   className="flex items-center gap-4 bg-zinc-900 border border-white/10 rounded-2xl p-4 cursor-pointer active:scale-[0.98] transition-transform group hover:border-[#E4AE2F]/30"
                 >
                   {/* Thumbnail */}
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-white/10 relative">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-white/10 relative bg-zinc-950 no-theme-flip">
+
                     <img
                       src={saga.sagaImage || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=200'}
                       alt={saga.sagaTitle}
