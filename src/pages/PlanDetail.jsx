@@ -59,8 +59,8 @@ const PlanDetail = () => {
 
   const { scrollY } = useScroll();
   const heroScale    = useTransform(scrollY, [0, 400], [1.0, 1.15]);
-  const navBg        = useTransform(scrollY, [140, 220], ['rgba(15,15,15,0)', 'rgba(15,15,15,0.95)']);
-  const navBorder    = useTransform(scrollY, [140, 220], ['rgba(255,255,255,0)', 'rgba(255,255,255,0.1)']);
+  const navBg        = useTransform(scrollY, [0, 200], ['rgba(15,15,15,0.85)', 'rgba(15,15,15,0.97)']);
+  const navBorder    = useTransform(scrollY, [0, 200], ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.12)']);
   const titleOpacity = useTransform(scrollY, [200, 280], [0, 1]);
 
   useEffect(() => { loadPlan(); fetchVibes(); window.scrollTo(0, 0); }, [id, user]);
