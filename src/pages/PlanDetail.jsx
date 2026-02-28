@@ -131,19 +131,23 @@ const PlanDetail = () => {
       {/* ╔══ NAV ══════════════════════════════════════════╗ */}
       <motion.nav
         style={{ backgroundColor: navBg, borderBottomColor: navBorder }}
-        className="no-theme-flip fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between border-b backdrop-blur-3xl"
+        className="fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between border-b backdrop-blur-3xl"
       >
-        <button onClick={() => navigate(-1)} className="no-theme-flip w-10 h-10 rounded-full bg-zinc-950 border border-zinc-800 shadow-lg flex items-center justify-center active:scale-90 transition-transform">
-          <CaretLeft size={18} weight="bold" className="text-white" />
+        <button
+          onClick={() => navigate(-1)}
+          className="w-10 h-10 rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform"
+          style={{ backgroundColor: '#0f0f0f', borderColor: '#27272a', border: '1px solid #27272a' }}
+        >
+          <CaretLeft size={18} weight="bold" style={{ color: 'white' }} />
         </button>
 
-        <motion.p style={{ opacity: titleOpacity }} className="no-theme-flip text-[10px] font-black uppercase tracking-[0.3em] text-white truncate max-w-[50%] text-center">
+        <motion.p style={{ opacity: titleOpacity, color: 'white' }} className="text-[10px] font-black uppercase tracking-[0.3em] truncate max-w-[50%] text-center">
           {plan.title_it}
         </motion.p>
 
         <div className="flex items-center gap-1">
           <button className="w-10 h-10 flex items-center justify-center active:scale-90 transition-transform opacity-50 hover:opacity-100">
-            <Star size={20} weight="duotone" className="no-theme-flip text-white" />
+            <Star size={20} weight="duotone" style={{ color: 'white' }} />
           </button>
         </div>
       </motion.nav>
