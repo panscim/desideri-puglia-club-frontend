@@ -81,16 +81,49 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* The main app shell bg-zinc-950 used in Dashboard */
-[data-theme="light"] .theme-surface-dark {
+/* ─────────────────────────────────────────────────
+   LIGHT MODE — flip dark-by-default components
+   Dashboard, SagaDetail, etc. use bg-zinc-950
+   as their base. In light, these must go pale.
+───────────────────────────────────────────────── */
+[data-theme="light"] .bg-zinc-950 {
   background-color: var(--bg-base) !important;
+}
+[data-theme="light"] .bg-zinc-900 {
+  background-color: var(--bg-elevated) !important;
+}
+[data-theme="light"] .bg-zinc-800 {
+  background-color: #e4e4e7 !important;
+}
+[data-theme="light"] .text-white {
   color: var(--text-primary) !important;
 }
-[data-theme="dark"] .theme-surface-dark {
-  background-color: #0f0f0f !important;
+[data-theme="light"] .text-zinc-400,
+[data-theme="light"] .text-zinc-500 {
+  color: var(--text-secondary) !important;
+}
+/* Borders that look fine on dark but need help on light */
+[data-theme="light"] .border-white\/10,
+[data-theme="light"] .border-white\/5,
+[data-theme="light"] .border-white\/20 {
+  border-color: var(--border) !important;
+}
+/* Glassmorphism panels in dark pages */
+[data-theme="light"] .bg-zinc-900\/90,
+[data-theme="light"] .bg-zinc-950\/80,
+[data-theme="light"] .bg-zinc-950\/40 {
+  background-color: rgba(255,255,255,0.85) !important;
+  color: var(--text-primary) !important;
+}
+/* White/10 overlays (icon buttons on dark bg) */
+[data-theme="light"] .bg-white\/10 {
+  background-color: rgba(0,0,0,0.07) !important;
 }
 
-/* Cards that use bg-white */
+/* ─────────────────────────────────────────────────
+   DARK MODE — flip light-by-default components
+   DailyPlans, Profilo, etc. use bg-white / bg-zinc-50
+───────────────────────────────────────────────── */
 [data-theme="dark"] .bg-white {
   background-color: var(--card-bg) !important;
 }
@@ -122,10 +155,11 @@ body {
   background-color: #0f0f0f !important;
 }
 
-/* Smooth transition for theme switch */
+/* Smooth transition for ALL elements on theme switch */
 *, *::before, *::after {
   transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
 }
+
 
 @tailwind base;
 @tailwind components;
