@@ -59,8 +59,6 @@ const PlanDetail = () => {
 
   const { scrollY } = useScroll();
   const heroScale    = useTransform(scrollY, [0, 400], [1.0, 1.15]);
-  const navBg        = useTransform(scrollY, [0, 200], ['rgba(15,15,15,0.85)', 'rgba(15,15,15,0.97)']);
-  const navBorder    = useTransform(scrollY, [0, 200], ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.12)']);
   const titleOpacity = useTransform(scrollY, [200, 280], [0, 1]);
 
   useEffect(() => { loadPlan(); fetchVibes(); window.scrollTo(0, 0); }, [id, user]);
@@ -129,28 +127,28 @@ const PlanDetail = () => {
     <div className="min-h-screen bg-[#F9F9F7] text-zinc-900 pb-44" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.015em' }}>
 
       {/* ╔══ NAV ══════════════════════════════════════════╗ */}
-      <motion.nav
-        style={{ backgroundColor: navBg, borderBottomColor: navBorder }}
-        className="fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between border-b backdrop-blur-3xl"
+      <nav
+        style={{ backgroundColor: '#0f0f0f', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+        className="fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between"
       >
         <button
           onClick={() => navigate(-1)}
           className="w-10 h-10 rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform"
-          style={{ backgroundColor: '#0f0f0f', borderColor: '#27272a', border: '1px solid #27272a' }}
+          style={{ backgroundColor: '#27272a', border: '1px solid #3f3f46' }}
         >
           <CaretLeft size={18} weight="bold" style={{ color: 'white' }} />
         </button>
 
-        <motion.p style={{ opacity: titleOpacity, color: 'white' }} className="text-[10px] font-black uppercase tracking-[0.3em] truncate max-w-[50%] text-center">
+        <p style={{ color: 'white' }} className="text-[10px] font-black uppercase tracking-[0.3em] truncate max-w-[50%] text-center">
           {plan.title_it}
-        </motion.p>
+        </p>
 
         <div className="flex items-center gap-1">
-          <button className="w-10 h-10 flex items-center justify-center active:scale-90 transition-transform opacity-50 hover:opacity-100">
+          <button className="w-10 h-10 flex items-center justify-center active:scale-90 transition-transform opacity-60 hover:opacity-100">
             <Star size={20} weight="duotone" style={{ color: 'white' }} />
           </button>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* ╔══ HERO ══════════════════════════════════════════╗ */}
       <div className="relative h-[72vh] w-full overflow-hidden bg-zinc-900">
