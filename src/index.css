@@ -303,82 +303,80 @@ html {
 }
 
 /* ─────────────────────────────────────────────────
-   PREMIUM DIGITAL WOW UTILITIES
+   MINIMAL EXECUTIVE PREMIUM UTILITIES
 ───────────────────────────────────────────────── */
 
-/* Premium Glassmorphism */
-.glass-premium {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
-}
-
-.glass-premium-dark {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(24px) saturate(200%);
-  -webkit-backdrop-filter: blur(24px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.4);
-}
-
-/* Typography Overrides */
-.text-premium-display {
+/* Typography Precision */
+.text-exec-header {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 0.9;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.text-premium-body {
+.text-exec-body {
   font-family: 'Lora', serif !important;
-  line-height: 1.6;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
 }
 
-/* Background Effects */
-.mesh-gradient-premium {
-  background-color: #f8fafc;
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.1) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,0.1) 0, transparent 50%);
+/* Executive Surface System */
+.exec-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04), 0 1px 4px -2px rgba(0, 0, 0, 0.02);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease;
 }
 
-.bg-noise {
+.exec-card:hover {
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.06), 0 4px 8px -2px rgba(0, 0, 0, 0.02);
+}
+
+.exec-card-dark {
+  background: #18181b; /* zinc-900 */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  border-radius: 20px;
+}
+
+/* Timeline: Clean Executive Marker */
+.exec-timeline-marker {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
   position: relative;
+  z-index: 10;
 }
-.bg-noise::before {
-  content: "";
+
+.exec-timeline-line {
   position: absolute;
-  inset: 0;
-  background-image: url("https://www.transparenttextures.com/patterns/p6-dark.png");
-  opacity: 0.03;
-  pointer-events: none;
-  z-index: 1;
+  left: 5px;
+  top: 12px;
+  bottom: -40px;
+  width: 2px;
+  background: rgba(0, 0, 0, 0.05);
 }
 
-/* Dynamic Timeline Path */
-.timeline-glow-track {
-  filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.3));
+/* Rain Mode: Soft Transitional Hint */
+.exec-rain-hint {
+  border-left: 4px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.02);
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+/* Navigation Blur */
+.exec-nav-blur {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-}
-
-/* Rain Mode Overlay */
-.rain-atmospheric-overlay {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(30, 41, 59, 0.8) 100%);
-  pointer-events: none;
-  z-index: 50;
-  mix-blend-mode: overlay;
+/* Utility for Whitespace */
+.exec-section-spacing {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
 }
