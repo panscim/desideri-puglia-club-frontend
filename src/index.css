@@ -303,7 +303,7 @@ html {
 }
 
 /* ─────────────────────────────────────────────────
-   DIGITAL NOTEBOOK UTILITIES (Taccuino di Viaggio)
+   HIGH-FIDELITY SCRAPBOOK UTILITIES (Diario di Viaggio)
 ───────────────────────────────────────────────── */
 
 .font-sketch {
@@ -315,27 +315,85 @@ html {
 }
 
 .text-biro {
-  color: #003399 !important; /* Penna biro blu */
+  color: #1a4d8a !important; /* Blue ink */
 }
 
 .bg-paper {
   background-color: #fdfaf0;
   background-image: 
-    url("https://www.transparenttextures.com/patterns/cardboard.png"); /* Subtle paper grain */
+    url("https://www.transparenttextures.com/patterns/cardboard.png"); 
   background-attachment: fixed;
 }
 
 .highlighter {
-  background: linear-gradient(100deg, rgba(254, 240, 138, 0.4) 0%, rgba(254, 240, 138, 0.7) 50%, rgba(254, 240, 138, 0.3) 100%);
+  background: linear-gradient(100deg, rgba(254, 240, 138, 0.5) 0%, rgba(254, 240, 138, 0.8) 50%, rgba(254, 240, 138, 0.4) 100%);
   padding: 0 4px;
   border-radius: 2px;
 }
 
-/* Rain Mode Scratch Effect Overlay */
-.scratch-overlay {
-  pointer-events: none;
+/* Scrapbook Elements */
+.tape {
   position: absolute;
-  inset: -10px;
-  z-index: 50;
-  opacity: 0.8;
+  width: 80px;
+  height: 25px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(1px);
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transform: rotate(-3deg);
+  z-index: 20;
+}
+
+.tape-vertical {
+  width: 20px;
+  height: 60px;
+}
+
+.receipt-card {
+  background: #fcfcfc;
+  color: #333;
+  padding: 2rem 1.5rem;
+  border: 1px solid #e5e5e5;
+  box-shadow: 2px 5px 15px rgba(0,0,0,0.05);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.ticket-card {
+  background: #fff5e6;
+  border: 2px dashed #d99a5b;
+  border-radius: 4px;
+  position: relative;
+}
+
+.ticket-card::before, .ticket-card::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #fdfaf0; /* Matches pg-paper */
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 2px dashed #d99a5b;
+}
+
+.ticket-card::before { left: -12px; }
+.ticket-card::after { right: -12px; }
+
+.polaroid {
+  background: white;
+  padding: 10px 10px 40px 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.doodle {
+  filter: opacity(0.4) grayscale(1);
+  pointer-events: none;
+}
+
+/* Wobbly path for timeline */
+.wobbly-path {
+  stroke-dasharray: 5, 5;
+  filter: url(#wobble);
 }
