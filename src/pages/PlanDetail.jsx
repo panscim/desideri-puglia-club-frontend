@@ -124,7 +124,7 @@ const PlanDetail = () => {
       {/* Immersive Header Image */}
       <div className="relative h-[65vh] w-full overflow-hidden bg-zinc-900">
         <motion.img 
-          style={{ scale: 1.1, opacity: headerOpacity }}
+          style={{ scale: 1.1 }}
           src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
           className="w-full h-full object-cover"
         />
@@ -253,33 +253,40 @@ const PlanDetail = () => {
               ))}
             </div>
 
-            {/* Radar Activity Widget */}
-            <section className="pt-12">
-               <div className="bg-zinc-950 rounded-[2.5rem] p-10 relative overflow-hidden shadow-2xl">
-                  <div className="absolute top-8 right-8 flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full backdrop-blur-md border border-white/10">
-                    <div className="vibe-pulse-v2" />
-                    <span className="text-[9px] font-black text-green-500 uppercase tracking-widest">Live Now</span>
-                  </div>
-
+            {/* Radar Activity Widget: Compact & Cool */}
+            <section className="pt-10 px-2">
+               <div className="bg-zinc-950 rounded-[2.25rem] p-7 relative overflow-hidden shadow-xl border border-white/5">
+                  {/* Visual Background Effects */}
+                  <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-br from-orange-500/10 via-transparent to-blue-500/5 opacity-50" />
+                  
                   <div className="relative z-10">
-                     <div className="flex items-center gap-2 mb-8">
-                        <Sparkle size={18} weight="fill" className="text-orange-500" />
-                        <h4 className="text-[9px] font-black uppercase tracking-[0.4em] text-zinc-500">Radar Movida</h4>
+                     <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-2">
+                           <Sparkle size={16} weight="fill" className="text-orange-500" />
+                           <h4 className="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-500">Radar Movida</h4>
+                        </div>
+                        <div className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
+                          <div className="vibe-pulse-v2 !w-2 !h-2" />
+                          <span className="text-[7px] font-black text-green-500 uppercase tracking-widest">Live Now</span>
+                        </div>
                      </div>
 
-                     <h2 className="text-3xl font-black text-white mb-4 uppercase">
-                        Status: <span className="text-orange-500">{vibeStatus}</span>
-                     </h2>
+                     <div className="mb-8">
+                        <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest block mb-1">Livello Attuale</span>
+                        <h2 className="text-2xl font-black text-white uppercase leading-none tracking-tight">
+                           {vibeStatus}
+                        </h2>
+                     </div>
 
-                     <p className="text-zinc-500 text-xs font-medium leading-relaxed mb-10 opacity-80">
-                        Rete Resident Desideri attiva. Aggiornato ogni 5min.
-                     </p>
-
-                     <div className="sentiment-meter-v2">
-                        {[1,2,3,4,5,6,7,8].map(i => (
-                          <div key={i} className={`sentiment-meter-step-v2 ${i <= 5 ? 'active' : ''}`} />
+                     <div className="sentiment-meter-v2 !h-1.5 !gap-1.5">
+                        {[1,2,3,4,5,6,7,8,9,10,12].map(i => (
+                          <div key={i} className={`sentiment-meter-step-v2 !rounded-sm ${i <= 7 ? 'active !bg-orange-500 !shadow-[0_0_8px_rgba(249,115,22,0.4)]' : 'bg-white/5'}`} />
                         ))}
                      </div>
+                     
+                     <p className="text-[8px] font-medium text-zinc-500 mt-4 leading-relaxed opacity-60">
+                        Sincronizzato con Resident Puglia Net. Aggiornamento in tempo reale.
+                     </p>
                   </div>
                </div>
             </section>
