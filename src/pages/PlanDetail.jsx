@@ -192,7 +192,7 @@ const PlanDetail = () => {
           </p>
           <div className="mt-6 flex flex-col items-center gap-2">
              <div className="w-12 h-12 rounded-full border-2 border-biro/10 overflow-hidden shadow-sm">
-                <img src={plan.creator?.foto_profilo || '/logo.png'} className="w-full h-full object-cover" alt="" />
+                <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
              </div>
              <p className="font-sketch text-biro/70 text-sm">Consigli di {plan.creator?.nickname}</p>
           </div>

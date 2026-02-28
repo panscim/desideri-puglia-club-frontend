@@ -170,7 +170,7 @@ const DailyPlans = () => {
                       </h3>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full border border-white/20 overflow-hidden bg-white/10 p-0.5">
-                          <img src={plan.creator?.foto_profilo || '/logo.png'} className="w-full h-full object-cover rounded-full" alt="" />
+                          <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover rounded-full" alt="" />
                         </div>
                         <span className="text-[10px] font-black text-white/60 uppercase tracking-widest">{plan.creator?.nickname || 'Local Creator'}</span>
                       </div>

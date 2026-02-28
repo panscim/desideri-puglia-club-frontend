@@ -9,7 +9,7 @@ export const ConciergeService = {
       .from('daily_plans')
       .select(`
         *,
-        creator:utenti(nome, cognome, nickname, foto_profilo)
+        creator:utenti(nome, cognome, nickname, avatar_url)
       `)
       .eq('is_published', true)
       .order('purchases_count', { ascending: false });
@@ -38,7 +38,7 @@ export const ConciergeService = {
       .from('daily_plans')
       .select(`
         *,
-        creator:utenti(nome, cognome, nickname, foto_profilo),
+        creator:utenti(nome, cognome, nickname, avatar_url),
         slots:plan_slots(*)
       `)
       .eq('id', planId)
@@ -114,7 +114,7 @@ export const ConciergeService = {
       .from('vibe_reports')
       .select(`
         *,
-        user:utenti(nickname, foto_profilo)
+        user:utenti(nickname, avatar_url)
       `)
       .gt('expires_at', new Date().toISOString())
       .order('created_at', { ascending: false });
