@@ -17,7 +17,9 @@ import {
   LogOut,
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import { useTheme } from '../contexts/ThemeContext'
 import { supabase } from '../services/supabase'
+
 import toast from 'react-hot-toast'
 import Splash from './Splash'
 import { useTranslation } from 'react-i18next'
@@ -27,7 +29,9 @@ const Layout = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { profile, isAdmin } = useAuth()
+  const { theme } = useTheme()
   const [activeIndex, setActiveIndex] = useState(0)
+
 
   // We keep the logic for Desktop Sidebar active state
   useEffect(() => {
@@ -124,8 +128,13 @@ const Layout = () => {
 
       {/* ░ NEW NAV MOBILE (GetYourGuide Clone Bottom Tab Nav) ░ */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="bg-zinc-950/90 backdrop-blur-md border-t border-white/10 pb-[env(safe-area-inset-bottom)]">
+        <div className={`backdrop-blur-md border-t pb-[env(safe-area-inset-bottom)] transition-colors duration-300 ${
+          theme === 'dark'
+            ? 'bg-zinc-950/90 border-white/10'
+            : 'bg-white/95 border-zinc-200'
+        }`}>
           <nav className="flex justify-around items-center h-[64px] px-2 max-w-md mx-auto">
+
             {[
               { path: '/dashboard', icon: Compass, label: 'Scopri' },
               { path: '/partner', icon: Handshake, label: 'Partner' },
@@ -145,20 +154,32 @@ const Layout = () => {
                   <Icon
                     size={24}
                     weight={active ? "fill" : "regular"}
-                    className={`transition-colors duration-200 ${active ? 'text-white' : 'text-zinc-500'}`}
+                    className={`transition-colors duration-200 ${
+                      active
+                        ? theme === 'dark' ? 'text-white' : 'text-zinc-950'
+                        : 'text-zinc-400'
+                    }`}
                   />
-                  <span className={`text-[10px] font-geist transition-colors duration-200 ${active ? 'text-white font-medium' : 'text-zinc-500'}`}>
+                  <span className={`text-[10px] font-geist transition-colors duration-200 ${
+                    active
+                      ? theme === 'dark' ? 'text-white font-medium' : 'text-zinc-950 font-medium'
+                      : 'text-zinc-400'
+                  }`}>
                     {item.label}
                   </span>
                 </Link>
               );
+
             })}
           </nav>
         </div>
       </div>
 
       {/* ░ SIDEBAR DESKTOP ░ */}
-      <div className="hidden md:block fixed left-0 top-20 bottom-0 w-64 bg-zinc-950 border-r border-white/10 p-4 z-40">
+      <div className={`hidden md:block fixed left-0 top-20 bottom-0 w-64 border-r p-4 z-40 transition-colors duration-300 ${
+        theme === 'dark' ? 'bg-zinc-950 border-white/10' : 'bg-white border-zinc-200'
+      }`}>
+
         <nav className="space-y-2 h-full overflow-y-auto pb-20">
           {
             navItems.map((item) => {

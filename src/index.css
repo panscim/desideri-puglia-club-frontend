@@ -82,10 +82,19 @@ body {
 }
 
 /* ─────────────────────────────────────────────────
-   LIGHT MODE — flip dark-by-default components
-   Dashboard, SagaDetail, etc. use bg-zinc-950
-   as their base. In light, these must go pale.
+   LIGHT MODE — flip dark-by-default structural elements
+   Dashboard uses bg-zinc-950 as shell.
+   NOTE: text-white is NOT overridden globally — only
+   structural (non-image) wrappers get flipped via bg.
+   Use `.text-on-image` to protect white text on photos.
 ───────────────────────────────────────────────── */
+
+/* Utility: protect white text on photo overlays from any theme override */
+.text-on-image,
+.text-on-image * {
+  color: white !important;
+}
+
 [data-theme="light"] .bg-zinc-950 {
   background-color: var(--bg-base) !important;
 }
@@ -95,30 +104,43 @@ body {
 [data-theme="light"] .bg-zinc-800 {
   background-color: #e4e4e7 !important;
 }
-[data-theme="light"] .text-white {
+
+/* Only flip isolated text-white on non-image UI panels */
+[data-theme="light"] nav .text-white,
+[data-theme="light"] header .text-white,
+[data-theme="light"] .theme-flip-text.text-white {
   color: var(--text-primary) !important;
 }
-[data-theme="light"] .text-zinc-400,
-[data-theme="light"] .text-zinc-500 {
+[data-theme="light"] nav .text-zinc-400,
+[data-theme="light"] nav .text-zinc-500,
+[data-theme="light"] .theme-flip-text .text-zinc-400,
+[data-theme="light"] .theme-flip-text .text-zinc-500 {
   color: var(--text-secondary) !important;
 }
+
 /* Borders that look fine on dark but need help on light */
-[data-theme="light"] .border-white\/10,
-[data-theme="light"] .border-white\/5,
-[data-theme="light"] .border-white\/20 {
+[data-theme="light"] nav .border-white\/10,
+[data-theme="light"] nav .border-white\/5,
+[data-theme="light"] nav .border-white\/20,
+[data-theme="light"] .theme-flip-text .border-white\/10 {
   border-color: var(--border) !important;
 }
-/* Glassmorphism panels in dark pages */
-[data-theme="light"] .bg-zinc-900\/90,
+
+/* Bottom nav bar & search bar glassmorphism on dark */
+[data-theme="light"] .bg-zinc-900\/90 {
+  background-color: rgba(255,255,255,0.9) !important;
+}
 [data-theme="light"] .bg-zinc-950\/80,
 [data-theme="light"] .bg-zinc-950\/40 {
   background-color: rgba(255,255,255,0.85) !important;
-  color: var(--text-primary) !important;
 }
-/* White/10 overlays (icon buttons on dark bg) */
-[data-theme="light"] .bg-white\/10 {
+
+/* White/10 overlays (icon buttons on dark bg) — only within non-image nav */
+[data-theme="light"] nav .bg-white\/10 {
   background-color: rgba(0,0,0,0.07) !important;
 }
+
+
 
 /* ─────────────────────────────────────────────────
    DARK MODE — flip light-by-default components

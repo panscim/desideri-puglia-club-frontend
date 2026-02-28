@@ -224,7 +224,8 @@ const Dashboard = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-zinc-950/20 to-transparent pointer-events-none" />
 
                     {/* Testo In Basso a Sinistra - Stile GetYourGuide */}
-                    <div className="absolute inset-0 p-5 pb-8 flex flex-col justify-end text-left">
+                    <div className="text-on-image absolute inset-0 p-5 pb-8 flex flex-col justify-end text-left">
+
                       <h1 className="text-[26px] md:text-[30px] leading-[1.1] font-black font-satoshi text-white mb-2.5 tracking-tight drop-shadow-md">
                         {hero.title}
                       </h1>
@@ -283,7 +284,7 @@ const Dashboard = () => {
             />
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/40 to-transparent" />
             
-            <div className="absolute inset-0 p-6 flex flex-col justify-center">
+            <div className="text-on-image absolute inset-0 p-6 flex flex-col justify-center">
               <div className="flex items-center gap-2 mb-2">
                 <Sparkle size={20} weight="fill" className="text-orange-500" />
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-500">Local Concierge</span>
@@ -291,9 +292,10 @@ const Dashboard = () => {
               <h3 className="text-2xl font-black text-white leading-tight mb-2 max-w-[15ch]">
                 Cosa facciamo oggi in Puglia?
               </h3>
-              <p className="text-xs text-zinc-400 font-medium">Itinerari curati dai residenti per te.</p>
+              <p className="text-xs text-zinc-300 font-medium">Itinerari curati dai residenti per te.</p>
             </div>
-            <div className="absolute bottom-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 text-white">
+            <div className="text-on-image absolute bottom-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 text-white">
+
                <ArrowRight size={20} weight="bold" />
             </div>
           </div>
