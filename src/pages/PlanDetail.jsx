@@ -133,8 +133,8 @@ const PlanDetail = () => {
         style={{ backgroundColor: navBg, borderBottomColor: navBorder }}
         className="fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between border-b backdrop-blur-3xl"
       >
-        <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-white border border-zinc-100 shadow-sm flex items-center justify-center active:scale-90 transition-transform">
-          <CaretLeft size={18} weight="bold" className="text-zinc-900" style={{ color: '#18181b' }} />
+        <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-zinc-950 border border-zinc-800 shadow-lg flex items-center justify-center active:scale-90 transition-transform">
+          <CaretLeft size={18} weight="bold" className="text-white" style={{ color: 'white' }} />
         </button>
 
         <motion.p style={{ opacity: titleOpacity }} className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-700 truncate max-w-[50%] text-center">
@@ -161,23 +161,7 @@ const PlanDetail = () => {
           background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.0) 30%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.92) 100%)'
         }} />
 
-        {/* Top-right: season & target pills */}
-        <div className="absolute top-20 right-5 flex flex-col items-end gap-2">
-          {plan.season && (
-            <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }}>
-              <Pill className="bg-white/10 border-white/20 text-white backdrop-blur-md">
-                <Sun size={10} weight="fill" /> {seasonLabels[plan.season] || plan.season}
-              </Pill>
-            </motion.div>
-          )}
-          {plan.target_audience && (
-            <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.65 }}>
-              <Pill className="bg-white/10 border-white/20 text-white backdrop-blur-md">
-                <Users size={10} weight="fill" /> {targetLabels[plan.target_audience] || plan.target_audience}
-              </Pill>
-            </motion.div>
-          )}
-        </div>
+        {/* Removed Hero Pills as requested */}
 
         {/* Bottom content */}
         <div className="absolute inset-x-0 bottom-0 px-6 pb-10">
@@ -296,12 +280,12 @@ const PlanDetail = () => {
                   {/* Timeline node */}
                   <div className="shrink-0 flex flex-col items-center gap-2 z-10">
                     <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-500 shadow-sm ${
-                      isRainMode ? 'bg-blue-600 border-blue-500' : 'bg-white border-zinc-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)]'
+                      isRainMode ? 'bg-blue-600 border-blue-500' : 'bg-zinc-950 border-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.15)]'
                     }`}>
                       <Clock
                         size={18}
                         weight="duotone"
-                        style={{ color: isRainMode ? 'white' : '#18181b' }}
+                        style={{ color: 'white' }}
                       />
                     </div>
                     <span
