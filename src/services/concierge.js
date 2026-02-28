@@ -20,7 +20,11 @@ export const ConciergeService = {
 
     const { data, error } = await query;
     if (error) {
-      console.error('Error fetching daily plans:', error);
+      console.error('--- SUPABASE ERROR [getDailyPlans] ---');
+      console.error('Code:', error.code);
+      console.error('Message:', error.message);
+      console.error('Details:', error.details);
+      console.error('Hint:', error.hint);
       return [];
     }
     return data;
