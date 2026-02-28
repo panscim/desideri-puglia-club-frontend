@@ -2,7 +2,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { supabase } from '../services/supabase';
+
 import { QuestService } from '../services/quest';
 import { EventsService } from '../services/events';
 import {
@@ -64,9 +66,10 @@ const EventTimer = ({ startDate, endDate }) => {
   );
 };
 
-const Dashboard = () => {
-  const { profile } = useAuth();
+export default function Dashboard() {
   const navigate = useNavigate();
+  const { profile } = useAuth();
+  const { theme } = useTheme();
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
@@ -184,11 +187,16 @@ const Dashboard = () => {
         <div className="flex-1 mx-3">
           <button
             onClick={() => setIsSearchModalOpen(true)}
-            className="w-full bg-zinc-900/90 backdrop-blur-md border border-white/10 hover:bg-zinc-800 transition-colors rounded-full py-2.5 px-4 flex items-center gap-2 text-zinc-400 text-sm shadow-xl active:scale-[0.98]"
+            className={`w-full backdrop-blur-md border transition-colors rounded-full py-2.5 px-4 flex items-center gap-2 text-sm shadow-xl active:scale-[0.98] ${
+              theme === 'dark' 
+                ? 'bg-zinc-900 border-white/10 text-zinc-400 hover:bg-zinc-800' 
+                : 'bg-white border-zinc-200 text-zinc-950 hover:bg-white'
+            }`}
           >
             <MagnifyingGlass size={18} weight="bold" />
             <span className="font-geist truncate font-medium">Trova luoghi e cose da fare</span>
           </button>
+
         </div>
 
         <button className="relative p-2 text-white shrink-0 hover:bg-white/10 rounded-full transition-colors drop-shadow-md">
@@ -201,7 +209,8 @@ const Dashboard = () => {
       <main className="flex-1 overflow-y-auto pb-24 no-scrollbar -mt-[72px]">
 
         {/* 2. HERO CAROUSEL (Dinamico) */}
-        <section className="relative w-full h-[65vh] md:h-[70vh]">
+        <section className="relative w-full h-[65vh] md:h-[70vh] bg-zinc-950 no-theme-flip">
+
           {heroItems.length > 0 ? (
             <div className="relative w-full h-full">
               <div
@@ -275,13 +284,14 @@ const Dashboard = () => {
         <section className="mt-8 px-4 mb-2">
           <div 
             onClick={() => navigate('/daily-plans')}
-            className="relative w-full h-40 rounded-[2rem] overflow-hidden group cursor-pointer shadow-2xl border border-white/5 active:scale-[0.98] transition-all"
+            className="relative h-[180px] bg-zinc-950 rounded-2xl overflow-hidden group shadow-lg border border-white/5 cursor-pointer no-theme-flip"
           >
             <img 
               src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=1200" 
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-60"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
               alt=""
             />
+
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/40 to-transparent no-theme-flip" />
             
             <div className="text-on-image absolute inset-0 p-6 flex flex-col justify-center">
@@ -393,8 +403,10 @@ const Dashboard = () => {
                 className="snap-center w-[280px] md:w-[320px] shrink-0 bg-zinc-900 rounded-[1.5rem] overflow-hidden shadow-xl border border-white/10 group flex flex-col cursor-pointer"
               >
                 {/* Image */}
-                <div className="h-40 bg-zinc-950 relative overflow-hidden border-b border-white/5">
-                  <img src={saga.image_url || saga.map_image_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={saga.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
+                <div className="h-40 bg-zinc-950 relative overflow-hidden border-b border-white/5 no-theme-flip">
+
+                  <img src={saga.image_url || saga.map_image_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={saga.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+
 
                   {/* Distance Badge */}
                   <div className="text-on-image no-theme-flip absolute top-3 left-3 bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-full text-[11px] font-bold text-white flex items-center gap-1.5 shadow-md border border-white/10 z-10">
@@ -469,8 +481,10 @@ const Dashboard = () => {
                   className="snap-center w-[280px] md:w-[320px] shrink-0 bg-zinc-900 rounded-[1.5rem] overflow-hidden shadow-xl border border-white/10 group flex flex-col cursor-pointer active:scale-[0.98] transition-all"
                 >
                   {/* Event Image */}
-                  <div className="h-40 bg-zinc-950 relative overflow-hidden border-b border-white/5">
-                    <img src={ev.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={ev.titolo} className="w-full h-full object-cover opacity-70 group-hover:scale-105 transition-transform duration-700" />
+                  <div className="h-40 bg-zinc-950 relative overflow-hidden border-b border-white/5 no-theme-flip">
+
+                    <img src={ev.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={ev.titolo} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+
 
                     {/* Date Badge */}
                     <div className="text-on-image no-theme-flip absolute top-3 left-3 bg-zinc-950/80 backdrop-blur border border-white/10 px-3 py-1.5 rounded-xl text-center shadow-lg">
