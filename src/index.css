@@ -303,80 +303,86 @@ html {
 }
 
 /* ─────────────────────────────────────────────────
-   MINIMAL EXECUTIVE PREMIUM UTILITIES
+   PREMIUM DIGITAL (RECOVERED v1) UTILITIES
 ───────────────────────────────────────────────── */
 
-/* Typography Precision */
-.text-exec-header {
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-}
-
-.text-exec-body {
-  font-family: 'Lora', serif !important;
-  line-height: 1.7;
-  letter-spacing: 0.01em;
-}
-
-/* Executive Surface System */
-.exec-card {
+/* Premium Card System (Recovered v1) */
+.premium-card-v1 {
   background: white;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04), 0 1px 4px -2px rgba(0, 0, 0, 0.02);
-  border-radius: 16px;
+  border-radius: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease;
 }
 
-.exec-card:hover {
-  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.06), 0 4px 8px -2px rgba(0, 0, 0, 0.02);
+.premium-card-v1:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
-.exec-card-dark {
-  background: #18181b; /* zinc-900 */
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
-  border-radius: 20px;
+/* Radar Sentiment Meter */
+.sentiment-meter {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  gap: 2px;
 }
 
-/* Timeline: Clean Executive Marker */
-.exec-timeline-marker {
-  width: 12px;
-  height: 12px;
-  background: white;
-  border: 2px solid var(--accent);
+.sentiment-meter-step {
+  height: 100%;
+  flex: 1;
+  border-radius: 999px;
+}
+
+.sentiment-meter-step.active {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* Vibe Pulse Animation */
+.vibe-pulse {
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
   border-radius: 50%;
   position: relative;
-  z-index: 10;
 }
 
-.exec-timeline-line {
+.vibe-pulse::after {
+  content: "";
   position: absolute;
-  left: 5px;
-  top: 12px;
-  bottom: -40px;
-  width: 2px;
-  background: rgba(0, 0, 0, 0.05);
+  inset: -4px;
+  border: 4px solid #22c55e;
+  border-radius: 50%;
+  animation: vibe-ping 1.5s infinite;
+  opacity: 0;
 }
 
-/* Rain Mode: Soft Transitional Hint */
-.exec-rain-hint {
-  border-left: 4px solid #3b82f6;
-  background: rgba(59, 130, 246, 0.02);
+@keyframes vibe-ping {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.5); opacity: 0; }
 }
 
-/* Navigation Blur */
-.exec-nav-blur {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* Rain Mode Overlay (v1 Style) */
+.rain-mode-b-bg {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+/* Navigation Blur (Standard Premium) */
+.premium-nav-blur {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Utility for Whitespace */
-.exec-section-spacing {
-  padding-top: 5rem;
-  padding-bottom: 5rem;
+/* Font Satoshi-like clean feel */
+.font-satoshi {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.02em;
 }
