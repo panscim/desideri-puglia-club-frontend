@@ -349,16 +349,16 @@ const PlanDetail = () => {
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-2">
                       <Sparkle size={16} weight="fill" className="text-orange-500" />
-                      <span className="text-[8.5px] font-black uppercase tracking-[0.4em] text-zinc-500">Radar Movida</span>
+                      <span className="text-[8.5px] font-black uppercase tracking-[0.4em] text-white/50">Radar Movida</span>
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.06] border border-white/10">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ boxShadow: '0 0 6px rgba(34,197,94,0.8)' }} />
-                      <span className="text-[7px] font-black uppercase tracking-[0.3em] text-green-500">Live</span>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/10 backdrop-blur-md">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ boxShadow: '0 0 8px rgba(34,197,94,0.9)' }} />
+                      <span className="text-[7px] font-black uppercase tracking-[0.3em] text-green-400">Live</span>
                     </div>
                   </div>
 
-                  <p className="text-[8.5px] font-black uppercase tracking-[0.3em] text-zinc-600 mb-2">Vibe Attuale</p>
-                  <h3 className="text-[2.4rem] font-black text-white leading-none mb-8 uppercase" style={{ letterSpacing: '-0.04em' }}>
+                  <p className="text-[8.5px] font-black uppercase tracking-[0.3em] text-white/40 mb-2 italic">Vibe Attuale</p>
+                  <h3 className="text-[2.6rem] font-black text-white leading-none mb-9 uppercase" style={{ letterSpacing: '-0.045em', textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>
                     {vibeStatus}
                   </h3>
 
@@ -377,17 +377,17 @@ const PlanDetail = () => {
                           style={{
                             height,
                             background: isActive
-                              ? `rgba(249,115,22,${0.4 + (i / 15) * 0.6})`
+                              ? `rgba(249,115,22,${0.6 + (i / 15) * 0.4})`
                               : 'rgba(255,255,255,0.06)',
-                            boxShadow: isActive ? `0 0 8px rgba(249,115,22,${0.15 + (i / 15) * 0.3})` : 'none'
+                            boxShadow: isActive ? `0 0 15px rgba(249,115,22,${0.3 + (i / 15) * 0.4})` : 'none'
                           }}
                         />
                       );
                     })}
                   </div>
 
-                  <p className="text-[8px] font-medium text-zinc-600 text-center uppercase tracking-[0.3em] opacity-50">
-                    Resident Puglia Network · Real-Time
+                  <p className="text-[8.5px] font-medium text-white/30 text-center uppercase tracking-[0.4em] leading-relaxed">
+                    Resident Puglia Network · Real-Time Tracking
                   </p>
                 </div>
               </div>
