@@ -156,9 +156,9 @@ const PlanDetail = () => {
           className="w-full h-full object-cover"
           alt={plan.title_it}
         />
-        {/* Gradient scrim */}
+        {/* Gradient scrim — dark bottom anchor for perfect legibility */}
         <div className="absolute inset-0" style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, transparent 38%, rgba(0,0,0,0.06) 70%, rgba(0,0,0,0.88) 100%)'
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.0) 30%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.92) 100%)'
         }} />
 
         {/* Top-right: season & target pills */}
@@ -181,31 +181,40 @@ const PlanDetail = () => {
 
         {/* Bottom content */}
         <div className="absolute inset-x-0 bottom-0 px-6 pb-10">
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-2 text-orange-400 mb-4">
-            <MapPin size={14} weight="fill" />
-            <span className="text-[9px] font-black uppercase tracking-[0.45em]">{plan.city}, Puglia</span>
+          {/* City label — always white, drop-shadow for depth */}
+          <motion.div
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-1.5 text-white mb-5"
+            style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.5))' }}
+          >
+            <MapPin size={13} weight="fill" className="text-orange-400" />
+            <span className="text-[9px] font-black uppercase tracking-[0.45em] opacity-90">{plan.city}, Puglia</span>
           </motion.div>
 
+          {/* Title — heavy contrast */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12, ease: [0.16, 1, 0.3, 1], duration: 0.8 }}
-            className="text-[3.5rem] font-black text-white leading-[0.88] mb-5 lowercase first-letter:uppercase"
-            style={{ letterSpacing: '-0.04em', textShadow: '0 4px 32px rgba(0,0,0,0.3)' }}
+            className="text-[3.4rem] font-black text-white leading-[0.88] mb-6 lowercase first-letter:uppercase"
+            style={{ letterSpacing: '-0.04em', textShadow: '0 2px 24px rgba(0,0,0,0.6), 0 8px 48px rgba(0,0,0,0.4)' }}
           >
             {plan.title_it}
           </motion.h1>
 
-          {/* Star rating row */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="flex items-center gap-3">
-            <div className="flex items-center gap-1">
+          {/* Star rating row — on a frosted pill so always readable */}
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
+            className="inline-flex items-center gap-2.5 bg-black/30 backdrop-blur-md rounded-full px-4 py-2 border border-white/10"
+          >
+            <div className="flex items-center gap-0.5">
               {[1,2,3,4,5].map(s => (
-                <Star key={s} size={12} weight={(plan.rating_avg || 4.9) >= s ? 'fill' : 'regular'} className="text-orange-400" />
+                <Star key={s} size={11} weight={(plan.rating_avg || 4.9) >= s ? 'fill' : 'regular'} className="text-orange-400" />
               ))}
             </div>
-            <span className="text-white/50 text-[10px] font-medium">{(plan.rating_avg || 4.9).toFixed(1)}</span>
-            <span className="text-white/20 text-[10px]">·</span>
-            <span className="text-white/50 text-[10px] font-medium">Giornata Premium</span>
+            <span className="text-white text-[10px] font-black">{(plan.rating_avg || 4.9).toFixed(1)}</span>
+            <div className="w-px h-3 bg-white/20" />
+            <span className="text-white/70 text-[9px] font-medium">Giornata Premium</span>
           </motion.div>
         </div>
       </div>
