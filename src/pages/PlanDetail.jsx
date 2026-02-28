@@ -134,7 +134,7 @@ const PlanDetail = () => {
         className="fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between border-b backdrop-blur-3xl"
       >
         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-zinc-950 border border-zinc-800 shadow-lg flex items-center justify-center active:scale-90 transition-transform">
-          <CaretLeft size={18} weight="bold" className="text-white" style={{ color: 'white' }} />
+          <CaretLeft size={18} weight="bold" className="text-white" />
         </button>
 
         <motion.p style={{ opacity: titleOpacity }} className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-700 truncate max-w-[50%] text-center">
@@ -143,7 +143,7 @@ const PlanDetail = () => {
 
         <div className="flex items-center gap-1">
           <button className="w-10 h-10 flex items-center justify-center active:scale-90 transition-transform opacity-50 hover:opacity-100">
-            <Star size={20} weight="duotone" className="text-zinc-900" style={{ color: '#18181b' }} />
+            <Star size={20} weight="duotone" className="text-zinc-900" />
           </button>
         </div>
       </motion.nav>
@@ -168,11 +168,13 @@ const PlanDetail = () => {
           {/* City label — always white, drop-shadow for depth */}
           <motion.div
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-1.5 text-white mb-5"
+            className="no-theme-flip flex items-center gap-1.5 text-white mb-5"
             style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.5))' }}
           >
             <MapPin size={13} weight="fill" className="text-orange-400" />
-            <span className="text-[9px] font-black uppercase tracking-[0.45em] opacity-90">{plan.city}, Puglia</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.45em] opacity-90">
+              {plan.city}, Puglia
+            </span>
           </motion.div>
 
           {/* Title — heavy contrast, immune to theme switches */}
@@ -180,8 +182,8 @@ const PlanDetail = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12, ease: [0.16, 1, 0.3, 1], duration: 0.8 }}
-            className="text-[3.4rem] font-black leading-[0.88] mb-6 lowercase first-letter:uppercase"
-            style={{ letterSpacing: '-0.04em', textShadow: '0 2px 24px rgba(0,0,0,0.6), 0 8px 48px rgba(0,0,0,0.4)', color: 'white' }}
+            className="no-theme-flip text-[3.4rem] font-black leading-[0.88] mb-6 lowercase first-letter:uppercase text-white"
+            style={{ letterSpacing: '-0.04em', textShadow: '0 2px 24px rgba(0,0,0,0.6), 0 8px 48px rgba(0,0,0,0.4)' }}
           >
             {plan.title_it}
           </motion.h1>
@@ -255,15 +257,14 @@ const PlanDetail = () => {
                 onClick={() => setIsRainMode(v => !v)}
                 className={`h-10 px-5 rounded-full flex items-center gap-2 border font-black text-[8px] uppercase tracking-[0.2em] transition-all duration-500 ${
                   isRainMode
-                    ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/25'
-                    : 'bg-white/15 border-white/20 backdrop-blur-md'
+                    ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/25 text-white'
+                    : 'bg-white/15 border-white/20 backdrop-blur-md text-white'
                 }`}
-                style={{ color: 'white' }}
               >
                 <AnimatePresence mode="wait">
                   {isRainMode
-                    ? <motion.span key="r" initial={{ opacity:0, rotate:-90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><CloudRain size={15} weight="duotone" style={{ color: 'white' }} /></motion.span>
-                    : <motion.span key="s" initial={{ opacity:0, rotate:90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><Sun size={15} weight="duotone" style={{ color: 'white' }} /></motion.span>
+                    ? <motion.span key="r" initial={{ opacity:0, rotate:-90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><CloudRain size={15} weight="duotone" className="text-white" /></motion.span>
+                    : <motion.span key="s" initial={{ opacity:0, rotate:90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><Sun size={15} weight="duotone" className="text-white" /></motion.span>
                   }
                 </AnimatePresence>
                 {isRainMode ? 'Piano B' : 'Meteo'}
@@ -285,12 +286,11 @@ const PlanDetail = () => {
                       <Clock
                         size={18}
                         weight="duotone"
-                        style={{ color: 'white' }}
+                        className="text-white"
                       />
                     </div>
                     <span
-                      className="text-[7px] font-black uppercase tracking-widest"
-                      style={{ color: 'white', textShadow: '0 1px 4px rgba(0,0,0,0.4)' }}
+                      className="text-[7px] font-black uppercase tracking-widest text-zinc-400"
                     >{slot.time_label}</span>
                   </div>
 
@@ -349,7 +349,7 @@ const PlanDetail = () => {
                   <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-2">
                       <Sparkle size={16} weight="fill" className="text-orange-500" />
-                      <span className="text-[8.5px] font-black uppercase tracking-[0.4em] text-white/50">Radar Movida</span>
+                      <span className="text-[8.5px] font-black uppercase tracking-[0.4em] text-zinc-500">Radar Movida</span>
                     </div>
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/10 backdrop-blur-md">
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ boxShadow: '0 0 8px rgba(34,197,94,0.9)' }} />
@@ -357,8 +357,8 @@ const PlanDetail = () => {
                     </div>
                   </div>
 
-                  <p className="text-[8.5px] font-black uppercase tracking-[0.3em] text-white/40 mb-2 italic">Vibe Attuale</p>
-                  <h3 className="text-[2.6rem] font-black text-white leading-none mb-9 uppercase" style={{ letterSpacing: '-0.045em', textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>
+                  <p className="text-[8.5px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-2 italic">Vibe Attuale</p>
+                  <h3 className="text-[2.6rem] font-black text-white leading-none mb-9 uppercase" style={{ letterSpacing: '-0.045em' }}>
                     {vibeStatus}
                   </h3>
 
@@ -386,7 +386,7 @@ const PlanDetail = () => {
                     })}
                   </div>
 
-                  <p className="text-[8.5px] font-medium text-white/30 text-center uppercase tracking-[0.4em] leading-relaxed">
+                  <p className="text-[8.5px] font-medium text-zinc-500 text-center uppercase tracking-[0.4em] leading-relaxed">
                     Resident Puglia Network · Real-Time Tracking
                   </p>
                 </div>
