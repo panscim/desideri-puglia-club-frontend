@@ -1,0 +1,8 @@
+{
+  "name": "desideri-puglia-club-root",
+  "private": true,
+  "scripts": {
+    "vercel-install": "cd frontend && npm install",
+    "vercel-build": "cd frontend && npm run build"
+  }
+}
