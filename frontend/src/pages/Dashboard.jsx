@@ -20,6 +20,7 @@ import {
   ArrowRight,
   MapTrifold,
   NavigationArrow,
+  MapPin,
   X
 } from '@phosphor-icons/react';
 

@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desideri di Puglia — Design System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   ROOT TOKENS
+============================================================ */
+:root {
+  /* BRAND COLORS */
+  --c-sand-50:  #FDFAF4;
+  --c-sand-100: #F5EFE0;
+  --c-sand-200: #EAE0CC;
+  --c-sand-300: #D9CDB5;
+  --c-sand-400: #BFB09A;
+
+  --c-teal-50:  #E0F4F2;
+  --c-teal-100: #B2E4DF;
+  --c-teal-200: #4DB6AC;
+  --c-teal-300: #2A9D8F;
+  --c-teal-400: #1A7A6E;
+
+  --c-terra-50:  #FDEEE9;
+  --c-terra-100: #FACCBC;
+  --c-terra-200: #F09070;
+  --c-terra-300: #E07A5F;
+  --c-terra-400: #C85C3E;
+  --c-terra-500: #A8421F;
+
+  --c-navy-50:  #EEF1F8;
+  --c-navy-100: #C8D2E8;
+  --c-navy-200: #7A91C0;
+  --c-navy-300: #2C3E6B;
+  --c-navy-400: #1A2744;
+  --c-navy-500: #0D1628;
+
+  --c-gold-50:  #FFF8E7;
+  --c-gold-100: #FFE9A0;
+  --c-gold-200: #F7C94B;
+  --c-gold-300: #F2A541;
+  --c-gold-400: #D4840A;
+
+  --c-purple-50:  #F0EBF8;
+  --c-purple-100: #D4C4ED;
+  --c-purple-200: #A882D4;
+  --c-purple-300: #7B5EA7;
+  --c-purple-400: #5A3E82;
+
+  /* SEMANTIC ALIASES */
+  --bg-app:      var(--c-sand-50);
+  --bg-surface:  #FFFFFF;
+  --bg-subtle:   var(--c-sand-100);
+  --bg-muted:    var(--c-sand-200);
+
+  --text-primary:   var(--c-navy-400);
+  --text-secondary: #4A5568;
+  --text-tertiary:  #8A95A8;
+  --text-disabled:  #BCC5D3;
+  --text-on-dark:   #FFFFFF;
+  --text-on-accent: #FFFFFF;
+
+  --accent-primary:   var(--c-terra-300);
+  --accent-hover:     var(--c-terra-400);
+  --accent-subtle:    var(--c-terra-50);
+  --accent-secondary: var(--c-teal-300);
+  --accent-sec-hover: var(--c-teal-400);
+  --accent-sec-sub:   var(--c-teal-50);
+
+  --rarity-legendary: var(--c-gold-300);
+  --rarity-rare:      var(--c-purple-300);
+  --rarity-common:    var(--c-teal-300);
+
+  --border-subtle: var(--c-sand-200);
+  --border-mid:    var(--c-sand-300);
+  --border-strong: var(--c-navy-200);
+
+  --shadow-xs: 0 1px 3px rgba(26,39,68,0.06);
+  --shadow-sm: 0 2px 8px rgba(26,39,68,0.08);
+  --shadow-md: 0 8px 24px rgba(26,39,68,0.12);
+  --shadow-lg: 0 20px 48px rgba(26,39,68,0.16);
+  --shadow-xl: 0 40px 80px rgba(26,39,68,0.22);
+
+  /* TYPOGRAPHY */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+
+  --text-xs:   11px;
+  --text-sm:   13px;
+  --text-base: 15px;
+  --text-md:   17px;
+  --text-lg:   20px;
+  --text-xl:   24px;
+  --text-2xl:  28px;
+  --text-3xl:  34px;
+  --text-4xl:  44px;
+
+  --leading-tight:  1.15;
+  --leading-snug:   1.3;
+  --leading-normal: 1.5;
+  --leading-loose:  1.7;
+
+  --tracking-tight:  -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;
+  --tracking-wider:  0.08em;
+  --tracking-widest: 0.14em;
+
+  /* SPACING */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+
+  /* BORDER RADIUS */
+  --r-xs:   6px;
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   20px;
+  --r-2xl:  24px;
+  --r-3xl:  32px;
+  --r-full: 999px;
+
+  /* MOTION */
+  --dur-fast:   120ms;
+  --dur-base:   200ms;
+  --dur-slow:   350ms;
+  --dur-slower: 500ms;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  --ease-out:    cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* ============================================================
+   RESET & BASE
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background: #1A2744;
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   DS SHELL
+============================================================ */
+.ds-sidebar {
+  position: fixed;
+  left: 0; top: 0; bottom: 0;
+  width: 220px;
+  background: var(--c-navy-500);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  overflow-y: auto;
+  z-index: 100;
+  padding: 32px 0 40px;
+}
+.ds-sidebar::-webkit-scrollbar { display:none; }
+
+.ds-logo {
+  padding: 0 24px 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 20px;
+}
+.ds-logo-name {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+}
+.ds-logo-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-top: 3px;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+.ds-nav-section {
+  padding: 0 14px;
+  margin-bottom: 8px;
+}
+.ds-nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  padding: 0 10px;
+  margin-bottom: 6px;
+}
+.ds-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--dur-base) var(--ease-smooth);
+}
+.ds-nav-item:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.85); }
+.ds-nav-item.active { background: rgba(224,122,95,0.2); color: var(--c-terra-200); }
+.ds-nav-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+.ds-main {
+  margin-left: 220px;
+  background: var(--bg-app);
+  min-height: 100vh;
+}
+
+.ds-section {
+  padding: var(--sp-12) var(--sp-10);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.ds-section:last-child { border-bottom: none; }
+
+.section-header {
+  margin-bottom: var(--sp-8);
+}
+.section-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--accent-primary);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  margin-bottom: var(--sp-2);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  margin-bottom: var(--sp-3);
+}
+.section-desc {
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: var(--leading-loose);
+  max-width: 600px;
+}
+
+/* ============================================================
+   COLOR SECTION
+============================================================ */
+.color-palettes { display: flex; flex-direction: column; gap: var(--sp-8); }
+
+.palette-group-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  margin-bottom: var(--sp-4);
+}
+
+.swatch-row { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.swatch-chip {
+  width: 80px; height: 56px;
+  border-radius: var(--r-lg);
+  position: relative;
+  transition: transform var(--dur-base) var(--ease-spring);
+  cursor: pointer;
+}
+.swatch-chip:hover { transform: scale(1.08) translateY(-2px); }
+.swatch-name { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+.swatch-hex  { font-family: var(--font-mono); font-size: 10px; color: var(--text-tertiary); }
+
+.semantic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--sp-4); }
+.semantic-chip {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+.semantic-preview {
+  height: 48px;
+}
+.semantic-info { padding: var(--sp-3) var(--sp-4); background: var(--bg-surface); }
+.semantic-token { font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); margin-bottom: 2px; }
+.semantic-label { font-size: 12px; color: var(--text-secondary); }
+
+/* ============================================================
+   TYPOGRAPHY
+============================================================ */
+.type-specimen { display: flex; flex-direction: column; gap: var(--sp-8); }
+
+.type-row {
+  display: grid;
+  grid-template-columns: 180px 1fr auto;
+  align-items: baseline;
+  gap: var(--sp-6);
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.type-meta { }
+.type-token { font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); margin-bottom: 4px; }
+.type-specs { font-size: 11px; color: var(--text-tertiary); line-height: 1.6; }
+.type-preview { flex: 1; }
+.type-family-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--r-full);
+  letter-spacing: var(--tracking-wide);
+}
+.tag-display { background: var(--c-terra-50); color: var(--c-terra-400); }
+.tag-body    { background: var(--c-teal-50); color: var(--c-teal-400); }
+.tag-mono    { background: var(--c-navy-50); color: var(--c-navy-300); }
+
+/* ============================================================
+   SPACING
+============================================================ */
+.spacing-grid { display: flex; flex-direction: column; gap: var(--sp-3); }
+.spacing-row {
+  display: grid;
+  grid-template-columns: 80px 120px 1fr;
+  align-items: center;
+  gap: var(--sp-6);
+}
+.spacing-token { font-family: var(--font-mono); font-size: 12px; color: var(--accent-primary); }
+.spacing-val   { font-size: 12px; color: var(--text-tertiary); }
+.spacing-bar   { height: 8px; background: var(--c-terra-200); border-radius: var(--r-full); opacity: 0.7; }
+
+/* ============================================================
+   RADIUS
+============================================================ */
+.radius-grid { display: flex; gap: var(--sp-6); flex-wrap: wrap; align-items: flex-end; }
+.radius-item { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.radius-box {
+  background: var(--c-teal-50);
+  border: 2px solid var(--c-teal-200);
+  width: 64px; height: 64px;
+}
+.radius-token { font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); }
+.radius-val   { font-size: 11px; color: var(--text-tertiary); }
+
+/* ============================================================
+   SHADOWS
+============================================================ */
+.shadow-grid { display: flex; gap: var(--sp-6); flex-wrap: wrap; align-items: flex-end; }
+.shadow-item {
+  display: flex; flex-direction: column;
+  align-items: center; gap: var(--sp-4);
+}
+.shadow-box {
+  width: 80px; height: 80px;
+  border-radius: var(--r-xl);
+  background: var(--bg-surface);
+}
+.shadow-token { font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); }
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+.component-grid { display: flex; flex-wrap: wrap; gap: var(--sp-6); align-items: flex-start; }
+.component-row  { display: flex; flex-wrap: wrap; gap: var(--sp-4); align-items: center; }
+.component-col  { display: flex; flex-direction: column; gap: var(--sp-3); }
+
+/* BTN BASE */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: var(--tracking-normal);
+  transition:
+    background var(--dur-base) var(--ease-smooth),
+    transform  var(--dur-fast) var(--ease-spring),
+    box-shadow var(--dur-base) var(--ease-smooth);
+  outline: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.btn:active { transform: scale(0.96); }
+
+/* Sizes */
+.btn-sm   { height: 36px; padding: 0 var(--sp-4); font-size: var(--text-sm); border-radius: var(--r-md); }
+.btn-md   { height: 44px; padding: 0 var(--sp-5); font-size: var(--text-base); border-radius: var(--r-lg); }
+.btn-lg   { height: 54px; padding: 0 var(--sp-8); font-size: var(--text-md); border-radius: var(--r-xl); }
+.btn-full { width: 100%; }
+
+/* Variants */
+.btn-primary {
+  background: var(--c-terra-300);
+  color: white;
+  box-shadow: 0 4px 16px rgba(224,122,95,0.38);
+}
+.btn-primary:hover {
+  background: var(--c-terra-400);
+  box-shadow: 0 6px 20px rgba(224,122,95,0.48);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--c-teal-300);
+  color: white;
+  box-shadow: 0 4px 14px rgba(42,157,143,0.35);
+}
+.btn-secondary:hover {
+  background: var(--c-teal-400);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1.5px solid var(--border-mid);
+}
+.btn-ghost:hover { background: var(--bg-subtle); border-color: var(--border-strong); }
+
+.btn-dark {
+  background: var(--c-navy-400);
+  color: white;
+}
+.btn-dark:hover { background: var(--c-navy-500); transform: translateY(-1px); }
+
+.btn-danger {
+  background: transparent;
+  color: var(--c-terra-400);
+  border: 1.5px solid var(--c-terra-100);
+}
+.btn-danger:hover { background: var(--c-terra-50); }
+
+.btn-disabled {
+  background: var(--bg-muted) !important;
+  color: var(--text-disabled) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Icon btn */
+.btn-icon {
+  width: 44px; height: 44px;
+  padding: 0; border-radius: var(--r-lg);
+  font-size: 18px;
+}
+.btn-icon.sm { width: 36px; height: 36px; border-radius: var(--r-md); font-size: 15px; }
+.btn-icon.lg { width: 54px; height: 54px; border-radius: var(--r-xl); font-size: 22px; }
+
+/* ============================================================
+   BADGES & CHIPS
+============================================================ */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: var(--r-full);
+  padding: 3px 10px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+.badge-legendary { background: var(--c-gold-100); color: var(--c-gold-400); }
+.badge-rare      { background: var(--c-purple-50); color: var(--c-purple-400); }
+.badge-common    { background: var(--c-teal-50);   color: var(--c-teal-400); }
+.badge-new       { background: var(--c-terra-50);  color: var(--c-terra-400); }
+.badge-partner   { background: var(--c-navy-50);   color: var(--c-navy-300); }
+.badge-free      { background: #E8F5E9; color: #2E7D32; }
+.badge-premium   { background: var(--c-gold-50);   color: var(--c-gold-400); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: var(--r-lg);
+  padding: 6px 12px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-base) var(--ease-smooth);
+  border: 1.5px solid transparent;
+}
+.chip-default { background: var(--bg-subtle); color: var(--text-secondary); border-color: var(--border-subtle); }
+.chip-default:hover { border-color: var(--border-strong); }
+.chip-active  { background: var(--c-navy-400); color: white; }
+
+/* ============================================================
+   CARDS
+============================================================ */
+.card {
+  background: var(--bg-surface);
+  border-radius: var(--r-2xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--dur-base) var(--ease-smooth), box-shadow var(--dur-base) var(--ease-smooth);
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+/* Collectable card */
+.card-collect { width: 160px; cursor: pointer; }
+.card-collect-img {
+  height: 120px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; position: relative;
+}
+.card-collect-body { padding: 10px 12px 14px; }
+.card-collect-name { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; line-height: 1.3; }
+.card-collect-meta { font-size: 11px; color: var(--text-tertiary); }
+.rarity-pin {
+  position: absolute; top: 8px; right: 8px;
+  border-radius: var(--r-sm);
+  padding: 3px 7px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.rp-legendary { background: var(--c-gold-300); color: #4A3000; }
+.rp-rare      { background: var(--c-purple-300); color: white; }
+.rp-common    { background: var(--c-teal-300); color: white; }
+
+/* Quest card */
+.card-quest { width: 280px; cursor: pointer; }
+.card-quest-img {
+  height: 140px;
+  display: flex; flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--sp-4);
+  position: relative; overflow: hidden;
+}
+.card-quest-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,20,40,0.75) 0%, transparent 55%);
+}
+.card-quest-title {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700;
+  color: white; position: relative; z-index: 1;
+  line-height: var(--leading-snug);
+}
+.card-quest-body { padding: var(--sp-4); }
+.card-quest-meta { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-bottom: var(--sp-3); }
+.cqm { font-size: var(--text-sm); color: var(--text-secondary); display: flex; align-items: center; gap: 3px; }
+.card-quest-rewards { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
+.reward-pip {
+  display: flex; align-items: center; gap: 4px;
+  background: var(--bg-subtle);
+  border-radius: var(--r-md);
+  padding: 4px 9px;
+  font-size: 11px; font-weight: 600; color: var(--text-primary);
+}
+
+/* Partner card */
+.card-partner { width: 200px; }
+.card-partner-header {
+  height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
+}
+.card-partner-body { padding: var(--sp-4); }
+.card-partner-name { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+.card-partner-type { font-size: 12px; color: var(--text-tertiary); margin-bottom: var(--sp-3); }
+.card-partner-offer {
+  background: var(--c-teal-50);
+  border-radius: var(--r-md);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: 12px; font-weight: 600; color: var(--c-teal-400);
+}
+
+/* ============================================================
+   INPUTS
+============================================================ */
+.input-group { display: flex; flex-direction: column; gap: var(--sp-2); }
+.input-label { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); }
+.input-hint  { font-size: var(--text-xs); color: var(--text-tertiary); }
+.input-error-msg { font-size: var(--text-xs); color: var(--c-terra-400); }
+
+.input {
+  height: 48px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--r-lg);
+  padding: 0 var(--sp-4);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color var(--dur-base) var(--ease-smooth), box-shadow var(--dur-base) var(--ease-smooth);
+  width: 100%;
+}
+.input::placeholder { color: var(--text-tertiary); }
+.input:focus {
+  border-color: var(--c-terra-300);
+  box-shadow: 0 0 0 3px rgba(224,122,95,0.15);
+}
+.input.error {
+  border-color: var(--c-terra-300);
+  background: var(--c-terra-50);
+}
+.input.success {
+  border-color: var(--c-teal-300);
+}
+.input-with-icon { position: relative; }
+.input-with-icon .input { padding-left: 44px; }
+.input-icon {
+  position: absolute; left: 14px; top: 50%;
+  transform: translateY(-50%); font-size: 16px;
+  pointer-events: none;
+}
+
+/* Search input */
+.search-input {
+  height: 44px;
+  border-radius: var(--r-full);
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-subtle);
+  padding: 0 var(--sp-5) 0 44px;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  outline: none;
+  width: 100%;
+  transition: all var(--dur-base);
+}
+.search-input:focus { border-color: var(--c-terra-300); background: var(--bg-surface); box-shadow: 0 0 0 3px rgba(224,122,95,0.12); }
+
+/* ============================================================
+   PROGRESS
+============================================================ */
+.progress-track {
+  height: 8px; background: var(--bg-muted);
+  border-radius: var(--r-full); overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: var(--r-full);
+  transition: width var(--dur-slower) var(--ease-smooth);
+}
+.progress-fill.terra { background: linear-gradient(90deg, var(--c-terra-300), var(--c-terra-200)); }
+.progress-fill.teal  { background: linear-gradient(90deg, var(--c-teal-300), var(--c-teal-200)); }
+.progress-fill.gold  { background: linear-gradient(90deg, var(--c-gold-400), var(--c-gold-200)); }
+.progress-fill.navy  { background: var(--c-navy-400); }
+
+.progress-lg { height: 12px; }
+.progress-sm { height: 5px; }
+
+/* Circular progress */
+.circ-progress { position: relative; width: 72px; height: 72px; }
+.circ-progress svg { transform: rotate(-90deg); }
+.circ-track { fill: none; stroke: var(--bg-muted); stroke-width: 6; }
+.circ-fill  { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 0.6s var(--ease-smooth); }
+.circ-label {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.circ-num  { font-size: 16px; font-weight: 700; color: var(--text-primary); line-height: 1; }
+.circ-unit { font-size: 10px; color: var(--text-tertiary); }
+
+/* ============================================================
+   STREAK & XP
+============================================================ */
+.streak-widget {
+  display: flex; align-items: center; gap: var(--sp-3);
+  background: linear-gradient(135deg, #FF6B35, #E07A5F);
+  border-radius: var(--r-2xl); padding: var(--sp-4) var(--sp-5);
+  box-shadow: 0 6px 20px rgba(224,107,53,0.35);
+}
+.streak-flame { font-size: 32px; }
+.streak-body { flex: 1; }
+.streak-count { font-family: var(--font-display); font-size: 28px; font-weight: 900; color: white; line-height: 1; }
+.streak-label { font-size: 13px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+.streak-mini {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-surface);
+  border-radius: var(--r-lg); padding: 7px 12px;
+  box-shadow: var(--shadow-sm);
+}
+.streak-mini .flame { font-size: 16px; }
+.streak-mini .count { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+
+/* XP widget */
+.xp-bar-row { display: flex; align-items: center; gap: var(--sp-4); }
+.xp-icon { font-size: 22px; }
+.xp-info { flex: 1; }
+.xp-label { display: flex; justify-content: space-between; margin-bottom: var(--sp-2); }
+.xp-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.xp-vals  { font-size: 12px; color: var(--text-tertiary); font-family: var(--font-mono); }
+
+/* ============================================================
+   BOTTOM SHEET / TOAST
+============================================================ */
+.bottom-sheet-demo {
+  background: var(--bg-surface);
+  border-radius: var(--r-3xl) var(--r-3xl) 0 0;
+  padding: var(--sp-5) var(--sp-5) var(--sp-6);
+  box-shadow: 0 -8px 32px rgba(26,39,68,0.12);
+  max-width: 400px;
+}
+.bs-handle {
+  width: 36px; height: 4px;
+  background: var(--border-mid);
+  border-radius: var(--r-full);
+  margin: 0 auto var(--sp-5);
+}
+.bs-eyebrow { font-size: var(--text-xs); font-weight: 700; color: var(--accent-primary); text-transform: uppercase; letter-spacing: var(--tracking-wider); margin-bottom: 4px; }
+.bs-title { font-family: var(--font-display); font-size: var(--text-xl); font-weight: 700; color: var(--text-primary); margin-bottom: var(--sp-3); }
+.bs-meta-row { display: flex; gap: var(--sp-4); margin-bottom: var(--sp-4); }
+.bs-meta-item { font-size: var(--text-sm); color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+
+.toast {
+  display: flex; align-items: center; gap: var(--sp-3);
+  background: var(--c-navy-400); color: white;
+  border-radius: var(--r-xl);
+  padding: var(--sp-4) var(--sp-5);
+  box-shadow: var(--shadow-lg);
+  max-width: 340px;
+}
+.toast-icon { font-size: 22px; flex-shrink: 0; }
+.toast-body { flex: 1; }
+.toast-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+.toast-desc  { font-size: 12px; color: rgba(255,255,255,0.65); }
+.toast.success { background: var(--c-teal-300); }
+.toast.warning { background: var(--c-gold-300); color: #3A2800; }
+.toast.warning .toast-desc { color: rgba(58,40,0,0.65); }
+
+/* Unlock card */
+.unlock-card {
+  background: var(--bg-surface);
+  border-radius: var(--r-3xl);
+  padding: var(--sp-8) var(--sp-8) var(--sp-6);
+  text-align: center;
+  box-shadow: var(--shadow-xl);
+  max-width: 300px;
+}
+.unlock-emoji { font-size: 60px; display: block; margin-bottom: var(--sp-3); }
+.unlock-badge { display: inline-flex; align-items: center; gap: 4px; background: var(--c-gold-100); color: var(--c-gold-400); border-radius: var(--r-full); padding: 4px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-wider); margin-bottom: var(--sp-3); }
+.unlock-title { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 900; color: var(--text-primary); margin-bottom: var(--sp-2); line-height: var(--leading-snug); }
+.unlock-desc  { font-size: var(--text-sm); color: var(--text-secondary); line-height: var(--leading-normal); margin-bottom: var(--sp-5); }
+.unlock-pts   { display: flex; justify-content: center; gap: var(--sp-3); margin-bottom: var(--sp-5); }
+.unlock-pt    { background: var(--bg-subtle); border-radius: var(--r-md); padding: var(--sp-2) var(--sp-4); font-size: 13px; font-weight: 700; color: var(--text-primary); }
+
+/* ============================================================
+   MASCOTTE
+============================================================ */
+.mascotte-states { display: flex; gap: var(--sp-8); flex-wrap: wrap; align-items: flex-end; }
+.mascotte-state  { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.mascotte-label  { font-size: 12px; font-weight: 600; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--tracking-wider); }
+
+/* ============================================================
+   NAVIGATION COMPONENTS
+============================================================ */
+.bottom-nav-demo {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-subtle);
+  display: flex; justify-content: space-around;
+  padding: 10px 0 18px;
+  border-radius: 0 0 var(--r-2xl) var(--r-2xl);
+  max-width: 400px;
+}
+.nav-item-demo {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  cursor: pointer; padding: 8px 14px; border-radius: var(--r-md);
+  transition: all var(--dur-base) var(--ease-smooth);
+}
+.nav-item-demo.active { background: var(--c-terra-50); }
+.nav-icon-demo { font-size: 22px; }
+.nav-lbl-demo { font-size: 11px; font-weight: 500; color: var(--text-tertiary); }
+.nav-item-demo.active .nav-lbl-demo { color: var(--c-terra-300); font-weight: 700; }
+
+/* Quest progress mini */
+.quest-mini-bar {
+  background: var(--c-navy-400);
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 12px;
+  max-width: 400px;
+}
+.qmb-icon { font-size: 16px; }
+.qmb-text { flex: 1; font-size: 13px; color: rgba(255,255,255,0.8); font-weight: 500; }
+.qmb-track { width: 72px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; }
+.qmb-fill  { height: 100%; background: var(--c-terra-300); border-radius: 3px; width: 40%; }
+.qmb-count { font-size: 12px; color: rgba(255,255,255,0.65); font-weight: 600; }
+
+/* Map markers */
+.marker-showcase { display: flex; gap: var(--sp-8); align-items: flex-end; flex-wrap: wrap; }
+.marker-item { display: flex; flex-direction: column; align-items: center; gap: var(--sp-3); }
+.marker-wrap { display: flex; flex-direction: column; align-items: center; }
+.marker-pin {
+  width: 44px; height: 44px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-md);
+}
+.marker-pin.monument { background: var(--c-navy-400); }
+.marker-pin.quest    { background: var(--c-terra-300); }
+.marker-pin.partner  { background: var(--c-gold-300); }
+.marker-inner { transform: rotate(45deg); font-size: 20px; }
+.marker-shadow {
+  width: 14px; height: 6px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 50%; margin-top: 2px;
+}
+.marker-lbl { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+/* Tappa step */
+.step-list { display: flex; flex-direction: column; max-width: 380px; }
+.step-row { display: flex; gap: 0; }
+.step-left { display: flex; flex-direction: column; align-items: center; width: 44px; }
+.step-dot {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+  border: 2.5px solid transparent; font-weight: 700;
+}
+.step-dot.done    { background: var(--c-teal-300); color: white; border-color: var(--c-teal-300); }
+.step-dot.active  { background: white; color: var(--c-terra-300); border-color: var(--c-terra-300); box-shadow: 0 0 0 4px rgba(224,122,95,0.18); }
+.step-dot.locked  { background: var(--bg-subtle); color: var(--text-tertiary); border-color: var(--border-subtle); }
+.step-connector { width: 2px; flex: 1; min-height: 24px; margin: 2px 0; }
+.step-connector.done   { background: var(--c-teal-300); }
+.step-connector.locked { background: var(--border-subtle); }
+.step-body { flex: 1; padding: 5px 0 18px 14px; }
+.step-name { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+.step-name.active { color: var(--c-terra-300); }
+.step-name.locked { color: var(--text-tertiary); }
+.step-sub  { font-size: 12px; color: var(--text-secondary); }
+
+/* ============================================================
+   MOTION TOKENS DISPLAY
+============================================================ */
+.motion-grid { display: flex; gap: var(--sp-6); flex-wrap: wrap; }
+.motion-item {
+  display: flex; flex-direction: column; align-items: center; gap: var(--sp-3);
+  cursor: pointer;
+}
+.motion-box {
+  width: 72px; height: 72px;
+  background: var(--c-terra-50);
+  border: 2px solid var(--c-terra-200);
+  border-radius: var(--r-xl);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  transition: transform 0.2s var(--ease-spring);
+}
+.motion-item:hover .motion-box { transform: scale(1.15) translateY(-4px); }
+.motion-token { font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); }
+.motion-val   { font-size: 11px; color: var(--text-tertiary); text-align: center; }
+
+/* ============================================================
+   UTILITIES / LAYOUT HELPERS (docs)
+============================================================ */
+.row   { display: flex; flex-wrap: wrap; }
+.col   { display: flex; flex-direction: column; }
+.gap-2 { gap: var(--sp-2); }
+.gap-3 { gap: var(--sp-3); }
+.gap-4 { gap: var(--sp-4); }
+.gap-6 { gap: var(--sp-6); }
+.gap-8 { gap: var(--sp-8); }
+
+.divider { height: 1px; background: var(--border-subtle); margin: var(--sp-8) 0; }
+.divider-sm { height: 1px; background: var(--border-subtle); margin: var(--sp-4) 0; }
+
+/* Code token display */
+.token-table { width: 100%; border-collapse: collapse; }
+.token-table th {
+  font-size: 11px; font-weight: 700; color: var(--text-tertiary);
+  text-transform: uppercase; letter-spacing: var(--tracking-wider);
+  text-align: left; padding: var(--sp-3) var(--sp-4);
+  border-bottom: 2px solid var(--border-mid);
+}
+.token-table td { padding: var(--sp-3) var(--sp-4); border-bottom: 1px solid var(--border-subtle); vertical-align: middle; }
+.token-table tr:last-child td { border-bottom: none; }
+.token-name  { font-family: var(--font-mono); font-size: 12px; color: var(--accent-primary); }
+.token-value { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+.token-role  { font-size: 12px; color: var(--text-secondary); }
+.token-preview { width: 32px; height: 32px; border-radius: var(--r-md); }
+
+/* Section tabs */
+.section-tab-bar {
+  position: sticky; top: 0; z-index: 30;
+  background: rgba(251,247,240,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 var(--sp-10);
+  display: flex; gap: 0;
+}
+.stab {
+  padding: var(--sp-4) var(--sp-5);
+  font-size: var(--text-sm); font-weight: 600;
+  color: var(--text-tertiary);
+  cursor: pointer; border-bottom: 2px solid transparent;
+  transition: all var(--dur-base); white-space: nowrap;
+  text-decoration: none;
+  display: block;
+}
+.stab:hover { color: var(--text-primary); }
+.stab.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+
+/* ============================================================
+   SCROLLBAR STYLING
+============================================================ */
+.ds-main::-webkit-scrollbar { width: 6px; }
+.ds-main::-webkit-scrollbar-track { background: transparent; }
+.ds-main::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 3px; }
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ds-section { animation: fadeUp 0.4s var(--ease-out) both; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     SIDEBAR
+═══════════════════════════════════════ -->
+<nav class="ds-sidebar">
+  <div class="ds-logo">
+    <div class="ds-logo-name">Desideri<br>di Puglia</div>
+    <div class="ds-logo-sub">Design System v1.0</div>
+  </div>
+
+  <div class="ds-nav-section">
+    <div class="ds-nav-label">Fondamenta</div>
+    <a class="ds-nav-item active" href="#colors"><span class="ds-nav-dot"></span>Colori</a>
+    <a class="ds-nav-item" href="#typography"><span class="ds-nav-dot"></span>Tipografia</a>
+    <a class="ds-nav-item" href="#spacing"><span class="ds-nav-dot"></span>Spacing & Layout</a>
+    <a class="ds-nav-item" href="#motion"><span class="ds-nav-dot"></span>Motion</a>
+  </div>
+
+  <div class="ds-nav-section">
+    <div class="ds-nav-label">Componenti</div>
+    <a class="ds-nav-item" href="#buttons"><span class="ds-nav-dot"></span>Bottoni</a>
+    <a class="ds-nav-item" href="#badges"><span class="ds-nav-dot"></span>Badge & Chip</a>
+    <a class="ds-nav-item" href="#cards"><span class="ds-nav-dot"></span>Card</a>
+    <a class="ds-nav-item" href="#inputs"><span class="ds-nav-dot"></span>Input & Form</a>
+    <a class="ds-nav-item" href="#progress"><span class="ds-nav-dot"></span>Progress</a>
+    <a class="ds-nav-item" href="#feedback"><span class="ds-nav-dot"></span>Feedback & Toast</a>
+  </div>
+
+  <div class="ds-nav-section">
+    <div class="ds-nav-label">Pattern</div>
+    <a class="ds-nav-item" href="#navigation"><span class="ds-nav-dot"></span>Navigazione</a>
+    <a class="ds-nav-item" href="#map-components"><span class="ds-nav-dot"></span>Mappa</a>
+    <a class="ds-nav-item" href="#gamification"><span class="ds-nav-dot"></span>Gamification</a>
+    <a class="ds-nav-item" href="#mascotte"><span class="ds-nav-dot"></span>Mascotte</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════ -->
+<main class="ds-main">
+
+<!-- ─── HERO ─── -->
+<div style="background: linear-gradient(135deg, #0D1628 0%, #1A2744 50%, #2A3A6A 100%); padding: 64px 40px 56px; position: relative; overflow: hidden;">
+  <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);background-size:32px 32px;opacity:0.5;"></div>
+  <div style="position:relative;z-index:1;">
+    <div style="font-size:11px;font-weight:700;color:var(--c-terra-200);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:14px;">Design System</div>
+    <div style="font-family:var(--font-display);font-size:52px;font-weight:900;color:white;line-height:1.05;letter-spacing:-0.02em;margin-bottom:16px;">Desideri<br><span style="color:var(--c-terra-200);">di Puglia</span></div>
+    <div style="font-size:16px;color:rgba(255,255,255,0.6);max-width:520px;line-height:1.6;margin-bottom:32px;">Il sistema di design dell'app turistica gamificata della Puglia. Ogni token, componente e pattern in un unico documento di riferimento.</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <div style="background:rgba(255,255,255,0.1);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.8);">v1.0.0</div>
+      <div style="background:rgba(224,122,95,0.25);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--c-terra-200);">2 Font families</div>
+      <div style="background:rgba(42,157,143,0.25);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--c-teal-200);">5 Palette · 25 token</div>
+      <div style="background:rgba(242,165,65,0.2);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--c-gold-200);">3 Rarità</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── COLORS ─── -->
+<section class="ds-section" id="colors">
+  <div class="section-header">
+    <div class="section-eyebrow">Fondamenta</div>
+    <div class="section-title">Colori</div>
+    <div class="section-desc">La palette è ispirata al paesaggio pugliese: la sabbia delle coste, il turchese del mare, la terracotta delle masserie, il blu notte del cielo. Ogni tono ha un'identità semantica precisa nell'interfaccia.</div>
+  </div>
+
+  <div class="color-palettes">
+
+    <!-- Sabbia -->
+    <div>
+      <div class="palette-group-title">Sabbia — Sfondi & Superfici</div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-chip" style="background:#FDFAF4;border:1px solid #EAE0CC;"></div><div class="swatch-name">sand-50</div><div class="swatch-hex">#FDFAF4</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#F5EFE0;"></div><div class="swatch-name">sand-100</div><div class="swatch-hex">#F5EFE0</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#EAE0CC;"></div><div class="swatch-name">sand-200</div><div class="swatch-hex">#EAE0CC</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#D9CDB5;"></div><div class="swatch-name">sand-300</div><div class="swatch-hex">#D9CDB5</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#BFB09A;"></div><div class="swatch-name">sand-400</div><div class="swatch-hex">#BFB09A</div></div>
+      </div>
+    </div>
+
+    <!-- Terracotta -->
+    <div>
+      <div class="palette-group-title">Terracotta — CTA, Accenti Primari, Stati Attivi</div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-chip" style="background:#FDEEE9;border:1px solid #FACCBC;"></div><div class="swatch-name">terra-50</div><div class="swatch-hex">#FDEEE9</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#FACCBC;"></div><div class="swatch-name">terra-100</div><div class="swatch-hex">#FACCBC</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#F09070;"></div><div class="swatch-name">terra-200</div><div class="swatch-hex">#F09070</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#E07A5F;"></div><div class="swatch-name">terra-300 ★</div><div class="swatch-hex">#E07A5F</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#C85C3E;"></div><div class="swatch-name">terra-400</div><div class="swatch-hex">#C85C3E</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#A8421F;"></div><div class="swatch-name">terra-500</div><div class="swatch-hex">#A8421F</div></div>
+      </div>
+    </div>
+
+    <!-- Teal -->
+    <div>
+      <div class="palette-group-title">Turchese — Accenti Secondari, Success, Teal Map</div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-chip" style="background:#E0F4F2;border:1px solid #B2E4DF;"></div><div class="swatch-name">teal-50</div><div class="swatch-hex">#E0F4F2</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#B2E4DF;"></div><div class="swatch-name">teal-100</div><div class="swatch-hex">#B2E4DF</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#4DB6AC;"></div><div class="swatch-name">teal-200</div><div class="swatch-hex">#4DB6AC</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#2A9D8F;"></div><div class="swatch-name">teal-300 ★</div><div class="swatch-hex">#2A9D8F</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#1A7A6E;"></div><div class="swatch-name">teal-400</div><div class="swatch-hex">#1A7A6E</div></div>
+      </div>
+    </div>
+
+    <!-- Navy -->
+    <div>
+      <div class="palette-group-title">Navy — Testi, Navbar, Sfondi Scuri</div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-chip" style="background:#EEF1F8;border:1px solid #C8D2E8;"></div><div class="swatch-name">navy-50</div><div class="swatch-hex">#EEF1F8</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#C8D2E8;"></div><div class="swatch-name">navy-100</div><div class="swatch-hex">#C8D2E8</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#7A91C0;"></div><div class="swatch-name">navy-200</div><div class="swatch-hex">#7A91C0</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#2C3E6B;"></div><div class="swatch-name">navy-300</div><div class="swatch-hex">#2C3E6B</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#1A2744;"></div><div class="swatch-name">navy-400 ★</div><div class="swatch-hex">#1A2744</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#0D1628;"></div><div class="swatch-name">navy-500</div><div class="swatch-hex">#0D1628</div></div>
+      </div>
+    </div>
+
+    <!-- Gold + Purple -->
+    <div>
+      <div class="palette-group-title">Oro & Viola — Rarità Leggendaria / Rara</div>
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-chip" style="background:#FFF8E7;border:1px solid #FFE9A0;"></div><div class="swatch-name">gold-50</div><div class="swatch-hex">#FFF8E7</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#F7C94B;"></div><div class="swatch-name">gold-200</div><div class="swatch-hex">#F7C94B</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#F2A541;"></div><div class="swatch-name">gold-300 ★</div><div class="swatch-hex">#F2A541</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#D4840A;"></div><div class="swatch-name">gold-400</div><div class="swatch-hex">#D4840A</div></div>
+        <div style="width:24px;"></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#F0EBF8;border:1px solid #D4C4ED;"></div><div class="swatch-name">purple-50</div><div class="swatch-hex">#F0EBF8</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#A882D4;"></div><div class="swatch-name">purple-200</div><div class="swatch-hex">#A882D4</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#7B5EA7;"></div><div class="swatch-name">purple-300 ★</div><div class="swatch-hex">#7B5EA7</div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#5A3E82;"></div><div class="swatch-name">purple-400</div><div class="swatch-hex">#5A3E82</div></div>
+      </div>
+    </div>
+
+    <!-- Semantic tokens table -->
+    <div>
+      <div class="palette-group-title">Token Semantici</div>
+      <table class="token-table">
+        <thead><tr><th>Token</th><th>Valore</th><th>Colore</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td class="token-name">--bg-app</td><td class="token-value">sand-50</td><td><div class="token-preview" style="background:#FDFAF4;border:1px solid #EAE0CC;"></div></td><td class="token-role">Sfondo principale dell'app</td></tr>
+          <tr><td class="token-name">--bg-surface</td><td class="token-value">#FFFFFF</td><td><div class="token-preview" style="background:#FFFFFF;border:1px solid #EAE0CC;"></div></td><td class="token-role">Card, modal, bottom sheet</td></tr>
+          <tr><td class="token-name">--bg-subtle</td><td class="token-value">sand-100</td><td><div class="token-preview" style="background:#F5EFE0;"></div></td><td class="token-role">Chip, input background, sezioni</td></tr>
+          <tr><td class="token-name">--accent-primary</td><td class="token-value">terra-300</td><td><div class="token-preview" style="background:#E07A5F;"></div></td><td class="token-role">Bottone primario, CTA, nav attivo</td></tr>
+          <tr><td class="token-name">--accent-secondary</td><td class="token-value">teal-300</td><td><div class="token-preview" style="background:#2A9D8F;"></div></td><td class="token-role">Bottone secondario, partner, success</td></tr>
+          <tr><td class="token-name">--text-primary</td><td class="token-value">navy-400</td><td><div class="token-preview" style="background:#1A2744;"></div></td><td class="token-role">Titoli, testo principale</td></tr>
+          <tr><td class="token-name">--rarity-legendary</td><td class="token-value">gold-300</td><td><div class="token-preview" style="background:#F2A541;"></div></td><td class="token-role">Badge card leggendarie</td></tr>
+          <tr><td class="token-name">--rarity-rare</td><td class="token-value">purple-300</td><td><div class="token-preview" style="background:#7B5EA7;"></div></td><td class="token-role">Badge card rare</td></tr>
+          <tr><td class="token-name">--rarity-common</td><td class="token-value">teal-300</td><td><div class="token-preview" style="background:#2A9D8F;"></div></td><td class="token-role">Badge card comuni</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── TYPOGRAPHY ─── -->
+<section class="ds-section" id="typography">
+  <div class="section-header">
+    <div class="section-eyebrow">Fondamenta</div>
+    <div class="section-title">Tipografia</div>
+    <div class="section-desc">Due famiglie: Playfair Display per i titoli evocativi e i momenti d'impatto; DM Sans per leggibilità massima all'aperto, anche sotto luce solare diretta. DM Mono per token e dati tecnici.</div>
+  </div>
+
+  <div style="display:flex;gap:var(--sp-4);flex-wrap:wrap;margin-bottom:var(--sp-8);">
+    <div style="background:var(--bg-surface);border-radius:var(--r-xl);padding:var(--sp-6) var(--sp-8);box-shadow:var(--shadow-sm);flex:1;min-width:240px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-tertiary);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--sp-4);">Display Font</div>
+      <div style="font-family:var(--font-display);font-size:36px;font-weight:900;color:var(--text-primary);line-height:1.1;">Playfair Display</div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:400;color:var(--text-secondary);margin-top:var(--sp-2);font-style:italic;">Titoli, hero, momenti d'impatto</div>
+      <div style="margin-top:var(--sp-4);font-size:12px;color:var(--text-tertiary);">Weights: 400 · 700 · 900 · 700 italic</div>
+    </div>
+    <div style="background:var(--bg-surface);border-radius:var(--r-xl);padding:var(--sp-6) var(--sp-8);box-shadow:var(--shadow-sm);flex:1;min-width:240px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-tertiary);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--sp-4);">Body Font</div>
+      <div style="font-family:var(--font-body);font-size:36px;font-weight:700;color:var(--text-primary);line-height:1.1;">DM Sans</div>
+      <div style="font-family:var(--font-body);font-size:18px;color:var(--text-secondary);margin-top:var(--sp-2);">Testo, bottoni, etichette</div>
+      <div style="margin-top:var(--sp-4);font-size:12px;color:var(--text-tertiary);">Weights: 300 · 400 · 500 · 600 · 700</div>
+    </div>
+    <div style="background:var(--bg-surface);border-radius:var(--r-xl);padding:var(--sp-6) var(--sp-8);box-shadow:var(--shadow-sm);flex:1;min-width:240px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-tertiary);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--sp-4);">Mono Font</div>
+      <div style="font-family:var(--font-mono);font-size:32px;font-weight:500;color:var(--text-primary);line-height:1.1;">DM Mono</div>
+      <div style="font-family:var(--font-mono);font-size:16px;color:var(--text-secondary);margin-top:var(--sp-2);">Token, dati, coordinate</div>
+      <div style="margin-top:var(--sp-4);font-size:12px;color:var(--text-tertiary);">Weights: 400 · 500</div>
+    </div>
+  </div>
+
+  <div class="type-specimen">
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-4xl / 44px</div><div class="type-specs">Playfair Display 900<br>Tracking −0.02em<br>Leading 1.15</div></div>
+      <div class="type-preview" style="font-family:var(--font-display);font-size:44px;font-weight:900;line-height:1.1;letter-spacing:-0.02em;color:var(--text-primary);">Lecce</div>
+      <span class="type-family-tag tag-display">Display</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-3xl / 34px</div><div class="type-specs">Playfair Display 700<br>Tracking −0.02em<br>Leading 1.15</div></div>
+      <div class="type-preview" style="font-family:var(--font-display);font-size:34px;font-weight:700;line-height:1.15;letter-spacing:-0.02em;color:var(--text-primary);">I Segreti di Lecce</div>
+      <span class="type-family-tag tag-display">Display</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-2xl / 28px</div><div class="type-specs">Playfair Display 700<br>Tracking −0.01em<br>Leading 1.2</div></div>
+      <div class="type-preview" style="font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text-primary);">Basilica di Santa Croce</div>
+      <span class="type-family-tag tag-display">Display</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-xl / 24px</div><div class="type-specs">DM Sans 600<br>Tracking 0<br>Leading 1.3</div></div>
+      <div class="type-preview" style="font-size:24px;font-weight:600;color:var(--text-primary);">Il tuo Album</div>
+      <span class="type-family-tag tag-body">Body</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-lg / 20px</div><div class="type-specs">DM Sans 600<br>Tracking 0<br>Leading 1.3</div></div>
+      <div class="type-preview" style="font-size:20px;font-weight:600;color:var(--text-primary);">Quest consigliata</div>
+      <span class="type-family-tag tag-body">Body</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-md / 17px</div><div class="type-specs">DM Sans 600<br>Tracking 0<br>Leading 1.4</div></div>
+      <div class="type-preview" style="font-size:17px;font-weight:600;color:var(--text-primary);">Inizia percorso →</div>
+      <span class="type-family-tag tag-body">Body — Button</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-base / 15px</div><div class="type-specs">DM Sans 400<br>Tracking 0<br>Leading 1.65</div></div>
+      <div class="type-preview" style="font-size:15px;color:var(--text-secondary);line-height:1.65;max-width:480px;">La Basilica di Santa Croce è considerata il capolavoro del barocco leccese. La sua facciata racconta storie di santi e simboli cosmici in un tripudio di pietra dorata.</div>
+      <span class="type-family-tag tag-body">Body — Corpo</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-sm / 13px</div><div class="type-specs">DM Sans 500<br>Tracking 0<br>Leading 1.5</div></div>
+      <div class="type-preview" style="font-size:13px;font-weight:500;color:var(--text-secondary);">📍 Lecce · 45 min · 5 tappe</div>
+      <span class="type-family-tag tag-body">Body — Meta</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--text-xs / 11px</div><div class="type-specs">DM Sans 700<br>Tracking 0.08em<br>Uppercase</div></div>
+      <div class="type-preview" style="font-size:11px;font-weight:700;color:var(--accent-primary);letter-spacing:0.08em;text-transform:uppercase;">Quest Consigliata</div>
+      <span class="type-family-tag tag-body">Eyebrow / Label</span>
+    </div>
+    <div class="type-row">
+      <div class="type-meta"><div class="type-token">--font-mono</div><div class="type-specs">DM Mono 500<br>Tracking 0<br>Leading 1.5</div></div>
+      <div class="type-preview" style="font-family:var(--font-mono);font-size:13px;color:var(--accent-primary);">--c-terra-300 · #E07A5F · 200ms</div>
+      <span class="type-family-tag tag-mono">Mono</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SPACING & LAYOUT ─── -->
+<section class="ds-section" id="spacing">
+  <div class="section-header">
+    <div class="section-eyebrow">Fondamenta</div>
+    <div class="section-title">Spacing & Layout</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-12);">
+
+    <div>
+      <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Spacing Scale (base 4px)</div>
+      <div class="spacing-grid">
+        <div class="spacing-row"><span class="spacing-token">--sp-1</span><span class="spacing-val">4px</span><div class="spacing-bar" style="width:4px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-2</span><span class="spacing-val">8px</span><div class="spacing-bar" style="width:8px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-3</span><span class="spacing-val">12px</span><div class="spacing-bar" style="width:12px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-4</span><span class="spacing-val">16px</span><div class="spacing-bar" style="width:16px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-5</span><span class="spacing-val">20px</span><div class="spacing-bar" style="width:20px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-6</span><span class="spacing-val">24px</span><div class="spacing-bar" style="width:24px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-8</span><span class="spacing-val">32px</span><div class="spacing-bar" style="width:32px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-10</span><span class="spacing-val">40px</span><div class="spacing-bar" style="width:40px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-12</span><span class="spacing-val">48px</span><div class="spacing-bar" style="width:48px;"></div></div>
+        <div class="spacing-row"><span class="spacing-token">--sp-16</span><span class="spacing-val">64px</span><div class="spacing-bar" style="width:64px;"></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Border Radius</div>
+      <div class="radius-grid" style="margin-bottom:var(--sp-8);">
+        <div class="radius-item"><div class="radius-box" style="border-radius:6px;"></div><div class="radius-token">--r-xs</div><div class="radius-val">6px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:8px;"></div><div class="radius-token">--r-sm</div><div class="radius-val">8px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:12px;"></div><div class="radius-token">--r-md</div><div class="radius-val">12px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:16px;"></div><div class="radius-token">--r-lg</div><div class="radius-val">16px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:20px;"></div><div class="radius-token">--r-xl</div><div class="radius-val">20px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:32px;"></div><div class="radius-token">--r-3xl</div><div class="radius-val">32px</div></div>
+        <div class="radius-item"><div class="radius-box" style="border-radius:999px;width:80px;height:36px;"></div><div class="radius-token">--r-full</div><div class="radius-val">999px</div></div>
+      </div>
+
+      <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Shadows</div>
+      <div class="shadow-grid">
+        <div class="shadow-item"><div class="shadow-box" style="box-shadow:0 1px 3px rgba(26,39,68,0.06);"></div><div class="shadow-token">--shadow-xs</div></div>
+        <div class="shadow-item"><div class="shadow-box" style="box-shadow:0 2px 8px rgba(26,39,68,0.08);"></div><div class="shadow-token">--shadow-sm</div></div>
+        <div class="shadow-item"><div class="shadow-box" style="box-shadow:0 8px 24px rgba(26,39,68,0.12);"></div><div class="shadow-token">--shadow-md</div></div>
+        <div class="shadow-item"><div class="shadow-box" style="box-shadow:0 20px 48px rgba(26,39,68,0.16);"></div><div class="shadow-token">--shadow-lg</div></div>
+        <div class="shadow-item"><div class="shadow-box" style="box-shadow:0 40px 80px rgba(26,39,68,0.22);"></div><div class="shadow-token">--shadow-xl</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── MOTION ─── -->
+<section class="ds-section" id="motion">
+  <div class="section-header">
+    <div class="section-eyebrow">Fondamenta</div>
+    <div class="section-title">Motion</div>
+    <div class="section-desc">Le animazioni devono essere veloci e intenzionali. Nessun effetto decorativo gratuito: ogni motion comunica stato, feedback o gerarchia. Passa il mouse sui box per sentire le easing.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-12);">
+    <div>
+      <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Durate</div>
+      <table class="token-table">
+        <thead><tr><th>Token</th><th>Valore</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td class="token-name">--dur-fast</td><td class="token-value">120ms</td><td class="token-role">Hover, active press, icone</td></tr>
+          <tr><td class="token-name">--dur-base</td><td class="token-value">200ms</td><td class="token-role">Transizioni UI standard</td></tr>
+          <tr><td class="token-name">--dur-slow</td><td class="token-value">350ms</td><td class="token-role">Slide panel, overlay</td></tr>
+          <tr><td class="token-name">--dur-slower</td><td class="token-value">500ms</td><td class="token-role">Progress bar, animazioni XP</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Easing Curves</div>
+      <table class="token-table">
+        <thead><tr><th>Token</th><th>Curva</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td class="token-name">--ease-spring</td><td class="token-value">cubic-bezier(0.34,1.56,0.64,1)</td><td class="token-role">Sblocco card, bounce</td></tr>
+          <tr><td class="token-name">--ease-smooth</td><td class="token-value">cubic-bezier(0.4,0,0.2,1)</td><td class="token-role">Transizioni generali</td></tr>
+          <tr><td class="token-name">--ease-out</td><td class="token-value">cubic-bezier(0,0,0.2,1)</td><td class="token-role">Elementi in entrata</td></tr>
+          <tr><td class="token-name">--ease-in</td><td class="token-value">cubic-bezier(0.4,0,1,1)</td><td class="token-role">Elementi in uscita</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="margin-top:var(--sp-8);">
+    <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Micro-interazioni — Passa il mouse</div>
+    <div class="motion-grid">
+      <div class="motion-item"><div class="motion-box" style="transition:transform 120ms cubic-bezier(0.34,1.56,0.64,1);">🃏</div><div class="motion-token">ease-spring</div><div class="motion-val">Sblocco card<br>120ms</div></div>
+      <div class="motion-item"><div class="motion-box" style="transition:transform 200ms cubic-bezier(0.4,0,0.2,1);">🗺️</div><div class="motion-token">ease-smooth</div><div class="motion-val">Bottoni, chip<br>200ms</div></div>
+      <div class="motion-item"><div class="motion-box" style="transition:transform 350ms cubic-bezier(0,0,0.2,1);">📌</div><div class="motion-token">ease-out</div><div class="motion-val">Overlay slide<br>350ms</div></div>
+      <div class="motion-item"><div class="motion-box" style="transition:transform 500ms cubic-bezier(0.4,0,0.2,1);">⚡</div><div class="motion-token">ease-smooth</div><div class="motion-val">Progress bar<br>500ms</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── BUTTONS ─── -->
+<section class="ds-section" id="buttons">
+  <div class="section-header">
+    <div class="section-eyebrow">Componenti</div>
+    <div class="section-title">Bottoni</div>
+    <div class="section-desc">Ogni schermata ha una sola CTA primaria (terracotta). Le varianti secondarie e ghost sono usate solo per azioni supplementari. Regola: mai più di 1 primario + 2 secondari visibili contemporaneamente.</div>
+  </div>
+
+  <!-- Variants -->
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Varianti</div>
+  <div class="component-row" style="margin-bottom:var(--sp-8);">
+    <button class="btn btn-primary btn-md">Inizia percorso →</button>
+    <button class="btn btn-secondary btn-md">Sblocca card</button>
+    <button class="btn btn-ghost btn-md">Annulla</button>
+    <button class="btn btn-dark btn-md">Salva ricordo</button>
+    <button class="btn btn-danger btn-md">Elimina</button>
+    <button class="btn btn-primary btn-md btn-disabled">Non disponibile</button>
+  </div>
+
+  <!-- Sizes -->
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Dimensioni</div>
+  <div class="component-row" style="margin-bottom:var(--sp-8);">
+    <button class="btn btn-primary btn-sm">Piccolo</button>
+    <button class="btn btn-primary btn-md">Medio</button>
+    <button class="btn btn-primary btn-lg">Grande</button>
+  </div>
+
+  <!-- Full width -->
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Full Width (CTA principale)</div>
+  <div style="max-width:400px;margin-bottom:var(--sp-8);">
+    <button class="btn btn-primary btn-lg btn-full">Inizia percorso →</button>
+  </div>
+
+  <!-- Icon buttons -->
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Icon Button</div>
+  <div class="component-row">
+    <button class="btn btn-primary btn-icon sm">←</button>
+    <button class="btn btn-ghost btn-icon">🔍</button>
+    <button class="btn btn-dark btn-icon">🗺️</button>
+    <button class="btn btn-primary btn-icon">↗</button>
+    <button class="btn btn-secondary btn-icon lg">🃏</button>
+  </div>
+</section>
+
+<!-- ─── BADGES ─── -->
+<section class="ds-section" id="badges">
+  <div class="section-header">
+    <div class="section-eyebrow">Componenti</div>
+    <div class="section-title">Badge & Chip</div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Badge — Sistema Rarità & Stato</div>
+  <div class="component-row" style="margin-bottom:var(--sp-8);">
+    <span class="badge badge-legendary">✨ Leggendaria</span>
+    <span class="badge badge-rare">💜 Rara</span>
+    <span class="badge badge-common">🌊 Comune</span>
+    <span class="badge badge-new">🆕 Nuovo</span>
+    <span class="badge badge-partner">🤝 Partner</span>
+    <span class="badge badge-free">🟢 Gratuita</span>
+    <span class="badge badge-premium">⭐ Premium</span>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Chip — Filtri e Selezione</div>
+  <div class="component-row">
+    <button class="chip chip-active">🏛️ Monumenti</button>
+    <button class="chip chip-default">☕ Partner</button>
+    <button class="chip chip-default">⭐ Quest</button>
+    <button class="chip chip-default">🔒 Da sbloccare</button>
+    <button class="chip chip-default">📍 Lecce</button>
+    <button class="chip chip-default">⭐ Rare</button>
+  </div>
+</section>
+
+<!-- ─── CARDS ─── -->
+<section class="ds-section" id="cards">
+  <div class="section-header">
+    <div class="section-eyebrow">Componenti</div>
+    <div class="section-title">Card</div>
+    <div class="section-desc">Tre tipologie principali: card collezionabile (Album), card Quest (lista quest) e card Partner. Tutte con hover lift e azione chiara.</div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Card Collezionabile</div>
+  <div class="component-row" style="margin-bottom:var(--sp-8);flex-wrap:wrap;">
+    <div class="card card-collect">
+      <div class="card-collect-img" style="background:linear-gradient(135deg,#E65100,#FF8A50);">🏛️<div class="rarity-pin rp-legendary">✨ Leggendaria</div></div>
+      <div class="card-collect-body"><div class="card-collect-name">Basilica di Santa Croce</div><div class="card-collect-meta">📍 Lecce · 12 mar</div></div>
+    </div>
+    <div class="card card-collect">
+      <div class="card-collect-img" style="background:linear-gradient(135deg,#7B5EA7,#B39DDB);">🏰<div class="rarity-pin rp-rare">💜 Rara</div></div>
+      <div class="card-collect-body"><div class="card-collect-name">Castello Carlo V</div><div class="card-collect-meta">📍 Lecce · 12 mar</div></div>
+    </div>
+    <div class="card card-collect">
+      <div class="card-collect-img" style="background:linear-gradient(135deg,#2A9D8F,#4DB6AC);">🌊<div class="rarity-pin rp-common">🌊 Comune</div></div>
+      <div class="card-collect-body"><div class="card-collect-name">Grotta della Poesia</div><div class="card-collect-meta">📍 Roca · 5 mar</div></div>
+    </div>
+    <div class="card card-collect" style="opacity:0.55;filter:grayscale(0.4);">
+      <div class="card-collect-img" style="background:linear-gradient(135deg,#4A148C,#9C27B0);"><div style="position:absolute;inset:0;background:rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;font-size:28px;">🔒</div><div class="rarity-pin rp-legendary">✨ Leggendaria</div></div>
+      <div class="card-collect-body"><div class="card-collect-name">Castel del Monte</div><div class="card-collect-meta">📍 Andria · Tappa 4</div></div>
+    </div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Card Quest</div>
+  <div class="component-row" style="margin-bottom:var(--sp-8);">
+    <div class="card card-quest">
+      <div class="card-quest-img" style="background:linear-gradient(135deg,#0A1E3D,#2A7BA8);">
+        <div class="card-quest-overlay"></div>
+        <div style="position:absolute;top:10px;right:10px;z-index:1;"><span class="badge badge-free">🟢 Gratuita</span></div>
+        <div class="card-quest-title">I Segreti di Lecce</div>
+      </div>
+      <div class="card-quest-body">
+        <div class="card-quest-meta">
+          <span class="cqm">🚶 45 min</span>
+          <span class="cqm">📍 5 tappe</span>
+          <span class="cqm">🤝 2 partner</span>
+        </div>
+        <div class="card-quest-rewards">
+          <span class="reward-pip">🃏 3 card</span>
+          <span class="reward-pip">⚡ 80 XP</span>
+        </div>
+      </div>
+    </div>
+    <div class="card card-quest">
+      <div class="card-quest-img" style="background:linear-gradient(135deg,#4A148C,#880E4F);">
+        <div class="card-quest-overlay"></div>
+        <div style="position:absolute;top:10px;right:10px;z-index:1;"><span class="badge badge-premium">⭐ Premium</span></div>
+        <div class="card-quest-title">La Via dei Trulli</div>
+      </div>
+      <div class="card-quest-body">
+        <div class="card-quest-meta">
+          <span class="cqm">🚶 90 min</span>
+          <span class="cqm">📍 8 tappe</span>
+        </div>
+        <div class="card-quest-rewards">
+          <span class="reward-pip">🃏 5 card</span>
+          <span class="reward-pip">⚡ 150 XP</span>
+          <span class="reward-pip">✨ 1 leggendaria</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Card Partner</div>
+  <div class="component-row">
+    <div class="card card-partner">
+      <div class="card-partner-header" style="background:linear-gradient(135deg,#FFF3CD,#FFE082);">☕</div>
+      <div class="card-partner-body">
+        <div class="card-partner-name">Caffè Alvino</div>
+        <div class="card-partner-type">Bar storico · Lecce</div>
+        <div class="card-partner-offer">🤝 −10% su pasticciotto</div>
+      </div>
+    </div>
+    <div class="card card-partner">
+      <div class="card-partner-header" style="background:linear-gradient(135deg,#E0F4F2,#B2E4DF);">🍷</div>
+      <div class="card-partner-body">
+        <div class="card-partner-name">Cantina De Falco</div>
+        <div class="card-partner-type">Enoteca · Lecce</div>
+        <div class="card-partner-offer">🤝 Degustazione gratuita</div>
+      </div>
+    </div>
+    <div class="card card-partner">
+      <div class="card-partner-header" style="background:linear-gradient(135deg,#FDEEE9,#FACCBC);">🧆</div>
+      <div class="card-partner-body">
+        <div class="card-partner-name">Forno Tamma</div>
+        <div class="card-partner-type">Panificio · Alberobello</div>
+        <div class="card-partner-offer">🤝 1 focaccia in omaggio</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── INPUTS ─── -->
+<section class="ds-section" id="inputs">
+  <div class="section-header">
+    <div class="section-eyebrow">Componenti</div>
+    <div class="section-title">Input & Form</div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-8);max-width:700px;">
+    <div class="input-group">
+      <label class="input-label">Città di esplorazione</label>
+      <div class="input-with-icon"><span class="input-icon">📍</span><input class="input" placeholder="Es. Lecce, Bari..."></div>
+      <span class="input-hint">Puoi cambiare città in qualsiasi momento</span>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Note personali</label>
+      <input class="input success" value="Era sera, la luce sulla facciata...">
+      <span class="input-hint" style="color:var(--c-teal-300);">✓ Salvato</span>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Codice invito</label>
+      <input class="input error" value="PUGLIA-XXX">
+      <span class="input-error-msg">⚠️ Codice non valido</span>
+    </div>
+    <div class="input-group">
+      <label class="input-label">Cerca monumenti</label>
+      <div class="input-with-icon"><span class="input-icon">🔍</span><input class="search-input" placeholder="Cerca in mappa..." style="border-radius:var(--r-full);"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROGRESS ─── -->
+<section class="ds-section" id="progress">
+  <div class="section-header">
+    <div class="section-eyebrow">Componenti</div>
+    <div class="section-title">Progress & XP</div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Progress Bar</div>
+  <div style="max-width:500px;display:flex;flex-direction:column;gap:var(--sp-5);margin-bottom:var(--sp-8);">
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:var(--sp-2);"><span style="font-size:13px;font-weight:600;color:var(--text-primary);">I Segreti di Lecce</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary);">2/5 tappe</span></div>
+      <div class="progress-track progress-lg"><div class="progress-fill teal" style="width:40%;"></div></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:var(--sp-2);"><span style="font-size:13px;font-weight:600;color:var(--text-primary);">XP Livello 3</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary);">320/500 XP</span></div>
+      <div class="progress-track"><div class="progress-fill gold" style="width:64%;"></div></div>
+    </div>
+    <div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:var(--sp-2);"><span style="font-size:13px;font-weight:600;color:var(--text-primary);">Album completato</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--text-tertiary);">12/20 card</span></div>
+      <div class="progress-track progress-sm"><div class="progress-fill terra" style="width:60%;"></div></div>
+    </div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Circular Progress</div>
+  <div class="component-row" style="gap:var(--sp-8);margin-bottom:var(--sp-8);">
+    <div class="circ-progress">
+      <svg width="72" height="72" viewBox="0 0 72 72"><circle class="circ-track" cx="36" cy="36" r="30"/><circle class="circ-fill" cx="36" cy="36" r="30" stroke="#E07A5F" stroke-dasharray="188.5" stroke-dashoffset="113"/></svg>
+      <div class="circ-label"><span class="circ-num">40%</span><span class="circ-unit">Quest</span></div>
+    </div>
+    <div class="circ-progress">
+      <svg width="72" height="72" viewBox="0 0 72 72"><circle class="circ-track" cx="36" cy="36" r="30"/><circle class="circ-fill" cx="36" cy="36" r="30" stroke="#F2A541" stroke-dasharray="188.5" stroke-dashoffset="68"/></svg>
+      <div class="circ-label"><span class="circ-num">64%</span><span class="circ-unit">XP</span></div>
+    </div>
+    <div class="circ-progress">
+      <svg width="72" height="72" viewBox="0 0 72 72"><circle class="circ-track" cx="36" cy="36" r="30"/><circle class="circ-fill" cx="36" cy="36" r="30" stroke="#2A9D8F" stroke-dasharray="188.5" stroke-dashoffset="75"/></svg>
+      <div class="circ-label"><span class="circ-num">12</span><span class="circ-unit">card</span></div>
+    </div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Streak Widget</div>
+  <div class="component-row" style="align-items:center;">
+    <div class="streak-widget" style="max-width:260px;">
+      <span class="streak-flame">🔥</span>
+      <div class="streak-body">
+        <div class="streak-count">5</div>
+        <div class="streak-label">giorni consecutivi</div>
+      </div>
+    </div>
+    <div class="streak-mini">
+      <span class="flame">🔥</span>
+      <span class="count">5 giorni</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FEEDBACK ─── -->
+<section class="ds-section" id="feedback">
+  <div class="section-header">
+    <div class="section-eyebrow">Componenti</div>
+    <div class="section-title">Feedback & Toast</div>
+    <div class="section-desc">I momenti di feedback sono fondamentali nell'experience gamificata. Ogni azione rilevante riceve un riscontro visivo immediato: unlock card, completamento tappa, reward ottenuta.</div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Toast Notifications</div>
+  <div class="component-col" style="gap:var(--sp-3);max-width:380px;margin-bottom:var(--sp-8);">
+    <div class="toast"><span class="toast-icon">🃏</span><div class="toast-body"><div class="toast-title">Card sbloccata!</div><div class="toast-desc">Basilica di Santa Croce · +30 XP</div></div></div>
+    <div class="toast success"><span class="toast-icon">✓</span><div class="toast-body"><div class="toast-title">Tappa completata</div><div class="toast-desc">Stai progredendo nella quest</div></div></div>
+    <div class="toast warning"><span class="toast-icon">🔥</span><div class="toast-body"><div class="toast-title">Streak a rischio!</div><div class="toast-desc">Sblocca una card entro le 23:59</div></div></div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Unlock Card — Momento di Sblocco</div>
+  <div class="component-row" style="flex-wrap:wrap;align-items:flex-start;">
+    <div class="unlock-card">
+      <span class="unlock-emoji">🏛️</span>
+      <div class="unlock-badge">✨ Leggendaria</div>
+      <div class="unlock-title">Basilica di Santa Croce</div>
+      <div class="unlock-desc">Hai sbloccato il capolavoro del barocco leccese. Aggiunta al tuo Album!</div>
+      <div class="unlock-pts"><div class="unlock-pt">⚡ +30 XP</div><div class="unlock-pt">🔥 Streak +1</div></div>
+      <button class="btn btn-primary btn-md btn-full">Aggiungi all'Album →</button>
+    </div>
+
+    <div class="bottom-sheet-demo">
+      <div class="bs-handle"></div>
+      <div class="bs-eyebrow">Quest consigliata</div>
+      <div class="bs-title">I Segreti di Lecce</div>
+      <div class="bs-meta-row">
+        <span class="bs-meta-item">🚶 45 min</span>
+        <span class="bs-meta-item">📍 5 tappe</span>
+        <span class="bs-meta-item">🟢 Gratuita</span>
+      </div>
+      <div class="component-row" style="margin-bottom:var(--sp-4);">
+        <span class="reward-pip" style="background:var(--gold-pale,#FFF3CD);">🃏 3 card</span>
+        <span class="reward-pip">⚡ 80 XP</span>
+        <span class="reward-pip" style="background:var(--c-teal-50);">🤝 2 partner</span>
+      </div>
+      <button class="btn btn-primary btn-lg btn-full">Inizia percorso →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NAVIGATION ─── -->
+<section class="ds-section" id="navigation">
+  <div class="section-header">
+    <div class="section-eyebrow">Pattern</div>
+    <div class="section-title">Navigazione</div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Bottom Navigation Bar</div>
+  <div class="bottom-nav-demo" style="margin-bottom:var(--sp-8);">
+    <div class="nav-item-demo active"><span class="nav-icon-demo">🗺️</span><span class="nav-lbl-demo">Mappa</span></div>
+    <div class="nav-item-demo"><span style="position:relative;display:inline-block;"><span class="nav-icon-demo">⭐</span><span style="position:absolute;top:-2px;right:-6px;background:var(--c-terra-300);color:white;border-radius:50%;width:15px;height:15px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;">2</span></span><span class="nav-lbl-demo">Quest</span></div>
+    <div class="nav-item-demo"><span class="nav-icon-demo">🃏</span><span class="nav-lbl-demo">Album</span></div>
+    <div class="nav-item-demo"><span class="nav-icon-demo">👤</span><span class="nav-lbl-demo">Profilo</span></div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Quest Progress Mini-Bar (sempre visibile)</div>
+  <div class="quest-mini-bar" style="border-radius:var(--r-lg);margin-bottom:var(--sp-8);">
+    <span class="qmb-icon">🗺️</span>
+    <span class="qmb-text">I Segreti di Lecce</span>
+    <div class="qmb-track"><div class="qmb-fill"></div></div>
+    <span class="qmb-count">2/5</span>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Stepper Tappe</div>
+  <div class="step-list">
+    <div class="step-row"><div class="step-left"><div class="step-dot done">✓</div><div class="step-connector done"></div></div><div class="step-body"><div class="step-name">Piazza Sant'Oronzo</div><div class="step-sub">Completata · +1 card comune</div></div></div>
+    <div class="step-row"><div class="step-left"><div class="step-dot done">✓</div><div class="step-connector done"></div></div><div class="step-body"><div class="step-name">Castello Carlo V</div><div class="step-sub">Completata · +1 card rara</div></div></div>
+    <div class="step-row"><div class="step-left"><div class="step-dot active">→</div><div class="step-connector locked"></div></div><div class="step-body"><div class="step-name active">Basilica di Santa Croce</div><div class="step-sub">Prossima · 8 min · +1 card leggendaria</div></div></div>
+    <div class="step-row"><div class="step-left"><div class="step-dot locked">4</div><div class="step-connector locked"></div></div><div class="step-body"><div class="step-name locked">Caffè Alvino</div><div class="step-sub" style="color:var(--text-tertiary)">Partner · offerta speciale</div></div></div>
+    <div class="step-row"><div class="step-left"><div class="step-dot locked">5</div></div><div class="step-body"><div class="step-name locked">Porta Napoli</div><div class="step-sub" style="color:var(--text-tertiary)">Finale · bonus streak</div></div></div>
+  </div>
+</section>
+
+<!-- ─── MAP COMPONENTS ─── -->
+<section class="ds-section" id="map-components">
+  <div class="section-header">
+    <div class="section-eyebrow">Pattern</div>
+    <div class="section-title">Componenti Mappa</div>
+    <div class="section-desc">I marker usano la forma Airbnb (pin drop) con colori semantici distinti. Mai più di 3–4 categorie attive simultaneamente. Il sistema di filtri è sempre compatto e compreso nella parte bassa della mappa.</div>
+  </div>
+
+  <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Marker</div>
+  <div class="marker-showcase">
+    <div class="marker-item">
+      <div class="marker-wrap">
+        <div class="marker-pin monument"><span class="marker-inner">🏛️</span></div>
+        <div class="marker-shadow"></div>
+      </div>
+      <span class="marker-lbl">Monumento</span>
+      <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">navy-400</span>
+    </div>
+    <div class="marker-item">
+      <div class="marker-wrap">
+        <div class="marker-pin quest"><span class="marker-inner">🗺️</span></div>
+        <div class="marker-shadow"></div>
+      </div>
+      <span class="marker-lbl">Tappa attiva</span>
+      <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">terra-300</span>
+    </div>
+    <div class="marker-item">
+      <div class="marker-wrap">
+        <div class="marker-pin partner"><span class="marker-inner">☕</span></div>
+        <div class="marker-shadow"></div>
+      </div>
+      <span class="marker-lbl">Partner locale</span>
+      <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">gold-300</span>
+    </div>
+    <div class="marker-item">
+      <div class="marker-wrap">
+        <div class="marker-pin" style="background:var(--c-teal-300);"><span class="marker-inner">📍</span></div>
+        <div class="marker-shadow"></div>
+      </div>
+      <span class="marker-lbl">Posizione utente</span>
+      <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">teal-300</span>
+    </div>
+    <div class="marker-item">
+      <div class="marker-wrap" style="opacity:0.45;">
+        <div class="marker-pin" style="background:var(--c-sand-400);"><span class="marker-inner">🔒</span></div>
+        <div class="marker-shadow"></div>
+      </div>
+      <span class="marker-lbl">Bloccato</span>
+      <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-tertiary);">sand-400</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── GAMIFICATION ─── -->
+<section class="ds-section" id="gamification">
+  <div class="section-header">
+    <div class="section-eyebrow">Pattern</div>
+    <div class="section-title">Gamification</div>
+    <div class="section-desc">Principi estratti da Duolingo e NYT Games, adattati al contesto outdoor. Il sistema premia l'esplorazione reale, non il tempo sullo schermo.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp-6);">
+    <div style="background:var(--bg-surface);border-radius:var(--r-2xl);padding:var(--sp-6);box-shadow:var(--shadow-sm);">
+      <div style="font-size:32px;margin-bottom:var(--sp-3);">🔥</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:var(--sp-2);">Streak Giornaliera</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">1 card al giorno mantiene la streak. Persiste anche con 1 sola card comune. Mini-bar sempre visibile nel profilo.</div>
+    </div>
+    <div style="background:var(--bg-surface);border-radius:var(--r-2xl);padding:var(--sp-6);box-shadow:var(--shadow-sm);">
+      <div style="font-size:32px;margin-bottom:var(--sp-3);">⚡</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:var(--sp-2);">Sistema XP</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">+10 XP card comune, +30 rara, +60 leggendaria. +20 bonus completamento quest. Livello visibile nel profilo.</div>
+    </div>
+    <div style="background:var(--bg-surface);border-radius:var(--r-2xl);padding:var(--sp-6);box-shadow:var(--shadow-sm);">
+      <div style="font-size:32px;margin-bottom:var(--sp-3);">✨</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:var(--sp-2);">Sistema Rarità</div>
+      <div style="font-size:13px;color:var(--text-secondary);line-height:1.6;">3 livelli: Comune (teal), Rara (viola), Leggendaria (oro). Le leggendarie appaiono solo in posizioni GPS esatte.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MASCOTTE ─── -->
+<section class="ds-section" id="mascotte" style="border-bottom:none;">
+  <div class="section-header">
+    <div class="section-eyebrow">Pattern</div>
+    <div class="section-title">Mascotte — Pugliello</div>
+    <div class="section-desc">La mascotte appare solo in 3 momenti chiave: onboarding, sblocco card leggendaria, completamento quest. Non interferisce mai con la mappa o il contenuto primario. 3 stati emotivi.</div>
+  </div>
+
+  <div class="mascotte-states">
+    <div class="mascotte-state">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="46" fill="#F2A541"/>
+        <circle cx="50" cy="48" r="26" fill="#FFD180"/>
+        <circle cx="42" cy="42" r="5" fill="white"/><circle cx="58" cy="42" r="5" fill="white"/>
+        <circle cx="43" cy="43" r="3" fill="#1A2744"/><circle cx="59" cy="43" r="3" fill="#1A2744"/>
+        <path d="M38 54 Q50 64 62 54" stroke="#E07A5F" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <ellipse cx="50" cy="26" rx="20" ry="7" fill="#E07A5F"/>
+        <polygon points="50,4 30,26 70,26" fill="#C85C3E"/>
+        <circle cx="50" cy="4" r="4" fill="#F2A541"/>
+      </svg>
+      <div class="mascotte-label">Felice</div>
+      <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px;">Onboarding</div>
+    </div>
+
+    <div class="mascotte-state">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="46" fill="#F2A541"/>
+        <circle cx="50" cy="48" r="26" fill="#FFD180"/>
+        <circle cx="42" cy="42" r="5" fill="white"/><circle cx="58" cy="42" r="5" fill="white"/>
+        <circle cx="42" cy="42" r="4" fill="#1A2744"/><circle cx="58" cy="42" r="4" fill="#1A2744"/>
+        <!-- occhi spalancati sorpresa -->
+        <circle cx="42" cy="41" r="1.5" fill="white"/><circle cx="58" cy="41" r="1.5" fill="white"/>
+        <circle cx="50" cy="56" r="8" fill="white" stroke="#E07A5F" stroke-width="2"/>
+        <ellipse cx="50" cy="26" rx="20" ry="7" fill="#E07A5F"/>
+        <polygon points="50,4 30,26 70,26" fill="#C85C3E"/>
+        <circle cx="50" cy="4" r="4" fill="#F2A541"/>
+        <!-- stelline sorpresa -->
+        <text x="12" y="40" font-size="14" opacity="0.8">✨</text>
+        <text x="74" y="38" font-size="12" opacity="0.8">⭐</text>
+      </svg>
+      <div class="mascotte-label">Sorpreso</div>
+      <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px;">Sblocco leggendaria</div>
+    </div>
+
+    <div class="mascotte-state">
+      <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="46" fill="#F2A541"/>
+        <circle cx="50" cy="48" r="26" fill="#FFD180"/>
+        <circle cx="42" cy="42" r="5" fill="white"/><circle cx="58" cy="42" r="5" fill="white"/>
+        <circle cx="43" cy="43" r="3" fill="#1A2744"/><circle cx="59" cy="43" r="3" fill="#1A2744"/>
+        <!-- sopracciglia orgogliose -->
+        <path d="M38 36 Q42 33 46 36" stroke="#1A2744" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M54 36 Q58 33 62 36" stroke="#1A2744" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M38 54 Q50 66 62 54" stroke="#E07A5F" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <ellipse cx="50" cy="26" rx="20" ry="7" fill="#E07A5F"/>
+        <polygon points="50,4 30,26 70,26" fill="#C85C3E"/>
+        <circle cx="50" cy="4" r="4" fill="#F2A541"/>
+        <!-- trofeo -->
+        <text x="68" y="80" font-size="22">🏆</text>
+      </svg>
+      <div class="mascotte-label">Orgoglioso</div>
+      <div style="font-size:12px;color:var(--text-tertiary);margin-top:4px;">Completamento quest</div>
+    </div>
+  </div>
+
+  <div style="margin-top:var(--sp-8);background:var(--bg-surface);border-radius:var(--r-2xl);padding:var(--sp-6);max-width:600px;box-shadow:var(--shadow-sm);">
+    <div class="palette-group-title" style="margin-bottom:var(--sp-4);">Regole di utilizzo</div>
+    <table class="token-table">
+      <thead><tr><th>Regola</th><th>Dettaglio</th></tr></thead>
+      <tbody>
+        <tr><td class="token-role" style="font-weight:600;">✅ Appare in</td><td class="token-role">Onboarding step 1, sblocco card leggendaria, completamento quest</td></tr>
+        <tr><td class="token-role" style="font-weight:600;">❌ Non appare</td><td class="token-role">Sulla mappa, su card rare/comuni, durante la navigazione</td></tr>
+        <tr><td class="token-role" style="font-weight:600;">📐 Dimensione</td><td class="token-role">72–100px. Mai sopra il 30% dello schermo</td></tr>
+        <tr><td class="token-role" style="font-weight:600;">🎭 Animazione</td><td class="token-role">Float (3s ease-in-out infinite) in idle; spring bounce allo sblocco</td></tr>
+        <tr><td class="token-role" style="font-weight:600;">🔤 Tono voce</td><td class="token-role">"Incredibile! Hai scoperto un capolavoro!" — mai formale, mai istituzionale</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+
+<script>
+  // Sidebar nav active state on scroll
+  const sections = document.querySelectorAll('.ds-section[id]');
+  const navLinks = document.querySelectorAll('.ds-nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + entry.target.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { threshold: 0.25, rootMargin: '-10% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Smooth scroll
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(link.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Filter chips demo
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const row = chip.closest('.component-row');
+      if (!row) return;
+      row.querySelectorAll('.chip').forEach(c => {
+        c.classList.remove('chip-active');
+        c.classList.add('chip-default');
+      });
+      chip.classList.remove('chip-default');
+      chip.classList.add('chip-active');
+    });
+  });
+
+  // Bottom nav demo
+  document.querySelectorAll('.nav-item-demo').forEach(item => {
+    item.addEventListener('click', () => {
+      item.closest('.bottom-nav-demo').querySelectorAll('.nav-item-demo').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>
