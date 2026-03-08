@@ -68,18 +68,18 @@ export default function Eventi() {
                             {/* Image Cover */}
                             <div className="relative w-full h-[240px]">
                                 <img
-                                    src={evento.image_url || "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=600&auto=format"}
-                                    alt={getLocalized(evento, 'title', i18n.language)}
+                                    src={evento.image_url || evento.immagine_url || "https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=600&auto=format"}
+                                    alt={getLocalized(evento, 'title', i18n.language) || evento.titolo}
                                     className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent" />
 
                                 {/* Date Badge */}
-                                {evento.event_date && (
+                                {(evento.event_date || evento.data_inizio) && (
                                     <div className="absolute top-5 left-5 bg-bg-primary/90 backdrop-blur-md px-4 py-2 rounded-2xl border border-border-default flex items-center gap-2.5 shadow-xl">
                                         <CalendarBlank size={18} className="text-accent" weight="fill" />
                                         <span className="text-[13px] font-black tracking-tight text-text-primary">
-                                            {format(new Date(evento.event_date), "d MMM", { locale: it })}
+                                            {format(new Date(evento.event_date || evento.data_inizio), "d MMM", { locale: it })}
                                         </span>
                                     </div>
                                 )}
@@ -88,32 +88,32 @@ export default function Eventi() {
                             {/* Content */}
                             <div className="p-7 flex flex-col gap-4 relative z-10">
                                 <h2 className="text-[28px] font-serif font-black leading-tight text-text-primary tracking-tight">
-                                    {getLocalized(evento, 'title', i18n.language)}
+                                    {getLocalized(evento, 'title', i18n.language) || evento.titolo}
                                 </h2>
 
                                 <div className="flex flex-wrap gap-y-3 gap-x-6 text-[13px] font-black uppercase tracking-[0.1em] text-text-muted mt-1">
-                                    {evento.location && (
+                                    {(evento.location || evento.luogo) && (
                                         <div className="flex items-center gap-2">
                                             <MapPin size={18} weight="fill" className="text-accent-gold" />
-                                            <span>{evento.location}</span>
+                                            <span>{evento.location || evento.luogo}</span>
                                         </div>
                                     )}
-                                    {evento.event_date && (
+                                    {(evento.event_date || evento.data_inizio) && (
                                         <div className="flex items-center gap-2">
                                             <Clock size={18} weight="fill" className="text-accent-gold" />
-                                            <span>{format(new Date(evento.event_date), "HH:mm")}</span>
+                                            <span>{format(new Date(evento.event_date || evento.data_inizio), "HH:mm")}</span>
                                         </div>
                                     )}
-                                    {evento.capacity && (
+                                    {(evento.capacity || evento.posti_totali) && (
                                         <div className="flex items-center gap-2">
                                             <Ticket size={18} weight="fill" className="text-accent-gold" />
-                                            <span>Max {evento.capacity} posti</span>
+                                            <span>Max {evento.capacity || evento.posti_totali} posti</span>
                                         </div>
                                     )}
                                 </div>
 
                                 <p className="text-[15px] text-text-muted leading-relaxed mt-2 line-clamp-3 font-medium">
-                                    {getLocalized(evento, 'description', i18n.language)}
+                                    {getLocalized(evento, 'description', i18n.language) || evento.descrizione}
                                 </p>
 
                                 <button
