@@ -8,7 +8,15 @@
 
 ### Validazione Partner Commerciali (Metodo PIN)
 - **Nessuna dipendenza GPS:** Per gli eventi o i check-in presso i partner commerciali (es. Vinerie, Ristoranti), la geolocalizzazione non è un fattore bloccante primario.
-- **Inserimento Manuale:** La validazione e l'acquisizione della Card Premio dipendono *esclusivamente* dall'inserimento manuale di un **PIN Segreto** fornito dal gestore del locale all'utente in loco.
+- **Inserimento Manuale:** La validazione e l'acquisizione della Card Premio dipendono *exclusively* dall'inserimento manuale di un **PIN Segreto** fornito dal gestore del locale all'utente in loco.
+- **Esperienza SPA Immersiva:** Le pagine Partner (Partner Elite) devono comportarsi come Single Page Applications (SPA) fluide, con caricamenti istantanei, transizioni animate e stati UI reattivi (Locked/Unlocked) senza ricaricamento pagina.
+
+### Architettura Partner Elite
+- **Hero & Branding:** Hero section fissa (220px o 100dvh) con linear-gradient per fondersi con lo sfondo sandy. Logo circolare overlay (80x80) a cavallo tra hero e contenuto.
+- **Benefit Card Multi-Stato:** Card bianca con shadow soft. Stati: 
+  - *Locked*: Mostra teaser e tasto "Rivendica".
+  - *Input*: Input PIN a 4 box interattivi.
+  - *Unlocked (Success)*: Glow dorato, badge "CARD ATTIVA" e sblocco immediato del codice/vantaggio.
 
 ### Sistema di Notifiche Push
 - **Guida Itinerari:** Notifiche automatiche per guidare l'utente tra le diverse tappe di un itinerario o saga.

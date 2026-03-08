@@ -1,0 +1,1 @@
+di seguito la chiave per conneterti al mio supase: postgresql://postgres:Uazmaragaddus12@db.edzwtxatihiqyvqvqqqe.supabase.co:5432/postgres
