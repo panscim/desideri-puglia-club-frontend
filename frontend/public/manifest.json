@@ -1,0 +1,49 @@
+{
+  "name": "Desideri di Puglia Club",
+  "short_name": "Puglia Club",
+  "description": "App ufficiale del Desideri di Puglia B&B - Completa missioni, guadagna punti e vinci premi!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFDF8",
+  "theme_color": "#5A5A40",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "travel", "social"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Missioni",
+      "short_name": "Missioni",
+      "description": "Visualizza le missioni disponibili",
+      "url": "/missioni",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Classifica",
+      "short_name": "Classifica",
+      "description": "Vedi la classifica mensile",
+      "url": "/classifica",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Chat",
+      "short_name": "Chat",
+      "description": "Chatta con la community",
+      "url": "/chat",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

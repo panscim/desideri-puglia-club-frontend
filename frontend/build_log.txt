@@ -1,0 +1,32 @@
+
+> frontend@0.0.0 build
+> vite build
+
+vite v7.1.11 building for production...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+transforming...
+✓ 26 modules transformed.
+✗ Build failed in 636ms
+error during build:
+[vite:esbuild] Transform failed with 1 error:
+/Users/ruggierospera/Desktop/desideri-puglia-club copia/frontend/src/components/Layout.jsx:19:7: ERROR: The symbol "toast" has already been declared
+file: /Users/ruggierospera/Desktop/desideri-puglia-club copia/frontend/src/components/Layout.jsx:19:7
+
+The symbol "toast" has already been declared
+17 |  import { supabase } from '../services/supabase'
+18 |  import toast from 'react-hot-toast'
+19 |  import toast from 'react-hot-toast'
+   |         ^
+20 |  import Splash from './Splash'
+21 |  import { useTranslation } from 'react-i18next'
+
+    at failureErrorWithLog (/Users/ruggierospera/Desktop/desideri-puglia-club copia/frontend/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/ruggierospera/Desktop/desideri-puglia-club copia/frontend/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/ruggierospera/Desktop/desideri-puglia-club copia/frontend/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/ruggierospera/Desktop/desideri-puglia-club copia/frontend/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/ruggierospera/Desktop/desideri-puglia-club copia/frontend/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:519:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)
+    at Readable.push (node:internal/streams/readable:392:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)

@@ -1,0 +1,322 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* ─────────────────────────────────────────────────
+   THEME SYSTEM — CSS Custom Properties
+   Applied via data-theme="light|dark" on <html>
+───────────────────────────────────────────────── */
+
+/* LIGHT (The only theme) */
+:root {
+  color-scheme: light;
+
+  /* Puglia Premium Brand Palette */
+  --brand-sabbia: #FAF7F2;
+  --brand-terracotta: #D4793A;
+  --brand-blu: #2F4858;
+  --brand-sole: #F2C87B;
+  --brand-green: #16A34A;
+  --brand-text: #1F2933;
+  --brand-text-muted: #6B7280;
+  --brand-divider: #E5E7EB;
+
+  /* Theme Overrides for Premium Brief */
+  --bg-base: var(--brand-sabbia);
+  --text-primary: var(--brand-text);
+  --text-secondary: var(--brand-text-muted);
+  --accent: var(--brand-terracotta);
+  --border: var(--brand-divider);
+}
+
+/* ─────────────────────────────────────────────────
+   GLOBAL STYLES
+   Forced Light Mode aesthetic
+   ───────────────────────────────────────────────── */
+
+/* Root background follows theme */
+body {
+  background-color: var(--bg-base) !important;
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Utilities for structural elements */
+.bg-zinc-950:not(.no-theme-flip) {
+  background-color: var(--bg-base) !important;
+}
+
+.bg-zinc-900:not(.no-theme-flip) {
+  background-color: var(--bg-elevated) !important;
+}
+
+/* Ensure titles and labels are visible */
+.text-white:not(.no-theme-flip, .text-on-image, .text-on-image *) {
+  color: var(--text-primary) !important;
+}
+
+.text-zinc-400:not(.no-theme-flip),
+.text-zinc-300:not(.no-theme-flip),
+.text-zinc-500:not(.no-theme-flip) {
+  color: var(--text-secondary) !important;
+}
+
+/* Glass/Transparent elements */
+.bg-white\/10:not(.no-theme-flip) {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+.border-white\/10,
+.border-white\/5,
+.border-white\/20,
+.border-zinc-800 {
+  border-color: var(--border) !important;
+}
+
+/* Forced Shadow styles */
+.shadow-xl {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
+}
+
+.shadow-2xl {
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ─────────────────────────────────────────────────
+   UTILITIES & PROTECTION
+   ───────────────────────────────────────────────── */
+
+/* Force white text on photos regardless of theme */
+.text-on-image,
+.text-on-image *,
+.no-theme-flip.text-white {
+  color: white !important;
+}
+
+/* Protect images from "washing out" */
+.no-theme-flip img,
+img.no-theme-flip {
+  opacity: 1 !important;
+}
+
+/* Global Transition */
+* {
+  transition: background-color 0.4s ease, border-color 0.4s ease, color 0.3s ease;
+}
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-serif;
+  }
+}
+
+
+@layer components {
+  .btn-primary {
+    @apply bg-olive-dark text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 active:scale-95 transition-all shadow-md hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-olive-light/20 text-olive-dark px-6 py-3 rounded-full font-medium hover:bg-opacity-30 active:scale-95 transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-md p-6 border border-sand;
+  }
+
+  .mission-card {
+    @apply card hover:shadow-lg transition-all cursor-pointer;
+  }
+
+  .badge {
+    @apply inline-block px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .badge-gold {
+    @apply badge bg-gold bg-opacity-20 text-gold;
+  }
+
+  .progress-bar {
+    @apply w-full bg-sand rounded-full h-3 overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-olive-light rounded-full transition-all duration-500;
+  }
+}
+
+/* 👈 chiusura di @layer components */
+
+/* 👇 REGOLE GLOBALI, fuori dai layer */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+/* CARDS ANIMATIONS */
+@keyframes pop-in {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 200%;
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.shine-effect::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%);
+  transform: skewX(-25deg);
+  animation: shine 3s infinite linear;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────
+   MOBILE NATIVE EXPERIENCE UTILITIES
+───────────────────────────────────────────────── */
+
+/* Floating Bottom Action Bar */
+.floating-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.75rem calc(1.5rem + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
+}
+
+/* App-Like Widget Card */
+.app-native-card {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  border-radius: 2.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.app-native-card:active {
+  transform: scale(0.98);
+}
+
+/* Radar Sentiment 3.0 (Native Widget Style) */
+.sentiment-meter-v2 {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  display: flex;
+  gap: 4px;
+}
+
+.sentiment-meter-step-v2 {
+  height: 100%;
+  flex: 1;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.8s ease;
+}
+
+.sentiment-meter-step-v2.active {
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+/* Live Pulse V2 */
+.vibe-pulse-v2 {
+  width: 12px;
+  height: 12px;
+  background: #22c55e;
+  border-radius: 50%;
+  position: relative;
+}
+
+.vibe-pulse-v2::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 2px solid #22c55e;
+  border-radius: 50%;
+  animation: vibe-ping-v2 2s infinite;
+}
+
+@keyframes vibe-ping-v2 {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+.header-scrim {
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 35%, rgba(0, 0, 0, 0.05) 75%, rgba(0, 0, 0, 0.85) 100%);
+}
+
+.font-satoshi {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.015em;
+}
+
+.tracking-tighter-lux {
+  letter-spacing: -0.05em;
+}
+
+.glass-magazine-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
+  border-radius: 2.5rem;
+}
