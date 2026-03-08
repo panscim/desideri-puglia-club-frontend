@@ -169,7 +169,7 @@ export default function Album() {
     }
 
     return (
-        <div className="pb-24 bg-[var(--bg-base)] min-h-screen font-sans flex flex-col items-center overflow-x-hidden relative">
+        <div className="pb-24 bg-bg-primary min-h-screen font-sans flex flex-col items-center overflow-x-hidden relative">
 
             {/* Global Ambient Glow - Subtler for Light Mode */}
             <div className="fixed top-0 left-0 w-full h-[40vh] bg-gradient-to-b from-zinc-100/50 to-transparent pointer-events-none z-0" />
@@ -182,60 +182,56 @@ export default function Album() {
             <div className="w-full max-w-7xl relative z-10 flex flex-col">
 
                 {/* HEADER & PROGRESS SECTION */}
-                <div className="px-6 pt-10 pb-6 shrink-0">
-                    <div className="flex justify-between items-center mb-6">
+                <div className="px-6 pt-12 pb-8 shrink-0">
+                    <div className="flex justify-between items-center mb-8">
                         <div>
-                            <h4 className="text-[10px] font-bold text-[#E4AE2F] uppercase tracking-[0.3em] mb-1">Passaporto</h4>
-                            <h1 className="text-2xl font-serif font-bold text-[var(--text-primary)] tracking-wide">LE TUE SCOPERTE</h1>
+                            <p className="overline !text-accent !mb-2 !tracking-[0.4em]">Passaporto</p>
+                            <h1 className="text-[32px] font-serif font-black text-text-primary tracking-tight leading-tight">LE TUE SCOPERTE</h1>
                         </div>
                     </div>
 
                     {/* Progress Card (Premium Light) */}
-                    <div className="relative w-full rounded-[2rem] overflow-hidden shadow-xl border border-[var(--border)] bg-[var(--bg-surface)]">
-                        {/* Background Decoration */}
-                        <div className="absolute right-0 top-0 bottom-0 w-2/3 opacity-[0.03] pointer-events-none"
-                            style={{ backgroundImage: 'radial-gradient(circle at center, #E4AE2F 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
-
-                        <div className="relative z-10 p-6 flex items-center justify-between">
+                    <div className="card !p-0 relative w-full overflow-hidden">
+                        <div className="relative z-10 p-8 flex items-center justify-between">
                             <div>
-                                <h3 className="text-[10px] font-bold tracking-[0.2em] text-[var(--text-muted)] mb-1 uppercase">Stato Collezione</h3>
+                                <p className="overline !text-text-muted !mb-2">Stato Collezione</p>
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-4xl font-serif font-bold text-[var(--text-primary)]">{stats.unlocked}</span>
-                                    <span className="text-lg font-serif text-[#E4AE2F]">/ {stats.total}</span>
+                                    <span className="text-[42px] font-serif font-black text-text-primary leading-none">{stats.unlocked}</span>
+                                    <span className="text-xl font-serif text-accent font-black opacity-60">/ {stats.total}</span>
                                 </div>
                             </div>
 
                             {/* Circular Progress */}
-                            <div className="relative w-16 h-16 flex items-center justify-center">
+                            <div className="relative w-20 h-20 flex items-center justify-center">
                                 <svg className="w-full h-full transform -rotate-90">
-                                    <circle cx="32" cy="32" r="28" fill="transparent" stroke="var(--bg-elevated)" strokeWidth="6" />
+                                    <circle cx="40" cy="40" r="35" fill="transparent" stroke="var(--bg-secondary)" strokeWidth="6" />
                                     <circle
-                                        cx="32" cy="32" r="28"
+                                        cx="40" cy="40" r="35"
                                         fill="transparent"
-                                        stroke="#E4AE2F"
+                                        stroke="var(--accent)"
                                         strokeWidth="6"
-                                        strokeDasharray="175.9"
-                                        strokeDashoffset={175.9 - (175.9 * collectionPercentage) / 100}
+                                        strokeDasharray="219.9"
+                                        strokeDashoffset={219.9 - (219.9 * collectionPercentage) / 100}
                                         className="transition-all duration-1000 ease-out"
                                         strokeLinecap="round"
                                     />
                                 </svg>
-                                <div className="absolute font-black text-[11px] text-[var(--text-primary)]">{collectionPercentage}%</div>
+                                <div className="absolute font-black text-[14px] text-text-primary">{collectionPercentage}%</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* FILTERS (Pill format) */}
-                <div className="px-6 mb-8 shrink-0">
-                    <div className="flex overflow-x-auto gap-3 pb-2 no-scrollbar px-1 -mx-1">
+                <div className="px-6 mb-10 shrink-0">
+                    <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar -mx-2 px-2">
                         {categories.map(cat => (
                             <button
                                 key={cat.id}
                                 onClick={() => setActiveCategory(cat.id)}
-                                className={`whitespace-nowrap px-5 py-2.5 rounded-full text-[12px] font-bold tracking-widest uppercase transition-all duration-300 border ${activeCategory === cat.id
-                                    ? 'bg-[#E4AE2F] text-[#0C0D10] border-[#E4AE2F] shadow-[0_0_15px_rgba(228,174,47,0.3)]'
-                                    : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border-[var(--border)] hover:border-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                                className={`whitespace-nowrap px-6 py-3 rounded-full text-[11px] font-black tracking-[0.15em] uppercase transition-all duration-300 border ${activeCategory === cat.id
+                                    ? 'bg-accent text-white border-accent shadow-sm'
+                                    : 'bg-surface text-text-muted border-border-default hover:border-accent/50 hover:text-text-primary'
                                     }`}
                             >
                                 {cat.label}
@@ -245,7 +241,7 @@ export default function Album() {
                 </div>
 
                 {/* GRID */}
-                <div className="px-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-8 pb-10 flex-grow content-start">
+                <div className="px-6 grid grid-cols-2 lg:grid-cols-4 gap-6 pb-12 flex-grow content-start">
                     {filteredCards.length > 0 ? (
                         filteredCards.map(card => (
                             <AlbumCard
@@ -256,9 +252,9 @@ export default function Album() {
                             />
                         ))
                     ) : (
-                        <div className="col-span-full py-16 flex flex-col items-center justify-center opacity-30">
-                            <Compass className="w-12 h-12 text-[var(--text-muted)] mb-4" />
-                            <p className="text-[var(--text-muted)] font-medium">Nessun segreto in questa categoria.</p>
+                        <div className="col-span-full py-20 flex flex-col items-center justify-center opacity-40">
+                            <Compass className="w-16 h-16 text-text-muted mb-6" />
+                            <p className="text-text-muted font-black uppercase tracking-widest text-[11px]">Nessun segreto in questa categoria.</p>
                         </div>
                     )}
                 </div>
@@ -267,10 +263,10 @@ export default function Album() {
 
             {/* PIN Modal */}
             {showPinModal && (
-                <div className="fixed inset-0 z-50 bg-[var(--bg-base)]/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300">
-                    <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-3xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-300">
-                        <h3 className="text-xl font-bold font-serif text-[var(--text-primary)] mb-2 text-center">Codice Segreto</h3>
-                        <p className="text-xs text-[var(--text-muted)] text-center mb-6 px-4">Inserisci il cifrario a 4 cifre fornito dal custode del luogo.</p>
+                <div className="fixed inset-0 z-50 bg-bg-dark/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
+                    <div className="bg-surface border border-border-default rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-300">
+                        <h3 className="text-2xl font-serif font-black text-text-primary mb-3 text-center">Codice Segreto</h3>
+                        <p className="text-xs text-text-muted text-center mb-8 px-4 font-medium leading-relaxed">Inserisci il cifrario a 4 cifre fornito dal custode del luogo.</p>
 
                         <form onSubmit={handlePinSubmit}>
                             <input
@@ -279,21 +275,21 @@ export default function Album() {
                                 placeholder="0000"
                                 value={pinCode}
                                 onChange={(e) => setPinCode(e.target.value)}
-                                className="w-full text-center text-5xl font-mono tracking-[0.5em] py-4 border-b border-[var(--border)] focus:border-[#E4AE2F] outline-none bg-transparent mb-8 text-[var(--text-primary)] placeholder:text-zinc-200 transition-colors"
+                                className="w-full text-center text-5xl font-mono tracking-[0.5em] py-6 border-b-2 border-border-default focus:border-accent outline-none bg-transparent mb-10 text-text-primary placeholder:text-bg-secondary transition-all"
                                 autoFocus
                             />
-                            <div className="flex gap-3">
+                            <div className="flex gap-4">
                                 <button
                                     type="button"
                                     onClick={() => setShowPinModal(false)}
-                                    className="flex-1 py-3.5 rounded-xl bg-[var(--bg-elevated)] text-[var(--text-muted)] font-bold hover:text-[var(--text-primary)] transition-colors border border-[var(--border)] text-sm uppercase tracking-widest"
+                                    className="btn-ghost flex-1 !py-4 !text-[11px]"
                                 >
-                                    Fuggi
+                                    Chiudi
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={pinCode.length !== 4 || unlocking}
-                                    className="flex-1 py-3.5 rounded-xl bg-[#E4AE2F] text-[#0C0D10] font-bold shadow-[0_0_15px_rgba(228,174,47,0.3)] hover:bg-[#F2C24E] hover:shadow-[0_0_25px_rgba(228,174,47,0.5)] transition-all disabled:opacity-50 disabled:shadow-none text-sm uppercase tracking-widest active:scale-[0.98]"
+                                    className="btn-primary flex-1 !py-4 !text-[11px]"
                                 >
                                     {unlocking ? '...' : 'Sblocca'}
                                 </button>

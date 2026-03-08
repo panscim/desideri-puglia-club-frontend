@@ -1,221 +1,190 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 /* ─────────────────────────────────────────────────
    THEME SYSTEM — CSS Custom Properties
-   Applied via data-theme="light|dark" on <html>
 ───────────────────────────────────────────────── */
 
-/* LIGHT (The only theme) */
 :root {
   color-scheme: light;
 
-  /* Puglia Premium Brand Palette */
-  --brand-sabbia: #FAF7F2;
-  --brand-terracotta: #D4793A;
-  --brand-blu: #2F4858;
-  --brand-sole: #F2C87B;
-  --brand-green: #16A34A;
-  --brand-text: #1F2933;
-  --brand-text-muted: #6B7280;
-  --brand-divider: #E5E7EB;
+  /* Design System Tokens */
+  --bg-primary: #FAF7F2;
+  --bg-secondary: #F9F9F7;
+  --bg-dark: #0f0f0f;
+  --bg-dark-2: #1C2833;
+  --accent: #D4793A;
+  --accent-orange: #f97316;
+  --accent-gold: #C4974A;
+  --text-primary: #1F2933;
+  --text-muted: #6B7280;
+  --text-light: #A0ADB8;
+  --text-on-dark: #FAF7F2;
+  --border: rgba(31,41,51,0.10);
+  --border-dark: rgba(255,255,255,0.08);
+  --surface: #FFFFFF;
+  --danger: #C0392B;
+  --success: #16a34a;
 
-  /* Theme Overrides for Premium Brief */
-  --bg-base: var(--brand-sabbia);
-  --text-primary: var(--brand-text);
-  --text-secondary: var(--brand-text-muted);
-  --accent: var(--brand-terracotta);
-  --border: var(--brand-divider);
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 48px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-card: 32px;
+  --radius-pill: 100px;
 }
 
 /* ─────────────────────────────────────────────────
    GLOBAL STYLES
-   Forced Light Mode aesthetic
-   ───────────────────────────────────────────────── */
+───────────────────────────────────────────────── */
 
-/* Root background follows theme */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 body {
-  background-color: var(--bg-base) !important;
+  background-color: #F0EDE8;
   color: var(--text-primary);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Utilities for structural elements */
-.bg-zinc-950:not(.no-theme-flip) {
-  background-color: var(--bg-base) !important;
+::selection {
+  background: rgba(212, 121, 58, 0.2);
 }
-
-.bg-zinc-900:not(.no-theme-flip) {
-  background-color: var(--bg-elevated) !important;
-}
-
-/* Ensure titles and labels are visible */
-.text-white:not(.no-theme-flip, .text-on-image, .text-on-image *) {
-  color: var(--text-primary) !important;
-}
-
-.text-zinc-400:not(.no-theme-flip),
-.text-zinc-300:not(.no-theme-flip),
-.text-zinc-500:not(.no-theme-flip) {
-  color: var(--text-secondary) !important;
-}
-
-/* Glass/Transparent elements */
-.bg-white\/10:not(.no-theme-flip) {
-  background-color: rgba(0, 0, 0, 0.06) !important;
-}
-
-.border-white\/10,
-.border-white\/5,
-.border-white\/20,
-.border-zinc-800 {
-  border-color: var(--border) !important;
-}
-
-/* Forced Shadow styles */
-.shadow-xl {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
-}
-
-.shadow-2xl {
-  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* ─────────────────────────────────────────────────
-   UTILITIES & PROTECTION
-   ───────────────────────────────────────────────── */
-
-/* Force white text on photos regardless of theme */
-.text-on-image,
-.text-on-image *,
-.no-theme-flip.text-white {
-  color: white !important;
-}
-
-/* Protect images from "washing out" */
-.no-theme-flip img,
-img.no-theme-flip {
-  opacity: 1 !important;
-}
-
-/* Global Transition */
-* {
-  transition: background-color 0.4s ease, border-color 0.4s ease, color 0.3s ease;
-}
-
-
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  body {
-    @apply font-sans antialiased;
+  h1, h2, h3, h4 {
+    font-family: 'Libre Baskerville', serif;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
   }
 
-  h1,
-  h2,
-  h3,
-  h4 {
-    @apply font-serif;
+  p {
+    line-height: 1.6;
   }
 }
-
 
 @layer components {
+  /* Buttons */
   .btn-primary {
-    @apply bg-olive-dark text-white px-6 py-3 rounded-full font-medium hover:bg-opacity-90 active:scale-95 transition-all shadow-md hover:shadow-lg;
+    @apply transition-all active:scale-[0.96] flex items-center justify-center gap-2;
+    background-color: var(--accent);
+    color: var(--text-on-dark);
+    padding: 15px 28px;
+    border-radius: var(--radius-pill);
+    font-family: 'Libre Baskerville', serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    box-shadow: 0 8px 24px rgba(212, 121, 58, 0.28);
+    border: none;
+    cursor: pointer;
   }
 
-  .btn-secondary {
-    @apply bg-olive-light/20 text-olive-dark px-6 py-3 rounded-full font-medium hover:bg-opacity-30 active:scale-95 transition-all;
+  .btn-ghost {
+    @apply transition-all active:scale-[0.96] flex items-center justify-center gap-2;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid rgba(31, 41, 51, 0.12);
+    border-radius: var(--radius-pill);
+    padding: 13px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
   }
 
+  .btn-outline {
+    @apply transition-all active:scale-[0.96] flex items-center justify-center gap-2;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-pill);
+    padding: 13px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* Cards */
   .card {
-    @apply bg-white rounded-xl shadow-md p-6 border border-sand;
+    @apply bg-white transition-all overflow-hidden;
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border);
+    padding: 24px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.05);
   }
 
-  .mission-card {
-    @apply card hover:shadow-lg transition-all cursor-pointer;
+  .card-featured {
+    @apply relative overflow-hidden;
+    background-color: var(--text-primary);
+    border-radius: var(--radius-card);
+    padding: 24px;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
   }
 
-  .badge {
-    @apply inline-block px-3 py-1 rounded-full text-sm font-medium;
+  .card-featured::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background-color: var(--accent);
+    border-radius: 1px;
   }
 
-  .badge-gold {
-    @apply badge bg-gold bg-opacity-20 text-gold;
+  /* Badge & Label */
+  .overline {
+    @apply font-sans;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 8px;
   }
 
-  .progress-bar {
-    @apply w-full bg-sand rounded-full h-3 overflow-hidden;
+  /* Utility Classes */
+  .font-serif-italic {
+    font-family: 'Libre Baskerville', serif;
+    font-style: italic;
   }
-
-  .progress-fill {
-    @apply h-full bg-olive-light rounded-full transition-all duration-500;
-  }
-}
-
-/* 👈 chiusura di @layer components */
-
-/* 👇 REGOLE GLOBALI, fuori dai layer */
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-/* CARDS ANIMATIONS */
-@keyframes pop-in {
-  0% {
-    transform: scale(0.5);
-    opacity: 0;
-  }
-
-  60% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes shine {
-  0% {
-    left: -100%;
-  }
-
-  100% {
-    left: 200%;
-  }
-}
-
-.animate-pop-in {
-  animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.shine-effect::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to right,
-      transparent 0%,
-      rgba(255, 255, 255, 0.4) 50%,
-      transparent 100%);
-  transform: skewX(-25deg);
-  animation: shine 3s infinite linear;
-  pointer-events: none;
 }
 
 /* ─────────────────────────────────────────────────
-   MOBILE NATIVE EXPERIENCE UTILITIES
+   ANIMATIONS
 ───────────────────────────────────────────────── */
 
-/* Floating Bottom Action Bar */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.fade-up {
+  animation: fadeUp 0.5s ease both;
+}
+
+/* ─────────────────────────────────────────────────
+   MOBILE NATIVE UTILITIES
+───────────────────────────────────────────────── */
+
 .floating-bottom-bar {
   position: fixed;
   bottom: 0;
@@ -233,90 +202,20 @@ html {
   box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
 }
 
-/* App-Like Widget Card */
 .app-native-card {
-  background: white;
+  @apply bg-white overflow-hidden transition-all;
   border: 1px solid rgba(0, 0, 0, 0.02);
   border-radius: 2.5rem;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .app-native-card:active {
   transform: scale(0.98);
 }
 
-/* Radar Sentiment 3.0 (Native Widget Style) */
-.sentiment-meter-v2 {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 999px;
-  display: flex;
-  gap: 4px;
-}
-
-.sentiment-meter-step-v2 {
-  height: 100%;
-  flex: 1;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  transition: all 0.8s ease;
-}
-
-.sentiment-meter-step-v2.active {
-  background: var(--accent);
-  box-shadow: 0 0 12px var(--accent);
-}
-
-/* Live Pulse V2 */
-.vibe-pulse-v2 {
-  width: 12px;
-  height: 12px;
-  background: #22c55e;
-  border-radius: 50%;
-  position: relative;
-}
-
-.vibe-pulse-v2::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  border: 2px solid #22c55e;
-  border-radius: 50%;
-  animation: vibe-ping-v2 2s infinite;
-}
-
-@keyframes vibe-ping-v2 {
-  0% {
-    transform: scale(1);
-    opacity: 0.8;
+/* Prevent zoom on mobile inputs */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
   }
-
-  100% {
-    transform: scale(3);
-    opacity: 0;
-  }
-}
-
-.header-scrim {
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 35%, rgba(0, 0, 0, 0.05) 75%, rgba(0, 0, 0, 0.85) 100%);
-}
-
-.font-satoshi {
-  font-family: 'Inter', sans-serif;
-  letter-spacing: -0.015em;
-}
-
-.tracking-tighter-lux {
-  letter-spacing: -0.05em;
-}
-
-.glass-magazine-card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03);
-  border-radius: 2.5rem;
 }

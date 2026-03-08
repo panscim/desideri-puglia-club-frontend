@@ -69,17 +69,17 @@ export default function SagaDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#E4AE2F] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (!saga) {
     return (
-      <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col items-center justify-center p-6">
-        <h2 className="text-xl font-bold font-serif mb-2">Saga non trovata</h2>
-        <button onClick={() => navigate('/missioni')} className="text-[#E4AE2F] underline">Torna indietro</button>
+      <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col items-center justify-center p-6">
+        <h2 className="text-xl font-serif font-black mb-2">Saga non trovata</h2>
+        <button onClick={() => navigate('/missioni')} className="text-accent underline">Torna indietro</button>
       </div>
     );
   }
@@ -152,7 +152,7 @@ export default function SagaDetail() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[var(--bg-base)] text-[var(--text-primary)] flex flex-col font-sans relative overflow-x-hidden transition-colors duration-500">
+    <div className="min-h-[100dvh] bg-bg-primary text-text-primary flex flex-col font-sans relative overflow-x-hidden transition-colors duration-500">
 
       {/* BACKGROUND SCENE */}
       <div className="absolute inset-0 z-0 select-none pointer-events-none">
@@ -160,41 +160,41 @@ export default function SagaDetail() {
           <img
             src={activeStep.image_url}
             alt="Luogo Misterioso"
-            className={`w-full h-[60vh] object-cover transition-all duration-[3000ms] ${canUnlockProximity ? 'blur-sm brightness-75 scale-100' : 'blur-xl brightness-50 grayscale scale-110'}`}
+            className={`w-full h-[65vh] object-cover transition-all duration-[3000ms] ${canUnlockProximity ? 'blur-sm brightness-75 scale-100' : 'blur-xl brightness-50 grayscale scale-110'}`}
           />
         ) : isSagaComplete ? (
           <img src={saga.image_url} alt="Saga Completata" className="w-full h-full object-cover blur-sm brightness-50" />
         ) : (
-          <div className="w-full h-[60vh] bg-gradient-to-b from-zinc-200 to-[var(--bg-base)]" />
+          <div className="w-full h-[65vh] bg-gradient-to-b from-bg-secondary to-bg-primary" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-base)] via-[var(--bg-base)]/80 to-transparent h-full" />
+        <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/80 to-transparent h-full" />
       </div>
 
       {/* TOP BAR */}
       <header className="relative z-20 pt-[env(safe-area-inset-top)] flex flex-col px-6">
-        <div className="flex items-center justify-between h-16">
-          <button onClick={() => navigate('/missioni')} className="w-10 h-10 rounded-full bg-[var(--bg-surface)] backdrop-blur-md flex items-center justify-center border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition shadow-sm">
-            <ChevronLeft size={20} strokeWidth={2.5} />
+        <div className="flex items-center justify-between h-20">
+          <button onClick={() => navigate('/missioni')} className="w-11 h-11 rounded-full bg-surface border border-border-default flex items-center justify-center text-text-primary hover:border-accent/40 transition-all shadow-sm active:scale-90">
+            <ChevronLeft size={22} strokeWidth={2.5} />
           </button>
           <div className="flex flex-col items-center">
-            <span className="text-[#E4AE2F] text-[9px] font-bold uppercase tracking-[0.2em] mb-0.5">La Bussola</span>
-            <div className="flex items-center gap-1.5">
-              <span className="text-[13px] font-bold text-[var(--text-primary)]">{completedSteps.length}</span>
-              <span className="text-[10px] text-[var(--text-muted)]">/</span>
-              <span className="text-[13px] font-bold text-[var(--text-muted)]">{steps.length}</span>
+            <span className="overline !text-accent !mb-1 !tracking-[0.3em] !text-[10px]">La Bussola</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[15px] font-black text-text-primary">{completedSteps.length}</span>
+              <span className="text-[12px] text-text-muted opacity-50">/</span>
+              <span className="text-[15px] font-black text-text-muted">{steps.length}</span>
             </div>
           </div>
-          <button onClick={() => setShowHistory(true)} className="w-10 h-10 rounded-full bg-[var(--bg-surface)] backdrop-blur-md flex items-center justify-center border border-[var(--border)] text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] transition relative shadow-sm">
-            <History size={18} />
-            {completedSteps.length > 0 && <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-[#E4AE2F] rounded-full border-2 border-[var(--bg-base)]"></span>}
+          <button onClick={() => setShowHistory(true)} className="w-11 h-11 rounded-full bg-surface border border-border-default flex items-center justify-center text-text-primary hover:border-accent/40 transition-all relative shadow-sm active:scale-90">
+            <History size={20} />
+            {completedSteps.length > 0 && <span className="absolute top-0.5 right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-surface shadow-sm animate-pulse"></span>}
           </button>
         </div>
       </header>
 
       {/* PROGRESS BAR */}
-      <div className="relative z-20 h-0.5 w-full bg-[var(--border)] mt-2">
+      <div className="relative z-20 h-1 w-full bg-border-default mt-2">
         <div
-          className="h-full bg-gradient-to-r from-[#E4AE2F] to-[#FFF1C0] transition-all duration-1000 shadow-[0_0_15px_rgba(228,174,47,0.4)]"
+          className="h-full bg-accent transition-all duration-[1500ms] shadow-[0_0_20px_rgba(212,121,58,0.4)]"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -205,36 +205,37 @@ export default function SagaDetail() {
           <div className="flex flex-col items-center max-w-sm mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
 
             {/* ENIGMA */}
-            <div className="mb-10 text-center">
-              <h3 className="text-[#E4AE2F] text-[10px] font-bold uppercase tracking-[0.3em] mb-4 flex items-center justify-center gap-2">
-                <Target className="w-3.5 h-3.5" /> {activeStep.title}
+            <div className="mb-14 text-center">
+              <h3 className="overline !text-accent !mb-5 flex items-center justify-center gap-2.5 !tracking-[0.4em]">
+                <Target size={16} weight="bold" /> {activeStep.title}
               </h3>
-              <p className="text-[20px] sm:text-[24px] font-serif font-bold text-[var(--text-primary)] leading-snug drop-shadow-lg italic px-2">
+              <p className="text-[26px] sm:text-[32px] font-serif font-black text-text-primary leading-[1.2] tracking-tight drop-shadow-xl italic px-4">
                 "{activeStep.hint}"
               </p>
             </div>
 
             {/* RADAR */}
-            <div className="relative w-48 h-48 mb-10 flex items-center justify-center">
-              <div className={`absolute inset-0 rounded-full border border-[#E4AE2F]/20 ${!canUnlockProximity ? 'animate-[ping_3s_ease-out_infinite]' : ''}`}></div>
-              <div className={`absolute inset-4 rounded-full border border-[#E4AE2F]/30 ${!canUnlockProximity ? 'animate-[ping_3s_ease-out_infinite_500ms]' : ''}`}></div>
-              <div className="absolute inset-8 rounded-full border border-[#E4AE2F]/50"></div>
-              <div className={`relative z-10 w-28 h-28 rounded-full flex flex-col items-center justify-center p-2 shadow-[0_0_40px_rgba(228,174,47,0.15)] transition-all duration-1000 ${canUnlockProximity ? 'bg-gradient-to-br from-[#E4AE2F] to-[#B8860B] border-2 border-white' : 'bg-[var(--bg-surface)] backdrop-blur-md border border-[#E4AE2F]/50 shadow-inner'}`}>
+            <div className="relative w-56 h-56 mb-12 flex items-center justify-center">
+              <div className={`absolute inset-0 rounded-full border border-accent/20 ${!canUnlockProximity ? 'animate-[ping_4s_ease-out_infinite]' : ''}`}></div>
+              <div className={`absolute inset-6 rounded-full border border-accent/25 ${!canUnlockProximity ? 'animate-[ping_4s_ease-out_infinite_1000ms]' : ''}`}></div>
+              <div className="absolute inset-12 rounded-full border border-accent/30"></div>
+              
+              <div className={`relative z-10 w-32 h-32 rounded-full flex flex-col items-center justify-center p-2 shadow-[0_0_60px_rgba(212,121,58,0.2)] transition-all duration-1000 ${canUnlockProximity ? 'bg-accent text-white border-2 border-white shadow-xl scale-110' : 'bg-surface/80 backdrop-blur-xl border border-accent/40 shadow-inner'}`}>
                 {canUnlockProximity ? (
                   <>
-                    <Unlock className="w-8 h-8 text-[#0C0D10] mb-1" />
-                    <span className="text-[#0C0D10] text-[11px] font-black uppercase tracking-widest text-center mt-1 leading-tight">Obiettivo<br />Raggiunto</span>
+                    <Unlock size={32} weight="fill" className="mb-2" />
+                    <span className="text-white text-[11px] font-black uppercase tracking-widest text-center mt-1 leading-tight">Sblocca<br />Ora</span>
                   </>
                 ) : (
                   <>
-                    <Navigation2 className="w-6 h-6 text-[#E4AE2F] mb-1" strokeWidth={2.5} />
+                    <Navigation2 size={24} weight="bold" className="text-accent mb-2 transition-transform duration-500 hover:rotate-45" />
                     {distanceMeters !== null ? (
                       <div className="flex flex-col items-center">
-                        <span className="text-[var(--text-primary)] text-[24px] font-bold font-serif leading-none tracking-tight">{distanceMeters > 999 ? (distanceMeters / 1000).toFixed(1) : distanceMeters}</span>
-                        <span className="text-[#E4AE2F] text-[10px] uppercase font-bold tracking-widest">{distanceMeters > 999 ? 'km' : 'metri'}</span>
+                        <span className="text-text-primary text-[28px] font-black font-serif leading-none tracking-tight">{distanceMeters > 999 ? (distanceMeters / 1000).toFixed(1) : distanceMeters}</span>
+                        <span className="text-accent text-[11px] uppercase font-black tracking-widest mt-1">{distanceMeters > 999 ? 'km' : 'metri'}</span>
                       </div>
                     ) : (
-                      <span className="text-[var(--text-muted)] text-xs text-center px-2">Cercando GPS...</span>
+                      <span className="text-text-muted text-[11px] font-black uppercase tracking-widest text-center px-4 leading-relaxed mt-1 animate-pulse">Cercando Segnale...</span>
                     )}
                   </>
                 )}
@@ -244,52 +245,49 @@ export default function SagaDetail() {
             {/* UNLOCK BUTTON */}
             <button
               onClick={attemptUnlock}
-              className={`w-full py-5 rounded-[1.25rem] text-[14px] font-bold uppercase tracking-[0.15em] flex items-center justify-center gap-3 transition-all duration-300 ${canUnlockProximity
-                ? 'bg-[#E4AE2F] hover:bg-[#F2C24E] text-[#0C0D10] shadow-[0_0_25px_rgba(228,174,47,0.4)] hover:shadow-[0_0_35px_rgba(228,174,47,0.6)] active:scale-[0.98]'
-                : 'bg-[var(--bg-surface)] border border-[var(--border)] text-[var(--text-muted)] backdrop-blur-md hover:bg-[var(--bg-elevated)]'
-                }`}
+              className={`w-full !py-5 btn-primary group ${!canUnlockProximity ? '!bg-surface !border-border-default !text-text-muted hover:!border-accent/30' : 'shadow-xl shadow-accent/20'}`}
             >
               {canUnlockProximity ? (
-                <>Rivela il Luogo <ArrowRight className="w-5 h-5" /></>
+                <>Rivela il Luogo <ArrowRight size={20} weight="bold" className="group-hover:translate-x-1 transition-transform" /></>
               ) : (
                 <>
-                  <Lock className="w-4 h-4" />
-                  <span className="opacity-90">{distanceMeters !== null ? `Avvicinati ancora di ${Math.max(0, distanceMeters - activeStep.radius)}m` : 'Attiva GPS per Sbloccare'}</span>
+                  <Lock size={18} weight="bold" />
+                  <span className="font-black tracking-[0.1em]">{distanceMeters !== null ? `Avvicinati ancora di ${Math.max(0, distanceMeters - activeStep.radius)}m` : 'Attiva GPS per Sbloccare'}</span>
                 </>
               )}
             </button>
-            <p className="text-[10px] text-[var(--text-muted)] mt-4 text-center max-w-[250px]">
+            <p className="overline !text-text-muted !mt-6 text-center max-w-[280px] !normal-case !font-medium opacity-60">
               Devi trovarti entro il raggio di {activeStep.radius} metri dalla destinazione per validare la presenza.
             </p>
 
             {/* ===== STEP NAMES SECTION ===== */}
-            <div className="mt-10 w-full">
+            <div className="mt-14 w-full">
               {/* Header row */}
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[9px] text-[#E4AE2F] font-bold uppercase tracking-widest flex items-center gap-1.5">
-                  <Route className="w-3.5 h-3.5" /> Tappe del percorso
+              <div className="flex items-center justify-between mb-5">
+                <span className="overline !text-accent !mb-0 !flex items-center gap-2.5">
+                  <Route size={16} weight="bold" /> Tappe del percorso
                 </span>
-                <span className="text-[10px] text-[var(--text-muted)]">{steps.length} luoghi</span>
+                <span className="overline !text-text-muted !mb-0 tracking-wider">{steps.length} luoghi</span>
               </div>
 
               {/* Pills */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-2.5 mb-6">
                 {steps.map((step, idx) => (
                   <span
                     key={step.id}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold border transition-all ${step.status === 'completed'
-                      ? 'bg-[#E4AE2F]/10 border-[#E4AE2F]/40 text-[#E4AE2F]'
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all ${step.status === 'completed'
+                      ? 'bg-accent/5 border-accent/30 text-accent'
                       : step.status === 'active'
-                        ? 'bg-[var(--bg-surface)] border-[var(--border)] text-[var(--text-primary)] shadow-sm'
-                        : 'bg-[var(--bg-surface)] opacity-40 border-[var(--border)] text-[var(--text-muted)]'
+                        ? 'bg-surface border-border-default text-text-primary shadow-sm'
+                        : 'bg-surface/40 opacity-30 border-border-default text-text-muted'
                       }`}
                   >
                     {step.status === 'completed' ? (
-                      <CheckCircle2 className="w-3 h-3" />
+                      <CheckCircle2 size={12} weight="fill" />
                     ) : step.status === 'active' ? (
-                      <span className="w-2 h-2 rounded-full bg-[#E4AE2F] animate-pulse inline-block" />
+                      <div className="w-2 h-2 rounded-full bg-accent animate-pulse shadow-[0_0_8px_rgba(212,121,58,0.5)]" />
                     ) : (
-                      <Lock className="w-3 h-3" />
+                      <Lock size={12} weight="bold" />
                     )}
                     {step.status === 'locked' ? `Mistero ${idx + 1}` : step.title}
                   </span>
@@ -299,43 +297,43 @@ export default function SagaDetail() {
               {/* "Vedi itinerario" toggle button */}
               <button
                 onClick={() => setShowItinerary(v => !v)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border)] text-[13px] font-bold text-[#E4AE2F] hover:bg-[var(--bg-elevated)] transition-all shadow-sm"
+                className="w-full flex items-center justify-between px-6 py-4 rounded-2xl bg-surface border border-border-default text-[13px] font-black uppercase tracking-widest text-accent hover:border-accent/30 transition-all shadow-sm active:scale-[0.98]"
               >
-                <span className="flex items-center gap-2"><Route size={14} /> Vedi itinerario</span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showItinerary ? 'rotate-180' : ''}`} />
+                <span className="flex items-center gap-3"><Route size={18} weight="bold" /> Esplora Itinerario</span>
+                <ChevronDown size={18} weight="bold" className={`transition-transform duration-500 ${showItinerary ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Dropdown itinerary list */}
               {showItinerary && (
-                <div className="mt-3 rounded-2xl overflow-hidden border border-[var(--border)] bg-[var(--bg-surface)] divide-y divide-[var(--border)] shadow-md">
+                <div className="mt-4 rounded-3xl overflow-hidden border border-border-default bg-surface divide-y divide-border-default shadow-xl animate-in fade-in slide-in-from-top-4 duration-500">
                   {steps.map((step, idx) => {
                     const isFirst = idx === 0;
                     const isLast = idx === steps.length - 1;
                     const isCurrent = step.status === 'active';
                     const isDone = step.status === 'completed';
                     return (
-                      <div key={step.id} className={`flex items-start gap-4 px-4 py-3.5 ${isCurrent ? 'bg-[#E4AE2F]/5' : ''}`}>
-                        <div className={`mt-0.5 w-6 h-6 rounded-full shrink-0 flex items-center justify-center border-2 text-[10px] font-bold ${isDone ? 'bg-[#E4AE2F] border-[#E4AE2F] text-[#0C0D10]'
-                          : isCurrent ? 'border-[#E4AE2F] text-[#E4AE2F] bg-[var(--bg-surface)]'
-                            : 'border-[var(--border)] text-[var(--text-muted)] bg-[var(--bg-base)] opacity-50'
+                      <div key={step.id} className={`flex items-start gap-5 px-6 py-4.5 ${isCurrent ? 'bg-accent/5' : ''}`}>
+                        <div className={`mt-1 w-7 h-7 rounded-full shrink-0 flex items-center justify-center border-2 text-[10px] font-black ${isDone ? 'bg-accent border-accent text-white shadow-sm'
+                          : isCurrent ? 'border-accent text-accent bg-surface animate-pulse shadow-[0_0_10px_rgba(212,121,58,0.2)]'
+                            : 'border-border-default text-text-muted bg-bg-secondary opacity-50'
                           }`}>
-                          {isDone ? <CheckCircle2 className="w-3.5 h-3.5" /> : idx + 1}
+                          {isDone ? <CheckCircle2 size={16} weight="bold" /> : idx + 1}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#E4AE2F]/60">
+                          <div className="flex items-center gap-2.5 mb-1.5">
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-accent opacity-70">
                               {isFirst ? 'Partenza' : isLast ? 'Destinazione' : `Tappa ${idx + 1}`}
                             </span>
-                            {isDone && <span className="text-[8px] font-black bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20">SVELATO</span>}
+                            {isDone && <span className="text-[8px] font-black bg-accent/10 text-accent px-2 py-0.5 rounded-full border border-accent/20">SVELATO</span>}
                           </div>
-                          <p className={`text-[14px] font-bold leading-tight ${isDone || isCurrent ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'}`}>
+                          <p className={`text-[17px] font-serif font-black leading-tight tracking-tight ${isDone || isCurrent ? 'text-text-primary' : 'text-text-muted'}`}>
                             {isDone || isCurrent ? step.title : `Mistero n. ${idx + 1}`}
                           </p>
                           {isCurrent && (
-                            <p className="text-[11px] text-[var(--text-secondary)] mt-1 italic line-clamp-2 pr-2">"{step.hint}"</p>
+                            <p className="text-[14px] text-text-muted mt-2 font-medium italic border-l-2 border-accent/20 pl-4">"{step.hint}"</p>
                           )}
                         </div>
-                        {isCurrent && <ChevronRight className="w-4 h-4 text-[#E4AE2F]/40 shrink-0 mt-1" />}
+                        {isCurrent && <ArrowRight size={18} weight="bold" className="text-accent opacity-30 shrink-0 mt-2 animate-bounce-horizontal" />}
                       </div>
                     );
                   })}
@@ -346,17 +344,17 @@ export default function SagaDetail() {
 
           </div>
         ) : isSagaComplete ? (
-          <div className="flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-1000 flex-1">
-            <div className="w-24 h-24 bg-gradient-to-br from-[#E4AE2F] to-[#B8860B] rounded-full flex items-center justify-center mb-6 shadow-[0_0_50px_rgba(228,174,47,0.4)]">
-              <CheckCircle2 className="w-12 h-12 text-[#0C0D10]" />
+          <div className="flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-1000 flex-1 py-10">
+            <div className="w-24 h-24 bg-accent rounded-full flex items-center justify-center mb-10 shadow-[0_0_60px_rgba(212,121,58,0.4)] border-4 border-white">
+              <CheckCircle2 size={40} weight="bold" className="text-white" />
             </div>
-            <h2 className="text-3xl font-serif font-bold text-[var(--text-primary)] mb-2">Saga Completata!</h2>
-            <p className="text-[var(--text-secondary)] font-medium max-w-xs mb-8">Hai svelato tutti i segreti di {title}. Il mistero è stato risolto.</p>
+            <h2 className="text-[36px] font-serif font-black text-text-primary mb-4 tracking-tight leading-tight">Saga Completata!</h2>
+            <p className="text-[17px] text-text-muted font-medium max-w-[280px] mb-12">Hai svelato tutti i segreti di {title}. Il mistero è finalmente risolto.</p>
             <button
               onClick={() => navigate('/missioni')}
-              className="px-8 py-3 bg-[var(--bg-surface)] hover:bg-[var(--bg-elevated)] text-[var(--text-primary)] border border-[var(--border)] rounded-full text-sm font-bold uppercase tracking-wider transition-all shadow-md"
+              className="btn-primary !px-10 group"
             >
-              Torna alle Missioni
+              Torna alle Missioni <ArrowRight size={18} weight="bold" className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         ) : null}
@@ -364,56 +362,63 @@ export default function SagaDetail() {
 
       {/* BOTTOM DRAWER TRIGGER */}
       {!isSagaComplete && completedSteps.length > 0 && (
-        <div className="relative z-20 pb-[env(safe-area-inset-bottom)] pb-8 px-6 pt-6 flex justify-center">
+        <div className="relative z-20 pb-[env(safe-area-inset-bottom)] pb-10 px-6 pt-6 flex justify-center">
           <button
             onClick={() => setShowHistory(true)}
-            className="flex flex-col items-center gap-1.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
+            className="flex flex-col items-center gap-2 text-text-muted hover:text-accent transition-all group"
           >
-            <span className="text-[10px] uppercase tracking-widest font-bold">Guarda Tappe Passate</span>
-            <div className="w-1 h-1 rounded-full bg-[var(--text-muted)]/30"></div>
-            <div className="w-1 h-1 rounded-full bg-[var(--text-muted)]/50"></div>
-            <div className="w-1 h-1 rounded-full bg-[var(--text-muted)]/70"></div>
+            <span className="overline !text-current !mb-1 !tracking-[0.4em]">Log Scoperte</span>
+            <div className="flex flex-col items-center gap-1 opacity-20 group-hover:opacity-100 transition-opacity">
+              <div className="w-1 h-1 rounded-full bg-current"></div>
+              <div className="w-1 h-1 rounded-full bg-current"></div>
+              <div className="w-1 h-1 rounded-full bg-current"></div>
+            </div>
           </button>
         </div>
       )}
 
       {/* HISTORY DRAWER */}
       {showHistory && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-[var(--bg-base)]/80 backdrop-blur-md animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 flex flex-col bg-bg-dark/40 backdrop-blur-md animate-in fade-in duration-300">
           <div className="flex-1" onClick={() => setShowHistory(false)} />
-          <div className="bg-[var(--bg-surface)] border-t border-[var(--border)] rounded-t-[2rem] p-6 max-h-[85vh] overflow-y-auto w-full max-w-lg mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-500 pb-[calc(24px+env(safe-area-inset-bottom))]">
-            <div className="flex items-center justify-between mb-8 sticky top-0 bg-[var(--bg-surface)] py-2 z-10 border-b border-[var(--border)]">
-              <h3 className="text-lg font-bold font-serif text-[var(--text-primary)]">Log delle Scoperte</h3>
-              <button onClick={() => setShowHistory(false)} className="w-8 h-8 bg-[var(--bg-elevated)] rounded-full flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
-                <ChevronLeft className="w-5 h-5 -rotate-90" />
+          <div className="bg-bg-primary border-t border-border-default rounded-t-[3rem] p-8 max-h-[85vh] overflow-y-auto w-full max-w-lg mx-auto shadow-2xl animate-in slide-in-from-bottom-full duration-500 pb-[calc(40px+env(safe-area-inset-bottom))]">
+            <div className="flex items-center justify-between mb-10 sticky top-0 bg-bg-primary/95 backdrop-blur-sm py-4 z-10 border-b border-border-default -mt-2">
+              <div>
+                <h3 className="text-2xl font-serif font-black text-text-primary tracking-tight">Le tue Scoperte</h3>
+                <p className="overline !text-accent !mb-0 !mt-1">Log dell'avventura</p>
+              </div>
+              <button onClick={() => setShowHistory(false)} className="w-11 h-11 bg-bg-secondary rounded-full flex items-center justify-center text-text-muted hover:text-text-primary transition-all active:scale-90">
+                <ChevronLeft className="w-6 h-6 -rotate-90" />
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-5">
               {completedSteps.map((step) => (
                 <div
                   key={step.id}
-                  className="flex items-start gap-4 p-4 bg-[var(--bg-base)] border border-[var(--border)] rounded-2xl cursor-pointer hover:border-[#E4AE2F]/30 transition-all group shadow-sm active:scale-[0.98]"
+                  className="flex items-start gap-5 p-5 bg-surface border border-border-default rounded-[1.5rem] cursor-pointer hover:border-accent/40 transition-all group shadow-sm active:scale-[0.98]"
                   onClick={() => setSelectedStep({ ...step, status: 'completed' })}
                 >
-                  <div className="w-14 h-14 shrink-0 rounded-xl overflow-hidden relative border border-[var(--border)] group-hover:border-[#E4AE2F] transition-colors">
-                    <img src={step.image_url} alt={step.title} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                      <CheckCircle2 className="w-6 h-6 text-[#E4AE2F] drop-shadow-md" />
+                  <div className="w-16 h-16 shrink-0 rounded-2xl overflow-hidden relative border border-border-default group-hover:border-accent transition-colors shadow-sm">
+                    <img src={step.image_url} alt={step.title} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
+                    <div className="absolute inset-0 bg-accent/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <CheckCircle2 size={24} weight="fill" className="text-white drop-shadow-lg" />
                     </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-[#E4AE2F] font-bold uppercase tracking-widest mb-0.5">Tappa {step.step_order}</p>
-                    <h4 className="text-[15px] font-bold text-[var(--text-primary)] leading-tight mb-1">{step.title}</h4>
-                    <span className="text-[12px] text-[var(--text-muted)] group-hover:text-[var(--text-secondary)] transition-colors">Tocca per rivedere ➔</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="overline !text-accent !mb-1.5 !text-[9px]">Tappa {step.step_order}</p>
+                    <h4 className="text-[18px] font-serif font-black text-text-primary leading-tight mb-2 tracking-tight truncate">{step.title}</h4>
+                    <span className="text-[12px] text-text-muted font-black uppercase tracking-wider group-hover:text-accent transition-colors">Dettagli ➔</span>
                   </div>
                 </div>
               ))}
               {lockedSteps.length > 0 && (
-                <div className="mt-8 pt-6 border-t border-[var(--border)] flex items-center gap-3 justify-center">
-                  {lockedSteps.map((s, idx) => (
-                    <div key={idx} className="w-2.5 h-2.5 rounded-full bg-[var(--bg-tertiary)] border border-[var(--border)]" title={`Tappa ${s.step_order} bloccata`}></div>
-                  ))}
-                  <span className="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest ml-2">Ancora Nascoste</span>
+                <div className="mt-10 pt-10 border-t border-border-default flex flex-col items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    {lockedSteps.map((s, idx) => (
+                      <div key={idx} className="w-2.5 h-2.5 rounded-full bg-border-default border border-border-default/50" title={`Tappa ${s.step_order} bloccata`}></div>
+                    ))}
+                  </div>
+                  <span className="overline !text-text-muted !mb-0 opacity-40">Misteri ancora nascosti</span>
                 </div>
               )}
             </div>

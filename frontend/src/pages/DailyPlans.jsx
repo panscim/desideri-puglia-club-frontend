@@ -28,13 +28,13 @@ const container = {
 };
 
 const item = {
-  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  hidden: { opacity: 0, y: 30, scale: 0.98 },
   show: { 
     opacity: 1, 
     y: 0, 
     scale: 1, 
     transition: { 
-      duration: 0.8, 
+      duration: 1, 
       ease: [0.16, 1, 0.3, 1] 
     } 
   }
@@ -42,11 +42,11 @@ const item = {
 
 const Pill = ({ children, className = '', active = false }) => (
   <span 
-    className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-xl border transition-all duration-300 ${className}`}
-    style={active 
-      ? { backgroundColor: 'var(--text-primary)', color: 'var(--bg-base)', borderColor: 'var(--text-primary)' }
-      : { backgroundColor: 'var(--bg-surface)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }
-    }
+    className={`inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] px-5 py-3 rounded-full border transition-all duration-300 ${className} ${
+      active 
+      ? 'bg-accent text-white border-accent shadow-sm' 
+      : 'bg-surface text-text-muted border-border-default hover:border-accent/50'
+    }`}
   >
     {children}
   </span>
@@ -95,42 +95,39 @@ const DailyPlans = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9F7] pb-32 font-sans selection:bg-orange-500/30 transition-colors duration-500" style={{ backgroundColor: 'var(--bg-base)' }}>
+    <div className="min-h-screen bg-bg-primary pb-32 font-sans selection:bg-accent/30 transition-colors duration-500">
       {/* ╔══ NAV ══════════════════════════════════════════╗ */}
       <nav 
-        style={{ backgroundColor: '#0f0f0f', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
-        className="fixed top-0 inset-x-0 z-[100] px-5 h-16 flex items-center justify-between"
+        className="fixed top-0 inset-x-0 z-[100] px-6 h-16 flex items-center justify-between bg-bg-primary/80 backdrop-blur-lg border-b border-border-default"
       >
         <button 
           onClick={() => navigate(-1)} 
-          className="w-10 h-10 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform"
-          style={{ backgroundColor: '#27272a', border: '1px solid #3f3f46' }}
+          className="w-10 h-10 rounded-full bg-surface border border-border-default flex items-center justify-center active:scale-95 transition-all hover:border-accent/30"
         >
-          <CaretLeft size={18} weight="bold" style={{ color: 'white' }} />
+          <CaretLeft size={20} weight="bold" className="text-text-primary" />
         </button>
-        <p style={{ color: 'white' }} className="text-[10px] font-black uppercase tracking-[0.4em] text-center">Marketplace</p>
-        <div className="w-10 h-10 rounded-full flex items-center justify-center opacity-60">
-          <Sparkle size={20} weight="fill" className="text-orange-500" />
+        <p className="overline !text-text-primary !mb-0 !tracking-[0.4em]">Marketplace</p>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center">
+          <Sparkle size={24} weight="fill" className="text-accent-gold" />
         </div>
       </nav>
 
       <main className="pt-28 px-5 max-w-lg mx-auto">
         {/* Hero Section */}
-        <header className="mb-12">
+        <header className="mb-14">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 mb-4"
+            className="flex items-center gap-3 mb-5"
           >
-            <div className="h-[1px] w-8 bg-orange-500" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-orange-500">Concierge Privato</span>
+            <div className="h-[1px] w-8 bg-accent" />
+            <span className="overline !text-accent !mb-0">Concierge Privato</span>
           </motion.div>
           <motion.h2 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-[2.8rem] font-black text-zinc-900 leading-[0.9] mb-4 lowercase first-letter:uppercase tracking-tighter"
-            style={{ color: 'var(--text-primary)' }}
+            className="text-[48px] font-serif font-black text-text-primary leading-[1] mb-5 tracking-tight"
           >
             Esplora la <br/>Puglia Vera.
           </motion.h2>
@@ -138,28 +135,26 @@ const DailyPlans = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-[13px] text-zinc-500 font-medium leading-relaxed max-w-[85%]"
+            className="text-[15px] text-text-muted font-medium leading-relaxed max-w-[90%]"
           >
             Itinerari d'eccellenza curati dai migliori locator locali. Esperienze autentiche, sbloccabili in un tap.
           </motion.p>
         </header>
 
         {/* ── Search & Filters ─────────────────────────── */}
-        <section className="mb-14 space-y-6">
+        <section className="mb-16 space-y-8">
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
-            className="relative group"
+            className="relative"
           >
-            <div className="absolute inset-0 bg-zinc-900/5 rounded-[2rem] blur-xl group-focus-within:bg-orange-500/10 transition-colors" />
             <div className="relative">
-              <MagnifyingGlass size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <MagnifyingGlass size={22} className="absolute left-6 top-1/2 -translate-y-1/2 text-accent" weight="bold" />
               <select 
-                className="w-full h-16 pl-14 pr-7 bg-white border border-zinc-100 rounded-[2rem] text-[13px] font-black appearance-none shadow-[0_8px_30px_rgba(0,0,0,0.03)] outline-none focus:border-zinc-950 transition-all uppercase tracking-widest"
+                className="w-full h-16 pl-16 pr-8 bg-surface border border-border-default rounded-pill text-[12px] font-black appearance-none shadow-sm outline-none focus:border-accent transition-all uppercase tracking-widest text-text-primary"
                 value={filters.city}
                 onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
-                style={{ backgroundColor: 'var(--card-bg)', color: 'var(--text-primary)', borderColor: 'var(--card-border)' }}
               >
                 <option value="">Tutta la Puglia</option>
                 {cities.map(c => <option key={c} value={c}>{c}</option>)}
@@ -250,17 +245,17 @@ const DailyPlans = () => {
                     </div>
 
                     {/* Content */}
-                    <div className="absolute bottom-0 left-0 p-9 w-full">
-                      <div className="flex items-center gap-3 mb-5">
-                        <span className="px-3.5 py-1.5 bg-black/40 text-white text-[9px] font-black uppercase tracking-[0.25em] rounded-xl border border-white/20 backdrop-blur-md" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
+                    <div className="absolute bottom-0 left-0 p-10 w-full">
+                      <div className="flex items-center gap-3 mb-6">
+                        <span className="px-4 py-1.5 bg-black/40 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-white/20 backdrop-blur-md">
                           {plan.city}
                         </span>
-                        <div className="flex items-center gap-1.5 text-[9px] font-black text-white/70 uppercase tracking-[0.2em]" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
-                           <Calendar size={13} weight="fill" className="text-orange-400" /> {seasonLabels[plan.season] || plan.season}
+                        <div className="flex items-center gap-2 text-[10px] font-black text-white/80 uppercase tracking-[0.2em]">
+                           <Calendar size={14} weight="fill" className="text-accent-gold" /> {seasonLabels[plan.season] || plan.season}
                         </div>
                       </div>
                       
-                      <h3 className="text-[2.2rem] font-black text-white leading-[1] mb-7 lowercase first-letter:uppercase group-hover:translate-x-1 transition-transform duration-500" style={{ letterSpacing: '-0.03em', textShadow: '0 2px 16px rgba(0,0,0,0.8), 0 6px 32px rgba(0,0,0,0.5)' }}>
+                      <h3 className="text-[34px] font-serif font-black text-white leading-[1] mb-8 tracking-tight group-hover:translate-x-1 transition-transform duration-500">
                         {plan.title_it}
                       </h3>
 
@@ -296,21 +291,21 @@ const DailyPlans = () => {
                   </div>
                   
                   {/* Subtle Sub-Footer for Social Proof */}
-                  <div className="px-4 flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity">
-                    <div className="flex items-center gap-5 text-zinc-400 text-[9px] font-black uppercase tracking-[0.3em]">
-                      <div className="flex items-center gap-2">
+                  <div className="px-6 flex items-center justify-between opacity-80 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-5 text-text-muted text-[10px] font-black uppercase tracking-[0.25em]">
+                      <div className="flex items-center gap-3">
                         <div className="flex -space-x-2">
                           {[1,2,3].map(i => (
-                            <div key={i} className="w-5 h-5 rounded-full border border-white bg-zinc-200" />
+                            <div key={i} className="w-6 h-6 rounded-full border-2 border-bg-primary bg-bg-secondary" />
                           ))}
                         </div>
-                        <span style={{ color: 'var(--text-secondary)' }}>
+                        <span>
                            Sbloccato da {plan.purchases_count || 0} clubber
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-orange-500 font-black text-[9px] uppercase tracking-[0.3em] group-hover:gap-4 transition-all duration-500">
-                      Svela itinerario <ArrowRight size={14} weight="bold" />
+                    <div className="flex items-center gap-3 text-accent font-black text-[10px] uppercase tracking-[0.25em] group-hover:gap-5 transition-all duration-500">
+                      Svela itinerario <ArrowRight size={16} weight="bold" />
                     </div>
                   </div>
                 </motion.div>

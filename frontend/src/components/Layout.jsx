@@ -72,22 +72,22 @@ const Layout = () => {
     location.pathname === path || location.pathname.startsWith(path + '/')
 
   return (
-    <div className="min-h-[100dvh] flex flex-col md:pb-0 bg-[var(--bg-primary)] font-satoshi">
+    <div className="min-h-[100dvh] flex flex-col md:pb-0 bg-bg-primary font-sans">
       {typeof window !== 'undefined' && <Splash />}
 
       {/* ░ HEADER ░ */}
-      <header className="hidden md:block bg-white border-b border-sand sticky top-0 z-40">
+      <header className="hidden md:block bg-surface border-b border-border-default sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             <img
               src="/logo.png"
               alt="Desideri di Puglia"
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-12 h-12 rounded-full object-cover border-2 border-accent/20 shadow-sm"
             />
             <div>
-              <h1 className="text-lg font-bold text-olive-dark">Desideri di Puglia</h1>
-              <p className="text-xs text-olive-light">Club</p>
+              <h1 className="text-xl font-serif font-black text-text-primary tracking-tight">Desideri di Puglia</h1>
+              <p className="overline !text-accent-gold !mb-0">Club</p>
             </div>
           </div>
 
@@ -137,8 +137,8 @@ const Layout = () => {
 
       {/* ░ NEW NAV MOBILE (GetYourGuide Clone Bottom Tab Nav) ░ */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-        <div className="backdrop-blur-md border-t pb-[env(safe-area-inset-bottom)] transition-colors duration-300 bg-white/95 border-zinc-200 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
-          <nav className="flex justify-around items-center h-[64px] px-2 max-w-md mx-auto">
+        <div className="backdrop-blur-md border-t pb-[env(safe-area-inset-bottom)] transition-colors duration-300 bg-surface/90 border-border-default shadow-card">
+          <nav className="flex justify-around items-center h-[68px] px-2 max-w-md mx-auto">
 
             {[
               { path: '/dashboard', icon: Sparkle, label: 'Scopri' },
@@ -157,12 +157,12 @@ const Layout = () => {
                   className="flex flex-col items-center justify-center w-[20%] h-full gap-1"
                 >
                   <Icon
-                    size={24}
-                    weight={active ? "fill" : "regular"}
-                    className={`transition-colors duration-200 ${active ? 'text-zinc-950' : 'text-zinc-400'
+                    size={26}
+                    weight={active ? "bold" : "regular"}
+                    className={`transition-all duration-300 ${active ? 'text-accent scale-110' : 'text-text-light'
                       }`}
                   />
-                  <span className={`text-[10px] font-geist transition-colors duration-200 ${active ? 'text-zinc-950 font-medium' : 'text-zinc-400'
+                  <span className={`text-[10px] font-sans tracking-tight transition-colors duration-300 ${active ? 'text-accent font-black' : 'text-text-muted'
                     }`}>
                     {item.label}
                   </span>
@@ -186,13 +186,13 @@ const Layout = () => {
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all ${active
-                    ? 'bg-white/10 text-white font-medium'
-                    : 'text-zinc-400 hover:bg-white/5 hover:text-white'
+                  className={`flex items-center space-x-4 px-5 py-4 rounded-lg transition-all ${active
+                    ? 'bg-accent/10 text-accent font-black shadow-sm'
+                    : 'text-text-muted hover:bg-bg-secondary hover:text-text-primary'
                     }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span>{item.label}</span>
+                  <Icon className="w-6 h-6" size={24} weight={active ? "bold" : "regular"} />
+                  <span className="text-[15px]">{item.label}</span>
                 </Link>
               )
             })

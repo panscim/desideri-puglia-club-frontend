@@ -158,7 +158,7 @@ export default function Profilo() {
   const initials = (profile?.nome?.[0] || profile?.nickname?.[0] || '?').toUpperCase()
 
   return (
-    <div className="min-h-[100dvh] bg-[#f9f9f7] font-sans pb-32">
+    <div className="min-h-[100dvh] bg-bg-primary font-sans pb-32">
       {/* ── HERO ── */}
       <div className="relative w-full bg-zinc-950 pt-12 pb-16 px-6 flex flex-col items-center text-center overflow-hidden transition-colors duration-400">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -179,8 +179,8 @@ export default function Profilo() {
           <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-md border border-white/30 text-zinc-900"><Camera weight="fill" className="w-3.5 h-3.5" /></div>
         </label>
 
-        <h1 className="text-[22px] font-bold text-white tracking-tight z-10">{displayName}</h1>
-        <p className="text-[12px] text-white/75 mt-1 z-10 flex items-center gap-1"><MapPin weight="fill" className="w-3 h-3" />{profile?.citta || 'Puglia, Italia'}</p>
+        <h1 className="text-[22px] font-serif font-black text-white tracking-tight z-10">{displayName}</h1>
+        <p className="text-[12px] font-sans text-white/75 mt-1 z-10 flex items-center gap-1"><MapPin weight="bold" className="w-3 h-3" />{profile?.citta || 'Puglia, Italia'}</p>
 
         <div className="flex items-center gap-2 mt-3 z-10 no-theme-flip">
           <span className="px-3 py-1 rounded-full bg-stone-100 border border-zinc-950 text-[10px] font-bold text-zinc-950 uppercase tracking-widest">
@@ -200,30 +200,30 @@ export default function Profilo() {
       <div className="max-w-3xl mx-auto px-4 -mt-6 relative z-30 space-y-4">
         {/* ── BENTO STATS ── */}
         <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-2xl bg-white border border-zinc-200/60 p-4 shadow-sm text-center flex flex-col justify-center">
-            <CardsThree weight="duotone" className="w-6 h-6 text-emerald-500 mx-auto" />
-            <p className="text-2xl font-bold font-mono tracking-tighter text-zinc-950 mt-2">{loading ? '...' : stats.cards}</p>
-            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mt-0.5">Card Sbloccate</p>
+          <div className="rounded-card bg-white border border-border-default p-4 shadow-sm text-center flex flex-col justify-center">
+            <CardsThree weight="bold" className="w-6 h-6 text-success mx-auto" />
+            <p className="text-[28px] font-serif font-black tracking-tighter text-text-primary mt-2 leading-none">{loading ? '...' : stats.cards}</p>
+            <p className="overline mt-2">Card</p>
           </div>
-          <div className="rounded-2xl bg-white border border-zinc-200/60 p-4 shadow-sm text-center flex flex-col justify-center">
-            <Path weight="duotone" className="w-6 h-6 text-blue-500 mx-auto" />
-            <p className="text-2xl font-bold font-mono tracking-tighter text-zinc-950 mt-2">{loading ? '...' : stats.km}</p>
-            <p className="text-[10px] font-medium text-zinc-500 uppercase tracking-wider mt-0.5">Km Percorsi</p>
+          <div className="rounded-card bg-white border border-border-default p-4 shadow-sm text-center flex flex-col justify-center">
+            <Path weight="bold" className="w-6 h-6 text-accent mx-auto" />
+            <p className="text-[28px] font-serif font-black tracking-tighter text-text-primary mt-2 leading-none">{loading ? '...' : stats.km}</p>
+            <p className="overline mt-2">Km</p>
           </div>
-          <div className="rounded-2xl bg-stone-50 border border-stone-200 p-4 shadow-sm text-center flex flex-col justify-center relative overflow-hidden no-theme-flip">
-            <Medal weight="duotone" className="w-6 h-6 text-zinc-900 mx-auto relative z-10" />
-            <p className="text-2xl font-bold font-mono tracking-tighter text-zinc-950 mt-2 relative z-10">{loading ? '...' : stats.xp}</p>
-            <p className="text-[10px] font-medium text-zinc-700 uppercase tracking-wider mt-0.5 relative z-10">Punti XP</p>
+          <div className="rounded-card bg-surface border border-border-default p-4 shadow-sm text-center flex flex-col justify-center relative overflow-hidden no-theme-flip">
+            <Medal weight="bold" className="w-6 h-6 text-accent-gold mx-auto relative z-10" />
+            <p className="text-[28px] font-serif font-black tracking-tighter text-text-primary mt-2 relative z-10 leading-none">{loading ? '...' : stats.xp}</p>
+            <p className="overline mt-2 relative z-10">Punti XP</p>
           </div>
         </div>
 
         {/* ── SHARE APP ── */}
-        <button onClick={handleShare} className="w-full rounded-2xl bg-zinc-950 text-white p-4 flex items-center justify-between shadow-md hover:shadow-lg active:scale-[0.98] transition-all">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center"><ShareNetwork weight="fill" className="w-5 h-5 text-white" /></div>
+        <button onClick={handleShare} className="w-full rounded-card bg-bg-dark text-white p-5 flex items-center justify-between shadow-md hover:shadow-lg active:scale-[0.98] transition-all">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 rounded-lg bg-white/10 flex items-center justify-center"><ShareNetwork weight="bold" className="w-6 h-6 text-white" /></div>
             <div className="text-left">
-              <p className="text-[14px] font-bold tracking-tight">Invita un Amico</p>
-              <p className="text-[11px] text-white/50">Mostra le bellezze della Puglia</p>
+              <p className="text-[15px] font-bold tracking-tight family-sans">Invita un Amico</p>
+              <p className="text-[12px] text-white/50">Mostra le bellezze della Puglia</p>
             </div>
           </div>
           <ArrowRight weight="bold" className="w-4 h-4 text-white/30" />
@@ -232,32 +232,35 @@ export default function Profilo() {
         {!partner && (
           <button
             onClick={() => navigate('/partner/join')}
-            className="w-full rounded-2xl p-5 text-left border border-amber-300/50 bg-gradient-to-br from-[#201504] via-[#2e1f07] to-[#18120a] text-amber-50 shadow-[0_14px_36px_rgba(0,0,0,0.22)] hover:shadow-[0_18px_40px_rgba(0,0,0,0.28)] active:scale-[0.99] transition-all"
+            className="w-full rounded-card p-6 text-left border border-white/10 bg-bg-dark text-white shadow-card hover:shadow-2xl active:scale-[0.99] transition-all relative overflow-hidden"
           >
-            <p className="text-[11px] uppercase tracking-[0.18em] text-amber-200/80 font-bold mb-1">Area Business</p>
-            <p className="text-[18px] leading-tight font-extrabold tracking-tight">Hai un&apos;attività? Diventa nostro Partner</p>
-            <p className="text-[12px] text-amber-100/85 mt-2">
+             <div className="absolute top-0 left-5 right-5 h-[2px] bg-accent opacity-80" />
+            <p className="overline text-accent-gold mb-2">Area Business</p>
+            <p className="text-[20px] leading-tight font-serif font-black tracking-tight mb-2">Hai un&apos;attività? Diventa nostro Partner</p>
+            <p className="text-[13px] text-white/60 leading-relaxed">
               Entra nella rete Desideri di Puglia, vendi eventi, ottieni visibilità premium e monitora i guadagni.
             </p>
-            <div className="mt-3 inline-flex items-center gap-2 text-[12px] font-bold text-amber-200">
+            <div className="mt-4 inline-flex items-center gap-2 text-[14px] font-bold text-accent">
               Inizia onboarding <ArrowRight weight="bold" className="w-3.5 h-3.5" />
             </div>
           </button>
         )}
 
         {/* ── MODIFICA PROFILO ── */}
-        <section className="rounded-2xl bg-white border border-zinc-200/60 p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[14px] font-bold text-zinc-950 tracking-tight flex items-center gap-2"><UserCircle weight="duotone" className="w-4.5 h-4.5 text-zinc-400" /> Il tuo Profilo</h2>
+        <section className="card">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-[16px] font-serif font-black text-text-primary tracking-tight flex items-center gap-3">
+              <UserCircle weight="bold" className="w-5 h-5 text-text-light" /> Il tuo Profilo
+            </h2>
             {!editing ? (
-              <button onClick={() => setEditing(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-100 border border-zinc-200 text-[11px] font-semibold text-zinc-700 hover:bg-zinc-200 transition">
-                <PencilSimple weight="bold" className="w-3 h-3" /> Modifica
+              <button onClick={() => setEditing(true)} className="btn-ghost !px-4 !py-2 !text-[11px]">
+                <PencilSimple weight="bold" className="w-3.5 h-3.5" /> Modifica
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <button onClick={() => setEditing(false)} className="w-7 h-7 rounded-full bg-zinc-100 border border-zinc-200 flex items-center justify-center hover:bg-zinc-200 transition"><X weight="bold" className="w-3 h-3 text-zinc-500" /></button>
-                <button onClick={handleSave} disabled={saving} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-950 text-white text-[11px] font-semibold disabled:opacity-50 active:scale-95 transition">
-                  <FloppyDisk weight="bold" className="w-3 h-3" /> {saving ? 'Salvo...' : 'Salva'}
+                <button onClick={() => setEditing(false)} className="w-8 h-8 rounded-full bg-bg-secondary border border-border-default flex items-center justify-center hover:bg-zinc-200 transition"><X weight="bold" className="w-4 h-4 text-text-muted" /></button>
+                <button onClick={handleSave} disabled={saving} className="btn-primary !px-4 !py-2 !text-[11px] !shadow-none">
+                  <FloppyDisk weight="bold" className="w-3.5 h-3.5" /> {saving ? 'Salvo...' : 'Salva'}
                 </button>
               </div>
             )}
@@ -293,38 +296,37 @@ export default function Profilo() {
         </section>
 
         {/* ── HOW-TO EDUCATIONAL ── */}
-        <section className="rounded-2xl bg-white border border-zinc-200/60 p-5 shadow-sm">
-          <h2 className="text-[14px] font-bold text-zinc-950 tracking-tight mb-4 flex items-center gap-2">
-            <Books weight="duotone" className="w-4.5 h-4.5 text-zinc-400" /> Come Funziona
+        <section className="card">
+          <h2 className="text-[16px] font-serif font-black text-text-primary tracking-tight mb-6 flex items-center gap-3">
+            <Books weight="bold" className="w-5 h-5 text-text-light" /> Come Funziona
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <HowToCard icon={<Compass weight="duotone" className="w-6 h-6 text-blue-500" />} title="Sblocco GPS" desc="Avvicinati a un monumento entro 50m per ottenere la Card." />
-            <HowToCard icon={<Key weight="duotone" className="w-6 h-6 text-amber-500" />} title="PIN Partner" desc="Visita un locale affiliato e richiedi il codice segreto." />
-            <HowToCard icon={<CardsThree weight="duotone" className="w-6 h-6 text-emerald-500" />} title="Collezione" desc="Completa i Set Regionali sfidando gli altri esploratori." />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <HowToCard icon={<Compass weight="bold" className="w-6 h-6 text-accent" />} title="Sblocco GPS" desc="Avvicinati a un monumento entro 50m per ottenere la Card." />
+            <HowToCard icon={<Key weight="bold" className="w-6 h-6 text-accent-gold" />} title="PIN Partner" desc="Visita un locale affiliato e richiedi il codice segreto." />
+            <HowToCard icon={<CardsThree weight="bold" className="w-6 h-6 text-success" />} title="Collezione" desc="Completa i Set Regionali sfidando gli altri esploratori." />
           </div>
-          <div className="mt-4 p-4 rounded-xl bg-zinc-50 border border-zinc-100 text-[11px] text-zinc-500 leading-relaxed">
-            <strong className="text-zinc-700">Le Saghe (Set di Carte):</strong> Sono percorsi tematici legati alla cultura pugliese. Completando internamente i set si ottengono punti XP massimizzati. Visita i tab "Missioni" per scoprire le sfide in corso!
+          <div className="mt-6 p-4 rounded-xl bg-bg-secondary border border-border-default text-[12px] text-text-muted leading-relaxed">
+            <strong className="text-text-primary font-bold">Le Saghe (Set di Carte):</strong> Sono percorsi tematici legati alla cultura pugliese. Completando internamente i set si ottengono punti XP massimizzati. Visita i tab "Missioni" per scoprire le sfide in corso!
           </div>
         </section>
 
         {/* ── SICUREZZA E LEGAL ── */}
-        <div className="grid sm:grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-white border border-zinc-200/60 p-2 shadow-sm space-y-1">
-            {/* Theme Toggle Removed - Light Mode is now permanent */}
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="card !p-2 space-y-1">
             {profile?.ruolo !== 'creator' && (
               <ActionRow
-                icon={<Compass weight="duotone" />}
-                color="text-amber-600"
+                icon={<Compass weight="bold" />}
+                color="text-accent"
                 label="Diventa Creator"
                 onClick={() => navigate('/diventa-creator')}
               />
             )}
-            <ActionRow icon={<Lock weight="duotone" />} color="text-zinc-600" label="Reimposta Password" onClick={() => setShowPasswordModal(true)} />
-            <ActionRow icon={<ShieldCheck weight="duotone" />} color="text-emerald-500" label="Informativa sulla Privacy" onClick={() => navigate('/privacy')} />
-            <ActionRow icon={<BookOpenText weight="duotone" />} color="text-orange-500" label="Termini e Condizioni" onClick={() => navigate('/termini')} />
+            <ActionRow icon={<Lock weight="bold" />} color="text-text-muted" label="Reimposta Password" onClick={() => setShowPasswordModal(true)} />
+            <ActionRow icon={<ShieldCheck weight="bold" />} color="text-success" label="Informativa sulla Privacy" onClick={() => navigate('/privacy')} />
+            <ActionRow icon={<BookOpenText weight="bold" />} color="text-accent-orange" label="Termini e Condizioni" onClick={() => navigate('/termini')} />
           </div>
-          <div className="rounded-2xl bg-rose-50 border border-rose-200/60 p-2 shadow-sm">
-            <ActionRow icon={<Warning weight="fill" />} color="text-rose-600" label="Elimina Account" onClick={() => setShowDeleteModal(true)} />
+          <div className="rounded-card bg-red-50/50 border border-red-100 p-2 shadow-sm">
+            <ActionRow icon={<Warning weight="fill" />} color="text-danger" label="Elimina Account" onClick={() => setShowDeleteModal(true)} />
           </div>
         </div>
 
@@ -332,14 +334,14 @@ export default function Profilo() {
 
       {/* ════ MODALI ════ */}
       <BottomModal open={showPasswordModal} onClose={() => setShowPasswordModal(false)} title="Reset Password">
-        <p className="text-[12px] text-zinc-500 mb-5 leading-relaxed">Riceverai un'email su <strong className="text-zinc-800">{profile?.email}</strong> per reimpostare la tua password.</p>
-        <button onClick={handleResetPassword} disabled={passwordSending} className="w-full py-3 rounded-xl bg-zinc-950 text-white text-[13px] font-bold active:scale-95 transition disabled:opacity-50">{passwordSending ? 'Invio in corso...' : 'Invia Modulo Reset'}</button>
+        <p className="text-[13px] text-text-muted mb-6 leading-relaxed">Riceverai un'email su <strong className="text-text-primary">{profile?.email}</strong> per reimpostare la tua password.</p>
+        <button onClick={handleResetPassword} disabled={passwordSending} className="btn-primary w-full">{passwordSending ? 'Invio in corso...' : 'Invia Modulo Reset'}</button>
       </BottomModal>
 
-      <BottomModal open={showDeleteModal} onClose={() => { setShowDeleteModal(false); setDeleteConfirmText('') }} title={<span className="text-rose-600 flex items-center gap-2"><Warning weight="fill" /> Danger Zone</span>}>
-        <p className="text-[12px] text-zinc-600 mb-4 leading-relaxed">Eliminando l'account perderai per sempre le card sbloccate, gli XP e il ranking nel Club. <strong>L'azione non è reversibile.</strong></p>
-        <input type="text" value={deleteConfirmText} onChange={e => setDeleteConfirmText(e.target.value)} placeholder='Scrivi "elimina" per confermare' className="w-full px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl mb-4 text-[13px] outline-none focus:border-rose-400 focus:ring-1 focus:ring-rose-400" />
-        <button onClick={handleDeleteAccount} disabled={deletingAccount || deleteConfirmText.trim().toLowerCase() !== 'elimina'} className="w-full py-3 rounded-xl bg-rose-600 text-white text-[13px] font-bold disabled:opacity-40 active:scale-95 transition">Conferma Eliminazione</button>
+      <BottomModal open={showDeleteModal} onClose={() => { setShowDeleteModal(false); setDeleteConfirmText('') }} title={<span className="text-danger flex items-center gap-2"><Warning weight="fill" /> Danger Zone</span>}>
+        <p className="text-[13px] text-text-muted mb-4 leading-relaxed">Eliminando l'account perderai per sempre le card sbloccate, gli XP e il ranking nel Club. <strong>L'azione non è reversibile.</strong></p>
+        <input type="text" value={deleteConfirmText} onChange={e => setDeleteConfirmText(e.target.value)} placeholder='Scrivi "elimina" per confermare' className="w-full px-4 py-3 bg-bg-secondary border border-border-default rounded-md mb-4 text-[14px] outline-none focus:border-danger transition" />
+        <button onClick={handleDeleteAccount} disabled={deletingAccount || deleteConfirmText.trim().toLowerCase() !== 'elimina'} className="w-full py-4 rounded-pill bg-danger text-white text-[14px] font-black disabled:opacity-40 active:scale-95 transition shadow-lg">Conferma Eliminazione</button>
       </BottomModal>
 
       {modeTransition.active && (
@@ -357,20 +359,20 @@ export default function Profilo() {
 
 function ProfileRow({ label, value }) {
   return (
-    <div className="flex gap-4 py-2 border-b border-zinc-100 last:border-0 justify-between items-start">
-      <span className="text-[11px] text-zinc-600 uppercase tracking-wider font-bold shrink-0">{label}</span>
-      <span className="text-[12px] text-zinc-900 font-medium text-right break-words">{value}</span>
+    <div className="flex gap-4 py-3 border-b border-border-default last:border-0 justify-between items-start">
+      <span className="overline !mb-0 shrink-0">{label}</span>
+      <span className="text-[13px] text-text-primary font-medium text-right break-words">{value}</span>
     </div>
   )
 }
 
 function FormField({ label, value, onChange, type = "text", multiline = false, icon = null }) {
-  const cls = "w-full pl-3 pr-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl text-[13px] text-zinc-900 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700/30 transition resize-none"
+  const cls = "w-full pl-3 pr-3 py-3 bg-white border border-border-default rounded-md text-[14px] text-text-primary placeholder:text-text-light focus:outline-none focus:border-accent transition resize-none shadow-sm"
   return (
     <div className="relative">
-      <label className="block text-[10px] font-bold text-zinc-700 uppercase tracking-wider mb-1 flex items-center gap-1">{icon}{label}</label>
+      <label className="overline !text-text-muted flex items-center gap-2">{icon}{label}</label>
       {multiline
-        ? <textarea rows={2} className={cls} value={value} onChange={e => onChange(e.target.value)} />
+        ? <textarea rows={3} className={cls} value={value} onChange={e => onChange(e.target.value)} />
         : <input type={type} className={cls} value={value} onChange={e => onChange(e.target.value)} />}
     </div>
   )
@@ -390,13 +392,13 @@ function ActionRow({ icon, color, label, onClick }) {
 
 function HowToCard({ icon, title, desc }) {
   return (
-    <div className="rounded-xl bg-zinc-50 border border-zinc-100 p-4 flex flex-col gap-3 hover:bg-zinc-100/60 transition">
-      <div className="w-10 h-10 rounded-xl bg-white border border-zinc-100 flex items-center justify-center shadow-sm text-zinc-500">
+    <div className="rounded-lg bg-bg-secondary border border-border-default p-5 flex flex-col gap-4 hover:bg-white hover:shadow-md transition-all duration-300">
+      <div className="w-12 h-12 rounded-lg bg-white border border-border-default flex items-center justify-center shadow-sm text-text-light">
         {icon}
       </div>
       <div>
-        <p className="text-[12px] font-bold text-zinc-900">{title}</p>
-        <p className="text-[11px] text-zinc-500 mt-0.5 leading-relaxed">{desc}</p>
+        <p className="text-[14px] font-serif font-black text-text-primary">{title}</p>
+        <p className="text-[12px] text-text-muted mt-1 leading-relaxed">{desc}</p>
       </div>
     </div>
   )
@@ -405,17 +407,14 @@ function HowToCard({ icon, title, desc }) {
 function BottomModal({ open, onClose, title, children }) {
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-zinc-950/40 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={onClose}>
-      {/* 
-        Aggiungiamo mb-20 sm:mb-0 al contenitore del modale in modo che si alzi sopra la navbar 
-        del layout globale, che fissa in basso la navigazione su mobile. 
-      */}
-      <div className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 flex flex-col max-h-[80vh] mb-24 sm:mb-0" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-5 shrink-0">
-          <h3 className="text-[16px] font-bold text-zinc-950">{title}</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-500 hover:bg-zinc-200"><X weight="bold" /></button>
+    <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-bg-dark/60 backdrop-blur-md p-4 animate-in fade-in duration-300" onClick={onClose}>
+      <div className="w-full max-w-sm bg-bg-primary rounded-t-lg sm:rounded-lg p-7 shadow-card animate-in slide-in-from-bottom-10 sm:scale-95 flex flex-col max-h-[85vh] mb-24 sm:mb-0 relative" onClick={e => e.stopPropagation()}>
+        <div className="absolute top-0 left-10 right-10 h-[2px] bg-accent rounded-full opacity-50" />
+        <div className="flex items-center justify-between mb-6 shrink-0 pt-2">
+          <h3 className="text-[20px] font-serif font-black text-text-primary tracking-tight">{title}</h3>
+          <button onClick={onClose} className="w-9 h-9 rounded-full bg-white border border-border-default flex items-center justify-center text-text-muted hover:bg-zinc-100 transition shadow-sm"><X weight="bold" /></button>
         </div>
-        <div className="overflow-y-auto overflow-x-hidden pr-2 -mr-2 pb-2">
+        <div className="overflow-y-auto overflow-x-hidden pr-2 -mr-2 pb-4 scrollbar-hide">
           {children}
         </div>
       </div>

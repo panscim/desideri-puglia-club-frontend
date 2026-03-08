@@ -3,11 +3,12 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
-import { Mail, User, MapPin } from "lucide-react";
+import { Mail, User, MapPin, ArrowRight, ArrowLeft, Camera, ShieldCheck, CheckCircle } from "lucide-react";
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import { motion, AnimatePresence } from 'framer-motion'
 import AnimatedAuthBackground from '../components/AnimatedAuthBackground'
+import { colors as TOKENS, typography, motion as springMotion } from '../utils/designTokens'
 
 const ALLOWED_DOMAINS = [
   "gmail.com",
@@ -26,18 +27,8 @@ function getDomain(email) {
 }
 
 const MONTHS_IT = [
-  "Gennaio",
-  "Febbraio",
-  "Marzo",
-  "Aprile",
-  "Maggio",
-  "Giugno",
-  "Luglio",
-  "Agosto",
-  "Settembre",
-  "Ottobre",
-  "Novembre",
-  "Dicembre",
+  "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+  "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre",
 ];
 
 const hasStrongPassword = (password) => {
@@ -49,14 +40,13 @@ const hasStrongPassword = (password) => {
 
 const getDaysInMonth = (year, month) => new Date(year, month, 0).getDate();
 
-// --- helper: carica immagine in modo compatibile (createImageBitmap o Image) ---
+// --- helper: carica immagine in modo compatibile ---
 async function loadImageFromFile(file) {
   if (typeof createImageBitmap === "function") {
     try {
       return await createImageBitmap(file);
     } catch (_) { }
   }
-
   const url = URL.createObjectURL(file);
   try {
     const img = new Image();
@@ -75,26 +65,20 @@ async function loadImageFromFile(file) {
 // --- compressione avatar: resize + WebP ---
 async function compressToWebp(file, { maxPx = 384, quality = 0.82 } = {}) {
   const source = await loadImageFromFile(file);
-
   const srcW = source.width;
   const srcH = source.height;
-
   const scale = Math.min(1, maxPx / Math.max(srcW, srcH));
   const w = Math.max(1, Math.round(srcW * scale));
   const h = Math.max(1, Math.round(srcH * scale));
-
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
-
   const ctx = canvas.getContext("2d", { alpha: false });
   ctx.drawImage(source, 0, 0, w, h);
-
   const blob = await new Promise((resolve) =>
     canvas.toBlob(resolve, "image/webp", quality)
   );
   if (!blob) throw new Error("Impossibile comprimere immagine");
-
   return new File([blob], "avatar.webp", { type: "image/webp" });
 }
 
@@ -128,18 +112,11 @@ export default function Register() {
   const [currentStep, setCurrentStep] = useState(1);
   const [focusedField, setFocusedField] = useState(null);
 
-  const [permissions, setPermissions] = useState({
-    location: false,
-    push: false,
-    photo: false,
-    camera: false
-  });
-
-  const [privacyConsent, setPrivacyConsent] = useState(null); // 'accepted' | 'declined' | null
-
+  const [privacyConsent, setPrivacyConsent] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [birthDateParts, setBirthDateParts] = useState({ day: "", month: "", year: "" });
+
   const today = new Date();
   const currentYear = today.getFullYear();
   const minYear = currentYear - 100;
@@ -161,249 +138,87 @@ export default function Register() {
     };
   }, [avatarPreview]);
 
-  useEffect(() => {
-    if (!formData.data_nascita) return;
-    const [y = "", m = "", d = ""] = formData.data_nascita.split("-");
-    if (y && m && d) {
-      setBirthDateParts((prev) => {
-        if (prev.year === y && prev.month === String(Number(m)) && prev.day === String(Number(d))) return prev;
-        return { year: y, month: String(Number(m)), day: String(Number(d)) };
-      });
-    }
-  }, [formData.data_nascita]);
-
-  const handleSocialLogin = async (provider) => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: window.location.origin + '/dashboard',
-        },
-      })
-      if (error) throw error
-    } catch (error) {
-      toast.error(error.message || t('common.error'))
-    }
-  }
-
   const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Carica un file immagine valido");
-      return;
-    }
-
-    const maxInputSize = 12 * 1024 * 1024; // 12MB input
-    if (file.size > maxInputSize) {
-      toast.error("Immagine troppo grande (max 12MB)");
-      return;
-    }
-
     try {
-      // ✅ compressione reale (WebP + resize)
       const webp = await compressToWebp(file, { maxPx: 384, quality: 0.82 });
-
       const previewUrl = URL.createObjectURL(webp);
       if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-
       setAvatarFile(webp);
       setAvatarPreview(previewUrl);
     } catch (err) {
-      console.error(err);
-      toast.error("Errore nella compressione della foto profilo");
+      toast.error("Errore nella foto profilo");
     }
   };
 
+  const nextStep = () => {
+    if (currentStep === 1 && (!formData.nome || !formData.cognome || !formData.nickname)) {
+      toast.error("Compila tutti i campi"); return;
+    }
+    if (currentStep === 2 && (!formData.data_nascita || !formData.sesso)) {
+      toast.error("Compila la data di nascita e il sesso"); return;
+    }
+    if (currentStep === 3 && (!formData.email || !formData.password)) {
+      toast.error("Inserisci email e password"); return;
+    }
+    if (currentStep === 3) {
+      if (!hasStrongPassword(formData.password)) {
+        toast.error("La password deve contenere almeno 1 maiuscola, 1 numero e 1 simbolo"); return;
+      }
+    }
+    if (currentStep === 5 && !privacyConsent) {
+      toast.error("Devi accettare la privacy policy"); return;
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 6));
+  };
+  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
+
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
+    setLoading(true);
 
-    if (currentStep !== 5) {
-      toast.error("Completa lo step 5 prima di finalizzare la registrazione");
-      return;
-    }
-
-    const nickname = formData.nickname.trim();
     const domain = getDomain(formData.email);
     if (!ALLOWED_DOMAINS.includes(domain)) {
       toast.error("Usa una email Gmail, iCloud, Libero o Outlook");
+      setLoading(false);
       return;
     }
 
-    if (privacyConsent !== 'accepted') {
-      toast.error("Devi accettare la privacy policy per registrarti.");
-      return;
-    }
-
-    if (
-      !formData.nome.trim() ||
-      !formData.cognome.trim() ||
-      !nickname ||
-      !formData.data_nascita ||
-      !formData.sesso ||
-      !formData.telefono.trim() ||
-      !formData.email.trim() ||
-      !formData.password.trim() ||
-      !formData.confirmPassword.trim()
-    ) {
-      toast.error("Compila tutti i campi obbligatori");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast.error("La password deve essere di almeno 6 caratteri");
-      return;
-    }
-
-    if (!hasStrongPassword(formData.password)) {
-      toast.error("La password deve contenere almeno 1 maiuscola, 1 numero e 1 simbolo");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Le password non coincidono");
-      return;
-    }
-
-    // Evita errore generico Supabase (trigger su auth.users) se il nickname e' gia' usato.
-    try {
-      const { data: nicknameMatch, error: nicknameError } = await supabase
-        .from("utenti")
-        .select("id")
-        .eq("nickname", nickname)
-        .maybeSingle();
-
-      if (nicknameError && nicknameError.code !== "PGRST116") throw nicknameError;
-      if (nicknameMatch) {
-        toast.error("Questo nickname e' gia' in uso. Scegline un altro.");
-        return;
-      }
-    } catch (precheckError) {
-      console.warn("Nickname precheck warning:", precheckError?.message || precheckError);
-    }
-
-    // if (!avatarFile) {
-    //   toast.error(t('auth.profile_photo_required') || 'Carica una foto profilo per continuare')
-    //   return;
-    // }
-
-    setLoading(true);
     try {
       let avatarUrl = null;
       if (avatarFile) {
-        const filePath = `avatars/${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2)}.webp`;
-
+        const filePath = `avatars/${Date.now()}-${Math.random().toString(36).slice(2)}.webp`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("avatars")
-          .upload(filePath, avatarFile, {
-            cacheControl: "31536000",
-            upsert: true,
-            contentType: "image/webp",
-          });
+          .upload(filePath, avatarFile, { contentType: "image/webp" });
 
-        if (uploadError) {
-          console.error("Avatar upload error:", uploadError);
-          toast.error("Errore nel caricamento della foto profilo");
-          return;
+        if (!uploadError) {
+          const { data: publicUrlData } = supabase.storage.from("avatars").getPublicUrl(uploadData.path);
+          avatarUrl = publicUrlData?.publicUrl;
         }
-
-        const { data: publicUrlData } = supabase.storage
-          .from("avatars")
-          .getPublicUrl(uploadData.path);
-
-        avatarUrl = publicUrlData?.publicUrl || null;
       }
 
-      // 1) signup + metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email.trim(),
         password: formData.password,
         options: {
-          emailRedirectTo: window.location.origin + "/login",
           data: {
             nome: formData.nome.trim(),
             cognome: formData.cognome.trim(),
-            nickname,
-            paese: null,
-            citta: null,
-            via: null,
-            cap: null,
-            civico: null,
-            sesso: formData.sesso,
-            telefono: formData.telefono.trim() || null,
-            instagram_url: formData.instagram_url.trim() || null,
-            facebook_url: formData.facebook_url.trim() || null,
-            tiktok_url: formData.tiktok_url.trim() || null,
-            youtube_url: formData.youtube_url.trim() || null,
+            nickname: formData.nickname.trim(),
             avatar_url: avatarUrl,
             ruolo: "Utente",
-            data_nascita: formData.data_nascita || null,
-          },
-        },
+          }
+        }
       });
 
       if (authError) throw authError;
-      if (!authData?.user) {
-        throw new Error("Registrazione non completata. Riprova.");
-      }
 
-      // Se il provider restituisce subito sessione, la conferma email non e' richiesta.
-      if (authData.session) {
-        toast.success("Account creato con successo!");
-        navigate("/dashboard");
-        return;
-      }
-
-      // Utente gia' registrato (Supabase puo' non lanciare errore per anti-enumerazione)
-      if ((authData.user.identities || []).length === 0) {
-        toast("Email gia' registrata: prova ad accedere o reinvia la conferma.", { icon: "ℹ️" });
-        setCurrentStep(6);
-        return;
-      }
-
-      // 2) upsert profilo su "utenti"
-      const userId = authData?.user?.id;
-      if (userId) {
-        const { error: profileError } = await supabase.from("utenti").upsert(
-          [
-            {
-              id: userId,
-              email: formData.email.trim(),
-              nome: formData.nome.trim(),
-              cognome: formData.cognome.trim(),
-              nickname,
-              paese: null,
-              citta: null,
-              via: null,
-              cap: null,
-              civico: null,
-              sesso: formData.sesso,
-              telefono: formData.telefono.trim() || null,
-              ruolo: "Utente",
-              has_onboarding_completed: false,
-              avatar_url: avatarUrl,
-              instagram_url: formData.instagram_url.trim() || null,
-              facebook_url: formData.facebook_url.trim() || null,
-              tiktok_url: formData.tiktok_url.trim() || null,
-              youtube_url: formData.youtube_url.trim() || null,
-            },
-          ],
-          { onConflict: "id" }
-        );
-
-        if (profileError) {
-          console.warn("Profile insert error (ignoro):", profileError.message);
-        }
-      }
-
-      toast.success("Registrazione ok! Controlla la tua email per attivare l’account.");
-      setCurrentStep(6); // Verifica Email
+      toast.success("Registrazione completata! Verifica la tua email.");
+      setCurrentStep(6);
     } catch (error) {
-      console.error("Signup error:", error);
-      toast.error(error?.message || t('common.error'))
+      toast.error(error.message || "Errore durante la registrazione");
     } finally {
       setLoading(false);
     }
@@ -412,591 +227,260 @@ export default function Register() {
   const updateBirthDatePart = (part, value) => {
     const nextParts = { ...birthDateParts, [part]: value };
     setBirthDateParts(nextParts);
-
     const y = nextParts.year ? Number(nextParts.year) : null;
     const m = nextParts.month ? Number(nextParts.month) : null;
     const d = nextParts.day ? Number(nextParts.day) : null;
-
-    if (!y || !m || !d) {
-      setFormData((prev) => ({ ...prev, data_nascita: "" }));
-      return;
-    }
-
-    const maxDay = getDaysInMonth(y, m);
-    const safeDay = Math.min(d, maxDay);
-
-    if (safeDay !== d) {
-      nextParts.day = String(safeDay);
-      setBirthDateParts(nextParts);
-    }
-
-    const iso = `${String(y)}-${String(m).padStart(2, "0")}-${String(safeDay).padStart(2, "0")}`;
-    setFormData((prev) => ({ ...prev, data_nascita: iso }));
-  };
-
-  const handleResendConfirmation = async () => {
-    if (!formData.email?.trim()) {
-      toast.error("Inserisci prima una email valida");
-      return;
-    }
-    setResendingEmail(true);
-    try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: formData.email.trim(),
-        options: {
-          emailRedirectTo: window.location.origin + "/login",
-        },
-      });
-      if (error) throw error;
-      toast.success("Email di conferma reinviata");
-    } catch (error) {
-      toast.error(error?.message || "Impossibile reinviare l'email adesso");
-    } finally {
-      setResendingEmail(false);
+    if (y && m && d) {
+      const iso = `${String(y)}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      setFormData(prev => ({ ...prev, data_nascita: iso }));
     }
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col items-center px-6 py-12 relative overflow-hidden bg-[#EAE5DF]">
+    <div className="min-h-[100dvh] flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden" style={{ background: TOKENS.bgPrimary }}>
       <AnimatedAuthBackground />
 
-      <div className="absolute top-6 right-6 z-20">
+      <div className="absolute top-8 right-8 z-50 flex items-center gap-4 pointer-events-auto">
+        {currentStep > 1 && currentStep < 6 && (
+          <button
+            onClick={prevStep}
+            className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-md border border-stone-200 shadow-sm flex items-center justify-center"
+          >
+            <ArrowLeft size={18} />
+          </button>
+        )}
         <LanguageSwitcher />
       </div>
 
-      <div className="w-full max-w-sm w-full z-10 flex flex-col">
+      <div className="w-full max-w-[420px] z-10 flex flex-col">
+        {/* Logo Section */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={springMotion.spring}
+          className="mb-12 flex flex-col items-start"
+        >
+          <div className="w-24 h-24 flex items-center justify-center mb-6 overflow-hidden">
+            <img src="/logo.png" className="w-full h-full object-contain" alt="Logo" />
+          </div>
+        </motion.div>
 
-        {/* Intestazione */}
-                <div className="mt-12 mb-10 text-left">
-          <h1 className="text-[32px] font-black text-zinc-900 leading-[1.05] tracking-tight">
-            Crea il tuo<br />profilo Club
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-black text-zinc-950 leading-tight mb-3" style={{ fontFamily: typography.serif }}>
+            {currentStep === 6 ? 'Quasi fatta!' : 'Entra nel'} <br />
+            <span className="text-[#D4793A] italic">{currentStep === 6 ? 'Verifica' : 'Club'}</span>
           </h1>
-          <p className="text-[13px] font-semibold uppercase tracking-[0.22em] text-zinc-600 mt-3">
-            onboarding premium
-          </p>
+          <div className="w-12 h-1 bg-[#D4793A] rounded-full opacity-30" />
         </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (currentStep === 5) handleSubmit(e);
-          }}
-          className="space-y-6 pb-20"
-        >
-          {/* Step Indicator */}
-          {currentStep < 6 && (
-            <div className="mb-8 w-full">
-              <div className="flex justify-between items-end mb-2">
-                <span className="text-[12px] font-bold text-zinc-500 uppercase tracking-widest">
-                  Step {currentStep} di 5
-                </span>
-              </div>
-              <div className="h-1.5 w-full bg-zinc-300/50 rounded-full overflow-hidden">
+        {/* Step Indicator */}
+        {currentStep < 6 && (
+          <div className="mb-10 flex items-center gap-2">
+            {[1, 2, 3, 4, 5].map(s => (
+              <div key={s} className="flex-1 h-1 rounded-full overflow-hidden bg-stone-200">
                 <motion.div
-                  className="h-full bg-zinc-900 rounded-full"
-                  initial={{ width: `${((currentStep - 1) / 5) * 100}%` }}
-                  animate={{ width: `${(currentStep / 5) * 100}%` }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
+                  initial={{ width: 0 }}
+                  animate={{ width: currentStep >= s ? '100%' : '0%' }}
+                  className="h-full bg-zinc-950"
                 />
               </div>
-            </div>
-          )}
+            ))}
+          </div>
+        )}
 
-          <AnimatePresence mode="wait">
-            {/* STEP 1: IDENTITÀ (Nome, Cognome, Nickname) */}
+        {/* Form Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentStep}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={springMotion.spring}
+            className="min-h-[340px]"
+          >
             {currentStep === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-5"
-              >
-                <div className="mb-6">
-                  <h2 className="text-2xl font-black text-zinc-900 mb-1">Chi sei?</h2>
-                  <p className="text-sm text-zinc-600">Dicci come ti chiami.</p>
-                </div>
-
+              <div className="space-y-6">
+                <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Identità</p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="relative group">
-                    <motion.div animate={{ borderColor: focusedField === 'nome' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
+                    <div className="absolute inset-0 rounded-2xl border-2 border-stone-200 bg-white/60 -z-10" />
                     <input
-                      type="text"
+                      placeholder="Nome"
+                      className="w-full bg-transparent border-0 px-5 py-5 text-[15px] font-bold"
                       value={formData.nome}
-                      onFocus={() => setFocusedField('nome')}
-                      onBlur={() => setFocusedField(null)}
-                      onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                      className="w-full bg-transparent border-0 px-4 py-4 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium"
-                      placeholder={t('common.name') + " *"}
-                      required
+                      onChange={e => setFormData({ ...formData, nome: e.target.value })}
                     />
                   </div>
                   <div className="relative group">
-                    <motion.div animate={{ borderColor: focusedField === 'cognome' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
+                    <div className="absolute inset-0 rounded-2xl border-2 border-stone-200 bg-white/60 -z-10" />
                     <input
-                      type="text"
+                      placeholder="Cognome"
+                      className="w-full bg-transparent border-0 px-5 py-5 text-[15px] font-bold"
                       value={formData.cognome}
-                      onFocus={() => setFocusedField('cognome')}
-                      onBlur={() => setFocusedField(null)}
-                      onChange={(e) => setFormData({ ...formData, cognome: e.target.value })}
-                      className="w-full bg-transparent border-0 px-4 py-4 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium"
-                      placeholder={t('common.surname') + " *"}
-                      required
+                      onChange={e => setFormData({ ...formData, cognome: e.target.value })}
                     />
                   </div>
                 </div>
-
                 <div className="relative group">
-                  <motion.div animate={{ borderColor: focusedField === 'nickname' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
+                  <div className="absolute inset-0 rounded-2xl border-2 border-stone-200 bg-white/60 -z-10" />
                   <input
-                    type="text"
+                    placeholder="Nickname Unico"
+                    className="w-full bg-transparent border-0 px-5 py-5 text-[15px] font-bold"
                     value={formData.nickname}
-                    onFocus={() => setFocusedField('nickname')}
-                    onBlur={() => setFocusedField(null)}
-                    onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                    className="w-full bg-transparent border-0 px-4 py-4 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium"
-                    placeholder="Nickname *"
-                    required
+                    onChange={e => setFormData({ ...formData, nickname: e.target.value })}
                   />
                 </div>
-              </motion.div>
+              </div>
             )}
 
-            {/* STEP 2: ANAGRAFICA (Data Nascita, Sesso) */}
             {currentStep === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-5"
-              >
-                <div className="mb-6">
-                  <h2 className="text-2xl font-black text-zinc-900 mb-1">Qualche dettaglio</h2>
-                  <p className="text-sm text-zinc-600">Per personalizzare la tua esperienza.</p>
-                </div>
-
-                <div className="relative group">
-                  <motion.div animate={{ borderColor: focusedField === 'data_nascita' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
-                  <div className="px-4 py-3">
-                    <p className="text-[11px] uppercase tracking-wider text-zinc-500 mb-2">Data di nascita *</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      <select
-                        value={selectedDay || ""}
-                        onFocus={() => setFocusedField('data_nascita')}
-                        onBlur={() => setFocusedField(null)}
-                        onChange={(e) => updateBirthDatePart("day", e.target.value)}
-                        className="bg-white/80 rounded-xl px-3 py-3 text-[14px] font-semibold text-zinc-900 border border-zinc-200 focus:outline-none"
-                        required
-                      >
-                        <option value="">Giorno</option>
-                        {dayOptions.map((d) => (
-                          <option key={d} value={d}>
-                            {d}
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        value={selectedMonth || ""}
-                        onFocus={() => setFocusedField('data_nascita')}
-                        onBlur={() => setFocusedField(null)}
-                        onChange={(e) => updateBirthDatePart("month", e.target.value)}
-                        className="bg-white/80 rounded-xl px-3 py-3 text-[14px] font-semibold text-zinc-900 border border-zinc-200 focus:outline-none"
-                        required
-                      >
-                        <option value="">Mese</option>
-                        {monthOptions.map((m) => (
-                          <option key={m} value={m}>
-                            {MONTHS_IT[m - 1]}
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        value={selectedYear || ""}
-                        onFocus={() => setFocusedField('data_nascita')}
-                        onBlur={() => setFocusedField(null)}
-                        onChange={(e) => updateBirthDatePart("year", e.target.value)}
-                        className="bg-white/80 rounded-xl px-3 py-3 text-[14px] font-semibold text-zinc-900 border border-zinc-200 focus:outline-none"
-                        required
-                      >
-                        <option value="">Anno</option>
-                        {yearOptions.map((y) => (
-                          <option key={y} value={y}>
-                            {y}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+              <div className="space-y-6">
+                <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Dettagli personali</p>
+                <div className="relative overflow-hidden rounded-3xl border-2 border-stone-200 bg-white/60 p-6 space-y-4">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">Data di Nascita</label>
+                  <div className="grid grid-cols-3 gap-3">
+                    <select className="bg-white rounded-xl h-12 px-3 font-bold border-stone-100" onChange={e => updateBirthDatePart('day', e.target.value)}>
+                      <option>Giorno</option>
+                      {dayOptions.map(d => <option key={d}>{d}</option>)}
+                    </select>
+                    <select className="bg-white rounded-xl h-12 px-3 font-bold border-stone-100" onChange={e => updateBirthDatePart('month', e.target.value)}>
+                      <option>Mese</option>
+                      {monthOptions.map(m => <option key={m} value={m}>{MONTHS_IT[m - 1]}</option>)}
+                    </select>
+                    <select className="bg-white rounded-xl h-12 px-3 font-bold border-stone-100" onChange={e => updateBirthDatePart('year', e.target.value)}>
+                      <option>Anno</option>
+                      {yearOptions.map(y => <option key={y}>{y}</option>)}
+                    </select>
                   </div>
                 </div>
-
                 <div className="relative group">
-                  <motion.div animate={{ borderColor: focusedField === 'sesso' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
+                  <div className="absolute inset-0 rounded-2xl border-2 border-stone-200 bg-white/60 -z-10" />
                   <select
+                    className="w-full bg-transparent border-0 px-5 py-5 text-[15px] font-bold appearance-none"
                     value={formData.sesso}
-                    onFocus={() => setFocusedField('sesso')}
-                    onBlur={() => setFocusedField(null)}
-                    onChange={(e) => setFormData({ ...formData, sesso: e.target.value })}
-                    className="w-full bg-transparent border-0 px-4 py-4 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium appearance-none"
-                    required
+                    onChange={e => setFormData({ ...formData, sesso: e.target.value })}
                   >
-                    <option value="" disabled>{t('auth.gender_select')} *</option>
-                    <option value="M">{t('auth.gender_male')}</option>
-                    <option value="F">{t('auth.gender_female')}</option>
-                    <option value="Altro">{t('auth.gender_other')}</option>
+                    <option value="">Sesso</option>
+                    <option value="M">Uomo</option>
+                    <option value="F">Donna</option>
+                    <option value="Altro">Altro / Non Specificato</option>
                   </select>
                 </div>
-
-                <div className="relative group">
-                  <motion.div animate={{ borderColor: focusedField === 'telefono' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
-                  <input
-                    type="tel"
-                    inputMode="tel"
-                    value={formData.telefono}
-                    onFocus={() => setFocusedField('telefono')}
-                    onBlur={() => setFocusedField(null)}
-                    onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
-                    className="w-full bg-transparent border-0 px-4 py-4 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium"
-                    placeholder={t('common.phone') + " *"}
-                    required
-                  />
-                </div>
-              </motion.div>
+              </div>
             )}
 
-            {/* STEP 3: CREDENZIALI (Email, Pass, Conform) */}
             {currentStep === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-4"
-              >
-                <div className="mb-6">
-                  <h2 className="text-2xl font-black text-zinc-900 mb-1">Proteggi l'account</h2>
-                  <p className="text-sm text-zinc-600">Inserisci i dati di accesso (solo email approvate).</p>
-                </div>
-
+              <div className="space-y-6">
+                <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Credenziali</p>
                 <div className="relative group">
-                  <motion.div animate={{ borderColor: focusedField === 'email' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
+                  <div className="absolute inset-0 rounded-2xl border-2 border-stone-200 bg-white/60 -z-10" />
                   <input
+                    placeholder="Email"
                     type="email"
+                    className="w-full bg-transparent border-0 px-5 py-5 text-[15px] font-bold"
                     value={formData.email}
-                    onFocus={() => setFocusedField('email')}
-                    onBlur={() => setFocusedField(null)}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-transparent border-0 px-4 py-4 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium"
-                    placeholder="Email *"
-                    required
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
-
                 <div className="relative group">
-                  <motion.div animate={{ borderColor: focusedField === 'password' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
+                  <div className="absolute inset-0 rounded-2xl border-2 border-stone-200 bg-white/60 -z-10" />
                   <input
+                    placeholder="Password"
                     type="password"
+                    className="w-full bg-transparent border-0 px-5 py-5 text-[15px] font-bold"
                     value={formData.password}
-                    onFocus={() => setFocusedField('password')}
-                    onBlur={() => setFocusedField(null)}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full bg-transparent border-0 px-4 py-4 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium"
-                    placeholder="Password *"
-                    required
+                    onChange={e => setFormData({ ...formData, password: e.target.value })}
                   />
                 </div>
-                <p className="text-[11px] text-zinc-500 px-1">
-                  Minimo 6 caratteri, almeno 1 lettera maiuscola, 1 numero e 1 simbolo.
-                </p>
-
-                <div className="relative group">
-                  <motion.div animate={{ borderColor: focusedField === 'confirmPassword' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)', backgroundColor: 'rgba(255,255,255,0.6)' }} className="absolute inset-0 rounded-2xl border backdrop-blur-md -z-10" />
-                  <input
-                    type="password"
-                    value={formData.confirmPassword}
-                    onFocus={() => setFocusedField('confirmPassword')}
-                    onBlur={() => setFocusedField(null)}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="w-full bg-transparent border-0 px-4 py-4 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium"
-                    placeholder={t('auth.confirm_password') + " *"}
-                    required
-                  />
-                </div>
-              </motion.div>
+              </div>
             )}
 
-          </AnimatePresence>
-
-          {/* STEP 4: PRIVACY CONSENT */}
-          <AnimatePresence mode="wait">
             {currentStep === 4 && (
-              <motion.div
-                key="step4"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-6"
-              >
-                <div className="mb-6">
-                  <h2 className="text-2xl font-black text-zinc-900 mb-1">La tua privacy</h2>
-                  <p className="text-sm text-zinc-600">Scegli le tue preferenze sui dati.</p>
-                </div>
-
-                <div className="bg-white/40 backdrop-blur-md rounded-2xl p-5 border border-zinc-200/50 shadow-sm relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-blue-100/30 rounded-full blur-3xl -z-10" />
-                  <h3 className="text-sm font-bold text-zinc-900 mb-2">Trattamento Dati Personali</h3>
-                  <p className="text-[12px] leading-relaxed text-zinc-600 mb-5">
-                    Per offrirti i nostri servizi e personalizzare l'esperienza su Desideri di Puglia, abbiamo bisogno del tuo consenso al trattamento dei dati personali secondo la nostra Privacy Policy.
-                  </p>
-
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl hover:bg-white/60 transition-colors border border-transparent hover:border-zinc-200/50">
-                      <div className="relative flex shrink-0 items-center justify-center w-5 h-5">
-                        <input
-                          type="radio"
-                          name="privacy"
-                          value="accepted"
-                          checked={privacyConsent === 'accepted'}
-                          onChange={(e) => setPrivacyConsent(e.target.value)}
-                          className="peer appearance-none w-5 h-5 rounded-full border-2 border-zinc-300 bg-white/50 checked:bg-zinc-900 checked:border-zinc-900 transition-all cursor-pointer shadow-sm"
-                        />
-                        <motion.div
-                          initial={false}
-                          animate={{ scale: privacyConsent === 'accepted' ? 1 : 0.5, opacity: privacyConsent === 'accepted' ? 1 : 0 }}
-                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                          className="absolute w-2 h-2 bg-white rounded-full pointer-events-none"
-                        />
-                      </div>
-                      <div>
-                        <span className="text-[14px] font-bold text-zinc-900 block">Accetto</span>
-                        <span className="text-[11px] text-zinc-500 block">Necessario per registrarsi</span>
-                      </div>
-                    </label>
-
-                    <label className="flex items-center gap-3 cursor-pointer group p-3 rounded-xl hover:bg-white/60 transition-colors border border-transparent hover:border-zinc-200/50">
-                      <div className="relative flex shrink-0 items-center justify-center w-5 h-5">
-                        <input
-                          type="radio"
-                          name="privacy"
-                          value="declined"
-                          checked={privacyConsent === 'declined'}
-                          onChange={(e) => setPrivacyConsent(e.target.value)}
-                          className="peer appearance-none w-5 h-5 rounded-full border-2 border-zinc-300 bg-white/50 checked:bg-zinc-900 checked:border-zinc-900 transition-all cursor-pointer shadow-sm"
-                        />
-                        <motion.div
-                          initial={false}
-                          animate={{ scale: privacyConsent === 'declined' ? 1 : 0.5, opacity: privacyConsent === 'declined' ? 1 : 0 }}
-                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                          className="absolute w-2 h-2 bg-white rounded-full pointer-events-none"
-                        />
-                      </div>
-                      <div>
-                        <span className="text-[14px] font-bold text-zinc-900 block">Non accetto</span>
-                        <span className="text-[11px] text-zinc-500 block">Interrompe la registrazione</span>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* STEP 5: PERMISSIONS & AVATAR */}
-          <AnimatePresence mode="wait">
-            {currentStep === 5 && (
-              <motion.div
-                key="step5"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className="space-y-4"
-              >
-                <div className="mb-6">
-                  <h2 className="text-2xl font-black text-zinc-900 mb-1">Ottimizza l'app</h2>
-                  <p className="text-sm text-zinc-600">Permettici di offrirti il massimo.</p>
-                </div>
-
-                {/* Avatar Upload (integrato come permesso fotocamera/libreria) */}
-                <div className="bg-white/40 backdrop-blur-md rounded-2xl p-4 border border-zinc-200/50 flex items-center justify-between group overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full duration-1000 transition-transform" />
-                  <div className="flex items-center gap-4 relative z-10 w-full">
-                    <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-white bg-white/50 flex items-center justify-center shadow-sm">
+              <div className="space-y-6">
+                <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Foto Profilo</p>
+                <div className="flex flex-col items-center">
+                  <div className="relative group">
+                    <div className="w-40 h-40 rounded-full bg-stone-100 border-4 border-white shadow-xl flex items-center justify-center overflow-hidden">
                       {avatarPreview ? (
-                        <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                        <img src={avatarPreview} className="w-full h-full object-cover" />
                       ) : (
-                        <User size={20} className="text-zinc-400" />
+                        <Camera size={40} className="text-stone-300" />
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <span className="text-[14px] font-bold text-zinc-900 block truncate">Foto Profilo *</span>
-                      <span className="text-[11px] text-zinc-500 block leading-tight">Carica una foto per farti riconoscere nella community.</span>
-                    </div>
-                    <div className="shrink-0 relative overflow-hidden rounded-full">
-                      <input type="file" onChange={handleAvatarChange} accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer z-20" />
-                      <button type="button" className={`px-4 py-2 text-[12px] font-bold rounded-full transition-colors relative z-10 pointer-events-none ${avatarFile ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-900 shadow-sm border border-zinc-200'}`}>
-                        {avatarFile ? 'Scelta' : 'Carica'}
-                      </button>
-                    </div>
+                    <input
+                      type="file"
+                      onChange={handleAvatarChange}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
                   </div>
+                  <p className="mt-6 text-center text-sm font-medium text-zinc-500">La tua foto sarà visibile agli altri membri del Club.</p>
                 </div>
-
-                {/* Posizione */}
-                <div className="bg-white/40 backdrop-blur-md rounded-2xl p-4 border border-zinc-200/50 flex items-center justify-between group overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full duration-1000 transition-transform" />
-                  <div className="flex items-center gap-4 relative z-10">
-                    <div className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center shrink-0 border border-zinc-200/50 shadow-sm">
-                      <MapPin size={18} className="text-zinc-600" />
-                    </div>
-                    <div>
-                      <span className="text-[14px] font-bold text-zinc-900 block">Posizione</span>
-                      <span className="text-[11px] text-zinc-500 block leading-tight">Per sbloccare missioni vicine a te.</span>
-                    </div>
-                  </div>
-                  <button type="button" onClick={() => setPermissions(p => ({ ...p, location: !p.location }))} className={`shrink-0 px-4 py-2 text-[12px] font-bold rounded-full transition-colors ${permissions.location ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-900 shadow-sm border border-zinc-200'}`}>
-                    {permissions.location ? 'On' : 'Attiva'}
-                  </button>
-                </div>
-
-                {/* Push Notes */}
-                <div className="bg-white/40 backdrop-blur-md rounded-2xl p-4 border border-zinc-200/50 flex items-center justify-between group overflow-hidden relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full duration-1000 transition-transform" />
-                  <div className="flex items-center gap-4 relative z-10">
-                    <div className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center shrink-0 border border-zinc-200/50 shadow-sm">
-                      <Mail size={18} className="text-zinc-600" />
-                    </div>
-                    <div>
-                      <span className="text-[14px] font-bold text-zinc-900 block">Notifiche Push</span>
-                      <span className="text-[11px] text-zinc-500 block leading-tight">Per non perderti eventi esclusivi.</span>
-                    </div>
-                  </div>
-                  <button type="button" onClick={() => setPermissions(p => ({ ...p, push: !p.push }))} className={`shrink-0 px-4 py-2 text-[12px] font-bold rounded-full transition-colors ${permissions.push ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-900 shadow-sm border border-zinc-200'}`}>
-                    {permissions.push ? 'On' : 'Attiva'}
-                  </button>
-                </div>
-
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* STEP 6: VERIFICA EMAIL (Success State) */}
-          <AnimatePresence mode="wait">
-            {currentStep === 6 && (
-              <motion.div
-                key="step6"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="flex flex-col items-center justify-center py-10 text-center"
-              >
-                <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center shadow-2xl mb-6 relative">
-                  <div className="absolute inset-0 border-4 border-zinc-100 rounded-full" />
-                  <Mail size={40} className="text-zinc-900" />
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.5, type: "spring", stiffness: 300 }}
-                    className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 rounded-full border-4 border-white flex items-center justify-center"
-                  >
-                    <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </motion.div>
-                </div>
-                <h2 className="text-2xl font-black text-zinc-900 mb-3 tracking-tight">Controlla la posta</h2>
-                <p className="text-[15px] text-zinc-600 mb-8 max-w-[280px]">
-                  Abbiamo inviato un'email a <span className="font-bold text-zinc-900">{formData.email}</span> con un link per attivare il tuo account.
-                </p>
-
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => navigate('/login')}
-                  className="w-full bg-zinc-950 text-white font-medium text-[15px] py-4 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all mb-4"
-                >
-                  Ho verificato, vai al Login
-                </motion.button>
-
-                <button
-                  type="button"
-                  onClick={handleResendConfirmation}
-                  disabled={resendingEmail}
-                  className="text-[13px] font-bold text-zinc-500 hover:text-zinc-900 transition-colors uppercase tracking-widest"
-                >
-                  {resendingEmail ? "Invio..." : "Reinvia email"}
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* CONTROLS (Steps 1-5) */}
-          {currentStep < 6 && (
-            <div className="pt-8 space-y-4">
-              <div className="flex items-center gap-3">
-                {/* Back Button */}
-                {currentStep > 1 && (
-                  <motion.button
-                    whileTap={{ scale: 0.95 }}
-                    type="button"
-                    onClick={() => setCurrentStep(prev => prev - 1)}
-                    className="w-14 h-14 shrink-0 bg-white/80 backdrop-blur-md rounded-full shadow-sm border border-zinc-200 flex items-center justify-center text-zinc-900 hover:bg-white transition-colors"
-                  >
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </motion.button>
-                )}
-
-                {/* Next / Submit Button */}
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={(e) => {
-                    if (currentStep < 5) {
-                      // VALIDATION BEFORE NEXT
-                      if (currentStep === 1 && (!formData.nome || !formData.cognome || !formData.nickname)) {
-                        toast.error("Compila tutti i campi"); return;
-                      }
-                      if (currentStep === 2 && (!formData.data_nascita || !formData.sesso || !formData.telefono)) {
-                        toast.error("Compila tutti i campi obbligatori"); return;
-                      }
-                      if (currentStep === 3 && (!formData.email || !formData.password || !formData.confirmPassword)) {
-                        toast.error("Inserisci credenziali valide"); return;
-                      }
-                      if (currentStep === 3 && !hasStrongPassword(formData.password)) {
-                        toast.error("La password deve contenere almeno 1 maiuscola, 1 numero e 1 simbolo"); return;
-                      }
-                      if (currentStep === 3 && formData.password !== formData.confirmPassword) {
-                        toast.error("Le password non coincidono"); return;
-                      }
-                      if (currentStep === 4 && privacyConsent !== 'accepted') {
-                        toast.error("Devi accettare per continuare"); return;
-                      }
-                      setCurrentStep(prev => prev + 1);
-                      return;
-                    }
-                    handleSubmit(e);
-                  }}
-                  disabled={loading}
-                  className="flex-1 bg-zinc-950 text-white font-medium text-[15px] py-4 h-14 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:bg-zinc-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                >
-                  {loading ? t('auth.register_loading') : (currentStep === 5 ? 'Completa Registrazione' : 'Continua')}
-                </motion.button>
               </div>
+            )}
 
-              {currentStep === 1 && (
-                <div className="pt-2 text-center">
-                  <p className="text-[14px] text-zinc-600 font-medium">
-                    Already have an account?{' '}
-                    <Link to="/login" className="text-zinc-950 font-bold hover:underline underline-offset-4 decoration-2 decoration-zinc-950/20">
-                      Log In
-                    </Link>
-                  </p>
+            {currentStep === 5 && (
+              <div className="space-y-6">
+                <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Privacy & Consenso</p>
+                <div className="bg-white/60 rounded-3xl p-6 border-2 border-stone-200 space-y-6">
+                  <div className="flex items-start gap-4">
+                    <ShieldCheck className="text-[#D4793A] mt-1 shrink-0" size={24} />
+                    <p className="text-sm font-medium text-zinc-600 leading-relaxed">
+                      Trattiamo i tuoi dati secondo la GDPR per garantirti sicurezza e personalizzazione. Accettando, dichiari di aver letto la nostra Privacy Policy.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPrivacyConsent(prev => prev === 'accepted' ? null : 'accepted')}
+                    className={`w-full py-4 rounded-2xl border-2 font-bold transition flex items-center justify-center gap-3 ${privacyConsent === 'accepted' ? 'border-[#D4793A] bg-[#D4793A]/10 text-[#D4793A]' : 'border-stone-200 bg-white text-zinc-400'}`}
+                  >
+                    {privacyConsent === 'accepted' && <CheckCircle size={20} />}
+                    Accetto i Termini e la Privacy
+                  </button>
                 </div>
-              )}
-            </div>
-          )}
-        </form>
+              </div>
+            )}
+
+            {currentStep === 6 && (
+              <div className="text-center space-y-8 py-8">
+                <div className="w-24 h-24 rounded-full bg-emerald-50 border-4 border-white shadow-lg mx-auto flex items-center justify-center">
+                  <Mail className="text-emerald-500" size={32} />
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-black text-zinc-950" style={{ fontFamily: typography.serif }}>Controlla la tua Email</h3>
+                  <p className="text-zinc-500 font-medium">Abbiamo inviato un link di conferma a <br /><span className="text-zinc-950 font-bold">{formData.email}</span></p>
+                </div>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-8 py-4 rounded-full bg-zinc-950 text-white font-black text-sm uppercase tracking-widest"
+                >
+                  Vai al Login
+                </button>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* CTA */}
+        {currentStep < 6 && (
+          <div className="mt-8">
+            <motion.button
+              whileTap={{ scale: 0.98 }}
+              onClick={currentStep === 5 ? handleSubmit : nextStep}
+              disabled={loading}
+              className="w-full h-16 rounded-full bg-zinc-950 text-white font-black text-[15px] uppercase tracking-[0.2em] shadow-2xl flex items-center justify-center gap-4 transition hover:bg-black group"
+            >
+              {loading ? 'Attendere...' : (currentStep === 5 ? 'Crea Account' : 'Continua')}
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </motion.button>
+          </div>
+        )}
+
+        {currentStep === 1 && (
+          <p className="mt-8 text-center text-sm font-medium text-zinc-500">
+            Hai già un account? <Link to="/login" className="text-zinc-950 font-bold underline underline-offset-4">Accedi</Link>
+          </p>
+        )}
       </div>
     </div>
   );

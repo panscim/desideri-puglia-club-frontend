@@ -62,7 +62,7 @@ const EventTimer = ({ startDate, endDate }) => {
   if (!timeLeft) return null;
 
   return (
-    <div className="flex items-center gap-1.5 text-[10px] font-bold text-red-500 bg-red-500/10 px-2.5 py-1.5 rounded-md border border-red-500/20 whitespace-nowrap">
+    <div className="flex items-center gap-1.5 text-[10px] font-black text-danger bg-danger/5 px-2.5 py-1.5 rounded-pill border border-danger/10 whitespace-nowrap">
       <span className="text-[13px]">⏳</span>
       {timeLeft}
     </div>
@@ -204,25 +204,24 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="h-[100dvh] max-h-[100dvh] w-full bg-[var(--bg-primary)] flex flex-col font-satoshi text-[var(--text-primary)] overflow-hidden relative transition-colors duration-500">
+    <div className="h-[100dvh] max-h-[100dvh] w-full bg-bg-primary flex flex-col font-sans text-text-primary overflow-hidden relative transition-colors duration-500">
 
       {/* 1. TOP HEADER (Statico) */}
-      <header className="flex-none px-4 py-3 pb-4 flex items-center justify-between z-20 bg-gradient-to-b from-[var(--bg-primary)] via-[var(--bg-primary)]/80 to-transparent">
+      <header className="flex-none px-6 py-4 flex items-center justify-between z-20 bg-gradient-to-b from-bg-primary via-bg-primary/80 to-transparent">
         <div className="flex items-center gap-2 shrink-0">
           <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shadow-lg bg-white p-0.5">
             <img src="/logo.png" alt="DDP" className="w-full h-full object-cover rounded-full" />
           </div>
         </div>
 
-        <div className="flex-1 mx-3">
+        <div className="flex-1 mx-4">
           <button
             onClick={() => setIsSearchModalOpen(true)}
-            className="w-full bg-white backdrop-blur-md border border-zinc-200 transition-colors rounded-full py-2.5 px-4 flex items-center gap-2 text-sm shadow-xl active:scale-[0.98] text-zinc-950 hover:bg-white"
+            className="w-full bg-surface/80 backdrop-blur-md border border-border-default transition-all rounded-pill py-3 px-5 flex items-center gap-3 text-sm shadow-sm active:scale-[0.98] text-text-muted hover:bg-white hover:border-accent/30"
           >
-            <MagnifyingGlass size={18} weight="bold" />
-            <span className="font-geist truncate font-medium">Trova luoghi e cose da fare</span>
+            <MagnifyingGlass size={20} weight="bold" className="text-accent" />
+            <span className="font-sans font-medium">Trova luoghi e cose da fare</span>
           </button>
-
         </div>
 
         {/* CAMPANELLA NOTIFICHE */}
@@ -247,21 +246,21 @@ export default function Dashboard() {
                 transition={{ duration: 0.2 }}
                 className="absolute top-12 right-0 w-80 max-h-[400px] overflow-y-auto bg-white/90 backdrop-blur-xl border border-white/40 shadow-2xl rounded-3xl p-4 z-50 no-scrollbar"
               >
-                <div className="flex items-center justify-between mb-3 px-1">
-                  <h3 className="font-bold text-lg text-zinc-900 font-satoshi">Notifiche</h3>
-                  <button onClick={() => setShowNotifications(false)} className="p-1 min-h-[30px] rounded-full hover:bg-zinc-100 transition-colors">
-                    <X size={18} color="#71717A" weight="bold" />
+                <div className="flex items-center justify-between mb-4 px-1">
+                  <h3 className="font-serif font-black text-[18px] text-text-primary">Notifiche</h3>
+                  <button onClick={() => setShowNotifications(false)} className="w-8 h-8 rounded-full bg-bg-secondary flex items-center justify-center hover:bg-zinc-100 transition-colors">
+                    <X size={16} weight="bold" className="text-text-muted" />
                   </button>
                 </div>
 
                 {notifications.length === 0 ? (
-                  <p className="text-sm text-zinc-500 text-center py-6 font-medium">Nessuna notifica per ora.</p>
+                  <p className="text-sm text-text-muted text-center py-8 font-medium italic">Nessuna notifica per ora.</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {notifications.map(notif => (
                       <div
                         key={notif.id}
-                        className={`p-3 rounded-2xl transition-colors cursor-pointer ${notif.letta ? 'bg-zinc-50/50 hover:bg-zinc-50' : 'bg-blue-50/50 border border-blue-100 hover:bg-blue-50'} shadow-sm`}
+                        className={`p-4 rounded-xl transition-all cursor-pointer ${notif.letta ? 'bg-bg-secondary/50' : 'bg-surface border border-accent/20 shadow-sm'} hover:bg-white`}
                         onClick={async () => {
                           if (!notif.letta && profile?.id) {
                             await NotificationService.markAsRead(notif.id);
@@ -271,12 +270,12 @@ export default function Dashboard() {
                           if (notif.link_azione) navigate(notif.link_azione);
                         }}
                       >
-                        <div className="flex gap-2">
-                          <div className={`w-2 h-2 mt-1.5 shrink-0 rounded-full ${notif.letta ? 'bg-transparent' : 'bg-blue-500'}`} />
+                        <div className="flex gap-3">
+                          <div className={`w-2 h-2 mt-2 shrink-0 rounded-full ${notif.letta ? 'bg-transparent' : 'bg-accent'}`} />
                           <div>
-                            <p className="text-[13px] font-bold text-zinc-900 leading-tight mb-0.5">{notif.titolo}</p>
-                            <p className="text-[12px] text-zinc-600 leading-snug">{notif.messaggio}</p>
-                            <span className="text-[10px] text-zinc-400 font-medium mt-1.5 block">
+                            <p className="text-[14px] font-bold text-text-primary leading-tight mb-1">{notif.titolo}</p>
+                            <p className="text-[12px] text-text-muted leading-relaxed">{notif.messaggio}</p>
+                            <span className="overline !text-[9px] !mb-0 mt-3 block opacity-60">
                               {new Date(notif.created_at).toLocaleDateString('it-IT')}
                             </span>
                           </div>
@@ -300,10 +299,10 @@ export default function Dashboard() {
       )}
 
       {/* SCROLLABLE CONTENT AREA */}
-      <main className="flex-1 overflow-y-auto pb-24 no-scrollbar -mt-[72px]">
+      <main className="flex-1 overflow-y-auto pb-24 no-scrollbar -mt-[84px]">
 
         {/* 2. HERO CAROUSEL (Dinamico) */}
-        <section className="relative w-full h-[65vh] md:h-[70vh] bg-[var(--bg-primary)]">
+        <section className="relative w-full h-[65vh] md:h-[70vh] bg-bg-dark">
 
           {heroItems.length > 0 ? (
             <div className="relative w-full h-full">
@@ -324,23 +323,23 @@ export default function Dashboard() {
                       className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                     {/* Overlay Leggero Solo in Basso */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/75 via-zinc-950/20 to-transparent pointer-events-none no-theme-flip" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/90 via-bg-dark/20 to-transparent pointer-events-none no-theme-flip" />
 
                     {/* Testo In Basso a Sinistra - Stile GetYourGuide */}
-                    <div className="text-on-image absolute inset-0 p-5 pb-8 flex flex-col justify-end text-left">
+                    <div className="text-on-image absolute inset-0 p-6 pb-12 flex flex-col justify-end text-left">
 
-                      <h1 className="text-[26px] md:text-[30px] leading-[1.1] font-black font-satoshi text-white mb-2.5 tracking-tight drop-shadow-md">
+                      <h1 className="text-[32px] md:text-[40px] leading-[1.05] font-serif font-black text-white mb-4 tracking-tight">
                         {hero.title}
                       </h1>
 
                       {/* Branding Badge */}
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <div className="w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm shrink-0">D</div>
-                        <span className="text-[13px] font-geist font-bold text-white drop-shadow-md">Originals by Desideri di Puglia</span>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-[10px] font-black text-white shadow-sm shrink-0">D</div>
+                        <span className="overline !text-white !mb-0 !tracking-[0.2em] !text-[10px]">Originals by Desideri di Puglia</span>
                       </div>
 
                       {hero.subtitle && (
-                        <p className="text-[15px] font-geist font-medium text-white mb-3 drop-shadow-md leading-snug">
+                        <p className="text-[15px] font-sans font-medium text-white/80 mb-4 leading-snug max-w-[32ch]">
                           {hero.subtitle}
                         </p>
                       )}
@@ -354,9 +353,9 @@ export default function Dashboard() {
                               navigate(hero.button_link);
                             }
                           }}
-                          className="flex items-center gap-1 text-[15px] font-semibold text-white w-fit drop-shadow-md hover:underline active:opacity-70"
+                          className="btn-primary !py-3 !px-6 !text-[13px]"
                         >
-                          Scopri di più <span className="text-xl leading-none">›</span>
+                          Scopri l'esperienza <ArrowRight weight="bold" size={14} />
                         </button>
                       )}
                     </div>
@@ -384,64 +383,60 @@ export default function Dashboard() {
         </section >
 
         {/* 2b. CONCIERGE BANNER (Editorial Arch Style) */}
-        <section className="mt-12 px-6 mb-8">
+        <section className="mt-14 px-6 mb-10">
           <div
             onClick={() => navigate('/daily-plans')}
-            className="relative bg-[var(--bg-surface)] rounded-[2.5rem] p-8 border border-[var(--border)] shadow-sm hover:shadow-md transition-all duration-500 cursor-pointer overflow-hidden flex items-center justify-between group"
+            className="card !p-8 group cursor-pointer relative overflow-hidden flex items-center justify-between"
           >
             {/* Elegant Left Column */}
             <div className="flex-1 z-10">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-[1px] bg-gold/50" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-gold">Concierge Esperienziale</span>
+                <div className="w-8 h-[1px] bg-accent/50" />
+                <span className="overline !text-accent !mb-0">Concierge Esperienziale</span>
               </div>
 
-              <h3 className="text-3xl font-serif italic text-[var(--text-primary)] leading-tight mb-4 max-w-[10ch]">
+              <h3 className="text-[32px] font-serif font-black text-text-primary leading-tight mb-5 max-w-[12ch]">
                 Il battito <br />
-                <span className="text-gold">autentico</span> della Puglia.
+                <span className="text-accent italic">autentico</span> della Puglia.
               </h3>
 
-              <p className="text-sm text-[var(--text-muted)] font-medium mb-8 max-w-[24ch] leading-relaxed">
+              <p className="text-[15px] text-text-muted font-medium mb-8 max-w-[28ch] leading-relaxed">
                 Itinerari d'autore curati dai local per farti vivere l'eccellenza.
               </p>
 
-              <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--text-primary)] group-hover:text-gold transition-colors">
+              <div className="inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-text-primary group-hover:text-accent transition-colors">
                 Esplora gli itinerari
-                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
             {/* Architectural Arch Detail */}
-            <div className="relative w-40 h-64 -mr-4 shrink-0 pointer-events-none hidden sm:block">
-              <div className="absolute inset-0 rounded-t-full border-[12px] border-[var(--bg-base)] shadow-inner overflow-hidden">
+            <div className="relative w-44 h-72 -mr-4 shrink-0 pointer-events-none hidden sm:block">
+              <div className="absolute inset-0 rounded-t-full border-[12px] border-bg-primary shadow-inner overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=600"
                   className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110"
                   alt="Puglia"
                 />
-                <div className="absolute inset-0 bg-gold/5" />
+                <div className="absolute inset-0 bg-accent/5" />
               </div>
-              {/* Decorative shadow for the arch */}
-              <div className="absolute -inset-1 rounded-t-full border border-gold/10 -z-10" />
+              <div className="absolute -inset-1 rounded-t-full border border-accent/10 -z-10" />
             </div>
-
-            {/* Mobile Arch (Simplified) */}
-            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-gold/5 to-transparent sm:hidden" />
           </div>
         </section>
 
         {/* 3. LE MIE SAGHE IN CORSO */}
         {activeSagas.length > 0 && (
-          <section className="mt-8 px-4 mb-2">
-            <div className="flex items-end justify-between mb-4">
-              <h3 className="text-[22px] font-black font-satoshi text-[var(--text-primary)] leading-tight tracking-tight">
+          <section className="mt-10 px-6 mb-4">
+            <div className="flex items-end justify-between mb-6">
+              <h3 className="text-[26px] font-serif font-black text-text-primary leading-tight tracking-tight">
                 Le Mie Saghe 🗺️
               </h3>
               <button
                 onClick={() => navigate('/missioni')}
-                className="text-[var(--text-muted)] font-medium text-sm hover:text-[var(--text-primary)] transition-colors flex items-center gap-1 group pb-1"
+                className="btn-ghost !px-4 !py-2 !text-[11px] !border-none hover:!bg-accent/5 !text-accent"
               >
-                Vedi tutte <span className="group-hover:translate-x-1 transition-transform">›</span>
+                Vedi tutte <ArrowRight weight="bold" size={12} className="ml-1" />
               </button>
             </div>
 
@@ -450,15 +445,15 @@ export default function Dashboard() {
                 <div
                   key={saga.questSetId}
                   onClick={() => navigate(`/saga/${saga.questSetId}/intro`)}
-                  className="flex items-center gap-4 bg-[var(--bg-surface)] border border-[var(--border)] rounded-2xl p-4 cursor-pointer active:scale-[0.98] transition-transform group hover:border-[#E4AE2F]/30 shadow-sm"
+                  className="flex items-center gap-5 bg-surface border border-border-default rounded-card p-4 cursor-pointer active:scale-[0.98] transition-all group hover:border-accent/30 shadow-sm"
                 >
                   {/* Thumbnail */}
-                  <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-[var(--border)] relative bg-[var(--bg-secondary)]">
+                  <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-border-default relative bg-bg-secondary">
 
                     <img
                       src={saga.sagaImage || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=200'}
                       alt={saga.sagaTitle}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     {/* Tiny Badge Indicator on thumbnail */}
                     {(saga.is_original === true || saga.isOriginal === true) && (
@@ -468,27 +463,27 @@ export default function Dashboard() {
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-[#E4AE2F] bg-[#E4AE2F]/10 px-2 py-0.5 rounded-full border border-[#E4AE2F]/20 flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#E4AE2F] animate-pulse inline-block" />
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="overline !text-accent !mb-0 !tracking-[0.1em] bg-accent/5 px-2.5 py-1 rounded-full border border-accent/10 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
                         In Corso
                       </span>
                       {saga.sagaCity && (
-                        <span className="text-[9px] text-[var(--text-muted)] font-medium">📍 {saga.sagaCity}</span>
+                        <span className="text-[10px] text-text-light font-bold">📍 {saga.sagaCity}</span>
                       )}
                     </div>
-                    <h4 className="text-[15px] font-bold text-[var(--text-primary)] leading-snug truncate mb-2">
+                    <h4 className="text-[17px] font-serif font-black text-text-primary leading-tight truncate mb-2.5">
                       {saga.sagaTitle}
                     </h4>
                     {/* Progress bar */}
-                    <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-bg-secondary rounded-full overflow-hidden border border-border-default">
                       <div
-                        className="h-full bg-gradient-to-r from-[#E4AE2F] to-[#FFD700] rounded-full transition-all duration-700"
+                        className="h-full bg-accent rounded-full transition-all duration-1000"
                         style={{ width: `${saga.percent}%` }}
                       />
                     </div>
-                    <p className="text-[10px] text-[var(--text-muted)] mt-1">
-                      {saga.doneSteps}/{saga.totalSteps} tappe · {saga.percent}%
+                    <p className="text-[10px] font-bold text-text-muted mt-2 tracking-wide uppercase">
+                      {saga.doneSteps}/{saga.totalSteps} tappe · {saga.percent}% completato
                     </p>
                   </div>
 
@@ -502,25 +497,25 @@ export default function Dashboard() {
 
 
         {/* 5. MISSIONI VICINE SLIDER */}
-        <section className="mt-8 px-4 mb-4">
-          <div className="flex items-end justify-between mb-5">
-            <h3 className="text-[28px] font-black font-satoshi text-[var(--text-primary)] leading-tight tracking-tight">
+        <section className="mt-12 px-6 mb-4">
+          <div className="flex items-end justify-between mb-6">
+            <h3 className="text-[28px] font-serif font-black text-text-primary leading-tight tracking-tight">
               Missioni Vicine
             </h3>
             <button
               onClick={() => navigate('/missioni')}
-              className="text-[var(--text-muted)] font-medium text-sm hover:text-[var(--text-primary)] transition-colors flex items-center gap-1 group pb-1"
+              className="btn-ghost !px-4 !py-2 !text-[11px] !border-none hover:!bg-accent/5 !text-accent"
             >
-              Scopri di più <span className="group-hover:translate-x-1 transition-transform">›</span>
+              Scopri tutto <ArrowRight weight="bold" size={12} className="ml-1" />
             </button>
           </div>
 
-          <div className="flex overflow-x-auto gap-4 pb-6 no-scrollbar snap-x -mx-4 px-4">
+          <div className="flex overflow-x-auto gap-5 pb-8 no-scrollbar snap-x -mx-6 px-6">
             {saghe.slice(0, 5).map((saga) => (
               <div
                 key={`vicina-${saga.id}`}
                 onClick={() => navigate(`/saga/${saga.id}/intro`)}
-                className="snap-center w-[280px] md:w-[320px] shrink-0 bg-[var(--bg-surface)] rounded-[1.5rem] overflow-hidden shadow-xl border border-[var(--border)] group flex flex-col cursor-pointer"
+                className="snap-center w-[290px] md:w-[340px] shrink-0 card !p-0 shadow-lg group flex flex-col cursor-pointer border-border-default hover:border-accent/20"
               >
                 {/* Image */}
                 <div className="h-40 bg-[var(--bg-secondary)] relative overflow-hidden border-b border-[var(--border)]">
@@ -562,11 +557,11 @@ export default function Dashboard() {
                 </div>
 
                 {/* Content */}
-                <div className="p-5 flex flex-col flex-grow">
-                  <h4 className="font-satoshi font-black text-[var(--text-primary)] text-[18px] leading-snug mb-2 group-hover:text-[var(--text-secondary)] transition-colors">
+                <div className="p-6 flex flex-col flex-grow">
+                  <h4 className="font-serif font-black text-text-primary text-[19px] leading-snug mb-3 group-hover:text-accent transition-colors">
                     {saga.title || saga.titolo}
                   </h4>
-                  <p className="text-sm font-geist text-[var(--text-muted)] line-clamp-2 leading-relaxed">
+                  <p className="text-[14px] font-sans text-text-muted line-clamp-2 leading-relaxed">
                     {saga.description || saga.descrizione || "Scopri questa incredibile avventura a passi lenti nel cuore della Puglia."}
                   </p>
                 </div>
@@ -576,20 +571,20 @@ export default function Dashboard() {
         </section>
 
         {/* 6. NEWS AND EVENTS SLIDER */}
-        <section className="mt-8 px-4 mb-4">
-          <div className="flex items-end justify-between mb-5">
-            <h3 className="text-[28px] font-black font-satoshi text-[var(--text-primary)] leading-tight tracking-tight">
+        <section className="mt-12 px-6 mb-4">
+          <div className="flex items-end justify-between mb-6">
+            <h3 className="text-[28px] font-serif font-black text-text-primary leading-tight tracking-tight">
               Notizie ed Eventi
             </h3>
             <button
               onClick={() => navigate('/eventi')}
-              className="text-[var(--text-muted)] font-medium text-sm hover:text-[var(--text-primary)] transition-colors flex items-center gap-1 group pb-1"
+              className="btn-ghost !px-4 !py-2 !text-[11px] !border-none hover:!bg-accent/5 !text-accent"
             >
-              Scopri di più <span className="group-hover:translate-x-1 transition-transform">›</span>
+              Scopri tutto <ArrowRight weight="bold" size={12} className="ml-1" />
             </button>
           </div>
 
-          <div className="flex overflow-x-auto gap-4 pb-6 no-scrollbar snap-x -mx-4 px-4">
+          <div className="flex overflow-x-auto gap-5 pb-8 no-scrollbar snap-x -mx-6 px-6">
             {events.length > 0 ? events.map((ev) => {
               const startDate = new Date(ev.data_inizio)
               const isPartner = !!ev.partners
@@ -598,7 +593,7 @@ export default function Dashboard() {
                 <div
                   key={ev.id}
                   onClick={() => navigate(`/eventi/${ev.id}`)}
-                  className="snap-center w-[280px] md:w-[320px] shrink-0 bg-[var(--bg-surface)] rounded-[1.5rem] overflow-hidden shadow-xl border border-[var(--border)] group flex flex-col cursor-pointer active:scale-[0.98] transition-all"
+                  className="snap-center w-[290px] md:w-[340px] shrink-0 card !p-0 shadow-lg group flex flex-col cursor-pointer border-border-default hover:border-accent/20"
                 >
                   {/* Event Image */}
                   <div className="h-40 bg-[var(--bg-secondary)] relative overflow-hidden border-b border-[var(--border)]">
@@ -607,39 +602,39 @@ export default function Dashboard() {
 
 
                     {/* Date Badge */}
-                    <div className="absolute top-3 left-3 bg-zinc-950/80 backdrop-blur border border-white/10 px-3 py-1.5 rounded-xl text-center shadow-lg text-on-image">
-                      <div className="text-[9px] font-bold uppercase tracking-widest text-red-500 leading-none mb-1">
+                    <div className="absolute top-4 left-4 bg-bg-dark/80 backdrop-blur-md px-3 py-2 rounded-lg text-center shadow-lg text-on-dark min-w-[50px]">
+                      <div className="overline !text-accent !text-[10px] !mb-1 !tracking-wider">
                         {startDate.toLocaleString('it-IT', { month: 'short' })}
                       </div>
-                      <div className="text-lg font-black text-white leading-none">
+                      <div className="text-[22px] font-serif font-black leading-none">
                         {startDate.getDate()}
                       </div>
                     </div>
 
                     {isPartner && (
-                      <div className="absolute top-3 right-3 bg-zinc-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-white no-theme-flip flex items-center gap-1.5 shadow-md border border-red-500/30">
-                        <span className="text-red-500 mb-[1px]">📍</span>
+                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-[11px] font-bold text-text-primary no-theme-flip flex items-center gap-2 shadow-md border border-accent/20">
+                        <MapPin size={12} weight="bold" className="text-accent" />
                         {ev.partners.name}
                       </div>
                     )}
                   </div>
 
                   {/* Content */}
-                  <div className="p-5 flex flex-col flex-grow">
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[var(--text-muted)] mb-2 flex items-center gap-1.5">
-                      📍 {ev.luogo}
+                  <div className="p-6 flex flex-col flex-grow">
+                    <div className="overline !text-text-muted mb-3 flex items-center gap-2 !tracking-[0.15em]">
+                      <MapPin size={12} weight="bold" className="text-accent-gold" /> {ev.luogo}
                     </div>
-                    <h4 className="text-[19px] font-bold font-satoshi text-[var(--text-primary)] mb-2 leading-tight">
+                    <h4 className="text-[20px] font-serif font-black text-text-primary mb-3 leading-tight group-hover:text-accent transition-colors">
                       {ev.titolo}
                     </h4>
-                    <p className="text-[13px] text-[var(--text-muted)] line-clamp-2 leading-relaxed mb-4">
+                    <p className="text-[14px] text-text-muted line-clamp-2 leading-relaxed mb-6">
                       {ev.descrizione}
                     </p>
 
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+                    <div className="flex items-center justify-between mt-auto pt-5 border-t border-border-default">
                       <EventTimer startDate={ev.data_inizio} endDate={ev.data_fine} />
                       {ev.posti_totali && (
-                        <div className="text-[10px] font-bold text-[var(--text-muted)] bg-[var(--bg-secondary)] px-2 py-1 rounded-md border border-[var(--border)]">
+                        <div className="overline !mb-0 !text-[9px] bg-bg-secondary px-3 py-1.5 rounded-md border border-border-default">
                           {Math.max(0, ev.posti_totali - (ev.iscritti_count || 0))} posti liberi
                         </div>
                       )}
@@ -648,7 +643,7 @@ export default function Dashboard() {
                 </div>
               )
             }) : (
-              <div className="w-full py-8 text-center text-[var(--text-muted)] italic border border-[var(--border)] rounded-2xl bg-[var(--bg-secondary)]/50">
+              <div className="w-full py-12 text-center text-text-muted italic border border-border-default rounded-card bg-bg-secondary/30 mx-6">
                 Nessun evento attivo al momento.
               </div>
             )}
@@ -656,28 +651,28 @@ export default function Dashboard() {
         </section >
 
         {/* 7. RADAR DELLA MOVIDA */}
-        <section className="mt-8 px-4 mb-20">
-          <div className="bg-[var(--bg-surface)] rounded-[2rem] p-8 border border-[var(--border)] relative overflow-hidden group shadow-2xl">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-blue-600/10 rounded-full blur-[80px] -mr-20 -mt-20" />
+        <section className="mt-12 px-6 mb-24">
+          <div className="card-featured !p-8 group shadow-card">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-accent/10 rounded-full blur-[90px] -mr-24 -mt-24" />
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-500 mb-2">Social Heatmap</h3>
-                <h2 className="text-2xl font-black text-[var(--text-primary)] leading-tight">Radar della Movida</h2>
+                <p className="overline !text-accent-gold mb-3 !tracking-[0.3em]">Social Heatmap</p>
+                <h2 className="text-[32px] font-serif font-black text-white leading-tight">Radar della Movida</h2>
               </div>
-              <div className="w-14 h-14 bg-blue-600/20 rounded-2xl flex items-center justify-center text-blue-400 border border-blue-500/20 shadow-xl">
-                <NavigationArrow size={32} weight="fill" className="animate-pulse" />
+              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-accent-gold border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500">
+                <NavigationArrow size={36} weight="bold" className="animate-pulse" />
               </div>
             </div>
 
-            <p className="text-sm text-[var(--text-muted)] leading-relaxed mb-8 font-medium italic">
+            <p className="text-[16px] text-white/70 leading-relaxed mb-10 font-sans font-medium">
               "Dove c'è gente stasera?"<br />
-              Scoprilo in tempo reale con le segnalazioni del club.
+              Scoprilo in tempo reale con le <span className="text-white italic">segnalazioni certificate</span> desideri.
             </p>
 
             <button
               onClick={() => navigate('/vibe-radar')}
-              className="w-full h-14 bg-[var(--bg-inverse)] text-[var(--text-inverse)] rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-xl hover:opacity-90 transition-all active:scale-95"
+              className="btn-primary w-full !py-4 !text-[14px] !shadow-none hover:!bg-white hover:!text-accent transition-all duration-300"
             >
               Apri Radar Live <ArrowRight size={18} weight="bold" />
             </button>

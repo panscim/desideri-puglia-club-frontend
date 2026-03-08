@@ -1,10 +1,9 @@
-// src/pages/PartnerJoin.jsx
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { supabase } from "../services/supabase";
 import { useAuth } from "../contexts/AuthContext";
 import toast from "react-hot-toast";
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   Sparkles,
   CreditCard,
@@ -20,39 +19,62 @@ import {
   ArrowRight,
   ArrowLeft,
   Camera,
+  Mail,
+  X,
+  Plus,
+  Check
 } from "lucide-react";
 import {
   Compass,
   RocketLaunch,
   Crown,
   CurrencyEur,
-  ShieldCheck
+  ShieldCheck,
+  Lightning,
+  QrCode,
+  ChartBar,
+  Bank,
+  IdentificationCard
 } from '@phosphor-icons/react';
 import { useTranslation } from "react-i18next";
+import { colors as TOKENS, typography, motion as springMotion } from "../utils/designTokens";
 
-const BRAND = {
-  sabbia: '#FAF7F2',
-  terracotta: '#D4793A',
-  blu: '#2F4858',
-  sole: '#F2C87B',
-  text: '#1F2933',
-  muted: '#6B7280',
-  divider: '#E5E7EB',
-  white: '#FFFFFF',
-  inkDark: '#1C2833',
+const TypewriterText = ({ words }) => {
+  const [index, setIndex] = useState(0);
+  const [subIndex, setSubIndex] = useState(0);
+  const [reverse, setReverse] = useState(false);
+
+  useEffect(() => {
+    if (subIndex === words[index].length + 1 && !reverse) {
+      setTimeout(() => setReverse(true), 1500);
+      return;
+    }
+    if (subIndex === 0 && reverse) {
+      setReverse(false);
+      setIndex((prev) => (prev + 1) % words.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setSubIndex((prev) => prev + (reverse ? -1 : 1));
+    }, reverse ? 75 : 150);
+
+    return () => clearTimeout(timeout);
+  }, [subIndex, index, reverse, words]);
+
+  return (
+    <span className="text-[#D4793A] italic">
+      {words[index].substring(0, subIndex)}
+      <motion.span
+        animate={{ opacity: [1, 0] }}
+        transition={{ duration: 0.8, repeat: Infinity }}
+        className="ml-1 inline-block w-[2px] h-[1em] bg-[#D4793A] align-middle"
+      />
+    </span>
+  );
 };
 
-const FadeUp = ({ children, delay = 0, className = '' }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: '-30px' }}
-    transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
-    className={className}
-  >{children}</motion.div>
-);
-
-const BUCKET = "partner-logos"; // usiamo lo stesso bucket per logo e copertina
+const BUCKET = "partner-logos";
 
 // Categorie disponibili nel menu a tendina (Canonical IT values for DB)
 const CATEGORIES_DB = [
@@ -91,34 +113,71 @@ const CATEGORIES_DB = [
 const PARTNER_PLANS = [
   {
     tier: 'discovery',
-    name: 'Puglia Discovery',
+    name: 'Essenziale',
     productId: 'prod_U6dXaqx4SvzxdW',
-    monthlyPrice: 9,
+    monthlyPrice: 0, // Gratulto in RN design
     commissionRate: 25,
     icon: Compass,
-    accent: 'from-amber-300/45 to-orange-300/35',
-    highlights: ["Mappa Partner", "Accesso Daily Plan", "Dashboard base"],
+    accent: 'from-stone-200/50 to-stone-300/30',
+    highlights: ["Mappa Partner", "Dettaglio attività", "Dashboard base"],
   },
   {
     tier: 'pro',
     name: 'Puglia Pro',
     productId: 'prod_U6dY6wVCv9xLCH',
-    monthlyPrice: 29,
+    monthlyPrice: 49,
     commissionRate: 15,
     icon: RocketLaunch,
-    accent: 'from-sky-300/45 to-cyan-300/35',
-    highlights: ["Commissione ridotta", "Priorità algoritmi", "Analytics dati"],
+    accent: 'from-[#D4793A]/30 to-[#D4793A]/10',
+    highlights: ["Eventi illimitati", "Incassi Stripe Connect", "Scanner QR Check-in", "Analisi prenotazioni"],
   },
   {
     tier: 'grande',
-    name: 'Grande Puglia',
+    name: 'Puglia Elite',
     productId: 'prod_U6dZmZC556bqNX',
-    monthlyPrice: 59,
+    monthlyPrice: 99,
     commissionRate: 10,
     icon: Crown,
-    accent: 'from-emerald-300/45 to-teal-300/35',
-    highlights: ["Fee minima", "Massima visibilità", "Concierge 7/7"],
+    accent: 'from-amber-200/30 to-amber-300/10',
+    highlights: ["Account Manager", "Integrazioni API", "Posizionamento prioritario"],
   },
+];
+
+const WHY_ITEMS = [
+  {
+    Icon: Lightning,
+    title: 'Visibilità reale',
+    desc: 'I soci cercano esperienze in Puglia. Non sei su un aggregatore generico: sei nel Club dove vengono per trovare il meglio.',
+  },
+  {
+    Icon: CurrencyEur,
+    title: 'Incassi in 48h',
+    desc: 'Stripe Connect accredita direttamente sul tuo conto. Vendi un evento stasera, incassi dopodomani.',
+  },
+  {
+    Icon: QrCode,
+    title: 'QR e accessi live',
+    desc: 'Ogni biglietto genera un QR univoco. Scannerizzi all\'ingresso. Zero fogli, zero errori.',
+  },
+  {
+    Icon: ChartBar,
+    title: 'Analytics concreti',
+    desc: 'Prenotazioni, fasce orarie, prodotti più venduti. Dati reali per ottimizzare ogni evento.',
+  },
+  {
+    Icon: ShieldCheck,
+    title: 'Zero burocrazia',
+    desc: 'Nessun documento da caricare nell\'app. Stripe gestisce le verifiche fiscali in modo sicuro.',
+  },
+];
+
+const TYPEWRITER_WORDS = [
+  'Masseria',
+  'Cantina',
+  'Ristorante',
+  'Agriturismo',
+  'Boutique Hotel',
+  'Lido',
 ];
 
 const getPartnerPlanByTier = (tier) =>
@@ -635,414 +694,415 @@ export default function PartnerJoin() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-950" />
-      </div>
-    );
-  }
-
   const progress = (businessStep / 4) * 100;
 
-  return (
-    <div style={{ background: BRAND.sabbia, minHeight: '100vh' }}>
+  const PlanCard = ({ plan, idx, onSelect }) => {
+    const Icon = plan.icon;
+    const isPro = plan.tier === 'pro';
+    const isGrande = plan.tier === 'grande';
+    const colSpan = idx === 0 ? 'lg:col-span-12' : isPro ? 'lg:col-span-6' : 'lg:col-span-6';
 
-      {/* ═══════════════════════════════════════════════════════
-          HERO — allineamento a sinistra, background vivo
-         ═══════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative overflow-hidden no-theme-flip" style={{ background: BRAND.inkDark, minHeight: '100dvh' }}>
-        {/* Background vivo con motion */}
+    return (
+      <motion.article
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: idx * 0.1 }}
+        className={`rounded-[2.5rem] p-10 border border-stone-200/60 bg-white shadow-2xl relative overflow-hidden flex flex-col justify-between transition-all hover:scale-[1.02] active:scale-[0.98] ${colSpan}`}
+      >
+        <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${plan.accent} opacity-30 blur-3xl pointer-events-none`} />
+
+        <div className="relative z-10 flex-1">
+          <div className="flex items-start justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-stone-50 border border-stone-100 flex items-center justify-center shadow-sm text-zinc-950">
+                <Icon size={28} weight="duotone" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-zinc-950" style={{ fontFamily: typography.serif }}>
+                  {plan.name}
+                </h3>
+                <p className="text-[9px] uppercase tracking-[0.25em] font-black text-[#D4793A] mt-1">
+                  {idx === 0 ? 'Punto d\'ingresso' : isPro ? 'Il più scelto' : 'Partner d\'élite'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 mb-10">
+            {plan.highlights.map((h, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-5 h-5 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
+                  <Check size={12} className="text-emerald-600" strokeWidth={3} />
+                </div>
+                <span className="text-[14px] font-semibold text-zinc-800">{h}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-end justify-between py-6 border-t border-stone-100">
+            <div>
+              <p className="text-[9px] uppercase tracking-[0.2em] font-black text-stone-400 mb-1">Commissione</p>
+              <p className="text-3xl font-black text-zinc-950">{plan.commissionRate}%</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[9px] uppercase tracking-[0.2em] font-black text-stone-400 mb-1">Canone</p>
+              <p className="text-3xl font-black text-zinc-950">
+                {plan.monthlyPrice === 0 ? "GRATIS" : `€${plan.monthlyPrice}`}
+                {plan.monthlyPrice > 0 && <span className="text-sm font-bold text-stone-400">/m</span>}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => onSelect(plan.tier)}
+            className="mt-8 w-full h-[64px] rounded-2xl bg-zinc-950 text-white text-[14px] uppercase tracking-[0.2em] font-black shadow-xl hover:bg-black transition flex items-center justify-center gap-3 group"
+          >
+            Scegli {plan.name}
+            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+      </motion.article>
+    );
+  };
+
+  return (
+    <div className="min-h-screen selection:bg-[#D4793A]/30" style={{ background: TOKENS.bgPrimary }}>
+
+      {/* HEADER / NAV */}
+      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center bg-transparent">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-10 h-10 rounded-xl bg-zinc-950 flex items-center justify-center shadow-lg">
+            <span className="text-white font-black text-xl italic">D</span>
+          </div>
+        </Link>
+        <Link to="/login" className="px-6 py-2.5 rounded-full bg-white/80 backdrop-blur-md border border-white/20 shadow-sm text-[13px] font-bold text-zinc-900 transition hover:bg-white">
+          Area Riservata
+        </Link>
+      </nav>
+
+      {/* ── HERO ──────────────────────────────────────── */}
+      <section ref={heroRef} className="relative overflow-hidden pt-32 pb-20 md:pt-48 md:pb-32 px-6">
+        {/* Mesh Gradients */}
         <div className="absolute inset-0 pointer-events-none">
           <motion.div
-            animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full"
-            style={{ background: `radial-gradient(circle, ${BRAND.terracotta}12 0%, transparent 70%)`, filter: 'blur(80px)' }}
+            animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+            className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full opacity-20 blur-[80px]"
+            style={{ background: TOKENS.accent }}
           />
           <motion.div
-            animate={{ x: [0, -40, 0], y: [0, 20, 0] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -bottom-20 -left-20 w-[500px] h-[500px] rounded-full"
-            style={{ background: `radial-gradient(circle, ${BRAND.blu}40 0%, transparent 70%)`, filter: 'blur(100px)' }}
+            animate={{ x: [0, -30, 0], y: [0, 50, 0] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+            className="absolute bottom-[-5%] left-[-10%] w-[400px] h-[400px] rounded-full opacity-10 blur-[100px]"
+            style={{ background: TOKENS.accentGold }}
           />
         </div>
 
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`,
-            backgroundSize: '80px 80px',
-          }} />
-
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity, minHeight: '100dvh' }}
-          className="relative z-10 flex flex-col justify-center px-8 sm:px-12 max-w-5xl">
-
+        <div className="max-w-6xl mx-auto relative z-10">
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-3xl"
           >
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-              <Building2 size={14} className="text-sole" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/80">Puglia Partner Network</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4793A]/10 border border-[#D4793A]/20 mb-8 backdrop-blur-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D4793A] animate-pulse" />
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4793A]">Partner Program 2026</span>
             </div>
 
-            <h1
-              className="text-[4.2rem] sm:text-[5.5rem] font-bold leading-[0.9] tracking-tight text-white mb-2"
-              style={{ fontFamily: "'Libre Baskerville', serif" }}
-            >
-              Il club d&apos;élite<br />
-              <span className="text-sole underline decoration-sole/30">della Puglia</span><br />
-              nella tua tasca.
+            <h1 className="text-6xl md:text-8xl font-black text-zinc-950 leading-[0.9] tracking-tight mb-8" style={{ fontFamily: typography.serif }}>
+              La Puglia <br />
+              <span className="text-[#D4793A] italic">ti aspetta.</span>
             </h1>
 
-            <p className="text-[16px] sm:text-[18px] leading-relaxed max-w-xl text-white/50 font-medium">
-              Entra nel cuore pulsante dell&apos;ospitalità pugliese. Non siamo una directory, siamo il pass per i membri più esclusivi del Club Desideri.
+            <div className="text-xl md:text-2xl font-medium text-zinc-600 mb-12 flex flex-wrap items-center gap-x-2">
+              Sei una <TypewriterText words={TYPEWRITER_WORDS} />
+              <span className="opacity-60">nel cuore del Club.</span>
+            </div>
+
+            <p className="text-lg md:text-xl text-zinc-500 leading-relaxed max-w-2xl mb-12">
+              Entra nel network di attività selezionate. Raggiungi soci motivati, incassa online, crea esperienze autentiche. Desideri di Puglia è il tuo nuovo varco digitale.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-5 pt-4">
-              {step === 1 && (
-                <button
-                  onClick={() => document.getElementById('piani-partner').scrollIntoView({ behavior: 'smooth' })}
-                  className="h-[64px] px-10 rounded-full font-black text-[15px] flex items-center justify-center gap-3 transition active:scale-95 shadow-2xl"
-                  style={{ background: BRAND.terracotta, color: BRAND.white, boxShadow: `0 12px 40px ${BRAND.terracotta}40` }}
-                >
-                  Esplora i Piani
-                  <ArrowRight size={20} strokeWidth={2.5} />
-                </button>
-              )}
-              {step >= 2 && (
-                <a
-                  href={selectedPlan ? "#registrazione-rapida" : "#piani-partner"}
-                  className="h-[64px] px-10 rounded-full font-black text-[15px] flex items-center justify-center gap-3 bg-white text-zinc-950 transition active:scale-95 shadow-xl"
-                >
-                  {selectedPlan ? "Completa Registrazione" : "Seleziona un Piano"}
-                  <ArrowRight size={20} strokeWidth={2.5} />
-                </a>
-              )}
-            </div>
+            <button
+              onClick={() => document.getElementById('piani').scrollIntoView({ behavior: 'smooth' })}
+              className="h-[72px] px-12 rounded-full bg-zinc-950 text-white font-black text-[15px] uppercase tracking-[0.2em] transition hover:bg-black active:scale-95 shadow-2xl flex items-center justify-center gap-4"
+            >
+              Scopri i Piani
+              <ArrowRight size={20} />
+            </button>
           </motion.div>
-
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-            className="absolute bottom-12 flex items-center gap-4 opacity-30"
-          >
-            <div className="w-9 h-9 rounded-full flex items-center justify-center border border-white/20">
-              <ChevronDown size={18} className="text-white" />
-            </div>
-            <p className="text-[11px] font-bold text-white uppercase tracking-widest">Scorri per esplorare</p>
-          </motion.div>
-        </motion.div>
+        </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════
-          PERCHÉ FARLO — LEVE CONCRETE
-         ═══════════════════════════════════════════════════════ */}
-      <div className="max-w-6xl mx-auto px-6 pt-24 pb-32">
-        <section className="space-y-16">
-          <FadeUp>
-            <div className="max-w-2xl">
-              <h2 className="text-5xl font-bold leading-tight mb-6" style={{ fontFamily: "'Libre Baskerville', serif", color: BRAND.text }}>
-                Perché diventare un <br />Partner Certificato?
+      {/* ── WHY ────────────────────────────────────────── */}
+      <section className="py-24 md:py-32 px-6 bg-white/30 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            <div className="lg:col-span-5">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 block mb-4">I vantaggi</span>
+              <h2 className="text-4xl md:text-5xl font-black text-zinc-950 leading-tight" style={{ fontFamily: typography.serif }}>
+                Perché farlo? <br />
+                <span className="text-[#D4793A]">5 motivi concreti.</span>
               </h2>
-              <p className="text-xl text-stone-500 font-medium leading-relaxed">
-                Dimentica leDirectory classiche. Desideri di Puglia è il varco d&apos;accesso per i membri del Club nel tuo territorio.
-              </p>
             </div>
-          </FadeUp>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Target Altospendente",
-                desc: "I nostri soci sono viaggiatori d&apos;élite e residenti in cerca di autenticità. Clientela qualificata, non turismo di massa.",
-                icon: TrendingUp,
-                dark: false
-              },
-              {
-                title: "Visibilità Esclusiva",
-                desc: "Apparirai nell&apos;algoritmo di ricerca del Concierge e nei percorsi su misura generati per i soci del Club.",
-                icon: Compass,
-                dark: true
-              },
-              {
-                title: "Pagamenti Garantiti",
-                desc: "Gestisci prenotazioni e incassi tramite Stripe Connect. Sicurezza totale, accrediti immediati e gestione no-show.",
-                icon: ShieldCheck,
-                dark: false
-              },
-              {
-                title: "Marketing Automatico",
-                desc: "La tua attività viene inclusa nelle notifiche push di prossimità quando un membro è nelle vicinanze.",
-                icon: Sparkles,
-                dark: false
-              },
-              {
-                title: "Costi Trasparenti",
-                desc: "Piani flessibili con commissioni ridotte legate alla tua crescita. Paghi solo se ricevi prenotazioni attive.",
-                icon: CurrencyEur,
-                dark: false
-              }
-            ].map((item, i) => (
-              <FadeUp key={i} delay={i * 0.1}>
-                <div className={`p-10 rounded-[2.5rem] flex flex-col h-full transition-all hover:shadow-2xl hover:-translate-y-1 ${item.dark ? 'bg-zinc-900 text-white' : 'bg-stone-100 border border-stone-200/50'
-                  }`}>
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 shadow-sm ${item.dark ? 'bg-white/10 text-white' : 'bg-white text-zinc-950'
-                    }`}>
-                    <item.icon size={28} weight={item.dark ? "fill" : "duotone"} />
+            <div className="lg:col-span-7 space-y-12">
+              {WHY_ITEMS.map((item, i) => (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  key={i}
+                  className="flex gap-6 items-start"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[#D4793A]/10 flex items-center justify-center shrink-0 border border-[#D4793A]/20">
+                    <item.Icon size={22} className="text-[#D4793A]" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-4" style={{ fontFamily: item.dark ? 'inherit' : "'Libre Baskerville', serif" }}>{item.title}</h3>
-                  <p className={`text-sm leading-relaxed ${item.dark ? 'text-white/60' : 'text-stone-500'}`}>
-                    {item.desc}
-                  </p>
-                </div>
-              </FadeUp>
+                  <div>
+                    <h3 className="text-xl font-bold text-zinc-950 mb-2" style={{ fontFamily: typography.serif }}>{item.title}</h3>
+                    <p className="text-zinc-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PIANI ───────────────────────────────────────── */}
+      <section id="piani" className="py-24 md:py-32 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl md:text-7xl font-black text-zinc-950 mb-6" style={{ fontFamily: typography.serif }}>
+              Scegli la <br />misura giusta.
+            </h2>
+            <p className="text-zinc-500 font-medium">Nessun impegno. Cambia piano quando vuoi.</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            {PARTNER_PLANS.map((plan, idx) => (
+              <PlanCard key={plan.tier} plan={plan} idx={idx} onSelect={(tier) => navigate(`/partner/subscription/${tier}`)} />
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* SCEGLI IL PIANO - Layout Asimmetrico */}
-        {step === 1 && (
-          <section id="piani-partner" className="max-w-7xl mx-auto px-6 py-32 bg-white/50">
-            <FadeUp>
-              <div className="text-center mb-20">
-                <h2 className="text-[2.8rem] font-bold tracking-tight text-zinc-900" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-                  Scegli il tuo impatto nel Club.
-                </h2>
-                <p className="mt-4 text-stone-500 font-medium">Tre livelli di partnership per scalare la tua visibilità.</p>
-              </div>
-            </FadeUp>
+      {/* ── FOOTER ──────────────────────────────────────── */}
+      <footer className="py-12 px-6 border-t border-zinc-200 text-center">
+        <p className="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400">
+          © 2026 Desideri di Puglia — Area Partner
+        </p>
+      </footer>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch">
-              {PARTNER_PLANS.map((plan, idx) => {
-                const Icon = plan.icon;
-                const isPro = plan.tier === 'pro';
-                const isGrande = plan.tier === 'grande';
-
-                // Layout asimmetrico: Discovery 5, Pro 7, Grande 12
-                const colSpan = idx === 0 ? 'lg:col-span-5' : isPro ? 'lg:col-span-7' : 'lg:col-span-12';
-
-                return (
-                  <article
-                    key={plan.tier}
-                    className={`rounded-[3rem] p-12 border border-stone-200/60 bg-white shadow-2xl relative overflow-hidden flex flex-col justify-between transition-all hover:scale-[1.02] active:scale-[0.98] md:col-span-12 ${colSpan}`}
-                  >
-                    <div className={`absolute top-0 right-0 w-64 h-64 bg-gradient-to-br ${plan.accent} opacity-20 blur-3xl pointer-events-none`} />
-
-                    <div className="relative z-10 flex-1">
-                      <div className="flex items-start justify-between mb-12">
-                        <div className="flex items-center gap-5">
-                          <div className="w-16 h-16 rounded-[1.5rem] bg-stone-50 border border-stone-100 flex items-center justify-center shadow-sm">
-                            <Icon size={32} weight="duotone" className="text-zinc-950" />
-                          </div>
-                          <div>
-                            <h3 className="text-3xl font-bold text-zinc-950" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-                              {plan.name}
-                            </h3>
-                            <p className="text-[10px] uppercase tracking-[0.25em] font-black text-amber-700 mt-2">
-                              {idx === 0 ? 'Punto d\'ingresso' : isPro ? 'Il più scelto' : 'Partner d\'élite'}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-5 mb-12">
-                        {plan.highlights.map((h, i) => (
-                          <div key={i} className="flex items-center gap-4">
-                            <div className="w-6 h-6 rounded-full bg-emerald-50 flex items-center justify-center shrink-0">
-                              <CheckCircle2 size={14} className="text-emerald-600" strokeWidth={3} />
-                            </div>
-                            <span className="text-[15px] font-semibold text-zinc-800">{h}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-8 py-8 border-t border-stone-100">
-                        <div>
-                          <p className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-400 mb-2">Commissione</p>
-                          <p className="text-4xl font-black text-zinc-950">{plan.commissionRate}%</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[10px] uppercase tracking-[0.2em] font-black text-stone-400 mb-2">Canone</p>
-                          <p className="text-4xl font-black text-zinc-950">
-                            €{plan.monthlyPrice}
-                            <span className="text-base font-bold text-stone-400">/m</span>
-                          </p>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => goToPlanDetail(plan.tier)}
-                        className="mt-10 w-full h-[72px] rounded-[1.8rem] bg-zinc-950 text-white text-[15px] uppercase tracking-[0.2em] font-black shadow-2xl hover:bg-black transition flex items-center justify-center gap-4 group"
-                      >
-                        Scopri i vantaggi
-                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                      </button>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          </section>
-        )}
-
+      {/* ── REGISTRATION DRAWER / OVERLAY ────────────────── */}
+      <AnimatePresence>
         {selectedPlan && (
-          <section id="registrazione-rapida" className="rounded-[2rem] border border-zinc-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Registrazione Attività</p>
-              <p className="text-[12px] font-bold text-zinc-900">{businessStep}/4</p>
-            </div>
-            <div className="h-2 w-full bg-zinc-100 rounded-full overflow-hidden mb-6">
-              <div className="h-full bg-zinc-900 transition-all duration-300" style={{ width: `${(businessStep / 4) * 100}%` }} />
-            </div>
-
-            {businessStep === 1 && (
-              <div className="space-y-4">
-                <h3 className="text-[24px] leading-tight text-zinc-950" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-                  Come si chiama la tua attività?
-                </h3>
-                <p className="text-[13px] text-zinc-600">Questo nome sarà visibile ai clienti.</p>
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-600 mb-1">Nome attività</label>
-                  <input
-                    value={businessData.name}
-                    onChange={(e) => setBusinessData((p) => ({ ...p, name: e.target.value }))}
-                    className="w-full px-3 py-3 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-900"
-                    placeholder="Nome attività"
-                  />
-                  <p className="text-[11px] text-zinc-500 mt-1">Usa il nome che trovi anche su insegna o Google.</p>
-                </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-zinc-950/20 backdrop-blur-3xl flex items-end sm:items-center justify-center p-0 sm:p-6"
+          >
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={springMotion.spring}
+              className="w-full max-w-2xl bg-[#FAF7F2] rounded-t-[3rem] sm:rounded-[3rem] shadow-[0_32px_80px_rgba(0,0,0,0.3)] border border-stone-200/50 overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              {/* Progress Bar */}
+              <div className="h-1.5 w-full bg-stone-200">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(businessStep / 4) * 100}%` }}
+                  className="h-full bg-zinc-950"
+                />
               </div>
-            )}
 
-            {businessStep === 2 && (
-              <div className="space-y-4">
-                <h3 className="text-[24px] leading-tight text-zinc-950" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-                  Carica una foto che invogli a entrare
-                </h3>
-                <p className="text-[13px] text-zinc-600">Una buona foto aumenta le visite.</p>
-                <button
-                  type="button"
-                  onClick={() => businessPhotoInputRef.current?.click()}
-                  className="w-full h-12 rounded-xl bg-zinc-950 text-white font-bold text-[13px]"
-                >
-                  {uploadingBusinessPhoto ? "Caricamento..." : "Carica foto"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => businessCameraInputRef.current?.click()}
-                  className="w-full h-11 rounded-xl border border-zinc-300 bg-white text-zinc-900 font-bold text-[13px]"
-                >
-                  Scatta ora
-                </button>
-                <input
-                  ref={businessPhotoInputRef}
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => onUploadBusinessPhoto(e.target.files?.[0])}
-                />
-                <input
-                  ref={businessCameraInputRef}
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  capture="environment"
-                  onChange={(e) => onUploadBusinessPhoto(e.target.files?.[0])}
-                />
-                {businessData.photo ? (
-                  <div className="rounded-2xl overflow-hidden border border-zinc-200">
-                    <img src={businessData.photo} alt="Foto attività" className="w-full h-48 object-cover" />
+              <div className="p-8 sm:p-12 overflow-y-auto">
+                <div className="flex items-center justify-between mb-8">
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4793A]">
+                    Step {businessStep} di 4
+                  </span>
+                  <button onClick={() => navigate('/partner/join')} className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center">
+                    <X size={16} className="text-zinc-900" />
+                  </button>
+                </div>
+
+                {businessStep === 1 && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                    <h3 className="text-4xl font-black text-zinc-950 mb-3" style={{ fontFamily: typography.serif }}>
+                      Come si chiama <br />l&apos;attività?
+                    </h3>
+                    <p className="text-zinc-500 mb-8 font-medium">Questo nome sarà visibile ai soci del Club.</p>
+                    <div className="relative group">
+                      <motion.div
+                        className="absolute inset-0 rounded-2xl border-2 border-zinc-200 bg-white shadow-sm -z-10 transition-colors group-focus-within:border-zinc-950"
+                      />
+                      <div className="p-1 flex items-center">
+                        <input
+                          value={businessData.name}
+                          onChange={(e) => setBusinessData(p => ({ ...p, name: e.target.value }))}
+                          className="w-full bg-transparent border-0 px-5 py-5 text-zinc-950 placeholder-zinc-400 focus:ring-0 text-lg font-bold"
+                          placeholder="Es. Masseria Torre Spagnola"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-zinc-400 mt-4 font-bold uppercase tracking-widest">
+                      Usa il nome ufficiale della struttura.
+                    </p>
+                  </motion.div>
+                )}
+
+                {businessStep === 2 && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                    <h3 className="text-4xl font-black text-zinc-950 mb-3" style={{ fontFamily: typography.serif }}>
+                      Una foto che <br />invogli a entrare.
+                    </h3>
+                    <p className="text-zinc-500 mb-8 font-medium">Una buona foto aumenta le visite del 40%.</p>
+
+                    {businessData.photo ? (
+                      <div className="relative rounded-[2.5rem] overflow-hidden border-2 border-white shadow-2xl group">
+                        <img src={businessData.photo} className="w-full aspect-[4/3] object-cover" alt="Preview" />
+                        <button
+                          onClick={() => setBusinessData(p => ({ ...p, photo: "" }))}
+                          className="absolute top-4 right-4 bg-zinc-950/80 backdrop-blur-md text-white px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest"
+                        >
+                          Cambia
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <button
+                          onClick={() => businessPhotoInputRef.current?.click()}
+                          className="h-48 rounded-[2.5rem] bg-white border-2 border-dashed border-stone-200 flex flex-col items-center justify-center gap-4 transition hover:border-[#D4793A] hover:bg-[#D4793A]/5 group"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-stone-50 flex items-center justify-center group-hover:scale-110 transition">
+                            <Plus size={24} className="text-zinc-400 group-hover:text-[#D4793A]" />
+                          </div>
+                          <span className="font-bold text-zinc-400 group-hover:text-[#D4793A]">Carica Foto</span>
+                        </button>
+                        <button
+                          onClick={() => businessCameraInputRef.current?.click()}
+                          className="h-48 rounded-[2.5rem] bg-zinc-950 flex flex-col items-center justify-center gap-4 transition hover:bg-black active:scale-95 shadow-xl"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white">
+                            <Camera size={24} />
+                          </div>
+                          <span className="font-bold text-white">Scatta Ora</span>
+                        </button>
+                      </div>
+                    )}
+
+                    <input ref={businessPhotoInputRef} type="file" className="hidden" accept="image/*" onChange={(e) => onUploadBusinessPhoto(e.target.files?.[0])} />
+                    <input ref={businessCameraInputRef} type="file" className="hidden" accept="image/*" capture="environment" onChange={(e) => onUploadBusinessPhoto(e.target.files?.[0])} />
+                  </motion.div>
+                )}
+
+                {businessStep === 3 && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
+                    <h3 className="text-4xl font-black text-zinc-950 mb-3" style={{ fontFamily: typography.serif }}>
+                      Dove si <br />trova?
+                    </h3>
+                    <p className="text-zinc-500 mb-8 font-medium">Serve per mostrarti sulla mappa e nei percorsi.</p>
+                    <div className="relative group">
+                      <motion.div className="absolute inset-0 rounded-2xl border-2 border-zinc-200 bg-white shadow-sm -z-10 transition-colors group-focus-within:border-zinc-950" />
+                      <div className="p-1 flex items-center">
+                        <MapPin size={24} className="ml-5 text-zinc-400" />
+                        <input
+                          value={businessData.position}
+                          onChange={(e) => setBusinessData(p => ({ ...p, position: e.target.value }))}
+                          className="w-full bg-transparent border-0 px-4 py-5 text-zinc-950 placeholder-zinc-400 focus:ring-0 text-lg font-bold"
+                          placeholder="Via, numero civico, città"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {businessStep === 4 && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
+                    <div>
+                      <h3 className="text-4xl font-black text-zinc-950 mb-3" style={{ fontFamily: typography.serif }}>
+                        Collega <br />Stripe.
+                      </h3>
+                      <p className="text-zinc-500 mb-8 font-medium">Niente commissioni nascoste. Incassi garantiti in 48h.</p>
+                    </div>
+
+                    <div className="bg-white rounded-[2rem] p-8 border border-stone-200 shadow-sm space-y-6">
+                      {[
+                        { Icon: Bank, text: "Accrediti automatici sul tuo conto" },
+                        { Icon: QrCode, text: "Ticket e QR per gestire gli accessi" },
+                        { Icon: IdentificationCard, text: "Nessun dato manuale da inserire" },
+                      ].map((item, i) => (
+                        <div key={i} className="flex gap-4 items-start">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100">
+                            <item.Icon size={20} className="text-emerald-600" />
+                          </div>
+                          <p className="text-[15px] font-semibold text-zinc-800 pt-2">{item.text}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="p-6 bg-emerald-50 rounded-2xl border-l-[6px] border-emerald-500">
+                      <p className="text-sm text-emerald-800 leading-relaxed font-medium">
+                        Sarai reindirizzato su Stripe. Sicuro, regolato, senza dati da inserire nell&apos;app.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div className="p-8 sm:p-12 bg-stone-50 border-t border-stone-100 flex gap-4">
+                {businessStep > 1 && (
+                  <button
+                    onClick={() => setBusinessStep(s => s - 1)}
+                    className="h-16 px-8 rounded-full border-2 border-stone-200 text-zinc-600 font-bold hover:bg-white transition"
+                  >
+                    Indietro
+                  </button>
+                )}
+                {businessStep < 4 ? (
+                  <button
+                    onClick={() => {
+                      if (businessStep === 1 && !businessData.name.trim()) return toast.error("Inserisci il nome.");
+                      if (businessStep === 2 && !businessData.photo) return toast.error("Carica una foto.");
+                      if (businessStep === 3 && !businessData.position.trim()) return toast.error("Inserisci l'indirizzo.");
+                      setBusinessStep(s => s + 1);
+                    }}
+                    className="flex-1 h-16 rounded-full bg-zinc-950 text-white font-black text-[15px] uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 transition hover:bg-black active:scale-95"
+                  >
+                    Continua
+                    <ArrowRight size={18} />
+                  </button>
+                ) : (
+                  <div className="flex-1 flex flex-col sm:flex-row gap-4">
+                    <button
+                      onClick={() => saveBusinessWizard({ startCheckout: true })}
+                      disabled={saving}
+                      className="flex-1 h-16 rounded-full bg-[#D4793A] text-white font-black text-[15px] uppercase tracking-widest shadow-[0_8px_30px_rgba(212,121,58,0.3)] flex items-center justify-center gap-3 transition hover:bg-[#c36a2f] active:scale-95 disabled:opacity-50"
+                    >
+                      {saving ? "Salvataggio..." : "Attiva Incassi"}
+                      <Lightning size={18} weight="fill" />
+                    </button>
+                    <button
+                      onClick={() => saveBusinessWizard({ startCheckout: false })}
+                      disabled={saving}
+                      className="h-16 px-8 rounded-full border-2 border-stone-200 text-zinc-600 font-bold hover:bg-white transition active:scale-95"
+                    >
+                      Non ora
+                    </button>
                   </div>
-                ) : null}
-                <p className="text-[11px] text-zinc-500">Deve essere chiara, luminosa, senza testo.</p>
+                )}
               </div>
-            )}
-
-            {businessStep === 3 && (
-              <div className="space-y-4">
-                <h3 className="text-[24px] leading-tight text-zinc-950" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-                  Dove si trova?
-                </h3>
-                <p className="text-[13px] text-zinc-600">Serve per mostrarti sulla mappa e nei percorsi.</p>
-                <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-zinc-600 mb-1">Cerca indirizzo</label>
-                  <input
-                    value={businessData.position}
-                    onChange={(e) => setBusinessData((p) => ({ ...p, position: e.target.value }))}
-                    className="w-full px-3 py-3 rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-900"
-                    placeholder="Via, numero civico, città"
-                  />
-                </div>
-              </div>
-            )}
-
-            {businessStep === 4 && (
-              <div className="space-y-4">
-                <h3 className="text-[24px] leading-tight text-zinc-950" style={{ fontFamily: "'Libre Baskerville', serif" }}>
-                  Ultimo passo: attiva gli incassi
-                </h3>
-                <p className="text-[13px] text-zinc-600">Collegherai il conto per ricevere pagamenti automaticamente.</p>
-                <ul className="space-y-2 text-[13px] text-zinc-700">
-                  <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-600" /> Accrediti automatici sul tuo conto</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-600" /> Ticket e QR per gestire gli accessi</li>
-                  <li className="flex items-center gap-2"><CheckCircle2 size={14} className="text-emerald-600" /> Nessun inserimento manuale di documenti nell’app</li>
-                </ul>
-              </div>
-            )}
-
-            <div className="mt-6 flex items-center justify-between">
-              {businessStep > 1 ? (
-                <button
-                  type="button"
-                  onClick={() => setBusinessStep((s) => Math.max(1, s - 1))}
-                  className="px-4 py-2 text-sm font-semibold text-zinc-600"
-                >
-                  Indietro
-                </button>
-              ) : <div />}
-
-              {businessStep < 4 ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (businessStep === 1 && !businessData.name.trim()) return toast.error("Inserisci il nome attività.");
-                    if (businessStep === 2 && !businessData.photo) return toast.error("Carica una foto attività.");
-                    if (businessStep === 3 && !businessData.position.trim()) return toast.error("Inserisci la posizione.");
-                    setBusinessStep((s) => Math.min(4, s + 1));
-                  }}
-                  className="h-11 px-6 rounded-full bg-zinc-950 text-white text-[13px] font-bold"
-                >
-                  Continua
-                </button>
-              ) : (
-                <div className="flex flex-wrap gap-2 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => saveBusinessWizard({ startCheckout: true })}
-                    disabled={saving}
-                    className="h-11 px-6 rounded-full bg-zinc-950 text-white text-[13px] font-bold disabled:opacity-60"
-                  >
-                    {saving ? "Salvataggio..." : "Attiva incassi"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => saveBusinessWizard({ startCheckout: false })}
-                    disabled={saving}
-                    className="h-11 px-6 rounded-full border border-zinc-300 bg-white text-zinc-900 text-[13px] font-bold"
-                  >
-                    Non ora
-                  </button>
-                </div>
-              )}
-            </div>
-          </section>
+            </motion.div>
+          </motion.div>
         )}
+      </AnimatePresence>
 
-      </div>
     </div>
   );
 }

@@ -47,11 +47,11 @@ const MissionSkeleton = () => (
 const FilterPill = ({ active, onClick, children }) => (
   <button
     onClick={onClick}
-    className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-xl border transition-all duration-300`}
-    style={active
-      ? { backgroundColor: 'var(--text-primary)', color: 'var(--bg-base)', borderColor: 'var(--text-primary)' }
-      : { backgroundColor: 'var(--bg-surface)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }
-    }
+    className={`inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] px-5 py-3 rounded-full border transition-all duration-300 ${
+      active
+      ? 'bg-accent text-white border-accent shadow-sm'
+      : 'bg-surface text-text-muted border-border-default hover:border-accent/50'
+    }`}
   >
     {children}
   </button>
@@ -136,45 +136,41 @@ const Missioni = () => {
   const setsToDisplay = hasCityFilterAndEmpty ? questSets : filteredSets
 
   return (
-    <div className="min-h-screen pb-32 font-sans selection:bg-orange-500/30 transition-colors duration-500" style={{ backgroundColor: 'var(--bg-base)' }}>
+    <div className="min-h-screen bg-bg-primary pb-32 font-sans selection:bg-accent/30 transition-colors duration-500">
 
       {/* ╔══ NAV ══════════════════════════════════════════╗ */}
       <nav
-        style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border)' }}
-        className="fixed top-0 inset-x-0 z-[100] px-5 h-16 flex items-center justify-between shadow-sm"
+        className="fixed top-0 inset-x-0 z-[100] px-6 h-16 flex items-center justify-between bg-bg-primary/80 backdrop-blur-lg border-b border-border-default"
       >
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform"
-          style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+          className="w-10 h-10 rounded-full bg-surface border border-border-default flex items-center justify-center active:scale-95 transition-all hover:border-accent/30"
         >
-          <CaretLeft size={18} weight="bold" style={{ color: 'var(--text-primary)' }} />
+          <CaretLeft size={20} weight="bold" className="text-text-primary" />
         </button>
-        <p style={{ color: 'var(--text-primary)' }} className="text-[10px] font-black uppercase tracking-[0.4em] text-center">
+        <p className="overline !text-text-primary !mb-0 !tracking-[0.4em]">
           Missioni
         </p>
-        {/* Map toggle: opens Mappa pre-set to Saghe tab */}
         <button
           onClick={() => navigate('/mappa?tab=saghe')}
-          className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
-          style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+          className="w-10 h-10 rounded-full bg-surface border border-border-default flex items-center justify-center active:scale-95 transition-all hover:border-accent/30"
           title="Vista mappa"
         >
-          <MapPin size={18} weight="fill" style={{ color: 'var(--text-secondary)' }} />
+          <MapPin size={20} weight="fill" className="text-accent" />
         </button>
       </nav>
 
       <main className="pt-28 px-5 max-w-lg mx-auto">
 
         {/* ── Hero ─────────────────────────────────────── */}
-        <header className="mb-12">
+        <header className="mb-14">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2 mb-4"
+            className="flex items-center gap-3 mb-5"
           >
-            <div className="h-[1px] w-8 bg-orange-500" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-orange-500">
+            <div className="h-[1px] w-8 bg-accent" />
+            <span className="overline !text-accent !mb-0">
               Saghe Leggendarie
             </span>
           </motion.div>
@@ -183,8 +179,7 @@ const Missioni = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-[2.8rem] font-black text-zinc-900 leading-[0.9] mb-4 lowercase first-letter:uppercase tracking-tighter"
-            style={{ color: 'var(--text-primary)' }}
+            className="text-[48px] font-serif font-black text-text-primary leading-[1] mb-5 tracking-tight"
           >
             Esplora la<br />Puglia Vera.
           </motion.h1>
@@ -192,7 +187,7 @@ const Missioni = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-[13px] text-zinc-500 font-medium leading-relaxed max-w-[85%]"
+            className="text-[15px] text-text-muted font-medium leading-relaxed max-w-[90%]"
           >
             Avventure autentiche tra storia, cultura e natura pugliese. Sblocca ogni tappa e diventa leggenda.
           </motion.p>
@@ -208,9 +203,9 @@ const Missioni = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <MapPin size={14} weight="fill" className="text-orange-500" />
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500">Destinazione</span>
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin size={16} weight="fill" className="text-accent" />
+                  <span className="overline !text-text-muted !mb-0">Destinazione</span>
                 </div>
                 <div className="flex gap-2.5 overflow-x-auto pb-4 scrollbar-hide px-1">
                   {cities.map((city, idx) => (
@@ -233,9 +228,9 @@ const Missioni = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
-                <div className="flex items-center gap-2 mb-3">
-                  <Compass size={14} weight="fill" className="text-blue-500" />
-                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500">Tipologia</span>
+                <div className="flex items-center gap-2 mb-4">
+                  <Compass size={16} weight="fill" className="text-accent-gold" />
+                  <span className="overline !text-text-muted !mb-0">Tipologia</span>
                 </div>
                 <div className="flex gap-2.5 overflow-x-auto pb-4 scrollbar-hide px-1">
                   {types.map((type, idx) => (
@@ -321,11 +316,11 @@ const Missioni = () => {
                     onClick={() => navigate(`/saga/${set.id}/intro`)}
                   >
                     {/* Modern Gallery Card */}
-                    <div className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-sm mb-6 bg-zinc-100 border border-zinc-100" style={{ borderColor: 'var(--border)' }}>
+                    <div className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-sm mb-7 bg-bg-secondary border border-border-default">
                       <img
                         src={set.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format'}
                         alt={getLocalized(set, 'title', i18n?.language)}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       />
 
                       {/* Very subtle top gradient for badges only */}
@@ -335,31 +330,26 @@ const Missioni = () => {
                       />
 
                       {/* Top badges (Fav) */}
-                      <div className="absolute top-5 right-5 z-10 flex flex-col items-end gap-2">
+                      {/* Top badges (Fav) */}
+                      <div className="absolute top-6 right-6 z-10">
                         <button
                           onClick={(e) => handleToggleFavorite(e, set.id)}
-                          className="w-10 h-10 rounded-2xl flex items-center justify-center border border-white/40 backdrop-blur-xl transition-all active:scale-90 hover:scale-110 shadow-sm"
-                          style={{ backgroundColor: 'rgba(255,255,255,0.7)' }}
+                          className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-xl border border-white/30 transition-all active:scale-90 hover:scale-110 shadow-lg"
                         >
                           <Heart
-                            size={18}
+                            size={20}
                             weight={favorites.includes(set.id) ? 'fill' : 'bold'}
-                            className={favorites.includes(set.id) ? 'text-red-500' : 'text-zinc-900'}
+                            className={favorites.includes(set.id) ? 'text-danger' : 'text-white'}
                           />
                         </button>
                       </div>
 
-                      {/* Badge Originals on Image - FORCED WHITE TEXT */}
-                      <div className="absolute top-4 left-4 z-10">
+                      {/* Badge Originals on Image */}
+                      <div className="absolute top-6 left-6 z-10">
                         {(set.is_original || set.isOriginal) && (
-                          <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/10 shadow-xl text-on-image">
-                            <div className="no-theme-flip w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-black text-white shadow-sm shrink-0">D</div>
-                            <span
-                              className="text-[10px] font-bold tracking-tight whitespace-nowrap"
-                              style={{ color: 'white', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}
-                            >
-                              Originals by Desideri di Puglia
-                            </span>
+                          <div className="flex items-center gap-2 bg-bg-dark/40 backdrop-blur-md px-3 py-2 rounded-full border border-white/10 shadow-xl">
+                            <div className="no-theme-flip w-5 h-5 rounded-full bg-accent flex items-center justify-center text-[10px] font-black text-white shadow-sm shrink-0">D</div>
+                            <span className="overline !text-white !mb-0 !text-[10px] !tracking-wider">Originals by Desideri di Puglia</span>
                           </div>
                         )}
                       </div>
@@ -367,62 +357,58 @@ const Missioni = () => {
 
                     {/* Content Block BELOW Image */}
                     <div className="px-2">
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-4 mb-4">
                         {set.city && (
-                          <span className="px-3 py-1 bg-orange-500/10 text-orange-600 text-[8.5px] font-black uppercase tracking-[0.2em] rounded-lg border border-orange-500/20">
+                          <span className="px-3.5 py-1.5 bg-accent/5 text-accent text-[9px] font-black uppercase tracking-[0.2em] rounded-lg border border-accent/20">
                             {set.city}
                           </span>
                         )}
                         {set.distance_km && (
-                          <div className="flex items-center gap-1 text-[8.5px] font-black text-zinc-400 uppercase tracking-[0.15em]">
-                            <MapPin size={11} weight="fill" className="text-zinc-300" /> {set.distance_km} km
+                          <div className="flex items-center gap-2 text-[9px] font-black text-text-muted uppercase tracking-[0.2em]">
+                            <MapPin size={14} weight="fill" className="text-accent-gold" /> {set.distance_km} km
                           </div>
                         )}
                       </div>
 
-                      <div className="flex justify-between items-start gap-4 mb-4">
-                        <h2
-                          className="text-[1.8rem] font-black text-zinc-900 leading-[1.05] lowercase first-letter:uppercase group-hover:text-orange-600 transition-colors duration-300"
-                          style={{ letterSpacing: '-0.03em', color: 'var(--text-primary)' }}
-                        >
+                      <div className="flex justify-between items-start gap-6 mb-6">
+                        <h2 className="text-[34px] font-serif font-black text-text-primary leading-[1] tracking-tight group-hover:text-accent transition-colors duration-300">
                           {getLocalized(set, 'title', i18n?.language)}
                         </h2>
 
-                        <div className="flex items-center gap-2 text-zinc-400 font-black text-[9px] uppercase tracking-[0.2em] shrink-0 pt-2 transition-all duration-500 group-hover:translate-x-1">
-                          Inizia <ArrowRight size={14} weight="bold" className="text-orange-500" />
+                        <div className="flex items-center gap-2 text-accent font-black text-[11px] uppercase tracking-[0.2em] shrink-0 pt-3 transition-all duration-500 group-hover:translate-x-1">
+                          Inizia <ArrowRight size={16} weight="bold" />
                         </div>
                       </div>
 
                       {/* Info Row */}
-                      <div className="flex items-center justify-between pb-4 border-b border-zinc-100" style={{ borderColor: 'var(--border)' }}>
-                        <div className="flex items-center gap-6">
+                      <div className="flex items-center justify-between pb-6 border-b border-border-default">
+                        <div className="flex items-center gap-8">
                           <div>
-                            <p className="text-[7.5px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-0.5">Tappe</p>
-                            <p className="text-[12px] font-black text-zinc-900" style={{ color: 'var(--text-primary)' }}>
+                            <p className="overline !text-text-muted !mb-1">Tappe</p>
+                            <p className="text-[14px] font-black text-text-primary">
                               {set.steps?.length || '—'} luoghi
                             </p>
                           </div>
 
                           {set.difficulty && (
                             <div>
-                              <p className="text-[7.5px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-0.5">Difficoltà</p>
-                              <div className="flex items-center gap-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                                <p className="text-[10px] font-black text-zinc-900 uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>{set.difficulty}</p>
+                              <p className="overline !text-text-muted !mb-1">Difficoltà</p>
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-accent-gold" />
+                                <p className="text-[12px] font-black text-text-primary uppercase tracking-widest">{set.difficulty}</p>
                               </div>
                             </div>
                           )}
                         </div>
 
                         {questProgress && (
-                          <div className="flex items-center gap-3 bg-zinc-50 px-3 py-1.5 rounded-xl border border-zinc-100" style={{ backgroundColor: 'var(--bg-elevated)', borderColor: 'var(--border)' }}>
-                            <span className="text-[10px] font-black text-zinc-900" style={{ color: 'var(--text-primary)' }}>{progressPercent}%</span>
-                            <div className="h-[2px] w-10 bg-zinc-200 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--border)' }}>
+                          <div className="flex items-center gap-4 bg-bg-secondary px-4 py-2.5 rounded-xl border border-border-default">
+                            <span className="text-[11px] font-black text-text-primary">{progressPercent}%</span>
+                            <div className="h-2 w-16 bg-bg-primary rounded-full overflow-hidden border border-border-default">
                               <div
-                                className="h-full rounded-full transition-all duration-700"
+                                className="h-full bg-accent rounded-full transition-all duration-1000"
                                 style={{
-                                  width: `${progressPercent}%`,
-                                  backgroundColor: 'var(--accent)'
+                                  width: `${progressPercent}%`
                                 }}
                               />
                             </div>
@@ -430,15 +416,15 @@ const Missioni = () => {
                         )}
                       </div>
 
-                      {/* Social Evidence / Bottom Padding */}
-                      <div className="pt-4 flex items-center gap-2">
-                        <div className="flex -space-x-1.5 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+                      {/* Social Evidence */}
+                      <div className="pt-5 flex items-center gap-3">
+                        <div className="flex -space-x-2">
                           {[1, 2, 3].map(i => (
-                            <div key={i} className="w-5 h-5 rounded-full border border-white bg-zinc-200" />
+                            <div key={i} className="w-6 h-6 rounded-full border-2 border-bg-primary bg-bg-secondary" />
                           ))}
                         </div>
-                        <span className="text-[8px] font-black uppercase tracking-[0.1em] text-zinc-400 group-hover:text-zinc-600 transition-colors">
-                          Saga completata da <span className="text-orange-500 font-black">{set.completions_count || Math.floor(Math.random() * 50) + 12}</span> clubbers
+                        <span className="text-[10px] font-black uppercase tracking-[0.1em] text-text-muted">
+                          Saga completata da <span className="text-accent font-black">{set.completions_count || Math.floor(Math.random() * 50) + 12}</span> clubbers
                         </span>
                       </div>
                     </div>

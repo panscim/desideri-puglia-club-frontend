@@ -22,14 +22,14 @@ import 'leaflet/dist/leaflet.css';
 
 // Custom Marker — usa solo inline CSS (Tailwind viene purgato da Vite nelle stringhe)
 const MARKER_COLORS = {
-    storico: { bg: '#1c1917', border: '#c4a35a', glow: 'rgba(196,163,90,0.35)' },   // gold on dark
-    cultura: { bg: '#1c1917', border: '#c4a35a', glow: 'rgba(196,163,90,0.35)' },
-    natura: { bg: '#111c14', border: '#6aa66a', glow: 'rgba(106,166,106,0.35)' },  // muted green
+    storico: { bg: 'var(--bg-dark)', border: 'var(--accent)', glow: 'rgba(212,121,58,0.35)' },
+    cultura: { bg: 'var(--bg-dark)', border: 'var(--accent)', glow: 'rgba(212,121,58,0.35)' },
+    natura: { bg: '#111c14', border: '#6aa66a', glow: 'rgba(106,166,106,0.35)' },
     trekking: { bg: '#111c14', border: '#6aa66a', glow: 'rgba(106,166,106,0.35)' },
-    gastro: { bg: '#1c1410', border: '#c47a2e', glow: 'rgba(196,122,46,0.35)' },  // muted amber
-    gastronomia: { bg: '#1c1410', border: '#c47a2e', glow: 'rgba(196,122,46,0.35)' },
-    evento: { bg: '#231410', border: '#ea580c', glow: 'rgba(234,88,12,0.35)' },   // brand orange for events
-    default: { bg: '#18181b', border: '#52525b', glow: 'rgba(82,82,91,0.3)' },     // zinc
+    gastro: { bg: 'var(--bg-dark)', border: 'var(--accent-gold)', glow: 'rgba(228,174,47,0.35)' },
+    gastronomia: { bg: 'var(--bg-dark)', border: 'var(--accent-gold)', glow: 'rgba(228,174,47,0.35)' },
+    evento: { bg: 'var(--bg-dark)', border: 'var(--danger)', glow: 'rgba(220,38,38,0.35)' },
+    default: { bg: 'var(--bg-dark)', border: 'var(--text-muted)', glow: 'rgba(82,82,91,0.3)' },
 };
 
 const createCustomMarker = (type, isActive, isEvent = false) => {
@@ -235,22 +235,22 @@ export default function Mappa() {
     }, [mapItems, activeTab, activeCategory, searchQuery]);
 
     return (
-        <div className="relative w-full h-[100dvh] bg-zinc-950 flex flex-col font-satoshi overflow-hidden">
+        <div className="relative w-full h-[100dvh] bg-bg-primary flex flex-col font-sans overflow-hidden">
 
             {/* FLOATING HEADER COMPONENT */}
             <div className="absolute top-0 w-full z-[1000] pointer-events-none flex flex-col gap-4">
 
-                <div className="flex items-center justify-between px-4 pt-12 pb-2">
+                <div className="flex items-center justify-between px-6 pt-12 pb-2">
                     <button
                         onClick={() => navigate(-1)}
-                        className="w-10 h-10 rounded-full bg-zinc-900/90 backdrop-blur-md border border-white/10 flex items-center justify-center text-white pointer-events-auto active:scale-95 transition-transform shadow-lg shrink-0"
+                        className="w-10 h-10 rounded-full bg-surface border border-border-default flex items-center justify-center text-text-primary pointer-events-auto active:scale-95 transition-all shadow-lg shrink-0"
                     >
-                        <CaretLeft size={24} weight="bold" />
+                        <CaretLeft size={20} weight="bold" />
                     </button>
 
                     <div className="flex-1 px-4 pointer-events-auto relative">
-                        <div className="w-full bg-zinc-900/90 backdrop-blur-md border border-white/10 rounded-full py-2 px-4 flex items-center gap-2 text-white shadow-xl">
-                            <MagnifyingGlass size={18} weight="bold" className="text-zinc-400" />
+                        <div className="w-full bg-surface border border-border-default rounded-pill py-2.5 px-6 flex items-center gap-3 text-text-primary shadow-xl">
+                            <MagnifyingGlass size={18} weight="bold" className="text-accent" />
                             <input
                                 type="text"
                                 value={searchQuery}
@@ -258,10 +258,10 @@ export default function Mappa() {
                                 onFocus={() => setIsSearching(true)}
                                 onBlur={() => setTimeout(() => setIsSearching(false), 200)}
                                 placeholder="Cerca città, saghe o eventi..."
-                                className="bg-transparent border-none outline-none w-full text-sm font-geist placeholder:text-zinc-500"
+                                className="bg-transparent border-none outline-none w-full text-[13px] font-black uppercase tracking-wider placeholder:text-text-muted"
                             />
                             {searchQuery && (
-                                <button onClick={() => setSearchQuery('')} className="p-1 rounded-full bg-white/10 text-white">
+                                <button onClick={() => setSearchQuery('')} className="p-1 rounded-full bg-bg-secondary text-text-primary">
                                     <X size={12} weight="bold" />
                                 </button>
                             )}
@@ -273,17 +273,17 @@ export default function Mappa() {
                 <div className="flex flex-col gap-3 px-4 pb-2 w-full pointer-events-auto">
 
                     {/* MACRO TABS (Saghe / Eventi) */}
-                    <div className="flex items-center bg-zinc-900/80 backdrop-blur-md p-1 rounded-full border border-white/10 shadow-lg shrink-0">
+                    <div className="flex items-center bg-surface p-1 rounded-pill border border-border-default shadow-lg shrink-0">
                         <button
                             onClick={() => { setActiveTab('saghe'); setActiveCategory('Tutti'); }}
-                            className={`flex-1 py-1.5 rounded-full text-sm font-bold transition-all ${activeTab === 'saghe' ? 'bg-white text-zinc-950 shadow-md' : 'text-zinc-400 hover:text-white'
+                            className={`flex-1 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'saghe' ? 'bg-accent text-white shadow-md' : 'text-text-muted hover:text-text-primary'
                                 }`}
                         >
                             Esplora Saghe
                         </button>
                         <button
                             onClick={() => { setActiveTab('eventi'); setActiveCategory('Tutti'); }}
-                            className={`flex-1 py-1.5 rounded-full text-sm font-bold transition-all ${activeTab === 'eventi' ? 'bg-rose-500 text-white shadow-md' : 'text-zinc-400 hover:text-white'
+                            className={`flex-1 py-2 rounded-full text-[11px] font-black uppercase tracking-widest transition-all ${activeTab === 'eventi' ? 'bg-danger text-white shadow-md' : 'text-text-muted hover:text-text-primary'
                                 }`}
                         >
                             Eventi del Club
@@ -291,14 +291,14 @@ export default function Mappa() {
                     </div>
 
                     {/* SUB-CATEGORIES PILLS */}
-                    <div className="flex overflow-x-auto gap-2 no-scrollbar">
+                    <div className="flex overflow-x-auto gap-3 no-scrollbar px-2 -mx-2">
                         {categories.map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setActiveCategory(f)}
-                                className={`px-4 py-1.5 rounded-full text-[13px] font-geist font-medium whitespace-nowrap transition-all shadow-md border ${activeCategory === f
-                                    ? 'bg-zinc-700 text-white border-zinc-500'
-                                    : 'bg-zinc-900/60 backdrop-blur-md text-zinc-400 border-white/5'
+                                className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all border ${activeCategory === f
+                                    ? 'bg-text-primary text-bg-primary border-text-primary'
+                                    : 'bg-surface text-text-muted border-border-default'
                                     }`}
                             >
                                 {f}
@@ -409,35 +409,35 @@ export default function Mappa() {
                         initial={{ y: '100%' }}
                         animate={{ y: 0 }}
                         exit={{ y: '100%' }}
-                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="absolute bottom-0 left-0 right-0 z-[1000] bg-zinc-900 border-t border-white/10 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex flex-col pointer-events-auto"
+                        transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                        className="absolute bottom-0 left-0 right-0 z-[1000] bg-surface border-t border-border-default rounded-t-[2.5rem] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex flex-col pointer-events-auto"
                     >
-                        <div className="w-full flex justify-center pt-3 pb-1">
-                            <div className="w-12 h-1.5 bg-zinc-700 rounded-full" />
+                        <div className="w-full flex justify-center pt-4 pb-2">
+                            <div className="w-12 h-1.5 bg-bg-secondary rounded-full" />
                         </div>
 
-                        <div className="p-5 flex flex-col gap-4">
+                        <div className="p-8 flex flex-col gap-6">
                             <div className="flex items-start justify-between">
-                                <div className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-2">
-                                        <span className={`text-[10px] font-bold uppercase tracking-widest border px-2 py-0.5 rounded-sm ${selectedItem.__itemType === 'evento' ? 'border-rose-500/30 text-rose-500 bg-rose-500/10' : 'border-red-500/30 text-red-500 bg-red-500/10'}`}>
-                                            {selectedItem.__itemType === 'evento' ? 'Evento' : 'Originals'}
+                                <div className="flex flex-col gap-2">
+                                    <div className="flex items-center gap-3">
+                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${selectedItem.__itemType === 'evento' ? 'border-danger/30 text-danger bg-danger/5' : 'border-accent/30 text-accent bg-accent/5'}`}>
+                                            {selectedItem.__itemType === 'evento' ? 'Club Event' : 'Originals'}
                                         </span>
                                         {(selectedItem.city || selectedItem.luogo) && (
-                                            <span className="text-zinc-400 text-[12px] font-geist flex items-center gap-1">
-                                                <MapPin weight="fill" /> {selectedItem.city || selectedItem.luogo}
+                                            <span className="text-text-muted text-[11px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                                <MapPin weight="fill" className="text-accent" /> {selectedItem.city || selectedItem.luogo}
                                             </span>
                                         )}
                                     </div>
-                                    <h3 className="text-2xl font-black text-white leading-tight">
+                                    <h3 className="text-3xl font-serif font-black text-text-primary leading-tight tracking-tight">
                                         {selectedItem._title}
                                     </h3>
                                 </div>
                                 <button
                                     onClick={() => setSelectedItem(null)}
-                                    className="p-1.5 bg-zinc-800 rounded-full text-zinc-400"
+                                    className="w-10 h-10 bg-bg-secondary rounded-full flex items-center justify-center text-text-muted active:scale-90 transition-all"
                                 >
-                                    <X size={18} weight="bold" />
+                                    <X size={20} weight="bold" />
                                 </button>
                             </div>
 
@@ -446,24 +446,24 @@ export default function Mappa() {
                                     if (selectedItem.__itemType === 'evento') navigate(`/eventi/${selectedItem.id}`);
                                     else navigate(`/saga/${selectedItem.id}/intro`);
                                 }}
-                                className="w-full h-40 rounded-xl overflow-hidden relative shadow-inner cursor-pointer active:scale-[0.99] transition-transform"
+                                className="w-full h-44 rounded-3xl overflow-hidden relative shadow-md cursor-pointer active:scale-[0.99] transition-transform"
                             >
                                 <img
                                     src={selectedItem._image || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"}
                                     alt={selectedItem._title}
                                     className="w-full h-full object-cover"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent" />
-                                <div className="absolute bottom-3 left-3 flex items-center gap-2 text-white text-xs font-bold">
+                                <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/60 via-transparent to-transparent" />
+                                <div className="absolute bottom-4 left-4 flex items-center gap-3 text-white text-[11px] font-black uppercase tracking-widest">
                                     {selectedItem.__itemType === 'evento' ? (
-                                        <><CalendarBlank size={16} /> <span>{new Date(selectedItem.data_inizio || selectedItem.event_date).toLocaleDateString('it-IT')}</span></>
+                                        <><CalendarBlank size={18} weight="fill" className="text-accent-gold" /> <span>{new Date(selectedItem.data_inizio || selectedItem.event_date).toLocaleDateString('it-IT')}</span></>
                                     ) : (
-                                        <><Compass size={16} /> <span>{selectedItem.difficulty || 'Avventura Epica'}</span></>
+                                        <><Compass size={18} weight="fill" className="text-accent-gold" /> <span>{selectedItem.difficulty || 'Avventura Epica'}</span></>
                                     )}
                                 </div>
                             </div>
 
-                            <p className="text-sm font-geist text-zinc-300 line-clamp-2 leading-relaxed">
+                            <p className="text-[15px] text-text-muted line-clamp-2 leading-relaxed font-medium">
                                 {selectedItem._desc}
                             </p>
 
@@ -472,9 +472,9 @@ export default function Mappa() {
                                     if (selectedItem.__itemType === 'evento') navigate(`/eventi/${selectedItem.id}`);
                                     else navigate(`/saga/${selectedItem.id}/intro`);
                                 }}
-                                className={`w-full text-zinc-950 font-bold py-3.5 rounded-xl text-md active:scale-[0.98] transition-transform shadow-lg ${selectedItem.__itemType === 'evento' ? 'bg-rose-500 text-white' : 'bg-white shadow-white/10'}`}
+                                className={`w-full !py-4 btn-primary ${selectedItem.__itemType === 'evento' ? '!bg-danger !border-danger' : ''}`}
                             >
-                                {selectedItem.__itemType === 'evento' ? 'Altre Info' : 'Inizia Viaggio'}
+                                {selectedItem.__itemType === 'evento' ? 'Esplora Evento' : 'Inizia Viaggio'}
                             </button>
                         </div>
                     </motion.div>
