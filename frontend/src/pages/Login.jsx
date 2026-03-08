@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import { motion } from 'framer-motion'
 import AnimatedAuthBackground from '../components/AnimatedAuthBackground'
+import { AppleLogo } from '@phosphor-icons/react'
 
 const Login = () => {
   const { t } = useTranslation()
@@ -92,10 +93,10 @@ const Login = () => {
             alt="Desideri di Puglia"
             className="w-16 h-16 rounded-[1.25rem] object-cover shadow-[0_20px_40px_rgba(0,0,0,0.18)] border border-white/70 ring-4 ring-white/20"
           />
-          <h1 className="text-[34px] font-black text-zinc-900 leading-[1.05] tracking-tight">
+          <h1 className="text-[34px] font-black text-zinc-950 leading-[1.05] tracking-tight">
             Bentornato nel<br />Club
           </h1>
-          <p className="text-[13px] font-semibold uppercase tracking-[0.22em] text-zinc-600">
+          <p className="text-[13px] font-semibold uppercase tracking-[0.22em] text-zinc-700">
             Accesso rapido e sicuro
           </p>
         </motion.div>
@@ -112,15 +113,15 @@ const Login = () => {
           <div className="relative group">
             <motion.div
               animate={{
-                borderColor: focusedField === 'email' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)',
-                backgroundColor: focusedField === 'email' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.4)',
+                borderColor: focusedField === 'email' ? 'rgba(24, 24, 27, 0.65)' : 'rgba(24, 24, 27, 0.24)',
+                backgroundColor: focusedField === 'email' ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.74)',
                 height: '60px'
               }}
               transition={{ duration: 0.2 }}
               className="absolute inset-0 rounded-2xl border backdrop-blur-md shadow-sm -z-10"
             />
             <div className="flex items-center px-4 h-[60px]">
-              <Mail size={18} className={`shrink-0 transition-colors duration-300 mr-3 ${focusedField === 'email' ? 'text-zinc-900' : 'text-zinc-500'}`} />
+              <Mail size={18} className={`shrink-0 transition-colors duration-300 mr-3 ${focusedField === 'email' ? 'text-zinc-900' : 'text-zinc-700'}`} />
               <div className="flex-1 relative h-full flex items-center">
                 <input
                   type="email"
@@ -129,7 +130,7 @@ const Login = () => {
                   onFocus={() => setFocusedField('email')}
                   onBlur={() => setFocusedField(null)}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full bg-transparent border-0 px-0 py-0 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium"
+                  className="w-full bg-transparent border-0 px-0 py-0 text-zinc-950 placeholder-zinc-600 focus:ring-0 text-[15px] font-semibold"
                   placeholder="Username/Email"
                   autoComplete="email"
                 />
@@ -141,15 +142,15 @@ const Login = () => {
           <div className="relative group">
             <motion.div
               animate={{
-                borderColor: focusedField === 'password' ? 'rgba(24, 24, 27, 0.5)' : 'rgba(24, 24, 27, 0.15)',
-                backgroundColor: focusedField === 'password' ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.4)',
+                borderColor: focusedField === 'password' ? 'rgba(24, 24, 27, 0.65)' : 'rgba(24, 24, 27, 0.24)',
+                backgroundColor: focusedField === 'password' ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.74)',
                 height: '60px'
               }}
               transition={{ duration: 0.2 }}
               className="absolute inset-0 rounded-2xl border backdrop-blur-md shadow-sm -z-10"
             />
             <div className="flex items-center px-4 h-[60px]">
-              <Lock size={18} className={`shrink-0 transition-colors duration-300 mr-3 ${focusedField === 'password' ? 'text-zinc-900' : 'text-zinc-500'}`} />
+              <Lock size={18} className={`shrink-0 transition-colors duration-300 mr-3 ${focusedField === 'password' ? 'text-zinc-900' : 'text-zinc-700'}`} />
               <div className="flex-1 relative h-full flex items-center">
                 <input
                   type="password"
@@ -158,13 +159,13 @@ const Login = () => {
                   onFocus={() => setFocusedField('password')}
                   onBlur={() => setFocusedField(null)}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full bg-transparent border-0 px-0 py-0 text-zinc-900 placeholder-zinc-500 focus:ring-0 text-[15px] font-medium pr-16"
+                  className="w-full bg-transparent border-0 px-0 py-0 text-zinc-950 placeholder-zinc-600 focus:ring-0 text-[15px] font-semibold pr-16"
                   placeholder="Password"
                   autoComplete="current-password"
                 />
               </div>
             </div>
-            <Link to="/forgot-password" className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-600 text-[12px] font-bold uppercase tracking-wider hover:text-zinc-900 transition-colors">
+            <Link to="/forgot-password" className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-700 text-[12px] font-black uppercase tracking-wider hover:text-zinc-950 transition-colors">
               Forgot?
             </Link>
           </div>
@@ -189,7 +190,7 @@ const Login = () => {
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </motion.svg>
               </div>
-              <span className="text-[14px] font-medium text-zinc-700 group-hover:text-zinc-900 transition-colors">
+              <span className="text-[14px] font-semibold text-zinc-800 group-hover:text-zinc-950 transition-colors">
                 Remember me
               </span>
             </label>
@@ -210,18 +211,16 @@ const Login = () => {
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 type="button"
-                className="w-full bg-white/80 backdrop-blur-md text-zinc-950 font-medium text-[14px] py-4 rounded-full border border-white/40 shadow-[0_4px_20px_rgb(0,0,0,0.05)] hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all flex items-center justify-center gap-2"
+                className="w-full bg-zinc-950 backdrop-blur-md text-white font-semibold text-[14px] py-4 rounded-full border border-zinc-950 shadow-[0_6px_20px_rgb(0,0,0,0.18)] hover:bg-black transition-all flex items-center justify-center gap-2"
                 onClick={() => handleSocialLogin('apple')}
               >
-                <svg className="w-5 h-5 text-black" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M16.22 12.16c.02 2.31 2.03 3.08 2.05 3.09-.02.05-.32 1.07-1.04 2.13-.63.91-1.28 1.81-2.31 1.83-1.01.02-1.33-.6-2.49-.6s-1.52.58-2.46.62c-.99.04-1.75-.99-2.39-1.89-1.31-1.86-2.31-5.25-.97-7.56.66-1.16 1.85-1.89 3.14-1.91.98-.02 1.91.66 2.49.66.58 0 1.68-.82 2.83-.7.48.02 1.84.19 2.7 1.45-.07.05-1.61.94-1.59 2.88Zm-1.79-5.36c.53-.64.89-1.53.79-2.42-.76.03-1.68.5-2.22 1.14-.49.57-.92 1.47-.81 2.33.85.06 1.71-.43 2.24-1.05Z" />
-                </svg>
+                <AppleLogo size={20} weight="fill" className="text-white" />
                 Apple
               </motion.button>
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 type="button"
-                className="w-full bg-white/80 backdrop-blur-md text-zinc-950 font-medium text-[14px] py-4 rounded-full border border-white/40 shadow-[0_4px_20px_rgb(0,0,0,0.05)] hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all flex items-center justify-center gap-2"
+                className="w-full bg-white/90 backdrop-blur-md text-zinc-950 font-semibold text-[14px] py-4 rounded-full border border-zinc-300 shadow-[0_4px_20px_rgb(0,0,0,0.05)] hover:bg-white hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all flex items-center justify-center gap-2"
                 onClick={() => handleSocialLogin('google')}
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -242,7 +241,7 @@ const Login = () => {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="mt-auto pb-4 text-center"
         >
-          <p className="text-[14px] text-zinc-600 font-medium">
+          <p className="text-[14px] text-zinc-700 font-semibold">
             Don't have an account?{' '}
             <Link to="/register" className="text-zinc-950 font-bold hover:underline underline-offset-4 decoration-2 decoration-zinc-950/20">
               Sign Up
