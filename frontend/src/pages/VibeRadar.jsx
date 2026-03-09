@@ -11,7 +11,7 @@ import {
   CheckCircle, 
   Plus, 
   X, 
-  NavigationArrow,
+  ArrowUpRight as NavigationArrow,
   Clock,
   Circle
 } from '@phosphor-icons/react';

@@ -285,7 +285,7 @@ const DailyPlans = () => {
 
         <footer className="text-center pt-20 border-t border-black/[0.03]">
             <p className="text-[11px] font-black uppercase tracking-[1em] text-accent/20 mb-4">Finis Terrae</p>
-            <p className="font-serif italic font-black text-[22px] text-text-primary opacity-30 italic">Desideri Puglia Club — Collection 2026 / Rev. G</p>
+            <p className="font-serif italic font-black text-[22px] text-text-primary opacity-30 italic">Desideri Puglia Club — Collection 2026 / Rev. H</p>
         </footer>
       </main>
 

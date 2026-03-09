@@ -11,7 +11,7 @@ import {
   Bell,
   Fire,
   ArrowRight,
-  NavigationArrow,
+  ArrowUpRight as NavigationArrow,
   MapPin,
   Compass,
   Bank,

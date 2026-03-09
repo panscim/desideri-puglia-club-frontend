@@ -5,7 +5,7 @@ import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  MapPin, X, Star, MapTrifold, List, NavigationArrow, ShieldCheck,
+  MapPin, X, Star, MapTrifold, List, ArrowUpRight as NavigationArrow, ShieldCheck,
   MagnifyingGlass, CaretLeft
 } from "@phosphor-icons/react";
 
