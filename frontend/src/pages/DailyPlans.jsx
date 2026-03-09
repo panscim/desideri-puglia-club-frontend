@@ -38,10 +38,10 @@ const PlanCard = ({ plan, navigate }) => {
         Archive Item №{plan.id?.slice(0,4)}
       </div>
       
-      <div className="flex flex-col lg:flex-row gap-12 md:gap-20">
-        {/* Visual Portion (Panoramic Sartorial Frame) */}
-        <div className="w-full lg:w-[52%] relative">
-          <div className="aspect-[3/2] overflow-hidden shadow-2xl p-1 bg-white relative transition-all duration-1000 group-hover:shadow-3xl">
+      <div className="flex flex-col lg:flex-row gap-12 md:gap-20 items-stretch">
+        {/* Visual Portion (Cinematic Panoramic Frame) */}
+        <div className="w-full lg:w-[60%] relative">
+          <div className="h-full aspect-[16/9] lg:aspect-auto overflow-hidden shadow-2xl p-1 bg-white relative transition-all duration-1000 group-hover:shadow-3xl">
               <div className="w-full h-full relative overflow-hidden border border-black/5">
                 <img 
                     src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
@@ -53,7 +53,7 @@ const PlanCard = ({ plan, navigate }) => {
         </div>
 
         {/* Text Portion (The Narrative Flow) */}
-        <div className="w-full lg:w-[48%] flex flex-col justify-center">
+        <div className="w-full lg:w-[40%] flex flex-col justify-center">
           {/* 1. Città */}
           <div className="flex items-center gap-4 mb-6">
                 <div className="w-8 h-[1px] bg-accent/30" />
@@ -68,35 +68,35 @@ const PlanCard = ({ plan, navigate }) => {
               
               {/* 3. Titolo & 4. Payoff */}
               <div className="space-y-5">
-                  <h3 className="text-[38px] md:text-[60px] font-serif font-black text-text-primary leading-[0.9] tracking-tighter italic">
+                  <h3 className="text-[34px] md:text-[54px] font-serif font-black text-text-primary leading-[0.9] tracking-tighter italic">
                       {plan.title_it}
                   </h3>
                   <div className="w-20 h-1.5 bg-accent-gold/20" />
-                  <p className="text-[17px] md:text-[20px] text-text-primary/70 font-serif italic leading-relaxed max-w-xl indent-6">
+                  <p className="text-[16px] md:text-[18px] text-text-primary/70 font-serif italic leading-relaxed max-w-xl indent-6">
                       {plan.description_it || "Un percorso sartoriale attraverso gli angoli più segreti della nostra terra, per scoprire ciò che i libri non dicono."}
                   </p>
               </div>
 
               {/* 5. Dettagli Esperienza */}
-              <div className="flex flex-wrap gap-6 py-6 border-y border-black/[0.04]">
+              <div className="flex flex-wrap gap-4 py-6 border-y border-black/[0.04]">
                   <div className="flex items-center gap-3">
                       <Timer size={16} weight="bold" className="text-accent/40" />
                       <div className="flex flex-col">
-                          <span className="text-[11px] font-black text-text-primary uppercase tracking-wider">{duration}</span>
+                          <span className="text-[10px] font-black text-text-primary uppercase tracking-wider">{duration}</span>
                           <span className="text-[8px] font-black text-text-muted/30 uppercase tracking-widest">Lettura</span>
                       </div>
                   </div>
-                  <div className="flex items-center gap-3 border-x border-black/[0.04] px-6">
+                  <div className="flex items-center gap-3 border-x border-black/[0.04] px-4">
                       <BookOpen size={16} weight="bold" className="text-accent/40" />
                       <div className="flex flex-col">
-                          <span className="text-[11px] font-black text-text-primary uppercase tracking-wider">{steps}</span>
+                          <span className="text-[10px] font-black text-text-primary uppercase tracking-wider">{steps}</span>
                           <span className="text-[8px] font-black text-text-muted/30 uppercase tracking-widest">Percorso</span>
                       </div>
                   </div>
                   <div className="flex items-center gap-3">
                       <Sparkle size={16} weight="bold" className="text-accent/40" />
                       <div className="flex flex-col">
-                          <span className="text-[11px] font-black text-text-primary uppercase tracking-wider">{explorations}</span>
+                          <span className="text-[10px] font-black text-text-primary uppercase tracking-wider">{explorations}</span>
                           <span className="text-[8px] font-black text-text-muted/30 uppercase tracking-widest">Popolarità</span>
                       </div>
                   </div>
@@ -119,11 +119,12 @@ const PlanCard = ({ plan, navigate }) => {
                   <button 
                     onClick={(e) => {
                         e.stopPropagation();
+                        console.log("Navigating to:", `/plan/${plan.id}`);
                         navigate(`/plan/${plan.id}`);
                     }}
-                    className="flex items-center gap-8 group/btn bg-text-primary text-white pl-10 pr-4 h-14 rounded-full shadow-xl hover:bg-accent transition-all duration-700 active:scale-95 group-hover:translate-x-3"
+                    className="flex items-center gap-4 group/btn bg-text-primary text-white pl-8 pr-4 h-14 rounded-full shadow-xl hover:bg-accent transition-all duration-700 active:scale-95 group-hover:translate-x-3"
                   >
-                      <span className="text-[12px] font-black uppercase tracking-[0.3em]">Vivi l'Esperienza</span>
+                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">Esplora</span>
                       <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center group-hover/btn:bg-white group-hover/btn:text-accent transition-all">
                           <ArrowRight size={20} weight="bold" />
                       </div>
@@ -284,7 +285,7 @@ const DailyPlans = () => {
 
         <footer className="text-center pt-20 border-t border-black/[0.03]">
             <p className="text-[11px] font-black uppercase tracking-[1em] text-accent/20 mb-4">Finis Terrae</p>
-            <p className="font-serif italic font-black text-[22px] text-text-primary opacity-30 italic">Desideri Puglia Club — Collection 2026</p>
+            <p className="font-serif italic font-black text-[22px] text-text-primary opacity-30 italic">Desideri Puglia Club — Collection 2026 / Rev. B</p>
         </footer>
       </main>
 
