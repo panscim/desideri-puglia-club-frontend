@@ -35,175 +35,142 @@ const item = {
   }
 };
 
-/* ── Cinematic Elements ────────────────────────────────────── */
-const ArchiveBar = ({ filters, setFilters, cities, seasons }) => (
+/* ── Cinematic Editorial Elements ────────────────────────────── */
+const Stamp = ({ text, className = '' }) => (
+  <div className={`w-20 h-20 rounded-full border-2 border-dashed border-accent/20 flex items-center justify-center -rotate-12 opacity-60 select-none ${className}`}>
+    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-accent text-center leading-tight">
+      {text.split(' ').map((word, i) => <React.Fragment key={i}>{word}<br/></React.Fragment>)}
+    </span>
+  </div>
+);
+
+const EditorialHeader = ({ filters, setFilters, cities, seasons, navigate }) => (
   <motion.nav 
     initial={{ y: -100 }}
     animate={{ y: 0 }}
-    className="fixed top-0 inset-x-0 z-[2000] h-24 px-8 flex items-center justify-between bg-black/20 backdrop-blur-xl border-b border-white/5"
+    className="fixed top-0 inset-x-0 z-[2000] h-20 px-6 md:px-12 flex items-center justify-between bg-[#FCFAF2]/80 backdrop-blur-xl border-b border-black/[0.03]"
   >
+    <div className="flex items-center gap-6">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="w-10 h-10 flex items-center justify-center hover:scale-110 active:scale-90 transition-all text-text-primary"
+        >
+          <CaretLeft size={24} weight="bold" />
+        </button>
+        <div className="hidden md:flex flex-col">
+            <span className="text-[8px] font-black uppercase tracking-[0.5em] text-accent/60">Journal</span>
+            <span className="text-[14px] font-serif font-black italic tracking-tight uppercase">Daily Ledger</span>
+        </div>
+    </div>
+
     <div className="flex items-center gap-8">
-      <div className="flex flex-col">
-        <span className="text-[8px] font-black uppercase tracking-[0.5em] text-accent/80">Cinematic</span>
-        <span className="text-[14px] font-serif font-black italic text-white uppercase tracking-tighter">Archive</span>
-      </div>
-      <div className="h-8 w-px bg-white/10 hidden md:block" />
-      <div className="hidden md:flex items-center gap-6">
-          <select 
-            className="bg-transparent text-[10px] font-black uppercase tracking-widest text-white/60 outline-none cursor-pointer hover:text-white transition-colors"
-            value={filters.city}
-            onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
-          >
-            <option value="" className="bg-zinc-900">Territori</option>
-            {cities.map(c => <option key={c} value={c} className="bg-zinc-900">{c}</option>)}
-          </select>
-          <div className="flex gap-4">
-            {seasons.slice(1).map(s => (
+        <div className="hidden md:flex items-center gap-6 overflow-x-auto">
+            {seasons.map(s => (
                 <button 
                     key={s.value}
                     onClick={() => setFilters(prev => ({ ...prev, season: prev.season === s.value ? '' : s.value }))}
-                    className={`text-[9px] font-black uppercase tracking-widest transition-all ${filters.season === s.value ? 'text-accent' : 'text-white/40 hover:text-white'}`}
+                    className={`text-[9px] font-black uppercase tracking-[0.3em] transition-all whitespace-nowrap ${filters.season === s.value ? 'text-accent' : 'text-text-muted/40 hover:text-text-primary'}`}
                 >
                     {s.label}
                 </button>
             ))}
-          </div>
-      </div>
-    </div>
-    
-    <div className="flex items-center gap-4">
-       <div className="hidden md:flex flex-col items-end mr-4">
-          <span className="text-[8px] font-black uppercase tracking-widest text-white/30 text-right">Selected Experience</span>
-          <span className="text-[10px] font-serif italic text-white/60">Puglia, IT</span>
-       </div>
-       <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-accent">
-          <Sparkle size={20} weight="fill" />
-       </div>
+        </div>
+        <div className="h-6 w-px bg-black/5 hidden md:block" />
+        <select 
+            className="bg-transparent text-[10px] font-black uppercase tracking-widest text-text-primary outline-none cursor-pointer border-b border-black/10 pb-1"
+            value={filters.city}
+            onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
+        >
+            <option value="">Tutti i Territori</option>
+            {cities.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
     </div>
   </motion.nav>
 );
 
-const CinematicPlan = ({ plan, index, navigate }) => {
+const CinematicCard = ({ plan, index, navigate }) => {
     const { scrollYProgress } = useScroll();
-    const yTransform = useTransform(scrollYProgress, [0, 1], [0, -100]);
+    const yImage = useTransform(scrollYProgress, [0, 1], [0, -120]);
+    const yContent = useTransform(scrollYProgress, [0, 1], [0, -40]);
     
     return (
         <motion.section 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            viewport={{ once: false, margin: "-100px" }}
-            className="relative h-[90vh] md:h-screen w-full flex items-center justify-center overflow-hidden group mb-32 md:mb-0"
+            viewport={{ once: false, margin: "-50px" }}
+            className="relative h-screen w-full flex items-center justify-center overflow-hidden mb-0 snap-start"
             onClick={() => navigate(`/plan/${plan.id}`)}
         >
-            {/* Background Parallax Image */}
+            {/* Parallax Image Background */}
             <motion.div 
-                style={{ y: yTransform }}
+                style={{ y: yImage }}
                 className="absolute inset-0 z-0 scale-110"
             >
                 <img 
                     src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
-                    className="w-full h-full object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-[2s] ease-out brightness-50 group-hover:brightness-[0.65]"
+                    className="w-full h-full object-cover grayscale-[0.2] transition-all duration-[1s]"
                     alt={plan.title_it}
                 />
+                <div className="absolute inset-0 bg-black/20" />
             </motion.div>
 
-            {/* Architecture Typography Overlays */}
-            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none overflow-hidden">
-                <motion.h2 
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 0.07 }}
-                    className="text-[20vw] font-serif font-black italic whitespace-nowrap text-white leading-none select-none"
-                >
-                    {plan.city.toUpperCase()}
-                </motion.h2>
-            </div>
+            {/* Floating Editorial Vellum Card */}
+            <motion.div 
+                style={{ y: yContent }}
+                className="relative z-20 w-[90%] max-w-lg md:max-w-2xl bg-[#FCFAF2]/95 backdrop-blur-md p-8 md:p-14 shadow-[0_50px_100px_rgba(0,0,0,0.1)] border border-white/40 group cursor-pointer"
+            >
+                {/* Texture Overlay */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.03] grayscale contrast-150" 
+                     style={{ backgroundImage: `url("https://www.transparenttextures.com/patterns/linen-paper.png")` }} />
 
-            {/* Content Container */}
-            <div className="relative z-20 container mx-auto px-8 md:px-24 flex flex-col md:flex-row items-end md:items-center justify-between h-full py-32">
-                <div className="max-w-xl flex flex-col items-start gap-6 md:gap-10">
-                    <motion.div 
-                        initial={{ x: -30, opacity: 0 }}
-                        whileInView={{ x: 0, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="flex items-center gap-4"
-                    >
-                        <div className="w-12 h-px bg-accent" />
-                        <span className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.6em] text-accent font-sans">Experience {index + 1}</span>
-                    </motion.div>
+                <Stamp text={plan.city + " Verified"} className="absolute -top-10 -right-4 z-30" />
 
-                    <motion.h3 
-                        initial={{ y: 40, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.4 }}
-                        className="text-[48px] md:text-[96px] font-serif font-black text-white leading-[0.9] tracking-tighter italic drop-shadow-2xl"
-                    >
+                <div className="relative z-10 space-y-8">
+                    <div className="flex items-center justify-between">
+                         <div className="flex items-center gap-4">
+                            <div className="w-10 h-px bg-accent/30" />
+                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-accent/60">Registry {index + 1}</span>
+                         </div>
+                         <div className="flex items-center gap-1.5 text-accent-gold text-[10px] font-black uppercase tracking-widest">
+                            <Star size={14} weight="fill" />
+                            {(plan.rating_avg || 4.9).toFixed(1)}
+                         </div>
+                    </div>
+
+                    <h3 className="text-[42px] md:text-[72px] font-serif font-black text-text-primary leading-[0.9] tracking-tighter italic group-hover:text-accent transition-colors duration-500">
                         {plan.title_it}
-                    </motion.h3>
+                    </h3>
 
-                    <motion.p 
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        transition={{ delay: 0.6 }}
-                        className="text-[16px] md:text-[20px] text-white/60 font-serif italic max-w-md leading-relaxed"
-                    >
-                        {plan.description_it || "Un viaggio sensoriale curato nei minimi dettagli per svelare l'anima segreta del territorio."}
-                    </motion.p>
+                    <p className="text-[17px] md:text-[20px] text-text-muted font-serif italic leading-relaxed opacity-70 line-clamp-3 md:line-clamp-none">
+                        {plan.description_it || "Un'esperienza sensoriale attraverso i segreti più autentici della Puglia, curata dai nostri local experts."}
+                    </p>
 
-                    <motion.div 
-                        initial={{ y: 20, opacity: 0 }}
-                        whileInView={{ y: 0, opacity: 1 }}
-                        transition={{ delay: 0.8 }}
-                        className="flex items-center gap-8 mt-4"
-                    >
-                        <button className="px-10 h-14 bg-white text-black text-[11px] font-black uppercase tracking-[0.3em] hover:bg-accent hover:text-white transition-all duration-500 rounded-none shadow-2xl">
-                            Svela Percorso
-                        </button>
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-1 leading-none">Rating</span>
-                            <div className="flex items-center gap-1.5 text-accent text-[18px] font-serif italic font-black">
-                                <Star size={16} weight="fill" />
-                                <span>{(plan.rating_avg || 4.9).toFixed(1)}</span>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 pt-6">
+                        <div className="flex items-center gap-6">
+                            <div className="w-12 h-12 rounded-full border border-black/5 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+                                <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[8px] font-black uppercase tracking-widest text-text-muted mb-0.5 opacity-40">Compilato da</span>
+                                <span className="text-[18px] font-serif font-black italic text-text-primary leading-none">{plan.creator?.nome || 'Expert'}</span>
                             </div>
                         </div>
-                    </motion.div>
-                </div>
 
-                <motion.div 
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    whileInView={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="hidden lg:flex flex-col items-end gap-6"
-                >
-                    <div className="w-56 aspect-[3/4] border border-white/10 p-2 overflow-hidden shadow-2xl">
-                        <img 
-                            src={plan.creator?.avatar_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
-                            className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700" 
-                            alt="" 
-                        />
+                        <div className="flex items-center gap-6">
+                            <div className="text-right">
+                                <span className="text-[24px] font-serif font-black italic text-text-primary">€{plan.price.toFixed(0)}</span>
+                                <p className="text-[8px] font-black uppercase tracking-widest text-text-muted/40 mt-0.5">Sblocco Ledger</p>
+                            </div>
+                            <div className="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center group-hover:scale-110 active:scale-95 transition-all shadow-xl">
+                                <ArrowRight size={20} weight="bold" />
+                            </div>
+                        </div>
                     </div>
-                    <div className="text-right">
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 mb-1">Curato da</p>
-                        <p className="text-[20px] font-serif font-black italic text-white leading-none">{plan.creator?.nome || 'Local Expert'}</p>
-                    </div>
-                </motion.div>
-            </div>
-
-            {/* Bottom Progress/Index */}
-            <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-4 z-30 opacity-40 group-hover:opacity-100 transition-opacity">
-                <span className="text-[10px] font-black text-white/40">{index + 1}</span>
-                <div className="w-16 h-px bg-white/20 relative">
-                     <motion.div 
-                        className="absolute inset-y-0 left-0 bg-accent"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: '100%' }}
-                        transition={{ duration: 1.5 }}
-                     />
                 </div>
-                <span className="text-[10px] font-black text-white/40">06</span>
-            </div>
+            </motion.div>
 
             {/* Viewport Vignette */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60 z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#FCFAF2]/40 via-transparent to-black/20 z-10 pointer-events-none" />
         </motion.section>
     );
 };
@@ -220,20 +187,13 @@ const DailyPlans = () => {
 
   const cities = ['Barletta', 'Bari', 'Trani', 'Andria', 'Polignano a Mare', 'Monopoli'];
   const seasons = [
+    { value: '', label: 'Tutte le stagioni' },
     { value: 'tutto_anno', label: 'Tutto l\'anno' },
     { value: 'primavera', label: 'Primavera' },
     { value: 'estate', label: 'Estate' },
     { value: 'autunno', label: 'Autunno' },
     { value: 'inverno', label: 'Inverno' }
   ];
-
-  const seasonLabels = {
-    tutto_anno: 'Tutto l\'anno',
-    primavera: 'Primavera',
-    estate: 'Estate',
-    autunno: 'Autunno',
-    inverno: 'Inverno'
-  };
 
   useEffect(() => {
     loadPlans();
@@ -250,28 +210,37 @@ const DailyPlans = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] selection:bg-accent/30 overflow-x-hidden relative scroll-smooth">
-      <ArchiveBar filters={filters} setFilters={setFilters} cities={cities} seasons={seasons} />
+    <div className="min-h-screen bg-[#FCFAF2] selection:bg-accent/30 overflow-x-hidden relative scroll-smooth">
+      <EditorialHeader 
+        filters={filters} 
+        setFilters={setFilters} 
+        cities={cities} 
+        seasons={seasons} 
+        navigate={navigate} 
+      />
 
       <AnimatePresence mode="wait">
         {loading ? (
-             <div className="h-screen flex items-center justify-center bg-black">
+             <div className="h-screen flex items-center justify-center bg-[#FCFAF2]">
                 <motion.div 
-                    animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+                    animate={{ scale: [1, 1.05, 1], opacity: [0.4, 0.8, 0.4] }}
                     transition={{ repeat: Infinity, duration: 2 }}
-                    className="flex flex-col items-center gap-4"
+                    className="flex flex-col items-center gap-6"
                 >
                     <Sparkle size={48} weight="fill" className="text-accent" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.8em] text-white/20">Apertura Archivi</span>
+                    <span className="text-[12px] font-serif font-black italic uppercase tracking-[0.4em] text-text-primary">Apertura Registri...</span>
                 </motion.div>
              </div>
         ) : plans.length === 0 ? (
-            <div className="h-screen flex items-center justify-center bg-black px-8">
-                <div className="text-center space-y-8">
-                    <h2 className="text-[48px] md:text-[64px] font-serif font-black text-white/20 italic tracking-tighter">Nessuna Storia <br/> Coincidente.</h2>
+            <div className="h-screen flex items-center justify-center bg-[#FCFAF2] px-8">
+                <div className="text-center space-y-12">
+                    <div className="w-px h-32 bg-accent/20 mx-auto" />
+                    <h2 className="text-[32px] md:text-[48px] font-serif font-black text-text-primary italic tracking-tight opacity-40">
+                        Nessun capitolo <br/> corrispondente.
+                    </h2>
                     <button 
                         onClick={() => setFilters({ city: '', season: '', targetAudience: '' })}
-                        className="text-accent text-[12px] font-black uppercase tracking-widest border-b border-accent/20 pb-1"
+                        className="text-accent text-[12px] font-black uppercase tracking-widest border-b border-accent/40 pb-2 hover:border-accent transition-all"
                     >
                         Reinizializza Archivi
                     </button>
@@ -281,25 +250,29 @@ const DailyPlans = () => {
             <div className="snap-y snap-mandatory h-screen overflow-y-auto overflow-x-hidden scrollbar-hide">
               {plans.map((plan, idx) => (
                     <div key={plan.id} className="snap-start h-screen w-full">
-                        <CinematicPlan plan={plan} index={idx} navigate={navigate} />
+                        <CinematicCard plan={plan} index={idx} navigate={navigate} />
                     </div>
               ))}
+
+              {/* End of results footer */}
+              <footer className="snap-start h-[40vh] bg-[#FCFAF2] flex flex-col items-center justify-center gap-8 relative overflow-hidden">
+                  <div className="w-[1px] h-24 bg-accent/20" />
+                  <p className="text-[9px] font-black uppercase tracking-[0.6em] text-accent/40">Fine della Collezione</p>
+                  <p className="font-serif italic font-black text-[18px] text-text-primary opacity-30">Desideri Puglia Club — Archive 2026</p>
+                  
+                  {/* Faded Stamp background */}
+                  <div className="absolute -bottom-10 rotate-6 text-[100px] font-serif font-black italic text-black/[0.02] select-none pointer-events-none whitespace-nowrap">
+                     OFFICIAL ARCHIVE PRIVÉ
+                  </div>
+              </footer>
             </div>
         )}
       </AnimatePresence>
 
-      {/* Floating Back Button */}
-      <button 
-        onClick={() => navigate(-1)} 
-        className="fixed bottom-12 left-12 z-[2000] w-14 h-14 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl flex items-center justify-center text-white hover:bg-white hover:text-black transition-all group active:scale-90"
-      >
-        <CaretLeft size={24} weight="bold" className="group-hover:-translate-x-1 transition-transform" />
-      </button>
-
-      {/* Luxury Scroll Hint */}
-      <div className="fixed bottom-12 right-12 z-[2000] flex flex-col items-end gap-4 pointer-events-none opacity-40">
-           <span className="text-[8px] font-black uppercase tracking-[0.4em] text-white [writing-mode:vertical-lr] mb-2">Scroll To Explore</span>
-           <div className="w-px h-12 bg-gradient-to-t from-white to-transparent" />
+      {/* Scroll Hint */}
+      <div className="fixed bottom-10 right-10 z-[2000] flex flex-col items-end gap-3 pointer-events-none opacity-20 hidden md:flex">
+           <span className="text-[8px] font-black uppercase tracking-[0.3em] text-text-primary [writing-mode:vertical-lr] mb-2">Esplora</span>
+           <div className="w-px h-10 bg-text-primary" />
       </div>
     </div>
   );
