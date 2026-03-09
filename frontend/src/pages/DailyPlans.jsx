@@ -29,96 +29,103 @@ const PlanCard = ({ plan, navigate }) => {
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
-      className="group cursor-pointer bg-white/40 backdrop-blur-sm border border-black/[0.03] p-6 md:p-12 mb-24 hover:shadow-[0_40px_80px_rgba(0,0,0,0.08)] transition-all duration-1000 relative overflow-hidden"
+      className="group cursor-pointer bg-white/30 backdrop-blur-sm border border-black/[0.02] p-6 md:p-14 mb-24 hover:shadow-[0_60px_100px_rgba(0,0,0,0.06)] transition-all duration-1000 relative overflow-hidden"
       onClick={() => navigate(`/plan/${plan.id}`)}
     >
-      {/* Editorial Decorative Corner */}
-      <div className="absolute top-0 right-0 w-32 h-32 border-t border-r border-accent/10 pointer-events-none" />
+      {/* Editorial Decorative Details */}
+      <div className="absolute top-0 right-0 w-32 h-32 border-t border-r border-accent/5 pointer-events-none" />
+      <div className="absolute top-8 right-8 text-[10px] font-black uppercase tracking-[0.6em] text-accent/20 rotate-90 origin-right translate-x-12 translate-y-4">
+        Archive Item №{plan.id?.slice(0,4)}
+      </div>
       
       <div className="flex flex-col lg:flex-row gap-12 md:gap-20">
-        {/* Visual Portion (The Cover) */}
-        <div className="w-full lg:w-[42%] relative">
-          <div className="aspect-[3/4] overflow-hidden shadow-2xl border-[15px] border-white relative group-hover:border-white/80 transition-all duration-1000">
-              <img 
-                  src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                  alt={plan.title_it}
-              />
-              <div className="absolute inset-0 bg-black/[0.02]" />
-          </div>
-          {/* Deckled Edge Location Tag */}
-          <div className="absolute -bottom-6 -left-6 bg-accent text-white px-6 py-3 shadow-2xl rotate-[-3deg] flex flex-col items-start translate-y-2 group-hover:translate-y-0 transition-transform duration-700">
-              <span className="text-[7px] font-black uppercase tracking-[0.4em] opacity-60 mb-0.5 whitespace-nowrap">Destinazione</span>
-              <span className="text-[12px] font-black uppercase tracking-widest whitespace-nowrap">{plan.city}</span>
+        {/* Visual Portion (Sartorial Frame) */}
+        <div className="w-full lg:w-[40%] relative">
+          <div className="aspect-[3.5/5] overflow-hidden shadow-2xl p-2 bg-white relative transition-all duration-1000 group-hover:shadow-3xl">
+              <div className="w-full h-full relative overflow-hidden border border-black/5">
+                <img 
+                    src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-[2000ms]"
+                    alt={plan.title_it}
+                />
+              </div>
           </div>
         </div>
 
-        {/* Text Portion (The Feature) */}
-        <div className="w-full lg:w-[58%] flex flex-col justify-center space-y-10">
-          <div className="space-y-6">
-              <div className="flex flex-wrap gap-2 mb-2">
+        {/* Text Portion (The Narrative Flow) */}
+        <div className="w-full lg:w-[60%] flex flex-col justify-center">
+          {/* 1. Città */}
+          <div className="flex items-center gap-4 mb-6">
+                <div className="w-8 h-[1px] bg-accent/30" />
+                <span className="text-[11px] font-black uppercase tracking-[0.4em] text-accent opacity-60">{plan.city}</span>
+          </div>
+
+          <div className="space-y-8">
+              {/* 2. Categoria */}
+              <div className="flex flex-wrap gap-2">
                  {chips.map(chip => <ExperienceChip key={chip} label={chip} />)}
               </div>
               
-              <div className="space-y-4">
-                  <h3 className="text-[42px] md:text-[64px] font-serif font-black text-text-primary leading-[1] tracking-tighter italic group-hover:text-accent transition-colors duration-700">
+              {/* 3. Titolo & 4. Payoff */}
+              <div className="space-y-5">
+                  <h3 className="text-[44px] md:text-[68px] font-serif font-black text-text-primary leading-[0.9] tracking-tighter italic">
                       {plan.title_it}
                   </h3>
-                  <p className="text-[18px] md:text-[22px] text-text-primary/80 font-serif italic leading-relaxed max-w-xl">
-                      {plan.description_it || "Un itinerario curato dai nostri esperti locali per farti vivere l'anima più autentica della Puglia."}
+                  <div className="w-20 h-1.5 bg-accent-gold/20" />
+                  <p className="text-[19px] md:text-[23px] text-text-primary/70 font-serif italic leading-relaxed max-w-xl indent-6">
+                      {plan.description_it || "Un percorso sartoriale attraverso gli angoli più segreti della nostra terra, per scoprire ciò che i libri non dicono."}
                   </p>
               </div>
-          </div>
 
-          {/* Value Metadata Layer */}
-          <div className="flex flex-wrap gap-8 py-6 border-y border-black/[0.05]">
-              <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-accent/5 flex items-center justify-center text-accent/60">
-                      <Timer size={18} weight="bold" />
+              {/* 5. Dettagli Esperienza */}
+              <div className="flex flex-wrap gap-8 py-8 border-y border-black/[0.04]">
+                  <div className="flex items-center gap-3">
+                      <Timer size={16} weight="bold" className="text-accent/40" />
+                      <div className="flex flex-col">
+                          <span className="text-[12px] font-black text-text-primary uppercase tracking-wider">{duration}</span>
+                          <span className="text-[8px] font-black text-text-muted/30 uppercase tracking-widest">Lettura</span>
+                      </div>
                   </div>
-                  <div className="flex flex-col">
-                      <span className="text-[12px] font-black text-text-primary uppercase tracking-wider">{duration}</span>
-                      <span className="text-[8px] font-black text-text-muted/40 uppercase tracking-widest">Lettura</span>
+                  <div className="flex items-center gap-3 border-x border-black/[0.04] px-8">
+                      <BookOpen size={16} weight="bold" className="text-accent/40" />
+                      <div className="flex flex-col">
+                          <span className="text-[12px] font-black text-text-primary uppercase tracking-wider">{steps}</span>
+                          <span className="text-[8px] font-black text-text-muted/30 uppercase tracking-widest">Percorso</span>
+                      </div>
                   </div>
-              </div>
-              <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-accent/5 flex items-center justify-center text-accent/60">
-                      <BookOpen size={18} weight="bold" />
-                  </div>
-                  <div className="flex flex-col">
-                      <span className="text-[12px] font-black text-text-primary uppercase tracking-wider">{steps}</span>
-                      <span className="text-[8px] font-black text-text-muted/40 uppercase tracking-widest">Percorso</span>
-                  </div>
-              </div>
-              <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-accent/5 flex items-center justify-center text-accent/60">
-                      <Sparkle size={18} weight="bold" />
-                  </div>
-                  <div className="flex flex-col">
-                      <span className="text-[12px] font-black text-text-primary uppercase tracking-wider">{explorations}</span>
-                      <span className="text-[8px] font-black text-text-muted/40 uppercase tracking-widest">Popolarità</span>
-                  </div>
-              </div>
-          </div>
-
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
-              {/* Refined Creator Badge */}
-              <div className="flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-full border-2 border-white shadow-lg overflow-hidden relative group-hover:scale-110 transition-transform">
-                      <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
-                  </div>
-                  <div className="flex flex-col">
-                      <span className="text-[10px] font-serif italic font-black text-accent opacity-80 decoration-accent/20 underline underline-offset-4">Curata da</span>
-                      <span className="text-[19px] font-serif font-black italic text-text-primary">{plan.creator?.nome || 'Local Expert'}</span>
+                  <div className="flex items-center gap-3">
+                      <Sparkle size={16} weight="bold" className="text-accent/40" />
+                      <div className="flex flex-col">
+                          <span className="text-[12px] font-black text-text-primary uppercase tracking-wider">{explorations}</span>
+                          <span className="text-[8px] font-black text-text-muted/30 uppercase tracking-widest">Popolarità</span>
+                      </div>
                   </div>
               </div>
 
-              <button className="flex items-center gap-6 group/btn bg-text-primary text-white pl-10 pr-4 h-14 rounded-full shadow-2xl hover:bg-accent transition-all duration-500 active:scale-95 group-hover:translate-x-2">
-                  <span className="text-[12px] font-black uppercase tracking-[0.2em]">Esplora l'Itinerario</span>
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center group-hover/btn:bg-white group-hover/btn:text-accent transition-all">
-                      <ArrowRight size={20} weight="bold" />
+              {/* 6. Autore & 7. CTA */}
+              <div className="flex flex-col md:flex-row items-center justify-between gap-10 pt-4">
+                  <div className="flex items-center gap-5">
+                      <div className="relative">
+                          <div className="w-14 h-14 rounded-full border border-black/5 overflow-hidden group-hover:scale-105 transition-transform">
+                              <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
+                          </div>
+                          <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-accent rounded-full border-2 border-[#FCFAF2] flex items-center justify-center">
+                              <Star size={8} weight="fill" className="text-white" />
+                          </div>
+                      </div>
+                      <div className="flex flex-col">
+                          <span className="text-[9px] font-black uppercase tracking-[0.2em] text-accent/40">Curata da</span>
+                          <span className="text-[20px] font-serif font-black italic text-text-primary">{plan.creator?.nome || 'Local Expert'}</span>
+                      </div>
                   </div>
-              </button>
+
+                  <button className="flex items-center gap-8 group/btn bg-text-primary text-white pl-10 pr-4 h-14 rounded-full shadow-xl hover:bg-accent transition-all duration-700 active:scale-95 group-hover:translate-x-3">
+                      <span className="text-[12px] font-black uppercase tracking-[0.3em]">Vivi l'Esperienza</span>
+                      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center group-hover/btn:bg-white group-hover/btn:text-accent transition-all">
+                          <ArrowRight size={20} weight="bold" />
+                      </div>
+                  </button>
+              </div>
           </div>
         </div>
       </div>
