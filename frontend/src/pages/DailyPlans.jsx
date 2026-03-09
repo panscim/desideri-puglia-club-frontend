@@ -69,7 +69,7 @@ const PlanCard = ({ plan, navigate }) => (
 
         <div className="flex items-center justify-between pt-6 border-t border-black/5">
             <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-full bg-black/5 overflow-hidden border border-black/5 grayscale">
+                <div className="w-10 h-10 rounded-full bg-black/5 overflow-hidden border border-black/5">
                     <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
                 </div>
                 <div className="flex flex-col">
@@ -139,43 +139,45 @@ const DailyPlans = () => {
                 <div className="w-10" /> {/* Spacer */}
             </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-center gap-6">
-                <div className="w-full md:w-auto min-w-[200px] relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-accent/40 group-hover:text-accent transition-colors">
-                        <MapPin size={18} weight="bold" />
-                    </div>
-                    <select 
-                        className="w-full h-12 pl-12 pr-6 bg-white border border-black/5 rounded-full text-[12px] font-black uppercase tracking-widest text-text-primary outline-none focus:border-accent/40 shadow-sm appearance-none cursor-pointer"
-                        value={filters.city}
-                        onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
-                    >
-                        <option value="">Tutti i Territori</option>
-                        {cities.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                </div>
-
-                <div className="w-full md:w-auto min-w-[200px] relative group">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-accent/40 group-hover:text-accent transition-colors">
-                        <Compass size={18} weight="bold" />
-                    </div>
-                    <select 
-                        className="w-full h-12 pl-12 pr-6 bg-white border border-black/5 rounded-full text-[12px] font-black uppercase tracking-widest text-text-primary outline-none focus:border-accent/40 shadow-sm appearance-none cursor-pointer"
-                        value={filters.targetAudience}
-                        onChange={(e) => setFilters(prev => ({ ...prev, targetAudience: e.target.value }))}
-                    >
-                        <option value="">Tipo di Itinerario</option>
-                        {types.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
-                    </select>
-                </div>
-
-                {filters.city || filters.targetAudience ? (
+            {/* Pill Style Filters */}
+            <div className="flex flex-col gap-6 items-center">
+                {/* City Pills */}
+                <div className="flex items-center gap-3 overflow-x-auto max-w-full pb-2 no-scrollbar px-4">
                     <button 
-                        onClick={() => setFilters({ city: '', targetAudience: '', season: '' })}
-                        className="text-[10px] font-black uppercase tracking-widest text-accent/60 hover:text-accent transition-all pb-1 border-b border-accent/20"
+                        onClick={() => setFilters(prev => ({ ...prev, city: '' }))}
+                        className={`px-6 h-10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${!filters.city ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-white border border-black/5 text-text-muted hover:border-accent/40'}`}
                     >
-                        Reset
+                        Tutti i Territori
                     </button>
-                ) : null}
+                    {cities.map(c => (
+                        <button 
+                            key={c}
+                            onClick={() => setFilters(prev => ({ ...prev, city: c }))}
+                            className={`px-6 h-10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filters.city === c ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-white border border-black/5 text-text-muted hover:border-accent/40'}`}
+                        >
+                            {c}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Type Pills */}
+                <div className="flex items-center gap-3 overflow-x-auto max-w-full pb-2 no-scrollbar px-4">
+                    <button 
+                        onClick={() => setFilters(prev => ({ ...prev, targetAudience: '' }))}
+                        className={`px-6 h-10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${!filters.targetAudience ? 'bg-accent-gold text-white shadow-lg shadow-accent-gold/20' : 'bg-white border border-black/5 text-text-muted hover:border-accent-gold/40'}`}
+                    >
+                        Tutti i Tipi
+                    </button>
+                    {types.map(t => (
+                        <button 
+                            key={t.value}
+                            onClick={() => setFilters(prev => ({ ...prev, targetAudience: t.value }))}
+                            className={`px-6 h-10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filters.targetAudience === t.value ? 'bg-accent-gold text-white shadow-lg shadow-accent-gold/20' : 'bg-white border border-black/5 text-text-muted hover:border-accent-gold/40'}`}
+                        >
+                            {t.label}
+                        </button>
+                    ))}
+                </div>
             </div>
         </div>
       </header>
