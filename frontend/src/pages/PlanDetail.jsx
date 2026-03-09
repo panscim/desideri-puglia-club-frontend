@@ -1,3 +1,24 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { 
+  CaretLeft, 
+  Sparkle, 
+  Star, 
+  Timer, 
+  BookOpen, 
+  Users, 
+  CloudRain, 
+  Sun, 
+  LockKey, 
+  ArrowUpRight as NavigationArrow, 
+  CreditCard,
+  Compass
+} from '@phosphor-icons/react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { ConciergeService } from '../services/concierge';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'react-hot-toast';
+
 /* ── Sophisticated Elements ─────────────────────────────────── */
 const ThreadPath = () => (
     <svg className="absolute left-0 top-0 w-full h-full pointer-events-none opacity-[0.05]" translate="no">
@@ -108,8 +129,8 @@ const PlanDetail = () => {
         </div>
       </nav>
 
-      {/* ========== MAGAZINE COVER HERO ========== */}
-      <div className="relative h-[85vh] w-full overflow-hidden bg-zinc-900 flex flex-col items-center justify-end">
+      {/* ========== MAGAZINE COVER HERO (MONUMENTAL) ========== */}
+      <div className="relative h-screen lg:h-[92vh] w-full overflow-hidden bg-zinc-900 flex flex-col items-center justify-end">
         <motion.div style={{ scale: heroScale }} className="absolute inset-x-0 inset-y-0 grayscale-[0.2]">
             <img 
                 src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
@@ -310,7 +331,7 @@ const PlanDetail = () => {
                <div className="text-center space-y-2">
                   <p className="text-[9px] font-black uppercase tracking-[0.6em] text-text-muted leading-relaxed">
                      Fine Documento <br/>
-                     <span className="font-serif italic font-black text-[13px] lowercase tracking-normal text-text-primary">Archivio Privato Desideri Puglia</span>
+                     <span className="font-serif italic font-black text-[13px] lowercase tracking-normal text-text-primary">Archivio Privato Desideri Puglia / Rev. C</span>
                   </p>
                </div>
             </footer>
