@@ -331,7 +331,7 @@ const PlanDetail = () => {
                <div className="text-center space-y-2">
                   <p className="text-[9px] font-black uppercase tracking-[0.6em] text-text-muted leading-relaxed">
                      Fine Documento <br/>
-                     <span className="font-serif italic font-black text-[13px] lowercase tracking-normal text-text-primary">Archivio Privato Desideri Puglia / Rev. C</span>
+                     <span className="font-serif italic font-black text-[13px] lowercase tracking-normal text-text-primary">Archivio Privato Desideri Puglia / Rev. D</span>
                   </p>
                </div>
             </footer>

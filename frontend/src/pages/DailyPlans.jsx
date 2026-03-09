@@ -124,7 +124,7 @@ const PlanCard = ({ plan, navigate }) => {
                     }}
                     className="flex items-center gap-4 group/btn bg-text-primary text-white pl-8 pr-4 h-14 rounded-full shadow-xl hover:bg-accent transition-all duration-700 active:scale-95 group-hover:translate-x-3"
                   >
-                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">Esplora</span>
+                      <span className="text-[11px] font-black uppercase tracking-[0.3em]">ENTRA</span>
                       <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center group-hover/btn:bg-white group-hover/btn:text-accent transition-all">
                           <ArrowRight size={20} weight="bold" />
                       </div>
@@ -285,7 +285,7 @@ const DailyPlans = () => {
 
         <footer className="text-center pt-20 border-t border-black/[0.03]">
             <p className="text-[11px] font-black uppercase tracking-[1em] text-accent/20 mb-4">Finis Terrae</p>
-            <p className="font-serif italic font-black text-[22px] text-text-primary opacity-30 italic">Desideri Puglia Club — Collection 2026 / Rev. B</p>
+            <p className="font-serif italic font-black text-[22px] text-text-primary opacity-30 italic">Desideri Puglia Club — Collection 2026 / Rev. D</p>
         </footer>
       </main>
 
