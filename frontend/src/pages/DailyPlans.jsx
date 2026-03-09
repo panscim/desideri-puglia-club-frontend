@@ -7,7 +7,8 @@ import {
   Star,
   MagnifyingGlass,
   Users,
-  Timer
+  Timer,
+  ArrowRight
 } from '@phosphor-icons/react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 
