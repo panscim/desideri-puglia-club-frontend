@@ -41,6 +41,20 @@ const item = {
 };
 
 /* ── Sophisticated Elements ─────────────────────────────────── */
+const VerticalIndex = ({ text, side = 'left' }) => (
+  <div className={`fixed ${side === 'left' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 z-[50] pointer-events-none hidden md:block`}>
+    <span className="text-[10px] font-black uppercase tracking-[0.8em] text-accent/20 [writing-mode:vertical-lr] rotate-180">
+      {text}
+    </span>
+  </div>
+);
+
+const NumberAnchor = ({ num }) => (
+  <div className="absolute -top-16 -left-12 text-[180px] font-serif font-black italic text-black/[0.03] leading-none pointer-events-none select-none z-0">
+    {num < 10 ? `0${num}` : num}
+  </div>
+);
+
 const Stamp = ({ text, className = '' }) => (
   <div className={`w-16 h-16 rounded-full border-2 border-dashed border-accent/20 flex items-center justify-center -rotate-12 opacity-40 select-none ${className}`}>
     <span className="text-[7px] font-black uppercase tracking-[0.3em] text-accent text-center leading-tight">
@@ -100,11 +114,11 @@ const DailyPlans = () => {
   return (
     <div className="min-h-screen bg-[#FCFAF2] pb-32 font-sans selection:bg-accent/30 overflow-x-hidden relative">
       {/* Texture Overlay */}
-      <div className="fixed inset-0 pointer-events-none opacity-[0.03] grayscale contrast-150 z-[1000]" 
+      <div className="fixed inset-0 pointer-events-none opacity-[0.03] grayscale contrast-150 z-[2000]" 
            style={{ backgroundImage: `url("https://www.transparenttextures.com/patterns/linen-paper.png")` }} />
 
       {/* ========== NAV ========== */}
-      <nav className="fixed top-0 inset-x-0 z-[100] px-6 h-20 flex items-center justify-between border-b border-black/[0.03] bg-[#FCFAF2]/80 backdrop-blur-md">
+      <nav className="fixed top-0 inset-x-0 z-[1000] px-6 h-20 flex items-center justify-between border-b border-black/[0.03] bg-[#FCFAF2]/80 backdrop-blur-md">
         <button 
           onClick={() => navigate(-1)} 
           className="w-10 h-10 flex items-center justify-center hover:scale-110 active:scale-90 transition-all text-text-primary"
@@ -112,96 +126,101 @@ const DailyPlans = () => {
           <CaretLeft size={24} weight="bold" />
         </button>
         <div className="flex flex-col items-center">
-            <span className="text-[9px] font-black uppercase tracking-[0.5em] text-accent/60 mb-0.5">Archive</span>
-            <span className="text-[15px] font-serif font-black italic tracking-tight">Esplora Piani</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.5em] text-accent/60 mb-0.5">Registry</span>
+            <span className="text-[15px] font-serif font-black italic tracking-tight uppercase">Daily Ledger</span>
         </div>
         <div className="w-10 h-10 flex items-center justify-center text-accent">
           <Sparkle size={24} weight="fill" />
         </div>
       </nav>
 
-      <main className="pt-36 px-6 max-w-lg mx-auto relative z-10">
+      <VerticalIndex text="Puglia Private Archive" side="left" />
+      <VerticalIndex text="Curated Travel Collection" side="right" />
+
+      <main className="pt-44 px-6 md:px-24 max-w-4xl mx-auto relative z-10">
         
-        {/* Header - Editorial Style */}
-        <header className="mb-24 relative">
+        {/* Header - Editorial Minimalism */}
+        <header className="mb-44 relative">
              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute -top-12 -left-4 w-24 h-24 border border-accent/10 rounded-full flex items-center justify-center -rotate-12 pointer-events-none"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="mb-12 flex items-center gap-4 overflow-hidden"
              >
-                <div className="w-20 h-20 border border-dashed border-accent/20 rounded-full" />
-                <span className="absolute text-[8px] font-black uppercase tracking-widest text-accent/40 text-center">Premium<br/>Collection</span>
+                <div className="w-12 h-px bg-accent/30" />
+                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/60">Collezione 2026</span>
              </motion.div>
 
              <motion.h2 
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-[48px] font-serif font-black text-text-primary leading-[1] mb-8 tracking-tighter italic"
+                className="text-[64px] md:text-[84px] font-serif font-black text-text-primary leading-[0.85] mb-12 tracking-tighter italic"
              >
-                Le Giornate <br/>
-                <span className="text-accent underline decoration-accent/20 underline-offset-[12px]">Perfette.</span>
+                Momenti <br/>
+                <span className="text-accent underline decoration-accent/10 underline-offset-[20px]">Eterni.</span>
              </motion.h2>
 
              <motion.p 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="text-[17px] text-text-muted font-medium leading-relaxed font-serif italic max-w-[95%] opacity-70"
+                transition={{ delay: 0.4 }}
+                className="text-[18px] md:text-[22px] text-text-muted font-medium leading-[1.5] font-serif italic max-w-xl opacity-60"
              >
-                Una collezione curata di segreti pugliesi. <br/>
-                Ogni piano è un capitolo di un viaggio senza tempo.
+                Un registro curato di avventure senza tempo. <br/>
+                Oltre la superficie, nel cuore della Puglia.
              </motion.p>
         </header>
 
-        {/* Filters - Minimal Washi Style */}
-        <section className="mb-24 flex flex-col gap-8">
-          <div className="relative group">
-            <MagnifyingGlass size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-accent/60" weight="bold" />
-            <select 
-              className="w-full h-14 pl-14 pr-8 bg-transparent border-b border-black/10 text-[12px] font-black uppercase tracking-widest text-text-primary outline-none focus:border-accent transition-colors"
-              value={filters.city}
-              onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
-            >
-              <option value="">Destinazioni</option>
-              {cities.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <div className="absolute top-1/2 right-4 -translate-y-1/2 opacity-20 pointer-events-none">
-                <CaretLeft size={14} weight="bold" className="-rotate-90" />
+        {/* Filters - Linear & Clean */}
+        <section className="mb-44 flex flex-col md:flex-row md:items-end justify-between gap-12 border-b border-black/[0.05] pb-12">
+          <div className="flex-1 max-w-sm">
+            <p className="text-[9px] font-black uppercase tracking-[0.4em] text-text-muted/40 mb-4 px-1">Destinazione</p>
+            <div className="relative group">
+                <select 
+                    className="w-full h-12 bg-transparent text-[14px] font-black uppercase tracking-widest text-text-primary outline-none cursor-pointer"
+                    value={filters.city}
+                    onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value }))}
+                >
+                    <option value="">Tutti i Territori</option>
+                    {cities.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none opacity-20">
+                    <CaretLeft size={16} weight="bold" className="-rotate-90" />
+                </div>
             </div>
           </div>
 
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
+          <div className="flex gap-10 overflow-x-auto scrollbar-hide">
             {seasons.map((s) => {
               const isActive = filters.season === s.value;
               return (
                 <button
                   key={s.value}
                   onClick={() => setFilters(prev => ({ ...prev, season: prev.season === s.value ? '' : s.value }))}
-                  className={`shrink-0 h-9 px-6 flex items-center rounded-sm text-[10px] font-black uppercase tracking-widest transition-all relative ${
-                    isActive 
-                    ? 'text-accent' 
-                    : 'text-text-muted opacity-50 hover:opacity-100'
+                  className={`shrink-0 flex flex-col items-start gap-2 group transition-all ${
+                    isActive ? 'opacity-100' : 'opacity-30 hover:opacity-100'
                   }`}
                 >
-                  {isActive && (
-                    <motion.div 
-                        layoutId="activeFilter"
-                        className="absolute inset-x-0 -bottom-1 h-[3px] bg-accent/20 rounded-full"
-                    />
-                  )}
-                  {s.label}
+                  <span className="text-[10px] font-black uppercase tracking-[0.3em]">{s.label}</span>
+                  <div className={`h-[3px] rounded-full bg-accent transition-all duration-500 ${isActive ? 'w-full' : 'w-0 group-hover:w-6'}`} />
                 </button>
               );
             })}
           </div>
         </section>
 
-        {/* Plans List - Artifact Collection */}
+        {/* Plans List - The Ledger Spread */}
         <AnimatePresence mode="wait">
           {loading ? (
-            <div className="space-y-16 py-10">
+            <div className="space-y-44 py-10">
               {[1, 2].map(i => (
-                <div key={i} className="aspect-[3/4] w-full bg-white/50 animate-pulse border border-black/[0.03]" />
+                <div key={i} className="flex flex-col md:flex-row gap-16 animate-pulse">
+                    <div className="w-full md:w-1/2 aspect-[4/5] bg-black/[0.02]" />
+                    <div className="w-full md:w-1/2 space-y-6 pt-12">
+                        <div className="h-4 w-24 bg-black/[0.02]" />
+                        <div className="h-16 w-full bg-black/[0.02]" />
+                        <div className="h-24 w-full bg-black/[0.02]" />
+                    </div>
+                </div>
               ))}
             </div>
           ) : plans.length === 0 ? (
@@ -209,11 +228,13 @@ const DailyPlans = () => {
               key="empty"
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }}
-              className="text-center py-24 flex flex-col items-center gap-6"
+              className="text-center py-44 flex flex-col items-center gap-10"
             >
-              <div className="w-1 h-20 bg-accent/10" />
-              <h3 className="text-2xl font-serif font-black text-text-primary italic">Nessun capitolo trovato.</h3>
-              <p className="text-[15px] text-text-muted font-serif italic opacity-60">Il diario è ancora da scrivere per questi filtri.</p>
+              <div className="w-px h-32 bg-accent/20" />
+              <h3 className="text-[32px] font-serif font-black text-text-primary italic tracking-tight text-center">
+                Nuovi capitoli in fase di <br/> redazione.
+              </h3>
+              <p className="text-[17px] text-text-muted font-serif italic opacity-40">Modifica i filtri per svelare altri archivi.</p>
             </motion.div>
           ) : (
             <motion.div 
@@ -221,95 +242,71 @@ const DailyPlans = () => {
               variants={container}
               initial="hidden"
               animate="show"
-              className="space-y-32"
+              className="space-y-64"
             >
               {plans.map((plan, idx) => {
-                const isEven = idx % 2 === 0;
+                const isOdd = idx % 2 !== 0;
                 return (
                   <motion.div
                     key={plan.id}
                     variants={item}
                     onClick={() => navigate(`/plan/${plan.id}`)}
-                    className={`relative flex flex-col ${isEven ? 'items-start' : 'items-end'}`}
+                    className={`relative flex flex-col ${isOdd ? 'md:flex-row-reverse' : 'md:flex-row'} gap-12 md:gap-24 items-center group cursor-pointer`}
                   >
-                    {/* Marginalia Note */}
-                    <div className={`absolute -top-12 ${isEven ? 'right-0' : 'left-0'} max-w-[120px] pointer-events-none`}>
-                        <p className={`text-[12px] font-serif italic text-text-muted/40 leading-tight ${isEven ? 'text-right' : 'text-left'}`}>
-                            {idx === 0 ? "Scelto dai nostri esperti per te." : idx === 1 ? "Un'avventura autentica." : "Segreti da svelare."}
-                        </p>
+                    <NumberAnchor num={idx + 1} />
+
+                    {/* Image Column - The Spread Photo */}
+                    <div className="w-full md:w-[55%] relative">
+                        <div className={`aspect-[4/5] overflow-hidden relative shadow-[0_50px_100px_rgba(0,0,0,0.06)] grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000 ${isOdd ? 'translate-y-12' : ''}`}>
+                            <img 
+                                src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
+                                className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000"
+                                alt={plan.title_it}
+                            />
+                            {/* Gradient Reveal */}
+                            <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                        </div>
+                        
+                        {/* Floating Metadata (Marginalia) */}
+                        <div className={`absolute -bottom-8 ${isOdd ? '-left-8' : '-right-8'} z-20 pointer-events-none`}>
+                            <div className="bg-white/95 backdrop-blur-md p-6 border border-black/[0.03] shadow-2xl flex flex-col gap-1 min-w-[140px]">
+                                <span className="text-[7px] font-black uppercase tracking-[0.4em] text-accent/60">Posizione</span>
+                                <span className="text-[13px] font-black uppercase tracking-widest text-text-primary">{plan.city}</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="w-[90%] group cursor-pointer relative">
-                      
-                      {/* Authenticity Stamp */}
-                      <Stamp text={plan.city + " Verified"} className={`absolute -top-8 ${isEven ? '-right-6' : '-left-6'} z-30`} />
-
-                      {/* Main Card Artifact */}
-                      <div className="bg-white p-4 pb-14 shadow-[0_30px_90px_rgba(0,0,0,0.04)] border border-black/[0.03] flex flex-col relative">
-                        
-                        {/* Museum Mount Image Area */}
-                        <div className="aspect-[3/4] overflow-hidden relative mb-10 bg-zinc-50 p-2 border border-black/[0.02]">
-                            <div className="w-full h-full overflow-hidden relative grayscale-[0.2] group-hover:grayscale-0 transition-all duration-1000">
-                                <img 
-                                    src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
-                                    alt={plan.title_it}
-                                />
-                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                            </div>
-                            
-                            {/* Category Washi Tape */}
-                            <div className="absolute top-4 left-4 z-20">
-                                <div className="relative">
-                                    <div className="absolute inset-0 bg-accent/20 -rotate-2 scale-110" />
-                                    <span className="relative bg-white/90 backdrop-blur-sm px-3 py-1 text-[8px] font-black uppercase tracking-[0.3em] text-accent border border-accent/10">
-                                        {plan.target_audience || 'Exclusive'}
-                                    </span>
-                                </div>
-                            </div>
+                    {/* Text Column - Editorial Content */}
+                    <div className="w-full md:w-[45%] flex flex-col items-start gap-8 py-10 relative">
+                        <div className="flex items-center gap-4">
+                            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-accent-gold">Expertise {idx + 1}</span>
+                            <div className="w-8 h-[1px] bg-black/10" />
                         </div>
 
-                        {/* Text Content */}
-                        <div className="px-2">
-                             <div className="flex items-center gap-4 mb-6">
-                                <div className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-accent-gold">
-                                    <Star size={12} weight="fill" />
-                                    {(plan.rating_avg || 4.9).toFixed(1)}
-                                </div>
-                                <div className="w-[1px] h-3 bg-black/10" />
-                                <div className="text-[9px] font-black uppercase tracking-widest text-text-muted/60">
-                                    Archive No. {plan.id.slice(0, 4)}
-                                </div>
-                             </div>
+                        <h3 className="text-[44px] md:text-[54px] font-serif font-black text-text-primary leading-[0.9] tracking-tighter italic group-hover:text-accent transition-colors duration-700">
+                            {plan.title_it}
+                        </h3>
 
-                             <h3 className="text-[34px] font-serif font-black text-text-primary leading-[1] mb-10 tracking-tighter italic group-hover:text-accent transition-colors">
-                                {plan.title_it}
-                             </h3>
-
-                             <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                     <div className="w-10 h-10 rounded-full border border-black/[0.05] overflow-hidden grayscale group-hover:grayscale-0 transition-all">
-                                        <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
-                                     </div>
-                                     <span className="text-[14px] font-serif font-black italic opacity-60">{plan.creator?.nome || 'Expert'}</span>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-[18px] font-serif font-black italic text-text-primary">€{plan.price.toFixed(0)}</span>
-                                    <p className="text-[7px] font-black uppercase tracking-widest text-text-muted mt-0.5">Sblocco</p>
-                                </div>
-                             </div>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-text-muted/60">
+                                <span>{(plan.rating_avg || 4.9).toFixed(1)} Rating</span>
+                                <span className="w-1 h-1 rounded-full bg-black/10" />
+                                <span>€{plan.price.toFixed(0)} Sblocco</span>
+                            </div>
+                            <p className="text-[15px] font-serif italic text-text-muted leading-relaxed opacity-60 line-clamp-3">
+                                {plan.description_it || "Un'esperienza curata nel dettaglio dai nostri esperti locall."}
+                            </p>
                         </div>
 
-                        <LineDetails />
-                      </div>
-
-                      {/* Social Proof Decoration */}
-                      <div className={`mt-6 flex ${isEven ? 'justify-start' : 'justify-end'}`}>
-                         <div className="flex items-center gap-3 opacity-30 group-hover:opacity-60 transition-opacity">
-                            <Users size={16} weight="light" />
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em]">{plan.purchases_count || 0} Membri Hanno Visitato</span>
-                         </div>
-                      </div>
+                        <div className="flex items-center gap-6 pt-4">
+                            <div className="w-10 h-10 rounded-full overflow-hidden border border-black/[0.05] grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all">
+                                <img src={plan.creator?.avatar_url || '/logo.png'} className="w-full h-full object-cover" alt="" />
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-[7px] font-black uppercase tracking-widest text-text-muted mb-0.5">Creato da</span>
+                                <span className="text-[15px] font-serif font-black italic text-text-primary leading-none">{plan.creator?.nome || 'Expert'}</span>
+                            </div>
+                        </div>
                     </div>
                   </motion.div>
                 );
@@ -318,11 +315,16 @@ const DailyPlans = () => {
           )}
         </AnimatePresence>
 
-        <footer className="py-32 flex flex-col items-center gap-8 relative">
-          <div className="w-1 h-12 bg-accent/20" />
-          <div className="text-center">
-             <p className="text-[10px] font-black uppercase tracking-[0.6em] text-accent/40 mb-4">Fine Collezione</p>
-             <p className="font-serif italic font-black text-[13px] text-text-muted">Desideri Puglia Club — Private Archive</p>
+        <footer className="py-64 flex flex-col items-center gap-12 relative overflow-hidden">
+          <div className="w-[1px] h-32 bg-accent/20" />
+          <div className="text-center space-y-4">
+             <p className="text-[11px] font-black uppercase tracking-[0.8em] text-accent/30">End of Ledger</p>
+             <p className="font-serif italic font-black text-[15px] text-text-muted opacity-40">Desideri Puglia Club — Private Archive 2026</p>
+          </div>
+          
+          {/* Faded Stamp background */}
+          <div className="absolute -bottom-20 rotate-12 text-[120px] font-serif font-black italic text-black/[0.02] select-none pointer-events-none whitespace-nowrap">
+             DESIDERI PUGLIA CLUB OFFICIAL ARCHIVE
           </div>
         </footer>
       </main>
