@@ -34,6 +34,21 @@ const LineStrike = () => (
     />
 );
 
+const seasonLabels = {
+  estate: 'Estate',
+  autunno: 'Autunno',
+  inverno: 'Inverno',
+  primavera: 'Primavera'
+};
+
+const targetLabels = {
+  coppie: 'Coppie',
+  famiglie: 'Famiglie',
+  amici: 'Amici',
+  solo: 'Solo',
+  lusso: 'Lusso'
+};
+
 const PlanDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
