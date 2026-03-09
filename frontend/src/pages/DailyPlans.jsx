@@ -92,13 +92,13 @@ const DailyPlans = () => {
   const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
     city: '',
     targetAudience: '',
     season: ''
   });
 
-  const cities = ['Barletta', 'Bari', 'Trani', 'Andria', 'Polignano a Mare', 'Monopoli'];
   const types = [
     { value: 'Coppie', label: 'In Coppia' },
     { value: 'Famiglie', label: 'In Famiglia' },
@@ -108,24 +108,38 @@ const DailyPlans = () => {
   ];
 
   useEffect(() => {
-    loadPlans();
-  }, [filters]);
+    const delayDebounceFn = setTimeout(() => {
+      loadPlans();
+    }, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [filters, searchTerm]);
 
   const loadPlans = async () => {
     setLoading(true);
-    const data = await ConciergeService.getDailyPlans(filters);
+    // Passing searchTerm to the service if supported, or filtering locally
+    const data = await ConciergeService.getDailyPlans({ ...filters, city: searchTerm || filters.city });
     setPlans(data || []);
     setLoading(false);
+  };
+
+  const handleLocationClick = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        // In a real app, we'd reverse geocode or use coords. 
+        // For now, we'll simulate finding the "nearest" city or just set a placeholder search
+        setSearchTerm('Bari'); // Example simulation
+      });
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#FCFAF2] selection:bg-accent/30 overflow-x-hidden relative">
       <PaperTexture />
 
-      {/* Cleaner Header / Filter Control */}
-      <header className="sticky top-0 z-[1000] bg-[#FCFAF2]/90 backdrop-blur-md border-b border-black/5 pt-6 pb-8">
+      {/* Compact Header / Search Control */}
+      <header className="sticky top-0 z-[1000] bg-[#FCFAF2]/90 backdrop-blur-md border-b border-black/5 pt-4 pb-6">
         <div className="container mx-auto px-6 md:px-12">
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-4 md:mb-6">
                 <button 
                     onClick={() => navigate(-1)} 
                     className="w-10 h-10 flex items-center justify-center hover:bg-black/5 rounded-full transition-all text-text-primary"
@@ -133,38 +147,41 @@ const DailyPlans = () => {
                     <CaretLeft size={24} weight="bold" />
                 </button>
                 <div className="flex flex-col items-center">
-                    <span className="text-[9px] font-black uppercase tracking-[0.6em] text-accent/60 mb-0.5">Desideri Puglia Club</span>
-                    <h1 className="text-[20px] font-serif font-black italic tracking-tight uppercase">Daily Journal</h1>
+                    <span className="text-[8px] font-black uppercase tracking-[0.6em] text-accent/60">Registry Archive</span>
+                    <h1 className="text-[18px] font-serif font-black italic tracking-tight uppercase">Daily Journal</h1>
                 </div>
-                <div className="w-10" /> {/* Spacer */}
+                <div className="w-10" />
             </div>
 
-            {/* Pill Style Filters */}
-            <div className="flex flex-col gap-6 items-center">
-                {/* City Pills */}
-                <div className="flex items-center gap-3 overflow-x-auto max-w-full pb-2 no-scrollbar px-4">
+            <div className="max-w-4xl mx-auto space-y-4">
+                {/* Search & Location Bar */}
+                <div className="flex items-center gap-3">
+                    <div className="relative flex-1 group">
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-accent/40 group-focus-within:text-accent transition-colors">
+                            <MapPin size={20} weight="bold" />
+                        </div>
+                        <input 
+                            type="text"
+                            placeholder="Cerca una città (es. Polignano, Trani...)"
+                            className="w-full h-12 pl-14 pr-6 bg-white border border-black/5 rounded-full text-[13px] font-serif italic text-text-primary outline-none focus:border-accent/40 shadow-sm transition-all"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
                     <button 
-                        onClick={() => setFilters(prev => ({ ...prev, city: '' }))}
-                        className={`px-6 h-10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${!filters.city ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-white border border-black/5 text-text-muted hover:border-accent/40'}`}
+                        onClick={handleLocationClick}
+                        className="w-12 h-12 flex items-center justify-center bg-white border border-black/5 rounded-full text-accent hover:bg-accent hover:text-white transition-all shadow-sm group"
+                        title="Usa la mia posizione"
                     >
-                        Tutti i Territori
+                        <Compass size={22} weight="bold" className="group-hover:rotate-45 transition-transform duration-500" />
                     </button>
-                    {cities.map(c => (
-                        <button 
-                            key={c}
-                            onClick={() => setFilters(prev => ({ ...prev, city: c }))}
-                            className={`px-6 h-10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filters.city === c ? 'bg-accent text-white shadow-lg shadow-accent/20' : 'bg-white border border-black/5 text-text-muted hover:border-accent/40'}`}
-                        >
-                            {c}
-                        </button>
-                    ))}
                 </div>
 
-                {/* Type Pills */}
-                <div className="flex items-center gap-3 overflow-x-auto max-w-full pb-2 no-scrollbar px-4">
+                {/* Type Pills - More Compact */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar justify-center">
                     <button 
                         onClick={() => setFilters(prev => ({ ...prev, targetAudience: '' }))}
-                        className={`px-6 h-10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${!filters.targetAudience ? 'bg-accent-gold text-white shadow-lg shadow-accent-gold/20' : 'bg-white border border-black/5 text-text-muted hover:border-accent-gold/40'}`}
+                        className={`px-5 h-8 rounded-full text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${!filters.targetAudience ? 'bg-accent-gold text-white shadow-md shadow-accent-gold/20' : 'bg-white/50 border border-black/5 text-text-muted hover:border-accent-gold/40'}`}
                     >
                         Tutti i Tipi
                     </button>
@@ -172,7 +189,7 @@ const DailyPlans = () => {
                         <button 
                             key={t.value}
                             onClick={() => setFilters(prev => ({ ...prev, targetAudience: t.value }))}
-                            className={`px-6 h-10 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filters.targetAudience === t.value ? 'bg-accent-gold text-white shadow-lg shadow-accent-gold/20' : 'bg-white border border-black/5 text-text-muted hover:border-accent-gold/40'}`}
+                            className={`px-5 h-8 rounded-full text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filters.targetAudience === t.value ? 'bg-accent-gold text-white shadow-md shadow-accent-gold/20' : 'bg-white/50 border border-black/5 text-text-muted hover:border-accent-gold/40'}`}
                         >
                             {t.label}
                         </button>
@@ -182,38 +199,38 @@ const DailyPlans = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 md:px-24 pt-16 pb-32">
+      <main className="container mx-auto px-6 md:px-24 pt-8 pb-32">
         <AnimatePresence mode="wait">
           {loading ? (
-            <div className="py-32 flex flex-col items-center">
+            <div className="py-20 flex flex-col items-center">
                  <motion.div 
                     animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                     className="flex flex-col items-center gap-6"
                  >
-                    <Sparkle size={48} weight="fill" className="text-accent/20" />
-                    <span className="text-[11px] font-serif italic text-text-muted">Consultando gli archivi...</span>
+                    <Sparkle size={40} weight="fill" className="text-accent/20" />
+                    <span className="text-[10px] font-serif italic text-text-muted opacity-40">Consultando gli archivi...</span>
                  </motion.div>
             </div>
           ) : plans.length === 0 ? (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="py-32 text-center space-y-8"
+              className="py-20 text-center space-y-6"
             >
-              <h2 className="text-[32px] md:text-[44px] font-serif font-black text-text-primary italic tracking-tight opacity-20">
+              <h2 className="text-[28px] md:text-[40px] font-serif font-black text-text-primary italic tracking-tight opacity-20">
                   Nessun racconto <br/> trovato per questa ricerca.
               </h2>
               <button 
-                  onClick={() => setFilters({ city: '', targetAudience: '', season: '' })}
-                  className="px-10 h-14 bg-accent text-white text-[12px] font-black uppercase tracking-widest rounded-full shadow-xl hover:scale-105 transition-all"
+                  onClick={() => { setSearchTerm(''); setFilters({ city: '', targetAudience: '', season: '' }); }}
+                  className="px-8 h-12 bg-accent text-white text-[11px] font-black uppercase tracking-widest rounded-full shadow-lg hover:scale-105 transition-all"
               >
-                  Mostra Tutti i Piani
+                  Reset Filtri
               </button>
             </motion.div>
           ) : (
             <motion.div 
-              key={filters.city + filters.targetAudience}
+              key={searchTerm + filters.targetAudience}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="max-w-6xl mx-auto"
@@ -227,16 +244,16 @@ const DailyPlans = () => {
 
         <SectionDivider />
 
-        <footer className="text-center pt-16 opacity-30 pointer-events-none">
-            <p className="text-[10px] font-black uppercase tracking-[0.8em] text-text-muted mb-4">The End of Record</p>
-            <p className="font-serif italic font-black text-[18px] text-text-primary">Desideri Puglia Club — Journal 2026</p>
+        <footer className="text-center pt-10 opacity-20 pointer-events-none">
+            <p className="text-[9px] font-black uppercase tracking-[0.8em] text-text-muted mb-3">The End of Record</p>
+            <p className="font-serif italic font-black text-[16px] text-text-primary">Desideri Puglia Club — Journal 2026</p>
         </footer>
       </main>
 
-      {/* Decorative Stamp for physical feel */}
-      <div className="fixed bottom-12 right-12 z-0 opacity-10 rotate-[-12deg] pointer-events-none select-none hidden lg:block">
-           <div className="w-32 h-32 border-4 border-dashed border-accent/40 rounded-full flex items-center justify-center text-accent text-center font-black uppercase tracking-widest text-[10px] leading-tight p-4">
-                Private<br/>Expert<br/>Archive
+      {/* Decorative Stamp */}
+      <div className="fixed bottom-10 right-10 z-0 opacity-[0.05] rotate-[-15deg] pointer-events-none select-none hidden lg:block">
+           <div className="w-28 h-28 border-2 border-dashed border-accent/40 rounded-full flex items-center justify-center text-accent text-center font-black uppercase tracking-widest text-[8px] leading-tight p-4">
+                Official<br/>Puglia<br/>Journal
            </div>
       </div>
     </div>
