@@ -138,11 +138,11 @@ const DailyPlans = () => {
   });
 
   const types = [
-    { value: 'Coppie', label: 'In Coppia' },
-    { value: 'Famiglie', label: 'In Famiglia' },
-    { value: 'Amici', label: 'Con Amici' },
-    { value: 'Solo', label: 'In Solitaria' },
-    { value: 'Lusso', label: 'Puglia Premium' }
+    { value: 'Coppie', label: '👩‍❤️‍👨 In Coppia' },
+    { value: 'Famiglie', label: '👨‍👩‍👧‍👦 In Famiglia' },
+    { value: 'Amici', label: '🍻 Con Amici' },
+    { value: 'Solo', label: '🎒 In Solitaria' },
+    { value: 'Lusso', label: '✨ Puglia Premium' }
   ];
 
   useEffect(() => {
@@ -188,27 +188,27 @@ const DailyPlans = () => {
                 <div className="w-12" />
             </div>
 
-            <div className="max-w-4xl mx-auto space-y-6">
+            <div className="max-w-2xl mx-auto space-y-5">
                 {/* Search Pills & Input */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                     <div className="relative flex-1 group">
-                        <div className="absolute left-6 top-1/2 -translate-y-1/2 text-accent/30 group-focus-within:text-accent transition-colors">
-                            <MapPin size={22} weight="bold" />
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 text-accent/30 group-focus-within:text-accent transition-colors">
+                            <MapPin size={20} weight="bold" />
                         </div>
                         <input 
                             type="text"
                             placeholder="Cerca la tua prossima tappa..."
-                            className="w-full h-14 pl-16 pr-8 bg-white border border-black/[0.03] rounded-full text-[15px] font-serif italic text-text-primary outline-none focus:border-accent/40 shadow-sm transition-all placeholder:text-text-muted/40"
+                            className="w-full h-12 pl-12 pr-6 bg-white border border-black/[0.03] rounded-full text-[14px] font-serif italic text-text-primary outline-none focus:border-accent/40 shadow-sm transition-all placeholder:text-text-muted/40"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <button 
                         onClick={handleLocationClick}
-                        className="w-14 h-14 flex-shrink-0 flex items-center justify-center bg-white border border-black/[0.03] rounded-full text-accent hover:bg-accent hover:text-white transition-all shadow-sm group"
+                        className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-white border border-black/[0.03] rounded-full text-accent hover:bg-accent hover:text-white transition-all shadow-sm group"
                         title="Usa la mia posizione"
                     >
-                        <Compass size={24} weight="bold" className="group-hover:rotate-90 transition-transform duration-700" />
+                        <Compass size={22} weight="bold" className="group-hover:rotate-90 transition-transform duration-700" />
                     </button>
                 </div>
 
