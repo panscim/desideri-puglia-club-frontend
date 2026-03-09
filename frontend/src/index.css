@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
 /* ─────────────────────────────────────────────────
    THEME SYSTEM — CSS Custom Properties
@@ -7,38 +7,52 @@
 :root {
   color-scheme: light;
 
-  /* Design System Tokens */
-  --bg-primary: #FAF7F2;
-  --bg-secondary: #F9F9F7;
-  --bg-dark: #0f0f0f;
-  --bg-dark-2: #1C2833;
-  --accent: #D4793A;
-  --accent-orange: #f97316;
-  --accent-gold: #C4974A;
-  --text-primary: #1F2933;
-  --text-muted: #6B7280;
-  --text-light: #A0ADB8;
-  --text-on-dark: #FAF7F2;
-  --border: rgba(31,41,51,0.10);
-  --border-dark: rgba(255,255,255,0.08);
-  --surface: #FFFFFF;
-  --danger: #C0392B;
-  --success: #16a34a;
+  /* Dashboard Redesign Tokens */
+  --sand:         #F7F1E8;
+  --sand-deep:    #EDE3D4;
+  --cream:        #FDFAF5;
+  --terra:        #D4693A;
+  --terra-soft:   #E8845A;
+  --terra-pale:   #FBF0EB;
+  --teal:         #2A8C80;
+  --teal-pale:    #E0F2EF;
+  --navy:         #16243E;
+  --navy-mid:     #243450;
+  --navy-soft:    #3A4F72;
+  --gold:         #E8A838;
+  --gold-pale:    #FEF5E4;
+  
+  /* Legacy/Compatibility Tokens */
+  --bg-primary: var(--cream);
+  --bg-secondary: var(--sand-deep);
+  --bg-dark: var(--navy);
+  --accent: var(--terra);
+  --accent-gold: var(--gold);
+  --text-primary: var(--navy);
+  --text-muted: var(--text-2);
+  --text-light: var(--text-3);
+  --border: var(--border);
 
-  /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-xxl: 48px;
+  /* New Redesign specifics */
+  --text-1:       #16243E;
+  --text-2:       #4A5670;
+  --text-3:       #8A95AD;
+  --surface:      #FFFFFF;
+  --border:       #EAE3D6;
+  --border-mid:   #D5CCBA;
 
-  /* Radius */
-  --radius-sm: 8px;
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-card: 32px;
-  --radius-pill: 100px;
+  /* Spacing & Radius from Mockup */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 26px;
+  --r-2xl: 32px;
+  --radius-card: var(--r-2xl);
+
+  /* Shadows */
+  --sh-sm: 0 2px 10px rgba(22,36,62,0.06);
+  --sh-md: 0 6px 24px rgba(22,36,62,0.10);
+  --sh-lg: 0 16px 48px rgba(22,36,62,0.14);
 }
 
 /* ─────────────────────────────────────────────────
@@ -49,6 +63,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  text-decoration: none !important;
 }
 
 body {
@@ -69,9 +84,9 @@ body {
 
 @layer base {
   h1, h2, h3, h4 {
-    font-family: 'Libre Baskerville', serif;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
+    font-family: 'Playfair Display', serif;
+    letter-spacing: -0.01em;
+    color: var(--text-1);
   }
 
   p {
@@ -163,8 +178,31 @@ body {
 
   /* Utility Classes */
   .font-serif-italic {
-    font-family: 'Libre Baskerville', serif;
+    font-family: 'Playfair Display', serif;
     font-style: italic;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--text-1);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .section-cta {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--terra);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    letter-spacing: 0.02em;
   }
 }
 

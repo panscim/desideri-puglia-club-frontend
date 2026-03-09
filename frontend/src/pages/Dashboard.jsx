@@ -1,693 +1,592 @@
 // src/pages/Dashboard.jsx
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { supabase } from '../services/supabase';
-
 import { QuestService } from '../services/quest';
 import { EventsService } from '../services/events';
 import { NotificationService } from '../services/notifications';
 import {
-  Bell,
   MagnifyingGlass,
   Heart,
-  Bank,
-  ForkKnife,
-  Tree,
-  Waves,
-  Sparkle,
+  Bell,
+  Fire,
   ArrowRight,
-  MapTrifold,
   NavigationArrow,
   MapPin,
-  X
+  Compass,
+  Bank,
+  ForkKnife,
+  Waves,
+  Sparkle,
 } from '@phosphor-icons/react';
-
 import { useTranslation } from 'react-i18next';
 import SearchModal from '../components/SearchModal';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
+/* ─────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────── */
+const getGreeting = () => {
+  const h = new Date().getHours();
+  if (h < 12) return 'Buongiorno';
+  if (h < 18) return 'Buon pomeriggio';
+  return 'Buona sera';
+};
+
+/* ─────────────────────────────────────────
+   SUB-COMPONENTS
+───────────────────────────────────────── */
+
+/** Countdown pill for events */
 const EventTimer = ({ startDate, endDate }) => {
-  const [timeLeft, setTimeLeft] = useState('');
+  const [label, setLabel] = useState('');
 
   useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date().getTime();
+    const calc = () => {
+      const now = Date.now();
       const start = new Date(startDate).getTime();
       const end = new Date(endDate).getTime();
-
-      if (now < start) {
-        const distance = start - now;
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        setTimeLeft(`Inizia tra: ${days}g ${hours}h ${minutes} m`);
-      } else if (now >= start && now <= end) {
-        const distance = end - now;
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        setTimeLeft(`Termina tra: ${days}g ${hours}h ${minutes} m`);
-      } else {
-        setTimeLeft('Concluso');
-      }
+      const fmt = (ms) => {
+        const d = Math.floor(ms / 86400000);
+        const h = Math.floor((ms % 86400000) / 3600000);
+        const m = Math.floor((ms % 3600000) / 60000);
+        return `${d}g ${h}h ${m}m`;
+      };
+      if (now < start) setLabel(`Inizia tra: ${fmt(start - now)}`);
+      else if (now <= end) setLabel(`Termina tra: ${fmt(end - now)}`);
+      else setLabel('Concluso');
     };
-
-    calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 60000);
-    return () => clearInterval(timer);
+    calc();
+    const t = setInterval(calc, 60000);
+    return () => clearInterval(t);
   }, [startDate, endDate]);
 
-  if (!timeLeft) return null;
-
+  if (!label) return null;
   return (
-    <div className="flex items-center gap-1.5 text-[10px] font-black text-danger bg-danger/5 px-2.5 py-1.5 rounded-pill border border-danger/10 whitespace-nowrap">
-      <span className="text-[13px]">⏳</span>
-      {timeLeft}
-    </div>
+    <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-red-600 bg-red-50 border border-red-100 px-2.5 py-1.5 rounded-full whitespace-nowrap">
+      ⏳ {label}
+    </span>
   );
 };
+
+/** Category pill button */
+const CatPill = ({ icon, label, active, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-95 ${active
+        ? 'bg-[#16243E] text-white border-[#16243E] shadow-md'
+        : 'bg-white text-[#4A5670] border-[#EAE3D6] shadow-sm'
+      }`}
+  >
+    <span className="text-[14px]">{icon}</span>
+    {label}
+  </button>
+);
+
+/** Active saga card (vertical list) */
+const ActiveSagaCard = ({ saga, onClick }) => (
+  <motion.div
+    onClick={onClick}
+    whileTap={{ scale: 0.985 }}
+    className="flex items-center gap-3.5 bg-white border border-[#EAE3D6] rounded-[20px] p-3.5 cursor-pointer shadow-sm group relative overflow-hidden"
+  >
+    {/* left accent bar on hover */}
+    <span className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#D4693A] rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+
+    {/* thumb */}
+    <div className="w-[66px] h-[66px] rounded-[14px] overflow-hidden shrink-0 bg-[#EDE3D4] relative">
+      <img
+        src={saga.sagaImage || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=200'}
+        alt={saga.sagaTitle}
+        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+      />
+    </div>
+
+    {/* info */}
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-2 mb-1">
+        <span className="inline-flex items-center gap-1 text-[10px] font-black text-[#D4693A] bg-[#FBF0EB] border border-[#D4693A]/15 px-2 py-0.5 rounded-full uppercase tracking-wide">
+          <span className="w-[5px] h-[5px] rounded-full bg-[#D4693A] animate-pulse" />
+          In Corso
+        </span>
+        {saga.sagaCity && (
+          <span className="text-[10px] font-bold text-[#8A95AD]">📍 {saga.sagaCity}</span>
+        )}
+      </div>
+      <p className="text-[16px] font-serif font-black text-[#16243E] leading-snug truncate mb-2">
+        {saga.sagaTitle}
+      </p>
+      <div className="flex items-center gap-2">
+        <div className="flex-1 h-[5px] bg-[#EDE3D4] rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-[#D4693A] to-[#E8845A] rounded-full transition-all duration-1000"
+            style={{ width: `${saga.percent}%` }}
+          />
+        </div>
+        <span className="text-[10px] font-black text-[#8A95AD] uppercase tracking-wide whitespace-nowrap">
+          {saga.doneSteps}/{saga.totalSteps} · {saga.percent}%
+        </span>
+      </div>
+    </div>
+
+    <span className="text-[#D0C8BC] group-hover:text-[#D4693A] group-hover:translate-x-0.5 transition-all text-xl shrink-0">›</span>
+  </motion.div>
+);
+
+/** Mission card (horizontal scroll) */
+const MissionCard = ({ saga, isFav, onFav, onClick }) => (
+  <motion.div
+    onClick={onClick}
+    whileTap={{ scale: 0.97 }}
+    className="w-[252px] shrink-0 snap-start bg-white rounded-[24px] overflow-hidden shadow-md border border-[#EAE3D6] cursor-pointer group flex flex-col"
+  >
+    {/* image */}
+    <div className="h-[144px] relative overflow-hidden bg-[#EDE3D4]">
+      <img
+        src={saga.image_url || saga.map_image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600'}
+        alt={saga.title}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#16243E]/60 via-transparent to-transparent" />
+
+      {/* city pill */}
+      <span className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-[#16243E]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/10">
+        📍 {saga.city || 'Puglia'}
+      </span>
+
+      {/* heart */}
+      <button
+        onClick={onFav}
+        className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center border border-white/15 transition-transform active:scale-90 ${isFav ? 'bg-red-500/85' : 'bg-[#16243E]/70'
+          }`}
+      >
+        <Heart size={15} weight={isFav ? 'fill' : 'bold'} className="text-white" />
+      </button>
+
+      {/* originals badge */}
+      <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/8">
+        {(saga.is_original || saga.isOriginal) ? (
+          <>
+            <span className="w-[18px] h-[18px] rounded-full bg-orange-600 flex items-center justify-center text-[8px] font-black text-white shrink-0">D</span>
+            <span className="text-[9px] font-bold text-white">Originals by Desideri di Puglia</span>
+          </>
+        ) : (
+          <span className="text-[9px] font-bold text-white">Certificato da Desideri di Puglia</span>
+        )}
+      </div>
+    </div>
+
+    {/* body */}
+    <div className="p-4 flex flex-col flex-1">
+      <h4 className="font-serif font-black text-[#16243E] text-[16px] leading-snug mb-3 line-clamp-2 group-hover:text-[#D4693A] transition-colors">
+        {saga.title || saga.titolo}
+      </h4>
+      <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#8A95AD] uppercase tracking-wider mt-auto">
+        <NavigationArrow size={12} weight="bold" className="text-[#D4693A]" />
+        {saga.totalSteps || 5} tappe
+        <span className="w-[3px] h-[3px] rounded-full bg-[#D0C8BC]" />
+        {saga.city || 'Puglia'}
+      </div>
+    </div>
+  </motion.div>
+);
+
+/** News card */
+const NewsCard = ({ item }) => (
+  <motion.div
+    whileTap={{ scale: 0.97 }}
+    className="w-[232px] shrink-0 snap-start bg-white rounded-[24px] overflow-hidden shadow-md border border-[#EAE3D6] cursor-pointer group flex flex-col"
+  >
+    <div className="h-[128px] relative overflow-hidden bg-[#EDE3D4]">
+      <img src={item.image_url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+      <span className="absolute top-2.5 left-2.5 bg-[#D4693A] text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full">
+        {item.category}
+      </span>
+    </div>
+    <div className="p-3.5 flex flex-col flex-1">
+      <p className="text-[10px] font-bold text-[#8A95AD] uppercase tracking-wider mb-1.5">
+        {new Date(item.date).toLocaleDateString('it-IT', { day: 'numeric', month: 'long' })}
+      </p>
+      <h4 className="font-serif font-black text-[#16243E] text-[14px] leading-snug line-clamp-2 mb-2 group-hover:text-[#D4693A] transition-colors">
+        {item.title}
+      </h4>
+      <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#D4693A] mt-auto">
+        <Sparkle size={11} weight="fill" /> In evidenza
+      </div>
+    </div>
+  </motion.div>
+);
+
+/** Event card */
+const EventCard = ({ ev, onClick }) => {
+  const d = new Date(ev.data_inizio);
+  return (
+    <motion.div
+      onClick={onClick}
+      whileTap={{ scale: 0.97 }}
+      className="w-[232px] shrink-0 snap-start bg-white rounded-[24px] overflow-hidden shadow-md border border-[#EAE3D6] cursor-pointer group flex flex-col"
+    >
+      <div className="h-[128px] relative overflow-hidden bg-[#EDE3D4]">
+        <img
+          src={ev.immagine_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600'}
+          alt={ev.titolo}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+        />
+        {/* date badge */}
+        <div className="absolute top-2.5 left-2.5 bg-[#16243E]/88 backdrop-blur-md px-2.5 py-1.5 rounded-[10px] text-center min-w-[44px]">
+          <p className="text-[9px] font-black text-[#E8845A] uppercase tracking-wider">
+            {d.toLocaleString('it-IT', { month: 'short' })}
+          </p>
+          <p className="font-serif font-black text-white text-[20px] leading-none">{d.getDate()}</p>
+        </div>
+        <span className="absolute top-2.5 right-2.5 bg-white/90 text-[#16243E] text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border border-[#16243E]/10">
+          Evento
+        </span>
+      </div>
+      <div className="p-3.5 flex flex-col flex-1">
+        <p className="flex items-center gap-1 text-[10px] font-bold text-[#D4693A] mb-1.5">
+          <MapPin size={11} weight="fill" /> {ev.luogo}
+        </p>
+        <h4 className="font-serif font-black text-[#16243E] text-[14px] leading-snug line-clamp-2 mb-2 group-hover:text-[#D4693A] transition-colors">
+          {ev.titolo}
+        </h4>
+        <div className="mt-auto">
+          <EventTimer startDate={ev.data_inizio} endDate={ev.data_fine} />
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+/* ─────────────────────────────────────────
+   SECTION HEADER
+───────────────────────────────────────── */
+const SectionHeader = ({ title, onMore }) => (
+  <div className="flex items-end justify-between px-5 mb-3.5">
+    <h2 className="font-serif font-black text-[#16243E] text-[22px] leading-tight tracking-tight">{title}</h2>
+    {onMore && (
+      <button
+        onClick={onMore}
+        className="flex items-center gap-1 text-[11px] font-bold text-[#D4693A] active:opacity-70"
+      >
+        Vedi tutte <ArrowRight size={11} weight="bold" />
+      </button>
+    )}
+  </div>
+);
+
+/* ─────────────────────────────────────────
+   SKELETON LOADER
+───────────────────────────────────────── */
+const Skeleton = ({ className }) => (
+  <div className={`animate-pulse bg-[#EDE3D4] rounded-[16px] ${className}`} />
+);
+
+const DashboardSkeleton = () => (
+  <div className="px-5 pt-4 flex flex-col gap-5">
+    <Skeleton className="h-[72px] w-full" />
+    <Skeleton className="h-[40px] w-full" />
+    <Skeleton className="h-[60px] w-3/4" />
+    <div className="flex gap-3">
+      <Skeleton className="h-[180px] w-[252px] shrink-0" />
+      <Skeleton className="h-[180px] w-[252px] shrink-0" />
+    </div>
+  </div>
+);
+
+/* ─────────────────────────────────────────
+   MAIN DASHBOARD
+───────────────────────────────────────── */
+const CATS = [
+  { id: 'all', icon: '🧭', label: 'Tutti' },
+  { id: 'cultura', icon: '🏛️', label: 'Cultura' },
+  { id: 'cibo', icon: '🍝', label: 'Cibo' },
+  { id: 'natura', icon: '🌿', label: 'Natura' },
+  { id: 'concierge', icon: '✨', label: 'Concierge' },
+];
+
+const DEFAULT_NEWS = [
+  {
+    id: 'news-1',
+    title: 'Nuovi Percorsi a Gallipoli',
+    image_url: 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=800',
+    category: 'Novità',
+    date: '2024-03-20',
+  },
+  {
+    id: 'news-2',
+    title: 'Editoriale: Il Barocco Leccese',
+    image_url: 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=800',
+    category: 'Cultura',
+    date: '2024-03-18',
+  },
+];
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { profile } = useAuth();
-  // eslint-disable-next-line no-unused-vars
-  const { theme } = useTheme();
-  // eslint-disable-next-line no-unused-vars
   const { t } = useTranslation();
 
   const [loading, setLoading] = useState(true);
-  const [heroItems, setHeroItems] = useState([]);
   const [saghe, setSaghe] = useState([]);
   const [activeSagas, setActiveSagas] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [events, setEvents] = useState([]);
-  const [activeHeroIndex, setActiveHeroIndex] = useState(0);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  // eslint-disable-next-line no-unused-vars
-  const [userLoc, setUserLoc] = useState(null);
-
-  // STATI NOTIFICHE
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([]);
+  const [news] = useState(DEFAULT_NEWS);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [userLoc, setUserLoc] = useState(null);
+  const [activeCat, setActiveCat] = useState('all');
 
-  const carouselRef = useRef(null);
-
+  /* ── data load ── */
   useEffect(() => {
-    // Fetch iniziale notifiche
-    const fetchNotificationsData = async () => {
-      if (profile?.id) {
-        const amount = await NotificationService.getUnreadCount(profile.id);
-        const data = await NotificationService.getUserNotifications(profile.id, 15);
-        setUnreadCount(amount);
-        setNotifications(data);
-      }
-    };
-    fetchNotificationsData();
-
-    // Try to get user location for proximity sorting
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        (err) => console.warn('GPS denied for proximity', err)
+        ({ coords }) => setUserLoc({ lat: coords.latitude, lng: coords.longitude }),
+        (err) => console.warn('GPS denied', err)
       );
     }
     loadData();
-  }, [profile?.id]); // Ricarica quando il profilo è pronto
+  }, [profile?.id]);
 
-  const handleOpenNotifications = async () => {
-    setShowNotifications(!showNotifications);
-    // Le notifiche non vengono più segnate tutte come lette all'apertura.
-    // L'utente deve cliccarci sopra.
-  };
-
-  const handleScroll = (e) => {
-    if (!carouselRef.current || heroItems.length === 0) return;
-    const scrollLeft = e.target.scrollLeft;
-    const itemWidth = carouselRef.current.scrollWidth / heroItems.length;
-    const newIndex = Math.round(scrollLeft / itemWidth);
-    if (newIndex !== activeHeroIndex) {
-      setActiveHeroIndex(newIndex);
-    }
-  };
+  useEffect(() => {
+    if (!profile?.id) return;
+    (async () => {
+      setUnreadCount(await NotificationService.getUnreadCount(profile.id));
+    })();
+  }, [profile?.id]);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      // Fetch Dashboard Hero Slides
-      const { data: heroData } = await supabase
-        .from('dashboard_hero')
-        .select('*')
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
-
-      // Fetch Active Events
-      const activeEvents = await EventsService.getActiveEvents();
-
-      // Fetch Saghe Storiche for Missioni Vicine
-      const activeSaghe = await QuestService.getActiveSets();
-
-      // Fetch user's active (in-progress) sagas
-      const userActiveSagas = profile?.id
-        ? await QuestService.getUserActiveSagas(profile.id)
-        : [];
-
-      // Fetch user favorites
-      const userFavorites = profile?.id
-        ? await QuestService.getUserFavorites(profile.id)
-        : [];
-
-      setHeroItems(heroData || []);
+      const [activeEvents, activeSaghe, userActiveSagas, userFavorites] = await Promise.all([
+        EventsService.getActiveEvents(),
+        QuestService.getActiveSets(),
+        profile?.id ? QuestService.getUserActiveSagas(profile.id) : [],
+        profile?.id ? QuestService.getUserFavorites(profile.id) : [],
+      ]);
       setEvents(activeEvents || []);
       setSaghe(activeSaghe || []);
       setActiveSagas(userActiveSagas || []);
       setFavorites(userFavorites || []);
     } catch (err) {
-      console.error('Error loading dashboard data', err);
+      console.error('Dashboard load error', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleToggleFavorite = async (e, setId) => {
+  const toggleFavorite = async (e, setId) => {
     e.stopPropagation();
-    if (!profile?.id) {
-      // Potresti voler mostrare un toast o reindirizzare al login
-      return;
-    }
-
+    if (!profile?.id) return;
     const res = await QuestService.toggleFavorite(profile.id, setId);
     if (res.success) {
-      if (res.isFavorite) {
-        setFavorites(prev => [...prev, setId]);
-      } else {
-        setFavorites(prev => prev.filter(id => id !== setId));
-      }
+      setFavorites(prev =>
+        res.isFavorite ? [...prev, setId] : prev.filter(id => id !== setId)
+      );
     }
   };
 
-  // eslint-disable-next-line no-unused-vars
-  const categories = [
-    { id: 'concierge', icon: <Sparkle size={24} weight="fill" className="text-orange-500" />, label: 'Concierge', path: '/daily-plans' },
-    { id: 'vibe', icon: <NavigationArrow size={24} weight="fill" className="text-blue-500" />, label: 'Radar Live', path: '/vibe-radar' },
-    { id: 'cultura', icon: <Bank size={24} weight="regular" />, label: 'Cultura' },
-    { id: 'gastronomia', icon: <ForkKnife size={24} weight="regular" />, label: 'Cibo' },
-  ];
+  /* ── animation variants ── */
+  const fadeUp = {
+    hidden: { opacity: 0, y: 16 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0, 0, 0.2, 1] } },
+  };
+  const stagger = {
+    show: { transition: { staggerChildren: 0.07 } },
+  };
 
-
+  /* ── loading state ── */
   if (loading) {
-    return <div className="h-[100dvh] bg-[var(--bg-primary)] flex items-center justify-center">
-      <div className="animate-pulse bg-[var(--bg-secondary)] w-12 h-12 rounded-full border border-[var(--border)]"></div>
-    </div>
+    return (
+      <div className="h-[100dvh] bg-[#FDFAF5] flex flex-col overflow-hidden">
+        {/* static header */}
+        <div className="px-5 pt-14 pb-5">
+          <Skeleton className="h-[36px] w-48 mb-1" />
+          <Skeleton className="h-[28px] w-32" />
+        </div>
+        <DashboardSkeleton />
+      </div>
+    );
   }
 
+  /* ── render ── */
   return (
-    <div className="h-[100dvh] max-h-[100dvh] w-full bg-bg-primary flex flex-col font-sans text-text-primary overflow-hidden relative transition-colors duration-500">
+    <div className="h-[100dvh] max-h-[100dvh] w-full bg-[#FDFAF5] flex flex-col overflow-hidden font-sans text-[#16243E]">
 
-      {/* 1. TOP HEADER (Statico) */}
-      <header className="flex-none px-6 py-4 flex items-center justify-between z-20 bg-gradient-to-b from-bg-primary via-bg-primary/80 to-transparent">
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="w-9 h-9 rounded-full overflow-hidden border border-white/10 shadow-lg bg-white p-0.5">
-            <img src="/logo.png" alt="DDP" className="w-full h-full object-cover rounded-full" />
+      {/* ════════════════════════════════
+          SCROLLABLE BODY WITH COLLAPSIBLE HEADER
+      ════════════════════════════════ */}
+      <motion.main
+        variants={stagger}
+        initial="hidden"
+        animate="show"
+        className="flex-1 overflow-y-auto overflow-x-hidden pb-28"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        {/* 1. GREETING ROW (Scrolls away) */}
+        <div className="px-5 pt-14 pb-4">
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <p className="text-[11px] font-black text-[#D4693A] uppercase tracking-[0.12em] mb-0.5">
+                {getGreeting()}
+              </p>
+              <h1 className="font-serif font-black text-[#16243E] text-[34px] leading-[1.05] tracking-tight">
+                {profile?.nome || profile?.nickname || 'Esploratore'} 👋
+              </h1>
+              <p className="text-[12px] font-medium text-[#8A95AD] mt-1">
+                {saghe.length} saghe pronte per te
+              </p>
+            </div>
+
+            {/* notif button */}
+            <button
+              onClick={() => navigate('/notifiche')}
+              className="relative w-[46px] h-[46px] rounded-[16px] bg-[#16243E] flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0"
+            >
+              <Bell size={22} weight="fill" className="text-white" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-[11px] h-[11px] bg-red-500 rounded-full border-2 border-[#FDFAF5]" />
+              )}
+            </button>
           </div>
         </div>
 
-        <div className="flex-1 mx-4">
+        {/* 2. STICKY SEARCH BAR (Stays at the top) */}
+        <div className="sticky top-0 z-30 bg-[#FDFAF5]/95 backdrop-blur-md px-5 py-3 -mt-4 mb-2">
           <button
-            onClick={() => setIsSearchModalOpen(true)}
-            className="w-full bg-surface/80 backdrop-blur-md border border-border-default transition-all rounded-pill py-3 px-5 flex items-center gap-3 text-sm shadow-sm active:scale-[0.98] text-text-muted hover:bg-white hover:border-accent/30"
+            onClick={() => setIsSearchOpen(true)}
+            className="w-full flex items-center bg-white border border-[#EAE3D6] rounded-[22px] px-4 py-2.5 gap-3 shadow-sm active:scale-[0.99] transition-transform"
           >
-            <MagnifyingGlass size={20} weight="bold" className="text-accent" />
-            <span className="font-sans font-medium">Trova luoghi e cose da fare</span>
+            <MagnifyingGlass size={20} weight="bold" className="text-[#8A95AD] shrink-0" />
+            <span className="flex-1 text-left text-[14px] font-medium text-[#8A95AD] truncate">
+              Cerca artista, evento o città…
+            </span>
+            <span className="flex items-center gap-1.5 bg-[#F7F1E8] border border-[#EAE3D6] rounded-full px-3 py-1.5 text-[12px] font-bold text-[#16243E] shrink-0">
+              📍 {userLoc ? 'Vicino' : 'Barletta'}
+            </span>
           </button>
         </div>
 
-        {/* CAMPANELLA NOTIFICHE */}
-        <div className="relative">
-          <button
-            onClick={handleOpenNotifications}
-            className="relative p-2 shrink-0 rounded-full transition-colors hover:bg-zinc-100 text-zinc-900"
-          >
-            <Bell size={26} weight="fill" />
-            {unreadCount > 0 && (
-              <span className="absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white shadow-sm" />
-            )}
-          </button>
+        {/* ── Category pills ── */}
+        <motion.div variants={fadeUp} className="flex gap-2 px-5 pb-1 overflow-x-auto no-scrollbar mt-1">
+          {CATS.map(c => (
+            <CatPill
+              key={c.id}
+              icon={c.icon}
+              label={c.label}
+              active={activeCat === c.id}
+              onClick={() => setActiveCat(c.id)}
+            />
+          ))}
+        </motion.div>
 
-          {/* DROPDOWN NOTIFICHE */}
-          <AnimatePresence>
-            {showNotifications && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="absolute top-12 right-0 w-80 max-h-[400px] overflow-y-auto bg-white/90 backdrop-blur-xl border border-white/40 shadow-2xl rounded-3xl p-4 z-50 no-scrollbar"
-              >
-                <div className="flex items-center justify-between mb-4 px-1">
-                  <h3 className="font-serif font-black text-[18px] text-text-primary">Notifiche</h3>
-                  <button onClick={() => setShowNotifications(false)} className="w-8 h-8 rounded-full bg-bg-secondary flex items-center justify-center hover:bg-zinc-100 transition-colors">
-                    <X size={16} weight="bold" className="text-text-muted" />
-                  </button>
-                </div>
-
-                {notifications.length === 0 ? (
-                  <p className="text-sm text-text-muted text-center py-8 font-medium italic">Nessuna notifica per ora.</p>
-                ) : (
-                  <div className="space-y-3">
-                    {notifications.map(notif => (
-                      <div
-                        key={notif.id}
-                        className={`p-4 rounded-xl transition-all cursor-pointer ${notif.letta ? 'bg-bg-secondary/50' : 'bg-surface border border-accent/20 shadow-sm'} hover:bg-white`}
-                        onClick={async () => {
-                          if (!notif.letta && profile?.id) {
-                            await NotificationService.markAsRead(notif.id);
-                            setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, letta: true } : n));
-                            setUnreadCount(prev => Math.max(0, prev - 1));
-                          }
-                          if (notif.link_azione) navigate(notif.link_azione);
-                        }}
-                      >
-                        <div className="flex gap-3">
-                          <div className={`w-2 h-2 mt-2 shrink-0 rounded-full ${notif.letta ? 'bg-transparent' : 'bg-accent'}`} />
-                          <div>
-                            <p className="text-[14px] font-bold text-text-primary leading-tight mb-1">{notif.titolo}</p>
-                            <p className="text-[12px] text-text-muted leading-relaxed">{notif.messaggio}</p>
-                            <span className="overline !text-[9px] !mb-0 mt-3 block opacity-60">
-                              {new Date(notif.created_at).toLocaleDateString('it-IT')}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </header>
-
-      {/* OVERLAY SFONDO (per chiudere le notifiche cliccando fuori) */}
-      {showNotifications && (
-        <div
-          className="lg:hidden fixed inset-0 z-10"
-          onClick={() => setShowNotifications(false)}
-        />
-      )}
-
-      {/* SCROLLABLE CONTENT AREA */}
-      <main className="flex-1 overflow-y-auto pb-24 no-scrollbar -mt-[84px]">
-
-        {/* 2. HERO CAROUSEL (Dinamico) */}
-        <section className="relative w-full h-[65vh] md:h-[70vh] bg-bg-dark">
-
-          {heroItems.length > 0 ? (
-            <div className="relative w-full h-full">
-              <div
-                ref={carouselRef}
-                onScroll={handleScroll}
-                className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar"
-              >
-                {heroItems.map((hero) => (
-                  <div
-                    key={hero.id}
-                    onClick={() => hero.button_link ? navigate(hero.button_link) : null}
-                    className="w-full h-full shrink-0 snap-center relative cursor-pointer group"
-                  >
-                    <img
-                      src={hero.image_url}
-                      alt={hero.title}
-                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                    />
-                    {/* Overlay Leggero Solo in Basso */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-bg-dark/90 via-bg-dark/20 to-transparent pointer-events-none no-theme-flip" />
-
-                    {/* Testo In Basso a Sinistra - Stile GetYourGuide */}
-                    <div className="text-on-image absolute inset-0 p-6 pb-12 flex flex-col justify-end text-left">
-
-                      <h1 className="text-[32px] md:text-[40px] leading-[1.05] font-serif font-black text-white mb-4 tracking-tight">
-                        {hero.title}
-                      </h1>
-
-                      {/* Branding Badge */}
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-[10px] font-black text-white shadow-sm shrink-0">D</div>
-                        <span className="overline !text-white !mb-0 !tracking-[0.2em] !text-[10px]">Originals by Desideri di Puglia</span>
-                      </div>
-
-                      {hero.subtitle && (
-                        <p className="text-[15px] font-sans font-medium text-white/80 mb-4 leading-snug max-w-[32ch]">
-                          {hero.subtitle}
-                        </p>
-                      )}
-
-                      {hero.button_link && (
-                        <button
-                          onClick={() => {
-                            if (hero.button_link.startsWith('http')) {
-                              window.open(hero.button_link, '_blank');
-                            } else {
-                              navigate(hero.button_link);
-                            }
-                          }}
-                          className="btn-primary !py-3 !px-6 !text-[13px]"
-                        >
-                          Scopri l'esperienza <ArrowRight weight="bold" size={14} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
+        {/* ── Le Mie Saghe ── */}
+        <AnimatePresence>
+          {activeSagas.length > 0 && (
+            <motion.section variants={fadeUp} className="mt-7">
+              <SectionHeader title="Le Mie Saghe 🗺️" onMore={() => navigate('/missioni')} />
+              <div className="px-5 flex flex-col gap-2.5">
+                {activeSagas.map(saga => (
+                  <ActiveSagaCard
+                    key={saga.questSetId}
+                    saga={saga}
+                    onClick={() => navigate(`/saga/${saga.questSetId}/intro`)}
+                  />
                 ))}
               </div>
-
-              {/* Dots Indicator */}
-              {heroItems.length > 1 && (
-                <div className="absolute bottom-6 w-full flex justify-center gap-2 z-10">
-                  {heroItems.map((_, idx) => (
-                    <div
-                      key={idx}
-                      className={`h-1.5 rounded-full transition-all duration-300 ${activeHeroIndex === idx ? 'w-6 bg-white' : 'w-2 bg-white/40'}`}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="w-full h-full bg-zinc-900 flex items-center justify-center text-zinc-500">
-              Nessuna esperienza.
-            </div>
+            </motion.section>
           )}
-        </section >
+        </AnimatePresence>
 
-        {/* 2b. CONCIERGE BANNER (Editorial Arch Style) */}
-        <section className="mt-14 px-6 mb-10">
-          <div
+        {/* ── Itinerari Section (Personal Diary Style) ── */}
+        <div className="px-5 mt-8 mb-4">
+          <motion.div
+            variants={fadeUp}
             onClick={() => navigate('/daily-plans')}
-            className="card !p-8 group cursor-pointer relative overflow-hidden flex items-center justify-between"
+            className="relative overflow-hidden rounded-[2px] bg-[#FCF9F2] p-7 cursor-pointer active:scale-[0.99] transition-all shadow-xl shadow-black/5 border-l-[12px] border-l-[#EAE3D6] border-y border-r border-[#EDE3D4]"
+            style={{
+              backgroundImage: `linear-gradient(#EAE3D6 1px, transparent 1px)`,
+              backgroundSize: '100% 32px',
+              backgroundPosition: '0 16px',
+              rotate: '-0.8deg'
+            }}
           >
-            {/* Elegant Left Column */}
-            <div className="flex-1 z-10">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-[1px] bg-accent/50" />
-                <span className="overline !text-accent !mb-0">Concierge Esperienziale</span>
-              </div>
-
-              <h3 className="text-[32px] font-serif font-black text-text-primary leading-tight mb-5 max-w-[12ch]">
-                Il battito <br />
-                <span className="text-accent italic">autentico</span> della Puglia.
-              </h3>
-
-              <p className="text-[15px] text-text-muted font-medium mb-8 max-w-[28ch] leading-relaxed">
-                Itinerari d'autore curati dai local per farti vivere l'eccellenza.
+            {/* Decorative Tape/Note effect */}
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-16 h-5 bg-[#D4693A]/10 border-x border-[#D4693A]/20 rotate-[-2deg] backdrop-blur-[2px] z-10" />
+            
+            <div className="relative pl-4">
+              <p className="text-[10px] font-black text-[#D4693A] uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full border border-[#D4693A] flex items-center justify-center">
+                  <span className="w-1 h-1 rounded-full bg-[#D4693A]" />
+                </span>
+                Appunti di Viaggio
               </p>
-
-              <div className="inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-text-primary group-hover:text-accent transition-colors">
-                Esplora gli itinerari
-                <ArrowRight size={16} weight="bold" className="group-hover:translate-x-1 transition-transform" />
-              </div>
-            </div>
-
-            {/* Architectural Arch Detail */}
-            <div className="relative w-44 h-72 -mr-4 shrink-0 pointer-events-none hidden sm:block">
-              <div className="absolute inset-0 rounded-t-full border-[12px] border-bg-primary shadow-inner overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1542281286-9e0a16bb7366?q=80&w=600"
-                  className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-110"
-                  alt="Puglia"
-                />
-                <div className="absolute inset-0 bg-accent/5" />
-              </div>
-              <div className="absolute -inset-1 rounded-t-full border border-accent/10 -z-10" />
-            </div>
-          </div>
-        </section>
-
-        {/* 3. LE MIE SAGHE IN CORSO */}
-        {activeSagas.length > 0 && (
-          <section className="mt-10 px-6 mb-4">
-            <div className="flex items-end justify-between mb-6">
-              <h3 className="text-[26px] font-serif font-black text-text-primary leading-tight tracking-tight">
-                Le Mie Saghe 🗺️
+              
+              <h3 className="font-serif font-black text-[#16243E] text-[24px] leading-[1.1] mb-3">
+                Cosa facciamo insieme oggi?
               </h3>
-              <button
-                onClick={() => navigate('/missioni')}
-                className="btn-ghost !px-4 !py-2 !text-[11px] !border-none hover:!bg-accent/5 !text-accent"
-              >
-                Vedi tutte <ArrowRight weight="bold" size={12} className="ml-1" />
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              {activeSagas.map((saga) => (
-                <div
-                  key={saga.questSetId}
-                  onClick={() => navigate(`/saga/${saga.questSetId}/intro`)}
-                  className="flex items-center gap-5 bg-surface border border-border-default rounded-card p-4 cursor-pointer active:scale-[0.98] transition-all group hover:border-accent/30 shadow-sm"
-                >
-                  {/* Thumbnail */}
-                  <div className="w-20 h-20 rounded-lg overflow-hidden shrink-0 border border-border-default relative bg-bg-secondary">
-
-                    <img
-                      src={saga.sagaImage || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=200'}
-                      alt={saga.sagaTitle}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    {/* Tiny Badge Indicator on thumbnail */}
-                    {(saga.is_original === true || saga.isOriginal === true) && (
-                      <div className="absolute top-1 left-1 w-4 h-4 bg-orange-600 rounded-full flex items-center justify-center text-[7px] font-black text-white shadow-sm border border-white/10">D</div>
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="overline !text-accent !mb-0 !tracking-[0.1em] bg-accent/5 px-2.5 py-1 rounded-full border border-accent/10 flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                        In Corso
-                      </span>
-                      {saga.sagaCity && (
-                        <span className="text-[10px] text-text-light font-bold">📍 {saga.sagaCity}</span>
-                      )}
-                    </div>
-                    <h4 className="text-[17px] font-serif font-black text-text-primary leading-tight truncate mb-2.5">
-                      {saga.sagaTitle}
-                    </h4>
-                    {/* Progress bar */}
-                    <div className="w-full h-2 bg-bg-secondary rounded-full overflow-hidden border border-border-default">
-                      <div
-                        className="h-full bg-accent rounded-full transition-all duration-1000"
-                        style={{ width: `${saga.percent}%` }}
-                      />
-                    </div>
-                    <p className="text-[10px] font-bold text-text-muted mt-2 tracking-wide uppercase">
-                      {saga.doneSteps}/{saga.totalSteps} tappe · {saga.percent}% completato
-                    </p>
-                  </div>
-
-                  {/* Arrow */}
-                  <span className="text-zinc-600 group-hover:text-[#E4AE2F] transition-colors text-lg shrink-0">›</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-
-        {/* 5. MISSIONI VICINE SLIDER */}
-        <section className="mt-12 px-6 mb-4">
-          <div className="flex items-end justify-between mb-6">
-            <h3 className="text-[28px] font-serif font-black text-text-primary leading-tight tracking-tight">
-              Missioni Vicine
-            </h3>
-            <button
-              onClick={() => navigate('/missioni')}
-              className="btn-ghost !px-4 !py-2 !text-[11px] !border-none hover:!bg-accent/5 !text-accent"
-            >
-              Scopri tutto <ArrowRight weight="bold" size={12} className="ml-1" />
-            </button>
-          </div>
-
-          <div className="flex overflow-x-auto gap-5 pb-8 no-scrollbar snap-x -mx-6 px-6">
-            {saghe.slice(0, 5).map((saga) => (
-              <div
-                key={`vicina-${saga.id}`}
-                onClick={() => navigate(`/saga/${saga.id}/intro`)}
-                className="snap-center w-[290px] md:w-[340px] shrink-0 card !p-0 shadow-lg group flex flex-col cursor-pointer border-border-default hover:border-accent/20"
-              >
-                {/* Image */}
-                <div className="h-40 bg-[var(--bg-secondary)] relative overflow-hidden border-b border-[var(--border)]">
-
-                  <img src={saga.image_url || saga.map_image_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={saga.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-
-
-                  {/* Distance Badge */}
-                  <div className="absolute top-3 left-3 bg-zinc-950/80 backdrop-blur-md px-3 py-1.5 rounded-full text-[11px] font-bold text-white no-theme-flip flex items-center gap-1.5 shadow-md border border-white/10 z-10">
-                    <span className="text-red-500 mb-[1px]">📍</span>
-                    {saga.city || 'Puglia'}
-                  </div>
-
-                  {/* Badge: Originals vs Certificato - BOTTOM LEFT */}
-                  <div className="absolute bottom-3 left-3 right-3 flex justify-start pointer-events-none z-10 text-on-image">
-                    {(saga.is_original === true || saga.isOriginal === true) ? (
-                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/5">
-                        <div className="w-5 h-5 rounded-full bg-orange-600 flex items-center justify-center text-[10px] font-black text-white shadow-sm shrink-0">D</div>
-                        <span className="text-[11px] font-geist font-bold text-white drop-shadow-md">Originals by Desideri di Puglia</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/5">
-                        <span className="text-[10px] font-bold text-white drop-shadow-md">Certificato da Desideri di Puglia</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Favorite Heart Button */}
-                  <button
-                    onClick={(e) => handleToggleFavorite(e, saga.id)}
-                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-zinc-950/60 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-lg hover:scale-110 active:scale-95 transition-transform"
-                  >
-                    <Heart
-                      size={18}
-                      weight={favorites.includes(saga.id) ? "fill" : "bold"}
-                      className={favorites.includes(saga.id) ? "text-red-500" : "text-white"}
-                    />
-                  </button>
-                </div>
-
-                {/* Content */}
-                <div className="p-6 flex flex-col flex-grow">
-                  <h4 className="font-serif font-black text-text-primary text-[19px] leading-snug mb-3 group-hover:text-accent transition-colors">
-                    {saga.title || saga.titolo}
-                  </h4>
-                  <p className="text-[14px] font-sans text-text-muted line-clamp-2 leading-relaxed">
-                    {saga.description || saga.descrizione || "Scopri questa incredibile avventura a passi lenti nel cuore della Puglia."}
-                  </p>
-                </div>
+              
+              <p className="text-[14px] font-medium text-[#4A5670] italic mb-6 leading-[32px] max-w-[90%]">
+                "Il piano per la tua giornata perfetta in Puglia è già pronto, aspetta solo te..."
+              </p>
+              
+              <div className="flex justify-start">
+                <button className="bg-[#16243E] text-white text-[12px] font-bold px-7 py-3 rounded-full shadow-lg active:scale-95 transition-transform uppercase tracking-widest flex items-center gap-2">
+                  Pianifica la mia giornata
+                  <ArrowRight size={14} weight="bold" />
+                </button>
               </div>
+            </div>
+
+            {/* Subtle paper grain texture overlay */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: `url("https://www.transparenttextures.com/patterns/natural-paper.png")` }} />
+          </motion.div>
+        </div>
+
+        {/* ── Saghe Vicine ── */}
+        <motion.section variants={fadeUp} className="mt-8">
+          <SectionHeader title="Saghe Vicine" onMore={() => navigate('/missioni')} />
+          <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
+            {saghe.slice(0, 6).map(saga => (
+              <MissionCard
+                key={saga.id}
+                saga={saga}
+                isFav={favorites.includes(saga.id)}
+                onFav={(e) => toggleFavorite(e, saga.id)}
+                onClick={() => navigate(`/saga/${saga.id}/intro`)}
+              />
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        {/* 6. NEWS AND EVENTS SLIDER */}
-        <section className="mt-12 px-6 mb-4">
-          <div className="flex items-end justify-between mb-6">
-            <h3 className="text-[28px] font-serif font-black text-text-primary leading-tight tracking-tight">
-              Notizie ed Eventi
-            </h3>
-            <button
-              onClick={() => navigate('/eventi')}
-              className="btn-ghost !px-4 !py-2 !text-[11px] !border-none hover:!bg-accent/5 !text-accent"
-            >
-              Scopri tutto <ArrowRight weight="bold" size={12} className="ml-1" />
-            </button>
+        {/* ── Notizie ed Eventi ── */}
+        <motion.section variants={fadeUp} className="mt-8">
+          <SectionHeader title="Notizie ed Eventi" onMore={() => navigate('/eventi')} />
+          <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
+            {news.map(item => (
+              <NewsCard key={item.id} item={item} />
+            ))}
+            {events.map(ev => (
+              <EventCard
+                key={ev.id}
+                ev={ev}
+                onClick={() => navigate(`/eventi/${ev.id}`)}
+              />
+            ))}
           </div>
+        </motion.section>
 
-          <div className="flex overflow-x-auto gap-5 pb-8 no-scrollbar snap-x -mx-6 px-6">
-            {events.length > 0 ? events.map((ev) => {
-              const startDate = new Date(ev.data_inizio)
-              const isPartner = !!ev.partners
+      </motion.main>
 
-              return (
-                <div
-                  key={ev.id}
-                  onClick={() => navigate(`/eventi/${ev.id}`)}
-                  className="snap-center w-[290px] md:w-[340px] shrink-0 card !p-0 shadow-lg group flex flex-col cursor-pointer border-border-default hover:border-accent/20"
-                >
-                  {/* Event Image */}
-                  <div className="h-40 bg-[var(--bg-secondary)] relative overflow-hidden border-b border-[var(--border)]">
-
-                    <img src={ev.immagine_url || "https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format"} alt={ev.titolo} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-
-
-                    {/* Date Badge */}
-                    <div className="absolute top-4 left-4 bg-bg-dark/80 backdrop-blur-md px-3 py-2 rounded-lg text-center shadow-lg text-on-dark min-w-[50px]">
-                      <div className="overline !text-accent !text-[10px] !mb-1 !tracking-wider">
-                        {startDate.toLocaleString('it-IT', { month: 'short' })}
-                      </div>
-                      <div className="text-[22px] font-serif font-black leading-none">
-                        {startDate.getDate()}
-                      </div>
-                    </div>
-
-                    {isPartner && (
-                      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full text-[11px] font-bold text-text-primary no-theme-flip flex items-center gap-2 shadow-md border border-accent/20">
-                        <MapPin size={12} weight="bold" className="text-accent" />
-                        {ev.partners.name}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="overline !text-text-muted mb-3 flex items-center gap-2 !tracking-[0.15em]">
-                      <MapPin size={12} weight="bold" className="text-accent-gold" /> {ev.luogo}
-                    </div>
-                    <h4 className="text-[20px] font-serif font-black text-text-primary mb-3 leading-tight group-hover:text-accent transition-colors">
-                      {ev.titolo}
-                    </h4>
-                    <p className="text-[14px] text-text-muted line-clamp-2 leading-relaxed mb-6">
-                      {ev.descrizione}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-auto pt-5 border-t border-border-default">
-                      <EventTimer startDate={ev.data_inizio} endDate={ev.data_fine} />
-                      {ev.posti_totali && (
-                        <div className="overline !mb-0 !text-[9px] bg-bg-secondary px-3 py-1.5 rounded-md border border-border-default">
-                          {Math.max(0, ev.posti_totali - (ev.iscritti_count || 0))} posti liberi
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )
-            }) : (
-              <div className="w-full py-12 text-center text-text-muted italic border border-border-default rounded-card bg-bg-secondary/30 mx-6">
-                Nessun evento attivo al momento.
-              </div>
-            )}
-          </div>
-        </section >
-
-        {/* 7. RADAR DELLA MOVIDA */}
-        <section className="mt-12 px-6 mb-24">
-          <div className="card-featured !p-8 group shadow-card">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-accent/10 rounded-full blur-[90px] -mr-24 -mt-24" />
-
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <p className="overline !text-accent-gold mb-3 !tracking-[0.3em]">Social Heatmap</p>
-                <h2 className="text-[32px] font-serif font-black text-white leading-tight">Radar della Movida</h2>
-              </div>
-              <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-accent-gold border border-white/10 shadow-lg group-hover:scale-110 transition-transform duration-500">
-                <NavigationArrow size={36} weight="bold" className="animate-pulse" />
-              </div>
-            </div>
-
-            <p className="text-[16px] text-white/70 leading-relaxed mb-10 font-sans font-medium">
-              "Dove c'è gente stasera?"<br />
-              Scoprilo in tempo reale con le <span className="text-white italic">segnalazioni certificate</span> desideri.
-            </p>
-
-            <button
-              onClick={() => navigate('/vibe-radar')}
-              className="btn-primary w-full !py-4 !text-[14px] !shadow-none hover:!bg-white hover:!text-accent transition-all duration-300"
-            >
-              Apri Radar Live <ArrowRight size={18} weight="bold" />
-            </button>
-          </div>
-        </section>
-
-
-      </main >
-
+      {/* ════════════════════════════════
+          SEARCH MODAL
+      ════════════════════════════════ */}
       <SearchModal
-        isOpen={isSearchModalOpen}
-        onClose={() => setIsSearchModalOpen(false)}
-        saghe={heroItems}
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        saghe={saghe}
       />
-    </div >
+    </div>
   );
 }

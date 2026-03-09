@@ -90,6 +90,7 @@ const Biglietti = lazy(() => import("./pages/Biglietti"));
 const DailyPlans = lazy(() => import("./pages/DailyPlans"));
 const PlanDetail = lazy(() => import("./pages/PlanDetail"));
 const VibeRadar = lazy(() => import("./pages/VibeRadar"));
+const Notifiche = lazy(() => import("./pages/Notifiche"));
 
 
 // Layout - Keep layout eager for better UX
@@ -229,6 +230,7 @@ function App() {
               >
                 {/* Dashboard utente */}
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/notifiche" element={<Notifiche />} />
 
                 <Route path="/saga/:id/intro" element={<SagaIntro />} />
                 <Route path="/saga/:id" element={<SagaDetail />} />

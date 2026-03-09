@@ -41,9 +41,6 @@ const Pill = ({ children, className = '' }) => (
   </span>
 );
 
-/* ═══════════════════════════════════════════════════════════
-   MAIN COMPONENT
-   ═══════════════════════════════════════════════════════════ */
 const PlanDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -58,8 +55,7 @@ const PlanDetail = () => {
   const [vibeLevel,   setVibeLevel]   = useState(7);
 
   const { scrollY } = useScroll();
-  const heroScale    = useTransform(scrollY, [0, 400], [1.0, 1.15]);
-  const titleOpacity = useTransform(scrollY, [200, 280], [0, 1]);
+  const heroScale    = useTransform(scrollY, [0, 400], [1.0, 1.05]);
 
   useEffect(() => { loadPlan(); fetchVibes(); window.scrollTo(0, 0); }, [id, user]);
 
@@ -95,24 +91,16 @@ const PlanDetail = () => {
     setIsBuying(false);
   };
 
-  /* ── Loading screen ───────────────────────────────────── */
   if (loading) return (
-    <div className="min-h-screen bg-[#F9F9F7] flex flex-col items-center justify-center gap-7">
+    <div className="min-h-screen bg-[#FCFAF2] flex flex-col items-center justify-center gap-10">
       <motion.div 
-        className="w-14 h-14 rounded-[1.75rem] bg-zinc-950 flex items-center justify-center"
-        animate={{ rotate: [0, 5, -5, 0] }}
+        className="w-16 h-16 rounded-full bg-white border border-black/5 shadow-sm flex items-center justify-center"
+        animate={{ rotate: [0, 10, -10, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
       >
-        <MapPin size={22} weight="fill" className="text-orange-500" />
+        <MapPin size={24} weight="fill" className="text-accent" />
       </motion.div>
-      <div className="w-20 h-[1.5px] bg-zinc-100 overflow-hidden rounded-full">
-        <motion.div 
-          className="h-full bg-zinc-900"
-          initial={{ x: '-100%' }} animate={{ x: '100%' }}
-          transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-        />
-      </div>
-      <p className="text-[8px] font-black uppercase tracking-[0.5em] text-zinc-300">Desideri Puglia</p>
+      <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent/40 animate-pulse">Svelando il diario...</p>
     </div>
   );
 
@@ -122,368 +110,359 @@ const PlanDetail = () => {
     ? (`${plan.creator.nome || ''} ${plan.creator.cognome || ''}`).trim() || plan.creator.nickname
     : 'Resident Desideri';
 
-  /* ── Render ───────────────────────────────────────────── */
   return (
-    <div className="min-h-screen bg-[#F9F9F7] text-zinc-900 pb-44" style={{ fontFamily: "'Inter', sans-serif", letterSpacing: '-0.015em' }}>
+    <div className="min-h-screen bg-[#FCFAF2] text-text-primary pb-44 overflow-x-hidden font-sans">
 
-      {/* ╔══ NAV ══════════════════════════════════════════╗ */}
-      <nav
-        style={{ backgroundColor: '#0f0f0f', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
-        className="fixed top-0 inset-x-0 z-[1000] px-5 h-16 flex items-center justify-between"
-      >
+      {/* ========== NAV ========== */}
+      <nav className="fixed top-0 inset-x-0 z-[1000] px-5 h-20 flex items-center justify-between bg-[#FCFAF2]/80 backdrop-blur-md border-b border-black/5">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 rounded-full shadow-lg flex items-center justify-center active:scale-90 transition-transform"
-          style={{ backgroundColor: '#27272a', border: '1px solid #3f3f46' }}
+          className="w-11 h-11 rounded-full bg-white border border-zinc-200 flex items-center justify-center active:scale-95 transition-all shadow-sm"
         >
-          <CaretLeft size={18} weight="bold" style={{ color: 'white' }} />
+          <CaretLeft size={22} weight="bold" className="text-text-primary" />
         </button>
 
-        <p style={{ color: 'white' }} className="text-[10px] font-black uppercase tracking-[0.3em] truncate max-w-[50%] text-center">
-          {plan.title_it}
-        </p>
+        <div className="flex flex-col items-center text-center max-w-[50%]">
+          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold truncate w-full mb-0.5">
+            {plan.city}
+          </p>
+          <p className="text-[14px] font-serif font-black italic truncate w-full leading-none">
+            {plan.title_it}
+          </p>
+        </div>
 
-        <div className="flex items-center gap-1">
-          <button className="w-10 h-10 flex items-center justify-center active:scale-90 transition-transform opacity-60 hover:opacity-100">
-            <Star size={20} weight="duotone" style={{ color: 'white' }} />
-          </button>
+        <div className="w-11 h-11 bg-accent/10 rounded-full flex items-center justify-center text-accent">
+            <Sparkle size={24} weight="fill" />
         </div>
       </nav>
 
-      {/* ╔══ HERO ══════════════════════════════════════════╗ */}
-      <div className="relative h-[72vh] w-full overflow-hidden bg-zinc-900">
-        <motion.img
-          style={{ scale: heroScale }}
-          src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'}
-          className="w-full h-full object-cover"
-          alt={plan.title_it}
-        />
-        {/* Gradient scrim — dark bottom anchor for perfect legibility */}
-        <div className="absolute inset-0" style={{
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.0) 30%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.92) 100%)'
-        }} />
-
-        {/* Removed Hero Pills as requested */}
-
-        {/* Bottom content */}
-        <div className="absolute inset-x-0 bottom-0 px-6 pb-10">
-          {/* City label — always white, drop-shadow for depth */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            className="no-theme-flip flex items-center gap-1.5 text-white mb-5"
-            style={{ filter: 'drop-shadow(0 1px 4px rgba(0,0,0,0.5))' }}
-          >
-            <MapPin size={13} weight="fill" className="text-orange-400" />
-            <span className="text-[9px] font-black uppercase tracking-[0.45em] opacity-90">
-              {plan.city}, Puglia
-            </span>
-          </motion.div>
-
-          {/* Title — heavy contrast, immune to theme switches */}
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.12, ease: [0.16, 1, 0.3, 1], duration: 0.8 }}
-            className="no-theme-flip text-[3.4rem] font-black leading-[0.88] mb-6 lowercase first-letter:uppercase text-white"
-            style={{ letterSpacing: '-0.04em', textShadow: '0 2px 24px rgba(0,0,0,0.6), 0 8px 48px rgba(0,0,0,0.4)' }}
-          >
-            {plan.title_it}
-          </motion.h1>
-
-          {/* Star rating row — on a frosted pill so always readable */}
-          <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}
-            className="inline-flex items-center gap-2.5 bg-black/30 backdrop-blur-md rounded-full px-4 py-2 border border-white/10"
-          >
-            <div className="flex items-center gap-0.5">
-              {[1,2,3,4,5].map(s => (
-                <Star key={s} size={11} weight={(plan.rating_avg || 4.9) >= s ? 'fill' : 'regular'} className="text-orange-400" />
-              ))}
+      {/* ========== HERO PHOTO ========== */}
+      <div className="relative pt-32 px-5 mb-16">
+        <motion.div 
+            initial={{ rotate: -1, y: 20 }}
+            animate={{ rotate: -1, y: 0 }}
+            className="relative aspect-[4/5] w-full bg-white p-3 shadow-[0_20px_60px_rgba(0,0,0,0.1)] border border-black/5 rounded-[2px]"
+        >
+            {/* Washi Tape */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-8 bg-accent/15 backdrop-blur-sm -translate-y-4 rotate-2 z-20 pointer-events-none" />
+            
+            <div className="w-full h-full overflow-hidden relative rounded-[1px]">
+                <motion.img
+                    style={{ scale: heroScale }}
+                    src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'}
+                    className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1]"
+                    alt={plan.title_it}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                
+                {/* Badge Rating on Photo */}
+                <div className="absolute bottom-6 left-6 flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-sm">
+                    <div className="flex items-center gap-0.5">
+                        {[1,2,3,4,5].map(s => (
+                            <Star key={s} size={10} weight={(plan.rating_avg || 4.9) >= s ? 'fill' : 'regular'} className="text-accent" />
+                        ))}
+                    </div>
+                    <span className="text-white text-[10px] font-black">{(plan.rating_avg || 4.9).toFixed(1)}</span>
+                </div>
             </div>
-            <span className="text-white text-[10px] font-black">{(plan.rating_avg || 4.9).toFixed(1)}</span>
-            <div className="w-px h-3 bg-white/20" />
-            <span className="text-white/70 text-[9px] font-medium">Giornata Premium</span>
-          </motion.div>
-        </div>
+        </motion.div>
+
+        {/* Floating City Sticker */}
+        <motion.div 
+            initial={{ scale: 0, rotate: 15 }}
+            animate={{ scale: 1, rotate: 12 }}
+            className="absolute -bottom-6 -right-2 z-30 bg-black text-white px-6 py-2.5 rounded-sm shadow-xl flex items-center gap-2 border border-white/20"
+        >
+            <MapPin size={14} weight="fill" className="text-accent" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em]">{plan.city}</span>
+        </motion.div>
       </div>
 
-      {/* ╔══ MAIN CONTENT ══════════════════════════════════╗ */}
-      <main className="px-5 -mt-8 relative z-10 space-y-8">
+      <main className="px-6 space-y-12 max-w-lg mx-auto">
+        
+        {/* Title & Lore */}
+        <header className="text-center relative py-4">
+             <div className="absolute -top-10 left-0 text-6xl opacity-10 -rotate-12 pointer-events-none italic font-serif">"</div>
+             <h1 className="text-[44px] font-serif font-black leading-[1] mb-8 text-text-primary tracking-tight italic">
+                {plan.title_it}
+             </h1>
+             <p className="text-[17px] text-text-muted font-medium leading-[1.6] italic font-serif opacity-80 mb-8 max-w-[90%] mx-auto">
+                "{plan.description_it}"
+             </p>
+             <div className="w-12 h-[2px] bg-accent-gold/20 mx-auto" />
+        </header>
 
-        {/* ── Locator card ─────────────────────────────── */}
+        {/* Locator Card - ID Badge Style */}
         <motion.div
-          initial={{ opacity: 0, y: 16, scale: 0.97 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ delay: 0.45, ease: [0.16, 1, 0.3, 1], duration: 0.7 }}
-          className="bg-white/80 backdrop-blur-2xl rounded-[1.75rem] px-5 py-4 flex items-center justify-between shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-white/70"
+          initial={{ opacity: 0, y: 10, rotate: -0.5 }}
+          animate={{ opacity: 1, y: 0, rotate: -0.5 }}
+          className="bg-white p-6 flex flex-col items-center shadow-[0_10px_40px_rgba(0,0,0,0.05)] border border-black/5 relative overflow-hidden"
         >
-          <div className="flex items-center gap-3.5">
+          {/* Header Bar */}
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-accent/20" />
+          
+          <div className="flex items-center gap-6 w-full">
             <div className="relative shrink-0">
-              {plan.creator?.avatar_url
-                ? <img src={plan.creator.avatar_url} className="w-11 h-11 rounded-[1rem] object-cover" alt={creatorName} />
-                : (
-                  <div className="w-11 h-11 rounded-[1rem] bg-zinc-100 flex items-center justify-center text-zinc-700 text-xs font-black">
-                    {creatorName[0]?.toUpperCase()}
-                  </div>
-                )
-              }
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow">
-                <CheckCircle size={13} weight="fill" className="text-orange-500" />
+              <div className="w-20 h-20 rounded-[4px] border border-black/5 overflow-hidden p-1 bg-zinc-50 rotate-1">
+                {plan.creator?.avatar_url
+                    ? <img src={plan.creator.avatar_url} className="w-full h-full object-cover rounded-[2px]" alt={creatorName} />
+                    : <div className="w-full h-full flex items-center justify-center text-2xl font-black opacity-20 bg-zinc-100">{creatorName[0]}</div>
+                }
+              </div>
+              <div className="absolute -bottom-2 -right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center shadow-md border border-black/5">
+                <CheckCircle size={18} weight="fill" className="text-accent" />
               </div>
             </div>
-            <div>
-              <p className="text-[7.5px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-1">Locator Verificato</p>
-              <p className="text-[13px] font-black text-zinc-900 leading-none" style={{ letterSpacing: '-0.02em' }}>{creatorName}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="w-[1px] h-8 bg-zinc-100" />
-            <div className="text-right">
-              <p className="text-[7.5px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-1">Rating</p>
-              <p className="text-[13px] font-black text-zinc-900 leading-none">{(plan.rating_avg || 4.9).toFixed(1)} <span className="text-zinc-300 font-medium text-[10px]">/ 5</span></p>
+            <div className="flex-1">
+              <p className="text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold mb-1">Local Expert ID</p>
+              <p className="text-[20px] font-serif font-black italic text-text-primary leading-tight mb-2 tracking-tight">{creatorName}</p>
+              <div className="flex items-center gap-4 pt-3 border-t border-black/5">
+                 <div className="flex flex-col">
+                    <span className="text-[7px] font-black uppercase tracking-widest text-text-muted">Experience</span>
+                    <span className="text-[11px] font-black">Resident Locator</span>
+                 </div>
+                 <div className="w-px h-6 bg-black/5" />
+                 <div className="flex flex-col">
+                    <span className="text-[7px] font-black uppercase tracking-widest text-text-muted">Global Rating</span>
+                    <span className="text-[11px] font-black">{(plan.rating_avg || 4.9).toFixed(1)} / 5</span>
+                 </div>
+              </div>
             </div>
           </div>
         </motion.div>
 
-        {/* ── Itinerary section ─────────────────────────── */}
+        {/* Itinerary Flow */}
         {isPurchased ? (
-          <motion.div variants={container} initial="hidden" animate="show" className="space-y-10">
+          <motion.div variants={container} initial="hidden" animate="show" className="space-y-16 py-8">
 
-            {/* Section header */}
-            <motion.div variants={item} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-px h-7 bg-zinc-200 rounded-full" />
-                <h2 className="text-[11px] font-black text-zinc-900 uppercase tracking-[0.35em]">La Giornata</h2>
-              </div>
-              <button
-                onClick={() => setIsRainMode(v => !v)}
-                className={`h-10 px-5 rounded-full flex items-center gap-2 border font-black text-[8px] uppercase tracking-[0.2em] transition-all duration-500 ${
-                  isRainMode
-                    ? 'bg-blue-600 border-blue-500 shadow-lg shadow-blue-500/25 text-white'
-                    : 'bg-white/15 border-white/20 backdrop-blur-md text-white'
-                }`}
-              >
-                <AnimatePresence mode="wait">
-                  {isRainMode
-                    ? <motion.span key="r" initial={{ opacity:0, rotate:-90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><CloudRain size={15} weight="duotone" className="text-white" /></motion.span>
-                    : <motion.span key="s" initial={{ opacity:0, rotate:90 }} animate={{ opacity:1, rotate:0 }} exit={{ opacity:0 }}><Sun size={15} weight="duotone" className="text-white" /></motion.span>
-                  }
-                </AnimatePresence>
-                {isRainMode ? 'Piano B' : 'Meteo'}
-              </button>
-            </motion.div>
-
-            {/* Slots timeline */}
-            <div className="relative space-y-8">
-              <div className="absolute left-[21px] top-7 bottom-7 w-px bg-zinc-100" />
-
-              {plan.slots?.map((slot, i) => (
-                <motion.div key={slot.id} variants={item} className="flex gap-5">
-
-                  {/* Timeline node */}
-                  <div className="shrink-0 flex flex-col items-center gap-2 z-10">
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center border transition-all duration-500 shadow-sm ${
-                      isRainMode ? 'bg-blue-600 border-blue-500' : 'bg-zinc-950 border-zinc-800 shadow-[0_2px_12px_rgba(0,0,0,0.15)]'
-                    }`}>
-                      <Clock
-                        size={18}
-                        weight="duotone"
-                        className="text-white"
-                      />
-                    </div>
-                    <span
-                      className="text-[7px] font-black uppercase tracking-widest text-zinc-400"
-                    >{slot.time_label}</span>
-                  </div>
-
-                  {/* Card */}
-                  <div className={`flex-1 rounded-[1.5rem] p-5 border transition-all duration-500 ${
-                    isRainMode && slot.alt_activity_title_it
-                      ? 'bg-blue-50/60 border-blue-100'
-                      : 'bg-white border-zinc-100/80 shadow-[0_4px_24px_rgba(0,0,0,0.04)]'
-                  }`}>
-                    <AnimatePresence mode="wait">
-                      {isRainMode && slot.alt_activity_title_it ? (
-                        <motion.div key="alt" initial={{ opacity:0, x:8 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-8 }} transition={{ duration: 0.3 }}>
-                          <div className="flex items-center gap-1.5 text-blue-500 mb-3">
-                            <CloudRain size={12} weight="duotone" />
-                            <span className="text-[7.5px] font-black uppercase tracking-[0.3em]">Piano B</span>
-                          </div>
-                          <h4 className="text-xl font-black text-blue-900 mb-2 lowercase first-letter:uppercase" style={{ letterSpacing: '-0.035em' }}>
-                            {slot.alt_activity_title_it}
-                          </h4>
-                          <p className="text-[13px] text-blue-800/55 font-medium leading-relaxed mb-5 italic">{slot.alt_activity_description_it}</p>
-                        </motion.div>
-                      ) : (
-                        <motion.div key="main" initial={{ opacity:0, x:8 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-8 }} transition={{ duration: 0.3 }}>
-                          <span className="text-[7.5px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-3 block">Tappa {i + 1}</span>
-                          <h4 className="text-xl font-black text-zinc-900 mb-2 lowercase first-letter:uppercase" style={{ letterSpacing: '-0.035em' }}>
-                            {slot.activity_title_it}
-                          </h4>
-                          <p className="text-[13px] text-zinc-500 font-medium leading-relaxed mb-5">{slot.activity_description_it}</p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    <button
-                      onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${slot.latitude},${slot.longitude}`, '_blank')}
-                      className={`w-full py-3.5 rounded-xl flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.25em] transition-all active:scale-[0.97] ${
-                        isRainMode ? 'bg-blue-600 text-white' : 'bg-zinc-950 text-white'
-                      }`}
-                    >
-                      <NavigationArrow size={14} weight="duotone" />
-                      Apri in Mappe
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* ── Radar v5 ────────────────────────────────── */}
-            <motion.div variants={item} className="rounded-[2rem] overflow-hidden bg-zinc-950 border border-white/[0.06] shadow-2xl">
-              <div className="relative p-7">
-                {/* BG glow */}
-                <div className="absolute inset-0 opacity-40" style={{
-                  background: 'radial-gradient(ellipse 80% 60% at 110% -10%, rgba(249,115,22,0.22), transparent)'
-                }} />
-
-                <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-2">
-                      <Sparkle size={16} weight="fill" className="text-orange-500" />
-                      <span className="text-[8.5px] font-black uppercase tracking-[0.4em] text-zinc-500">Radar Movida</span>
-                    </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.08] border border-white/10 backdrop-blur-md">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" style={{ boxShadow: '0 0 8px rgba(34,197,94,0.9)' }} />
-                      <span className="text-[7px] font-black uppercase tracking-[0.3em] text-green-400">Live</span>
-                    </div>
-                  </div>
-
-                  <p className="text-[8.5px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-2 italic">Vibe Attuale</p>
-                  <h3 className="text-[2.6rem] font-black text-white leading-none mb-9 uppercase" style={{ letterSpacing: '-0.045em' }}>
-                    {vibeStatus}
-                  </h3>
-
-                  {/* Meter */}
-                  <div className="flex gap-[3px] items-end h-5 mb-6">
-                    {Array.from({ length: 16 }).map((_, i) => {
-                      const isActive = i < vibeLevel;
-                      const height = `${40 + (i / 15) * 60}%`;
-                      return (
-                        <motion.div
-                          key={i}
-                          initial={{ scaleY: 0 }}
-                          animate={{ scaleY: 1 }}
-                          transition={{ delay: 0.6 + i * 0.03, ease: [0.16, 1, 0.3, 1] }}
-                          className="flex-1 rounded-full origin-bottom"
-                          style={{
-                            height,
-                            background: isActive
-                              ? `rgba(249,115,22,${0.6 + (i / 15) * 0.4})`
-                              : 'rgba(255,255,255,0.06)',
-                            boxShadow: isActive ? `0 0 15px rgba(249,115,22,${0.3 + (i / 15) * 0.4})` : 'none'
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-
-                  <p className="text-[8.5px] font-medium text-zinc-500 text-center uppercase tracking-[0.4em] leading-relaxed">
-                    Resident Puglia Network · Real-Time Tracking
-                  </p>
+            <div className="flex items-center justify-between sticky top-24 z-50 bg-[#FCFAF2]/80 backdrop-blur-md py-4 px-2 -mx-2">
+                <div className="relative">
+                    <h2 className="text-[22px] font-serif font-black text-text-primary italic relative z-10 px-2">Il Tuo Percorso</h2>
+                    <div className="absolute left-0 bottom-1 w-full h-3 bg-accent/10 -z-0 -rotate-1" />
                 </div>
-              </div>
-            </motion.div>
-
-            {/* Footer signature */}
-            <motion.div variants={item} className="py-16 flex flex-col items-center gap-4 opacity-30">
-              <div className="w-8 h-[1px] bg-zinc-500" />
-              <p className="text-[7.5px] font-black uppercase tracking-[0.6em] text-zinc-600">Desideri Puglia · Private Club</p>
-            </motion.div>
-
-          </motion.div>
-
-        ) : (
-          /* ── Lock / Preview ────────────────────────────── */
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="space-y-6">
-
-            {/* Description card */}
-            <div className="bg-white rounded-[1.75rem] p-6 border border-zinc-100 shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
-              <p className="text-[13px] text-zinc-600 font-medium leading-relaxed italic mb-5">{plan.description_it}</p>
-              <div className="flex flex-wrap gap-2">
-                {plan.season && <Pill className="bg-zinc-50 border-zinc-100 text-zinc-500"><Sun size={10} weight="fill" className="text-orange-400" /> {seasonLabels[plan.season]}</Pill>}
-                {plan.target_audience && <Pill className="bg-zinc-50 border-zinc-100 text-zinc-500"><Users size={10} weight="fill" className="text-orange-400" /> {targetLabels[plan.target_audience]}</Pill>}
-                {plan.slots?.length && <Pill className="bg-zinc-50 border-zinc-100 text-zinc-500"><Timer size={10} weight="fill" className="text-orange-400" /> {plan.slots.length} tappe</Pill>}
-              </div>
+                <button
+                    onClick={() => setIsRainMode(v => !v)}
+                    className={`h-11 px-6 rounded-sm flex items-center gap-3 border-b-2 font-black text-[10px] uppercase tracking-widest transition-all ${
+                    isRainMode
+                        ? 'bg-accent/20 border-accent text-accent shadow-sm'
+                        : 'bg-white border-black/5 text-text-muted hover:border-accent/40 shadow-sm'
+                    }`}
+                >
+                    {isRainMode ? <CloudRain size={18} weight="fill" /> : <Sun size={18} weight="fill" />}
+                    {isRainMode ? 'Piano B Attivo' : 'Meteo'}
+                </button>
             </div>
 
-            {/* Blur preview of first slot */}
+            <div className="relative space-y-12 pl-6">
+              {/* Hand-drawn Timeline Line */}
+              <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-accent/10 border-l border-dashed border-accent/30 rounded-full" />
+
+              {plan.slots?.map((slot, i) => {
+                const rotation = i % 2 === 0 ? '-1deg' : '1deg';
+                return (
+                    <motion.div key={slot.id} variants={item} className="relative group">
+                        
+                        {/* Bullet Point */}
+                        <div className={`absolute -left-[31px] top-6 w-11 h-11 rounded-full flex items-center justify-center border-4 border-[#FCFAF2] shadow-sm transition-colors duration-500 z-10 ${
+                            isRainMode ? 'bg-accent text-white' : 'bg-black text-white'
+                        }`}>
+                            <Clock size={18} weight="bold" />
+                        </div>
+
+                        {/* Note Card */}
+                        <motion.div 
+                            style={{ rotate: rotation }}
+                            className={`p-6 rounded-sm border shadow-[0_8px_30px_rgba(0,0,0,0.03)] transition-all duration-500 relative ${
+                                isRainMode && slot.alt_activity_title_it
+                                    ? 'bg-accent-gold/5 border-accent-gold/20'
+                                    : 'bg-white border-black/5'
+                            }`}
+                        >
+                            {/* Paper Clip / Tape for first few */}
+                            {i === 0 && (
+                                <div className="absolute -top-4 right-8 w-10 h-10 bg-accent/20 rounded-full -rotate-12 flex items-center justify-center opacity-40">📌</div>
+                            )}
+
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold">
+                                    {slot.time_label} • Tappa {i + 1}
+                                </span>
+                                {isRainMode && slot.alt_activity_title_it && (
+                                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-accent/10 text-accent rounded-sm">
+                                        <CloudRain size={10} weight="fill" />
+                                        <span className="text-[8px] font-black uppercase tracking-widest italic">Piano B</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            <AnimatePresence mode="wait">
+                                {isRainMode && slot.alt_activity_title_it ? (
+                                    <motion.div key="alt" initial={{ opacity:0, x:5 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-5 }}>
+                                        <h4 className="text-[22px] font-serif font-black text-text-primary mb-3 italic tracking-tight">
+                                            {slot.alt_activity_title_it}
+                                        </h4>
+                                        <p className="text-[15px] text-text-muted font-medium font-serif leading-relaxed mb-6 italic opacity-80 line-clamp-3">
+                                            {slot.alt_activity_description_it}
+                                        </p>
+                                    </motion.div>
+                                ) : (
+                                    <motion.div key="main" initial={{ opacity:0, x:5 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-5 }}>
+                                        <h4 className="text-[22px] font-serif font-black text-text-primary mb-3 italic tracking-tight">
+                                            {slot.activity_title_it}
+                                        </h4>
+                                        <p className="text-[15px] text-text-muted font-medium font-serif leading-relaxed mb-6 italic opacity-80">
+                                            {slot.activity_description_it}
+                                        </p>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            <button
+                                onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${slot.latitude},${slot.longitude}`, '_blank')}
+                                className="w-full h-12 flex items-center justify-center gap-3 bg-white border border-black/10 rounded-sm text-[10px] font-black uppercase tracking-widest text-text-primary hover:bg-accent/5 transition-all shadow-sm active:scale-95"
+                            >
+                                <NavigationArrow size={16} weight="fill" className="text-accent" />
+                                Esplora la Posizione
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Radar Section - Field Gadget Aesthetic */}
+            <motion.div variants={item} className="rounded-sm overflow-hidden bg-black text-white shadow-2xl relative border border-white/10 group">
+              {/* LED Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-accent/10 to-transparent pointer-events-none" />
+              
+              <div className="relative p-10">
+                <div className="flex items-center justify-between mb-10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center text-accent animate-pulse">
+                        <Sparkle size={20} weight="fill" />
+                    </div>
+                    <div>
+                        <span className="text-[9px] font-black uppercase tracking-[0.4em] text-zinc-500 block mb-0.5">Network Live</span>
+                        <span className="text-[12px] font-black uppercase tracking-widest text-white italic">Puglia Vibe Radar</span>
+                    </div>
+                  </div>
+                  <div className="px-4 py-2 rounded-sm bg-white/5 border border-white/10 backdrop-blur-md flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)] animate-pulse" />
+                    <span className="text-[9px] font-black uppercase tracking-widest text-green-400">Attivo</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 mb-10">
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-accent/60 italic">Status Attuale</p>
+                    <h3 className="text-[40px] font-serif font-black italic uppercase leading-none tracking-tight">
+                        {vibeStatus}
+                    </h3>
+                </div>
+
+                {/* Meter Bars */}
+                <div className="flex gap-[4px] items-end h-8 mb-10">
+                  {Array.from({ length: 18 }).map((_, i) => {
+                    const isActive = i < vibeLevel;
+                    const height = `${30 + (Math.sin(i * 0.5) * 10) + (i / 17) * 60}%`;
+                    return (
+                      <motion.div
+                        key={i}
+                        initial={{ scaleY: 0 }}
+                        animate={{ scaleY: 1 }}
+                        transition={{ delay: 0.1 + i * 0.02, ease: "easeOut" }}
+                        className="flex-1 rounded-sm origin-bottom"
+                        style={{
+                          height,
+                          background: isActive ? 'var(--accent)' : 'rgba(255,255,255,0.05)',
+                          boxShadow: isActive ? '0 -5px 15px var(--accent-gold)' : 'none'
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+
+                <p className="text-[9px] font-medium text-zinc-500 text-center uppercase tracking-[0.5em] opacity-60 italic">
+                    Resident Sensor · 0.4ms Lag · Puglia District
+                </p>
+              </div>
+            </motion.div>
+
+            <footer className="py-20 flex flex-col items-center gap-6 opacity-30">
+               <div className="w-12 h-[2px] bg-accent/20" />
+               <p className="text-[9px] font-black uppercase tracking-[0.5em] text-zinc-500 text-center leading-relaxed">
+                  Club Privato Desideri Puglia <br/>
+                  <span className="font-serif italic font-black text-[11px] lowercase tracking-normal">Documento Riservato © 2026</span>
+               </p>
+            </footer>
+          </motion.div>
+        ) : (
+          /* Locked State - Teaser Diary */
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 py-10">
+            <div className="bg-white p-8 border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.02)] rotate-1 rounded-sm relative">
+                {/* Tape */}
+                <div className="absolute -top-3 left-10 w-20 h-6 bg-accent/10 -rotate-2 z-10" />
+                
+                <h3 className="text-[13px] font-black uppercase tracking-[0.3em] text-accent-gold mb-6 pb-2 border-b border-black/5">Nota Introduttiva</h3>
+                <p className="text-[16px] text-text-muted font-medium font-serif leading-relaxed italic opacity-80 mb-10">
+                    {plan.description_it}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                    {plan.season && (
+                        <div className="px-5 py-2.5 bg-zinc-50 rounded-full border border-black/5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-text-muted">
+                            <Sun size={14} weight="fill" className="text-accent" /> {seasonLabels[plan.season]}
+                        </div>
+                    )}
+                    {plan.target_audience && (
+                         <div className="px-5 py-2.5 bg-zinc-50 rounded-full border border-black/5 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-text-muted">
+                            <Users size={14} weight="fill" className="text-accent" /> {targetLabels[plan.target_audience]}
+                         </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Blurred Preview Card */}
             {plan.slots?.[0] && (
-              <div className="relative rounded-[1.75rem] overflow-hidden border border-zinc-100">
-                <div className="p-5 bg-white">
-                  <span className="text-[7.5px] font-black uppercase tracking-[0.3em] text-zinc-400 block mb-3">Anteprima</span>
-                  <h4 className="text-xl font-black text-zinc-900 mb-2 lowercase first-letter:uppercase blur-[5px] select-none" style={{ letterSpacing: '-0.03em' }}>
+              <div className="relative bg-white p-6 border border-black/5 shadow-sm -rotate-1 opacity-60 filter blur-[0.6px]">
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold block mb-4">Anteprima Tappa 1</span>
+                  <h4 className="text-[24px] font-serif font-black text-text-primary mb-3 italic tracking-tight blur-[4px]">
                     {plan.slots[0].activity_title_it}
                   </h4>
-                  <p className="text-[13px] text-zinc-400 blur-[4px] select-none leading-relaxed line-clamp-2">
+                  <p className="text-[15px] font-serif italic text-text-muted leading-relaxed blur-[3px]">
                     {plan.slots[0].activity_description_it}
                   </p>
-                </div>
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-white/60 backdrop-blur-[2px]">
-                  <div className="w-10 h-10 rounded-2xl bg-zinc-950 flex items-center justify-center shadow-xl">
-                    <LockKey size={18} weight="duotone" className="text-white" />
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#FCFAF2]/40 backdrop-blur-[1px] z-20">
+                      <div className="w-14 h-14 bg-black rounded-sm flex items-center justify-center shadow-xl rotate-3">
+                        <LockKey size={24} weight="fill" className="text-white" />
+                      </div>
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-text-primary">Contenuto Proibito</span>
                   </div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-500">Sblocca per vedere</p>
-                </div>
               </div>
             )}
-
-            {/* Slot count teaser */}
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: 'Tappe', value: plan.slots?.length || 5 },
-                { label: 'Locali', value: plan.slots?.length ? `${plan.slots.length} posti` : '—' },
-                { label: 'Piano B', value: 'Incluso' }
-              ].map(s => (
-                <div key={s.label} className="bg-white rounded-2xl p-4 border border-zinc-100 text-center shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
-                  <p className="text-lg font-black text-zinc-900" style={{ letterSpacing: '-0.03em' }}>{s.value}</p>
-                  <p className="text-[7.5px] font-black uppercase tracking-[0.2em] text-zinc-400 mt-1">{s.label}</p>
-                </div>
-              ))}
-            </div>
-
           </motion.div>
         )}
-
       </main>
 
-      {/* ╔══ BOTTOM CTA ════════════════════════════════════╗ */}
+      {/* ========== CTA BAR ========== */}
       <AnimatePresence>
         {!isPurchased && (
           <motion.div
-            initial={{ y: 110, opacity: 0 }}
+            initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 110, opacity: 0 }}
-            transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-0 inset-x-0 z-50 px-5 pb-8 pt-4"
-            style={{ background: 'linear-gradient(to top, rgba(249,249,247,1) 70%, rgba(249,249,247,0))' }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-0 inset-x-0 z-50 px-5 pb-10"
           >
-            <div className="bg-white rounded-[1.75rem] p-4 flex items-center justify-between shadow-[0_8px_48px_rgba(0,0,0,0.12)] border border-zinc-100">
-              <div className="pl-1">
-                <p className="text-[8px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-0.5">Esperienza Completa</p>
-                <p className="text-2xl font-black text-zinc-950" style={{ letterSpacing: '-0.045em' }}>€{plan.price?.toFixed(2)}</p>
+            <div className="bg-white/90 backdrop-blur-xl p-5 flex items-center justify-between shadow-[0_-20px_50px_rgba(0,0,0,0.1)] border border-black/5 rounded-sm max-w-lg mx-auto">
+              <div className="pl-3">
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-text-muted mb-1">Costo Sblocco</p>
+                <p className="text-[28px] font-serif font-black italic leading-none text-text-primary">€{plan.price?.toFixed(0)}</p>
               </div>
               <motion.button
                 onClick={handlePurchase}
                 disabled={isBuying}
-                whileTap={{ scale: 0.95 }}
-                className="h-14 px-8 bg-zinc-950 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] flex items-center gap-2 shadow-xl shadow-zinc-900/30 disabled:opacity-60"
+                whileTap={{ scale: 0.96 }}
+                className="h-16 px-10 bg-black text-white rounded-sm font-black text-[12px] uppercase tracking-[0.25em] flex items-center gap-3 shadow-2xl disabled:opacity-50 transition-all"
               >
-                {isBuying ? (
-                  <span className="opacity-60">...</span>
-                ) : (
-                  <>Sblocca <CreditCard size={16} weight="duotone" /></>
-                )}
+                {isBuying ? 'Attendere...' : <>Svela Ora <CreditCard size={18} weight="fill" /></>}
               </motion.button>
             </div>
           </motion.div>

@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { supabase } from '../services/supabase'
 import { useAuth } from '../contexts/AuthContext'
 import { QuestService } from '../services/quest'
-import { CaretLeft, MapPin, Compass, Heart, ArrowRight, Sparkle } from '@phosphor-icons/react'
+import { CaretLeft, MapPin, Compass, Heart, ArrowRight, Sparkle, Bank, ForkKnife, Waves } from '@phosphor-icons/react'
 import { useTranslation } from 'react-i18next'
 import { getLocalized } from '../utils/content'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -43,16 +43,30 @@ const MissionSkeleton = () => (
   </div>
 )
 
-// --- FILTER PILL ---
-const FilterPill = ({ active, onClick, children }) => (
+// --- FILTER PILLS ---
+const CityPill = ({ active, onClick, children }) => (
   <button
     onClick={onClick}
-    className={`inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em] px-5 py-3 rounded-full border transition-all duration-300 ${
+    className={`inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.1em] px-3.5 py-2 rounded-full border transition-all duration-300 active:scale-95 ${
       active
-      ? 'bg-accent text-white border-accent shadow-sm'
-      : 'bg-surface text-text-muted border-border-default hover:border-accent/50'
+      ? 'bg-[#16243E] text-white border-[#16243E] shadow-sm'
+      : 'bg-white text-[#8A95AD] border-[#EAE3D6] shadow-sm'
     }`}
   >
+    {children}
+  </button>
+)
+
+const TypePill = ({ active, onClick, icon, children }) => (
+  <button
+    onClick={onClick}
+    className={`inline-flex items-center gap-2 text-[12px] font-bold px-4 py-2.5 rounded-full border transition-all duration-300 active:scale-95 ${
+      active
+      ? 'bg-[#16243E] text-white border-[#16243E] shadow-md'
+      : 'bg-white text-[#4A5670] border-[#EAE3D6] shadow-sm'
+    }`}
+  >
+    {icon && <span className="text-[14px]">{icon}</span>}
     {children}
   </button>
 )
@@ -149,7 +163,7 @@ const Missioni = () => {
           <CaretLeft size={20} weight="bold" className="text-text-primary" />
         </button>
         <p className="overline !text-text-primary !mb-0 !tracking-[0.4em]">
-          Missioni
+          Saghe
         </p>
         <button
           onClick={() => navigate('/mappa?tab=saghe')}
@@ -160,36 +174,59 @@ const Missioni = () => {
         </button>
       </nav>
 
-      <main className="pt-28 px-5 max-w-lg mx-auto">
+      <main className="pt-28 px-4 mx-auto max-w-lg">
 
         {/* ── Hero ─────────────────────────────────────── */}
-        <header className="mb-14">
+        <header className="mb-14 relative group">
+          {/* Playful Floaties */}
+          <motion.div 
+            animate={{ 
+              y: [0, -10, 0],
+              rotate: [0, 5, 0]
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-6 -right-2 text-3xl select-none pointer-events-none opacity-40 group-hover:opacity-100 transition-opacity"
+          >
+            🧭
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3 mb-5"
+            className="inline-flex items-center gap-2 mb-6"
           >
-            <div className="h-[1px] w-8 bg-accent" />
-            <span className="overline !text-accent !mb-0">
+            <div className="bg-accent-gold text-white px-3 py-1 text-[10px] font-black uppercase tracking-widest shadow-md rounded-sm -rotate-2 border-b-2 border-black/10">
               Saghe Leggendarie
-            </span>
+            </div>
+            <Sparkle size={14} weight="fill" className="text-accent-gold animate-pulse" />
           </motion.div>
 
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-[48px] font-serif font-black text-text-primary leading-[1] mb-5 tracking-tight"
+            className="text-[52px] font-serif font-black text-text-primary leading-[0.95] mb-6 tracking-tight relative"
           >
-            Esplora la<br />Puglia Vera.
+            Esplora la<br />
+            <span className="relative inline-block">
+              Puglia Vera
+              <motion.div 
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="absolute left-0 bottom-1 w-full h-4 bg-accent/20 -z-10 origin-left -rotate-1 rounded-sm"
+              />
+            </span>
+            <span className="text-accent ml-1 italic group-hover:rotate-12 inline-block transition-transform duration-500">.</span>
           </motion.h1>
+
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-[15px] text-text-muted font-medium leading-relaxed max-w-[90%]"
+            className="text-[16px] text-text-muted font-medium leading-relaxed max-w-[90%] italic"
           >
-            Avventure autentiche tra storia, cultura e natura pugliese. Sblocca ogni tappa e diventa leggenda.
+            "Appunti di viaggio tra borghi, sapori e segreti d'altri tempi – sblocca la tua prossima storia."
           </motion.p>
         </header>
 
@@ -207,15 +244,15 @@ const Missioni = () => {
                   <MapPin size={16} weight="fill" className="text-accent" />
                   <span className="overline !text-text-muted !mb-0">Destinazione</span>
                 </div>
-                <div className="flex gap-2.5 overflow-x-auto pb-4 scrollbar-hide px-1">
+                <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide px-1">
                   {cities.map((city, idx) => (
-                    <FilterPill
+                    <CityPill
                       key={idx}
                       active={selectedCity === city}
                       onClick={() => setSelectedCity(city)}
                     >
-                      {city === 'Tutte' ? 'Tutta la Puglia' : city}
-                    </FilterPill>
+                      {city === 'Tutte' ? 'Tutti' : city}
+                    </CityPill>
                   ))}
                 </div>
               </motion.div>
@@ -233,15 +270,32 @@ const Missioni = () => {
                   <span className="overline !text-text-muted !mb-0">Tipologia</span>
                 </div>
                 <div className="flex gap-2.5 overflow-x-auto pb-4 scrollbar-hide px-1">
-                  {types.map((type, idx) => (
-                    <FilterPill
-                      key={idx}
-                      active={selectedType === type}
-                      onClick={() => setSelectedType(type)}
-                    >
-                      {type === 'Tutti' ? 'Tutte' : type}
-                    </FilterPill>
-                  ))}
+                  {types.map((type, idx) => {
+                    const getIcon = (t) => {
+                      switch(t.toLowerCase()) {
+                        case 'tutti': return '🧭';
+                        case 'cultura': return '🏛️';
+                        case 'storia': return '📜';
+                        case 'cibo': return '🍝';
+                        case 'gastronomia': return '🍷';
+                        case 'natura': return '🌿';
+                        case 'outdoor': return '🥾';
+                        case 'mare': return '🏖️';
+                        case 'borghi': return '🏘️';
+                        default: return '✨';
+                      }
+                    }
+                    return (
+                      <TypePill
+                        key={idx}
+                        active={selectedType === type}
+                        onClick={() => setSelectedType(type)}
+                        icon={getIcon(type)}
+                      >
+                        {type === 'Tutti' ? 'Tutte' : type}
+                      </TypePill>
+                    );
+                  })}
                 </div>
               </motion.div>
             )}
@@ -296,7 +350,7 @@ const Missioni = () => {
               variants={container}
               initial="hidden"
               animate="show"
-              className="space-y-12"
+              className="space-y-10 pb-20"
             >
               {setsToDisplay.map((set, index) => {
                 let completedStepsCount = 0
@@ -307,104 +361,108 @@ const Missioni = () => {
                   completedStepsCount = questProgress.completedSteps.filter(id => setStepIds.includes(id)).length
                 }
                 const progressPercent = Math.min(100, Math.round((completedStepsCount / totalStepsCount) * 100))
+                const rotation = (index % 2 === 0 ? '-1.5deg' : '1.5deg')
+                const tapeColors = ['bg-accent/20', 'bg-accent-gold/30', 'bg-danger/10', 'bg-sky-400/20']
+                const tapeColor = tapeColors[index % tapeColors.length]
 
                 return (
                   <motion.div
                     key={set.id}
                     variants={item}
-                    className="group cursor-pointer"
+                    style={{ rotate: rotation }}
+                    className="group cursor-pointer bg-[#FCFAF2] rounded-[2rem] p-0 shadow-[0_15px_35px_rgba(0,0,0,0.08)] hover:shadow-[0_25px_45px_rgba(0,0,0,0.12)] transition-all duration-700 overflow-hidden relative"
                     onClick={() => navigate(`/saga/${set.id}/intro`)}
                   >
+                    {/* Decorative Tape */}
+                    <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-16 h-6 ${tapeColor} backdrop-blur-sm z-50 -translate-y-1 rotate-2 rounded-sm border-x border-black/5`} />
+
                     {/* Modern Gallery Card */}
-                    <div className="relative aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-sm mb-7 bg-bg-secondary border border-border-default">
-                      <img
-                        src={set.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format'}
-                        alt={getLocalized(set, 'title', i18n?.language)}
-                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                      />
+                    <div className="relative aspect-[16/11] overflow-hidden bg-bg-secondary p-4 pb-0">
+                      <div className="relative w-full h-full rounded-[1.5rem] overflow-hidden shadow-inner bg-zinc-200">
+                        <img
+                          src={set.image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600&auto=format'}
+                          alt={getLocalized(set, 'title', i18n?.language)}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                        />
+                        
+                        {/* Overlay Gradient */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
 
-                      {/* Very subtle top gradient for badges only */}
-                      <div
-                        className="absolute inset-x-0 top-0 h-24 pointer-events-none"
-                        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, transparent 100%)' }}
-                      />
-
-                      {/* Top badges (Fav) */}
-                      {/* Top badges (Fav) */}
-                      <div className="absolute top-6 right-6 z-10">
-                        <button
-                          onClick={(e) => handleToggleFavorite(e, set.id)}
-                          className="w-12 h-12 rounded-full flex items-center justify-center bg-white/20 backdrop-blur-xl border border-white/30 transition-all active:scale-90 hover:scale-110 shadow-lg"
-                        >
-                          <Heart
-                            size={20}
-                            weight={favorites.includes(set.id) ? 'fill' : 'bold'}
-                            className={favorites.includes(set.id) ? 'text-danger' : 'text-white'}
-                          />
-                        </button>
-                      </div>
-
-                      {/* Badge Originals on Image */}
-                      <div className="absolute top-6 left-6 z-10">
-                        {(set.is_original || set.isOriginal) && (
-                          <div className="flex items-center gap-2 bg-bg-dark/40 backdrop-blur-md px-3 py-2 rounded-full border border-white/10 shadow-xl">
-                            <div className="no-theme-flip w-5 h-5 rounded-full bg-accent flex items-center justify-center text-[10px] font-black text-white shadow-sm shrink-0">D</div>
-                            <span className="overline !text-white !mb-0 !text-[10px] !tracking-wider">Originals by Desideri di Puglia</span>
-                          </div>
-                        )}
+                        {/* Top badges (Fav) */}
+                        <div className="absolute top-4 right-4 z-10">
+                          <button
+                            onClick={(e) => handleToggleFavorite(e, set.id)}
+                            className="w-10 h-10 rounded-full flex items-center justify-center bg-white/40 backdrop-blur-xl border border-white/30 transition-all active:scale-90 hover:scale-110 shadow-lg"
+                          >
+                            <Heart
+                              size={18}
+                              weight={favorites.includes(set.id) ? 'fill' : 'bold'}
+                              className={favorites.includes(set.id) ? 'text-danger' : 'text-white'}
+                            />
+                          </button>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Content Block BELOW Image */}
-                    <div className="px-2">
+                    {/* Content Block */}
+                    <div className="px-6 py-7 relative">
+                      {/* Sticker Badge for Originals */}
+                      {(set.is_original || set.isOriginal) && (
+                        <div className="absolute -top-4 -right-2 rotate-12 z-20">
+                          <div className="bg-accent text-white px-3 py-1 text-[9px] font-black uppercase tracking-widest shadow-lg rounded-sm border-b-2 border-r-2 border-black/20">
+                            Originals
+                          </div>
+                        </div>
+                      )}
+
                       <div className="flex items-center gap-4 mb-4">
                         {set.city && (
-                          <span className="px-3.5 py-1.5 bg-accent/5 text-accent text-[9px] font-black uppercase tracking-[0.2em] rounded-lg border border-accent/20">
+                          <span className="px-3 py-1 bg-white shadow-sm text-accent text-[9px] font-black uppercase tracking-[0.2em] rounded border border-accent/10">
                             {set.city}
                           </span>
                         )}
                         {set.distance_km && (
                           <div className="flex items-center gap-2 text-[9px] font-black text-text-muted uppercase tracking-[0.2em]">
-                            <MapPin size={14} weight="fill" className="text-accent-gold" /> {set.distance_km} km
+                            <MapPin size={12} weight="fill" className="text-accent-gold" /> {set.distance_km} km
                           </div>
                         )}
                       </div>
 
-                      <div className="flex justify-between items-start gap-6 mb-6">
-                        <h2 className="text-[34px] font-serif font-black text-text-primary leading-[1] tracking-tight group-hover:text-accent transition-colors duration-300">
+                      <div className="flex justify-between items-start gap-4 mb-6">
+                        <h2 className="text-[26px] font-serif font-black text-text-primary leading-[1.2] tracking-tight group-hover:text-accent transition-colors duration-300">
                           {getLocalized(set, 'title', i18n?.language)}
                         </h2>
 
-                        <div className="flex items-center gap-2 text-accent font-black text-[11px] uppercase tracking-[0.2em] shrink-0 pt-3 transition-all duration-500 group-hover:translate-x-1">
-                          Inizia <ArrowRight size={16} weight="bold" />
+                        <div className="flex items-center gap-1.5 text-accent font-black text-[10px] uppercase tracking-[0.2em] shrink-0 pt-2 transition-all duration-500 group-hover:translate-x-1">
+                          Inizia <ArrowRight size={14} weight="bold" />
                         </div>
                       </div>
 
                       {/* Info Row */}
-                      <div className="flex items-center justify-between pb-6 border-b border-border-default">
-                        <div className="flex items-center gap-8">
+                      <div className="flex items-center justify-between pb-6 border-b border-border-default/40 border-dashed">
+                        <div className="flex items-center gap-6">
                           <div>
-                            <p className="overline !text-text-muted !mb-1">Tappe</p>
-                            <p className="text-[14px] font-black text-text-primary">
+                            <p className="overline !text-text-muted !mb-0.5 !text-[8px]">Tappe</p>
+                            <p className="text-[13px] font-black text-text-primary">
                               {set.steps?.length || '—'} luoghi
                             </p>
                           </div>
 
                           {set.difficulty && (
                             <div>
-                              <p className="overline !text-text-muted !mb-1">Difficoltà</p>
+                              <p className="overline !text-text-muted !mb-0.5 !text-[8px]">Difficoltà</p>
                               <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-accent-gold" />
-                                <p className="text-[12px] font-black text-text-primary uppercase tracking-widest">{set.difficulty}</p>
+                                <div className="w-1.5 h-1.5 rounded-full bg-accent-gold" />
+                                <p className="text-[11px] font-black text-text-primary uppercase tracking-widest">{set.difficulty}</p>
                               </div>
                             </div>
                           )}
                         </div>
 
                         {questProgress && (
-                          <div className="flex items-center gap-4 bg-bg-secondary px-4 py-2.5 rounded-xl border border-border-default">
-                            <span className="text-[11px] font-black text-text-primary">{progressPercent}%</span>
-                            <div className="h-2 w-16 bg-bg-primary rounded-full overflow-hidden border border-border-default">
+                          <div className="flex items-center gap-3 bg-white/50 px-3 py-2 rounded-xl border border-border-default/30 shadow-sm">
+                            <span className="text-[10px] font-black text-text-primary">{progressPercent}%</span>
+                            <div className="h-1.5 w-12 bg-zinc-100 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-accent rounded-full transition-all duration-1000"
                                 style={{
@@ -419,11 +477,20 @@ const Missioni = () => {
                       {/* Social Evidence */}
                       <div className="pt-5 flex items-center gap-3">
                         <div className="flex -space-x-2">
-                          {[1, 2, 3].map(i => (
-                            <div key={i} className="w-6 h-6 rounded-full border-2 border-bg-primary bg-bg-secondary" />
+                          {[
+                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=100&auto=format&fit=crop',
+                            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=100&auto=format&fit=crop',
+                            'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=100&auto=format&fit=crop'
+                          ].map((url, i) => (
+                            <img 
+                              key={i} 
+                              src={url} 
+                              alt="Clubber"
+                              className="w-6 h-6 rounded-full border-2 border-white object-cover shadow-sm bg-zinc-200" 
+                            />
                           ))}
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-[0.1em] text-text-muted">
+                        <span className="text-[9px] font-black uppercase tracking-[0.1em] text-text-muted italic">
                           Saga completata da <span className="text-accent font-black">{set.completions_count || Math.floor(Math.random() * 50) + 12}</span> clubbers
                         </span>
                       </div>
