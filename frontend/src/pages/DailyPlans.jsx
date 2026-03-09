@@ -39,9 +39,9 @@ const PlanCard = ({ plan, navigate }) => {
       </div>
       
       <div className="flex flex-col lg:flex-row gap-12 md:gap-20 items-stretch">
-        {/* Visual Portion (Cinematic Panoramic Frame) */}
+        {/* Visual Portion (Cinematic Panoramic Frame - Responsive) */}
         <div className="w-full lg:w-[60%] relative">
-          <div className="h-full aspect-[16/9] lg:aspect-auto overflow-hidden shadow-2xl p-1 bg-white relative transition-all duration-1000 group-hover:shadow-3xl">
+          <div className="aspect-[4/3] lg:aspect-[16/9] overflow-hidden shadow-2xl p-1 bg-white relative transition-all duration-1000 group-hover:shadow-3xl">
               <div className="w-full h-full relative overflow-hidden border border-black/5">
                 <img 
                     src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
@@ -285,7 +285,7 @@ const DailyPlans = () => {
 
         <footer className="text-center pt-20 border-t border-black/[0.03]">
             <p className="text-[11px] font-black uppercase tracking-[1em] text-accent/20 mb-4">Finis Terrae</p>
-            <p className="font-serif italic font-black text-[22px] text-text-primary opacity-30 italic">Desideri Puglia Club — Collection 2026 / Rev. D</p>
+            <p className="font-serif italic font-black text-[22px] text-text-primary opacity-30 italic">Desideri Puglia Club — Collection 2026 / Rev. E</p>
         </footer>
       </main>
 
