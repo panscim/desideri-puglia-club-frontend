@@ -39,9 +39,9 @@ const PlanCard = ({ plan, navigate }) => {
       </div>
       
       <div className="flex flex-col lg:flex-row gap-12 md:gap-20">
-        {/* Visual Portion (Sartorial Frame) */}
-        <div className="w-full lg:w-[40%] relative">
-          <div className="aspect-[3.5/5] overflow-hidden shadow-2xl p-2 bg-white relative transition-all duration-1000 group-hover:shadow-3xl">
+        {/* Visual Portion (Sartorial Frame - Balanced Rectangular) */}
+        <div className="w-full lg:w-[45%] relative">
+          <div className="aspect-[4/3] overflow-hidden shadow-2xl p-1.5 bg-white relative transition-all duration-1000 group-hover:shadow-3xl">
               <div className="w-full h-full relative overflow-hidden border border-black/5">
                 <img 
                     src={plan.cover_image_url || 'https://images.unsplash.com/photo-1542281286-9e0a16bb7366'} 
@@ -53,7 +53,7 @@ const PlanCard = ({ plan, navigate }) => {
         </div>
 
         {/* Text Portion (The Narrative Flow) */}
-        <div className="w-full lg:w-[60%] flex flex-col justify-center">
+        <div className="w-full lg:w-[55%] flex flex-col justify-center">
           {/* 1. Città */}
           <div className="flex items-center gap-4 mb-6">
                 <div className="w-8 h-[1px] bg-accent/30" />
