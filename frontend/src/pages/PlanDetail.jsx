@@ -141,7 +141,7 @@ const PlanDetail = () => {
 
   /* ── Render ───────────────────────────────────────────── */
   return (
-    <div className="min-h-screen bg-[#F9F9F7] text-zinc-900 pb-36" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen bg-[#F9F9F7] text-zinc-900 pb-[250px]" style={{ fontFamily: "'Inter', sans-serif" }}>
 
       {/* ╔══ NAV ══════════════════════════════════════════╗ */}
       <nav
