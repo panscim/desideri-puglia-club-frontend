@@ -65,13 +65,13 @@ const PlanCard = ({ plan, navigate, index }) => {
             alt={plan.title_it}
             loading="lazy"
           />
-          {/* City badge */}
+          {/* City badge — top left */}
           <div className="absolute top-2.5 left-2.5 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm">
             <MapPin size={9} weight="fill" className="text-orange-500" />
             <span className="text-[9px] font-black uppercase tracking-wide text-zinc-700">{plan.city || 'Puglia'}</span>
           </div>
-          {/* Steps pill */}
-          <div className="absolute top-2.5 right-2.5 bg-zinc-950/80 text-white px-2 py-1 rounded-full flex items-center gap-1">
+          {/* Steps pill — bottom right */}
+          <div className="absolute bottom-2.5 right-2.5 bg-zinc-950/80 text-white px-2 py-1 rounded-full flex items-center gap-1">
             <Timer size={9} />
             <span className="text-[9px] font-black">{steps} tappe</span>
           </div>
@@ -191,7 +191,7 @@ const DailyPlans = () => {
                 Daily Journal
               </h1>
             </div>
-            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.4em] mt-0.5">Puglia · Collection 2026</p>
+            <p className="text-[9px] font-bold text-zinc-400 uppercase tracking-[0.4em] mt-2">Puglia · Collection 2026</p>
           </div>
 
           <div className="w-9" /> {/* spacer */}
@@ -285,22 +285,38 @@ const DailyPlans = () => {
           )}
         </AnimatePresence>
 
-        {/* Footer note */}
-        {!loading && plans.length > 0 && (
-          <motion.footer
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+        {/* Diventa Creator CTA */}
+        {!loading && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-center mt-16 pt-8 border-t border-black/[0.05]"
+            className="mt-14"
           >
-            {/* Rubber stamp feel */}
-            <div className="inline-block border-2 border-zinc-900/10 rounded-sm px-6 py-3 rotate-[-1deg]">
-              <p className="text-[9px] font-black uppercase tracking-[0.5em] text-zinc-400">Fine Archivio · Rev. J</p>
-              <p className="text-[11px] font-black text-zinc-300 italic mt-0.5" style={{ fontFamily: "'Georgia', serif" }}>
-                Desideri Puglia Club
-              </p>
+            <div
+              className="bg-zinc-900 rounded-2xl p-6 text-center shadow-xl relative overflow-hidden cursor-pointer active:scale-[0.99] transition-transform"
+              onClick={() => navigate('/diventa-creator/candidatura')}
+            >
+              {/* Background texture */}
+              <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/cream-paper.png')` }} />
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-400/30 px-3 py-1 rounded-full mb-3">
+                  <Sparkle size={11} weight="fill" className="text-orange-400" />
+                  <span className="text-[9px] font-black uppercase tracking-[0.3em] text-orange-300">Opportunità</span>
+                </div>
+                <h3 className="text-[20px] font-black text-white mb-2" style={{ fontFamily: "'Georgia', serif", letterSpacing: '-0.02em' }}>
+                  Diventa un Local Expert
+                </h3>
+                <p className="text-[12px] text-zinc-400 leading-relaxed mb-5 max-w-xs mx-auto">
+                  Hai una conoscenza speciale della Puglia? Condividi i tuoi itinerari e guadagna dalla tua passione.
+                </p>
+                <div className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-500/30">
+                  Candidati ora
+                  <ArrowRight size={13} weight="bold" />
+                </div>
+              </div>
             </div>
-          </motion.footer>
+          </motion.div>
         )}
       </main>
     </div>
