@@ -426,7 +426,7 @@ const PlanDetail = () => {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 90, opacity: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-0 inset-x-0 z-50 px-4 pb-6 pt-3"
+            className="fixed bottom-[68px] inset-x-0 z-50 px-4 pb-3 pt-3"
             style={{ background: 'linear-gradient(to top, rgba(249,249,247,1) 60%, rgba(249,249,247,0))' }}
           >
             <div className="bg-white rounded-2xl p-3.5 flex items-center justify-between shadow-[0_6px_40px_rgba(0,0,0,0.12)] border border-zinc-100">
