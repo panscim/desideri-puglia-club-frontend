@@ -277,6 +277,17 @@ export default function PartnerDashboard() {
 
         // Se ho appena pagato (subscribed=1), ignoro il flag di scelta piano forzata
         const isFreshlySubscribed = params.get("subscribed") === "1";
+        
+        // --- SUBSCRIPTION GUARD ---
+        const subStatus = String(data.subscription_status || "").toLowerCase();
+        const isSubscribed = subStatus === "active" || subStatus === "trialing" || isFreshlySubscribed;
+
+        if (!isSubscribed) {
+          console.log("[PartnerDashboard] Subscription not active, redirecting to /partner/subscription");
+          navigate("/partner/subscription");
+          return;
+        }
+
         if (Boolean(data.must_choose_plan_once) && !isFreshlySubscribed) {
           navigate("/partner/subscription");
           return;
