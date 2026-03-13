@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Share2, Lock, Play, Headphones, MapPin, Star, Sparkles, Navigation, Clock, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 export function UnlockedCardDetail({ card, onClose }) {
     const { i18n } = useTranslation();
@@ -72,72 +73,74 @@ export function UnlockedCardDetail({ card, onClose }) {
         : (currentLang === 'en' ? "Just Unlocked" : "Appena Sbloccato");
 
     return (
-        <div className="fixed inset-0 z-[9999] bg-[var(--bg-base)] overflow-y-auto animate-pop-in font-sans selection:bg-gold/30">
+        <div className="fixed inset-0 z-[9999] bg-[#FAF7F2] overflow-y-auto animate-pop-in font-sans selection:bg-gold/30">
             {/* 1. MINIMALIST HEADER */}
-            <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-6 bg-[var(--bg-base)]/80 backdrop-blur-md px-6">
+            <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-6 bg-[#FAF7F2]/80 backdrop-blur-md px-6 shadow-[0_1px_0_rgba(0,0,0,0.03)]">
                 <button
                     onClick={onClose}
-                    className="w-10 h-10 flex items-center justify-center hover:scale-105 transition-all text-[var(--text-primary)]"
+                    className="w-10 h-10 flex items-center justify-center hover:scale-105 transition-all text-zinc-900 border border-black/5 rounded-full bg-white shadow-sm z-50"
                 >
                     <ArrowLeft className="w-6 h-6" />
                 </button>
                 <div className="flex flex-col items-center">
-                    <h2 className="text-[12px] font-bold tracking-[0.25em] text-[#5c6e8c] uppercase">Monument Detail</h2>
+                    <h2 className="text-[14px] font-serif font-black italic text-zinc-400 leading-none">Archivio Personale</h2>
                 </div>
-                <button className="w-10 h-10 flex items-center justify-center hover:scale-105 transition-all text-[var(--text-primary)]">
+                <button className="w-10 h-10 flex items-center justify-center hover:scale-105 transition-all text-zinc-900 border border-black/5 rounded-full bg-white shadow-sm z-50">
                     <Share2 className="w-5 h-5" />
                 </button>
             </header>
 
             <main className="pt-24 px-6 pb-20 w-full max-w-xl mx-auto">
-                {/* 2. PREMIUM HERO SECTION - CLEAN IMAGE */}
-                <div className="relative mb-8 group">
-                    <div className="relative aspect-[4/5] w-[90%] mx-auto rounded-[2.5rem] overflow-hidden shadow-2xl border-4 border-white">
+                {/* 2. PREMIUM HERO SECTION - EDITORIAL ARCH */}
+                <div className="relative mb-12">
+                    <div className="relative aspect-[4/5] w-full rounded-t-[12rem] rounded-b-[2rem] overflow-hidden shadow-2xl border-4 border-white transition-transform duration-700">
                         <div
                             className="absolute inset-0 bg-cover bg-center transition-transform duration-[3s] group-hover:scale-110"
                             style={{ backgroundImage: `url('${card.image_url}')` }}
                         />
-                        {/* Very subtle gradient just for depth */}
-                        <div className="absolute inset-0 bg-black/5 pointer-events-none" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                     </div>
                 </div>
 
-                {/* 3. STYLIZED HERO CONTENT - MISSIONI STYLE */}
-                <div className="px-5 mb-12">
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="h-[1px] w-8 bg-gold" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-gold">
+                {/* 3. STYLIZED HERO CONTENT */}
+                <div className="px-5 mb-12 text-center">
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                        <div className="h-[1px] w-8 bg-[#D4793A] opacity-30" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#D4793A]">
                             {card.rarity || 'Ancient Tier'}
                         </span>
+                        <div className="h-[1px] w-8 bg-[#D4793A] opacity-30" />
                     </div>
 
-                    <h1 className="text-[2.8rem] font-black text-[var(--text-primary)] leading-[0.9] mb-4 lowercase first-letter:uppercase tracking-tighter">
+                    <h1 className="text-[42px] sm:text-[48px] font-serif font-black text-zinc-900 leading-[0.9] mb-4 tracking-tighter">
                         {displayTitle}
                     </h1>
 
-                    <div className="flex items-center gap-2 text-[var(--text-secondary)] font-medium">
-                        <MapPin className="w-4 h-4 text-gold shrink-0" weight="fill" />
-                        <span className="text-sm tracking-tight">{card.city}, Italy</span>
+                    <div className="flex items-center justify-center gap-2 text-zinc-500 font-bold italic">
+                        <MapPin className="w-4 h-4 text-[#D4793A] shrink-0" />
+                        <span className="text-sm tracking-tight">{card.city}, Puglia</span>
                     </div>
                 </div>
 
                 {/* COLLECTION UNLOCKED Status */}
-                <div className="flex items-center justify-center gap-2 mb-14 bg-gold/5 py-3 rounded-2xl border border-gold/10 w-[90%] mx-auto shadow-sm">
-                    <Lock className="w-4 h-4 text-gold" fill="currentColor" />
-                    <span className="text-[10px] font-black text-gold uppercase tracking-[0.3em] font-sans">Collection Unlocked</span>
+                <div className="flex items-center justify-center gap-2 mb-14 bg-emerald-50 py-3 rounded-full border border-emerald-100 w-full max-w-[280px] mx-auto shadow-sm">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <span className="text-[10px] font-black text-emerald-700 uppercase tracking-[0.2em] font-sans">Proprietà Verificata</span>
                 </div>
 
-                {/* 4. STORY SECTION - Updated Typography */}
+                {/* 4. STORY SECTION */}
                 {historyText && (
                     <section className="mb-14 relative px-2">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="w-1.5 h-6 bg-gold rounded-full" />
-                            <h3 className="text-[1.8rem] font-black text-[var(--text-primary)] tracking-tighter lowercase first-letter:uppercase leading-none">The History</h3>
+                        <div className="flex items-center gap-3 mb-8">
+                           <div className="relative">
+                                <h3 className="text-[28px] font-serif font-black text-zinc-900 tracking-tighter relative z-10 first-letter:uppercase pr-4">La Storia</h3>
+                                <div className="absolute left-0 bottom-1 w-full h-3 bg-[#D4793A]/10 -z-0 -rotate-1" />
+                           </div>
                         </div>
 
                         <div className="relative">
-                            <div className="text-[var(--text-primary)] leading-[1.8] text-[16px] font-medium">
-                                <span className="float-left text-5xl font-bold text-gold mr-3 mt-1 leading-[0.8] no-theme-flip">
+                            <div className="text-zinc-800 leading-[1.8] text-[17px] font-medium font-serif italic text-justify">
+                                <span className="float-left text-6xl font-black text-[#C4974A] mr-4 mt-1 leading-[0.7] drop-shadow-sm">
                                     {firstLetter}
                                 </span>
                                 {restOfText}
@@ -146,23 +149,25 @@ export function UnlockedCardDetail({ card, onClose }) {
                     </section>
                 )}
 
-                {/* 5. CURIOSITY SECTION - Bento Style with Beige Background */}
+                {/* 5. CURIOSITY SECTION - Editorial Style */}
                 {curiosityItems.length > 0 && (
                     <section className="mb-14">
-                        <div className="bg-[#fdf9f0] rounded-[3rem] p-10 border border-gold/10 shadow-sm">
-                            <div className="flex items-center gap-3 mb-10">
-                                <Sparkles className="w-6 h-6 text-gold" />
-                                <h3 className="text-[1.8rem] font-black text-[var(--text-primary)] tracking-tighter lowercase first-letter:uppercase leading-none">Curiosity & Secrets</h3>
+                        <div className="bg-white rounded-[3rem] p-10 border border-black/5 shadow-sm relative overflow-hidden">
+                            <div className="flex items-center gap-4 mb-10">
+                                <Sparkles className="w-8 h-8 text-[#D4793A]" />
+                                <h3 className="text-[28px] font-serif font-black text-zinc-900 tracking-tighter lowercase first-letter:uppercase leading-none">Curiosità e Segreti</h3>
                             </div>
 
-                            <div className="space-y-6">
+                            <div className="space-y-8">
                                 {curiosityItems.map((item, idx) => (
-                                    <div key={idx} className="flex gap-4">
+                                    <div key={idx} className="flex gap-5 group">
                                         <div className="shrink-0 pt-1">
-                                            <Star className="w-5 h-5 text-gold" fill="currentColor" />
+                                            <div className="w-6 h-6 rounded-full bg-[#D4793A]/5 flex items-center justify-center text-[#D4793A] group-hover:scale-110 transition-transform">
+                                                <Star className="w-3.5 h-3.5" fill="currentColor" />
+                                            </div>
                                         </div>
                                         <div className="flex-1">
-                                            <p className="text-[14px] leading-relaxed text-[var(--text-primary)]/80 font-medium">
+                                            <p className="text-[15px] leading-relaxed text-zinc-600 font-medium font-serif italic">
                                                 {item}
                                             </p>
                                         </div>
@@ -173,38 +178,47 @@ export function UnlockedCardDetail({ card, onClose }) {
                     </section>
                 )}
 
-                {/* 6. AUDIO GUIDE - Updated Style */}
+                {/* 6. AUDIO GUIDE - Leather/Premium Style */}
                 <section className="mb-14">
-                    <h3 className="text-[1.8rem] font-black text-[var(--text-primary)] tracking-tighter lowercase first-letter:uppercase leading-none mb-8 ml-2">Audio Guide</h3>
+                    <div className="flex items-center gap-3 mb-8">
+                        <div className="relative">
+                            <h3 className="text-[28px] font-serif font-black text-zinc-900 tracking-tighter relative z-10 first-letter:uppercase pr-4">Audioguida</h3>
+                            <div className="absolute left-0 bottom-1 w-full h-3 bg-accent/15 -z-0 -rotate-1" />
+                        </div>
+                    </div>
 
-                    <div className="bg-[var(--bg-surface)] border border-[var(--border)] rounded-[2.5rem] p-8 flex items-center gap-8 shadow-sm relative overflow-hidden group">
+                    <div className="bg-zinc-900 rounded-[2.5rem] p-8 flex items-center gap-8 shadow-2xl relative overflow-hidden group border border-white/5">
+                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-5 pointer-events-none" />
+                        
                         <button
                             onClick={togglePlay}
-                            className="w-14 h-14 rounded-full bg-gold text-white flex items-center justify-center shadow-lg shadow-gold/20 hover:scale-105 transition-transform z-10 no-theme-flip"
+                            className="w-16 h-16 rounded-full bg-[#C4974A] text-zinc-950 flex items-center justify-center shadow-lg shadow-[#C4974A]/20 hover:scale-105 transition-transform z-10 no-theme-flip active:scale-95"
                         >
                             {isPlaying ? (
-                                <div className="flex gap-1 items-center">
-                                    <div className="w-1 h-4 bg-black rounded-full animate-pulse" />
-                                    <div className="w-1 h-4 bg-black rounded-full" />
+                                <div className="flex gap-1.5 items-center">
+                                    <motion.div animate={{ height: [12, 20, 12] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-1.5 bg-zinc-950 rounded-full" />
+                                    <motion.div animate={{ height: [20, 12, 20] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-1.5 bg-zinc-950 rounded-full" />
+                                    <motion.div animate={{ height: [12, 18, 12] }} transition={{ repeat: Infinity, duration: 0.8 }} className="w-1.5 bg-zinc-950 rounded-full" />
                                 </div>
                             ) : (
-                                <Play className="w-6 h-6 ml-1 text-black" fill="currentColor" />
+                                <Play className="w-7 h-7 ml-1" fill="currentColor" />
                             )}
                         </button>
 
                         <div className="flex-1 z-10">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-[9px] font-black uppercase text-gold/60 tracking-widest">{card.audio_title || "The Emperor's Legacy"}</span>
-                                <span className="text-[10px] font-bold text-[var(--text-muted)]">4:22</span>
+                            <div className="flex items-center justify-between mb-3">
+                                <span className="text-[10px] font-black uppercase text-[#C4974A]/80 tracking-[0.2em]">{card.audio_title || "L'Eredità dell'Imperatore"}</span>
+                                <span className="text-[10px] font-bold text-white/40 font-mono tracking-tighter">4:22</span>
                             </div>
-                            <div className="h-1.5 w-full bg-[var(--bg-elevated)] rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-gold rounded-full transition-all duration-300"
+                            <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                                <motion.div
+                                    className="h-full bg-[#C4974A] rounded-full"
                                     style={{ width: `${audioProgress}%` }}
+                                    transition={{ type: "spring", stiffness: 50 }}
                                 />
                             </div>
                         </div>
-                        <Headphones className="w-6 h-6 text-gold/40 mr-2" />
+                        <Headphones className="w-6 h-6 text-white/20 mr-2 hidden sm:block" />
 
                         {audioTrack && (
                             <audio
@@ -217,17 +231,18 @@ export function UnlockedCardDetail({ card, onClose }) {
                     </div>
                 </section>
 
-                {/* 7. STATS - Pure White Style */}
+                {/* 7. STATS - Editorial Box */}
                 <section className="mb-14">
-                    <h3 className="text-[1.8rem] font-black text-[var(--text-primary)] tracking-tighter lowercase first-letter:uppercase leading-none mb-8 ml-2">Your Stats</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-[var(--bg-surface)] border border-[var(--border)] p-8 rounded-[2.5rem] shadow-sm flex flex-col justify-center">
-                            <span className="text-[8px] font-black text-[var(--text-muted)] uppercase tracking-[0.2em] mb-2">Unlocked On</span>
-                            <div className="text-[14px] font-black text-[var(--text-primary)] uppercase tracking-tight">{unlockedDate}</div>
+                    <div className="grid grid-cols-2 gap-5">
+                        <div className="bg-white border border-black/5 p-8 rounded-[3rem] shadow-sm flex flex-col items-center text-center relative overflow-hidden">
+                            <Clock className="w-6 h-6 text-zinc-300 mb-4" />
+                            <span className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-2 leading-none">Data Scatola</span>
+                            <div className="text-[15px] font-serif font-black text-zinc-900 tracking-tight lowercase first-letter:uppercase">{unlockedDate}</div>
                         </div>
-                        <div className="bg-[var(--bg-surface)] border border-[var(--border)] p-8 rounded-[2.5rem] shadow-sm flex flex-col justify-center text-on-image !bg-zinc-950 !border-white/5 no-theme-flip">
-                            <span className="text-[8px] font-black text-white/40 uppercase tracking-[0.2em] mb-2">Global Rarity</span>
-                            <div className="text-[18px] font-black text-gold no-theme-flip tracking-tighter uppercase">{globalRarity}</div>
+                        <div className="bg-zinc-900 p-8 rounded-[3rem] shadow-2xl flex flex-col items-center text-center relative overflow-hidden border border-white/5 no-theme-flip">
+                            <Star className="w-6 h-6 text-[#C4974A] mb-4" fill="currentColor" />
+                            <span className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-2 leading-none">Rarità Globale</span>
+                            <div className="text-[20px] font-serif font-black text-[#C4974A] tracking-tight lowercase first-letter:uppercase no-theme-flip">{globalRarity}</div>
                         </div>
                     </div>
                 </section>
@@ -238,8 +253,8 @@ export function UnlockedCardDetail({ card, onClose }) {
                         <h3 className="text-[1.8rem] font-black text-white tracking-tighter lowercase first-letter:uppercase leading-none mb-8">Location Info</h3>
 
                         <div className="flex items-start gap-3 mb-6">
-                            <MapPin className="w-4 h-4 text-gold shrink-0 mt-0.5" />
-                            <p className="text-sm text-white/80 font-medium">Piazza Castello, 76121 Barletta BT, Italy</p>
+                            <MapPin className="w-4 h-4 text-[#C4974A] shrink-0 mt-0.5" />
+                            <p className="text-sm text-white/80 font-medium italic">Piazza Castello, 76121 Barletta BT, Italy</p>
                         </div>
 
                         {/* Map Container */}
@@ -263,7 +278,7 @@ export function UnlockedCardDetail({ card, onClose }) {
 
                         <button
                             onClick={handleOpenMap}
-                            className="w-full h-14 bg-gold rounded-2xl flex items-center justify-center gap-3 font-bold text-[14px] text-black shadow-xl shadow-gold/20 hover:bg-[#e0b020] transition-all active:scale-95"
+                            className="w-full h-14 bg-[#C4974A] rounded-2xl flex items-center justify-center gap-3 font-bold text-[14px] text-zinc-950 shadow-xl shadow-[#C4974A]/20 hover:bg-[#b0863c] transition-all active:scale-95"
                         >
                             <Navigation className="w-5 h-5" fill="currentColor" /> Visit Again
                         </button>
