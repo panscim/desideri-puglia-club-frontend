@@ -19,12 +19,19 @@ import {
   Map,
   ScanLine,
   CreditCard,
+  X,
+  User,
+  Mail,
+  Calendar,
+  Sparkles,
+  Camera
 } from "lucide-react";
 import toast from "react-hot-toast";
 import QRScannerModal from "../components/QRScannerModal";
+import PartnerProfileModal from "../components/PartnerProfileModal";
 import { PartnerService } from "../services/partner";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, User, Mail, Calendar } from "lucide-react";
+import confetti from 'canvas-confetti';
 
 import {
   AreaChart,
@@ -81,6 +88,50 @@ export default function PartnerDashboard() {
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [showPaymentsModal, setShowPaymentsModal] = useState(false);
   const [openingConnect, setOpeningConnect] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [partnerRank, setPartnerRank] = useState(null);
+  const [syncingStripe, setSyncingStripe] = useState(false);
+
+  // New Tabs & Modal state
+  const [currentTab, setCurrentTab] = useState("profilo"); // "profilo" | "analytics"
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Computed field per capire se il profilo è completo
+  const isProfileComplete = 
+    partner?.name &&
+    partner?.city &&
+    partner?.address &&
+    partner?.category &&
+    partner?.description;
+
+  const syncStripeStatus = async () => {
+    if (!partner?.id) return;
+    setSyncingStripe(true);
+    try {
+      const response = await fetch("/api/sync-stripe-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ partnerId: partner.id }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Errore sincronizzazione");
+
+      toast.success(payload.details);
+      if (payload.success && payload.chargesEnabled) {
+        // Aggiorna lo stato locale senza ricaricare tutto se possibile
+        setPartner(prev => ({ 
+          ...prev, 
+          charges_enabled: payload.chargesEnabled, 
+          payouts_enabled: payload.payoutsEnabled 
+        }));
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error(e.message || "Errore durante la sincronizzazione.");
+    } finally {
+      setSyncingStripe(false);
+    }
+  };
 
   const loadStats = async (partnerId) => {
     try {
@@ -197,26 +248,80 @@ export default function PartnerDashboard() {
       try {
         if (!profile?.id) { navigate("/login"); return; }
 
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from("partners")
-          .select("*, stripe_account_id, charges_enabled, payouts_enabled")
+          .select("*")
           .eq("owner_user_id", profile.id)
           .maybeSingle();
 
         if (error) console.error(error);
-        if (!data) { navigate("/partner/join"); return; }
-        if (Boolean(data.must_choose_plan_once)) {
+
+        // Se non trovo il partner ma ho subscribed=1, aspetto un attimo (eventual consistency)
+        if (!data && params.get("subscribed") === "1") {
+          console.log("[PartnerDashboard] Partner non trovato post-payment, riprovo tra 3s...");
+          await new Promise(r => setTimeout(r, 3000));
+          const retry = await supabase
+            .from("partners")
+            .select("*")
+            .eq("owner_user_id", profile.id)
+            .maybeSingle();
+          data = retry.data;
+          if (retry.error) console.error(retry.error);
+        }
+
+        if (!data) {
+          console.log("[PartnerDashboard] No partner data, redirecting to /partner/join");
+          navigate("/partner/join");
+          return;
+        }
+
+        // Se ho appena pagato (subscribed=1), ignoro il flag di scelta piano forzata
+        const isFreshlySubscribed = params.get("subscribed") === "1";
+        if (Boolean(data.must_choose_plan_once) && !isFreshlySubscribed) {
           navigate("/partner/subscription");
           return;
         }
 
         setPartner(data);
+
+        // --- CELEBRATION LOGIC ---
         if (params.get("subscribed") === "1") {
-          toast.success("Abbonamento attivo. Completa ora la configurazione pagamenti.");
+          // Trigger confetti
+          confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#D4793A', '#B8B48F', '#5A5A40']
+          });
+
+          // Fetch partner count for the "rank"
+          const { count } = await supabase
+            .from('partners')
+            .select('*', { count: 'exact', head: true })
+            .eq('subscription_status', 'active');
+          
+          setPartnerRank(count || 1);
+          setShowCelebration(true);
+        }
+
+        if (params.get("subscribed") === "1") {
+          toast.success("Abbonamento attivo! Benvenuto nel Club.");
         }
         if (!data?.charges_enabled && params.get("payments_setup_required") === "1") {
           setShowPaymentsModal(true);
         }
+
+        // Handle Stripe Connect return notifications
+        if (params.get("stripe_success") === "1") {
+          toast.success("Conto collegato con successo! Puoi ora incassare pagamenti.");
+        }
+        if (params.get("stripe_refresh") === "1") {
+          toast("Completa la configurazione Stripe per attivare gli incassi.");
+        }
+        if (params.get("stripe_error") === "1") {
+          toast.error("Errore configurazione Stripe. Riprova o contattaci.");
+        }
+
         await Promise.all([loadStats(data.id), loadEvents(data.id), loadFinance(data)]);
       } catch (e) {
         console.error(e);
@@ -237,8 +342,8 @@ export default function PartnerDashboard() {
         body: JSON.stringify({
           userId: profile.id,
           partnerId: partner.id,
-          returnUrl: `${window.location.origin}/partner/dashboard?connect=success`,
-          refreshUrl: `${window.location.origin}/partner/dashboard?payments_setup_required=1`,
+          returnUrl: `${window.location.origin}/partner/dashboard?stripe_success=1`,
+          refreshUrl: `${window.location.origin}/partner/dashboard?stripe_refresh=1`,
         }),
       });
       const payload = await response.json();
@@ -246,7 +351,7 @@ export default function PartnerDashboard() {
       window.location.href = payload.url;
     } catch (e) {
       console.error(e);
-      toast.error("Errore nell'avvio della configurazione pagamenti.");
+      toast.error(e.message || "Errore nell'avvio della configurazione pagamenti.");
     } finally {
       setOpeningConnect(false);
     }
@@ -335,8 +440,8 @@ export default function PartnerDashboard() {
         price: !isNaN(priceNum) && priceNum > 0 ? priceNum : 0,
         available_spots: !isNaN(spotsNum) && spotsNum > 0 ? spotsNum : null,
         payment_methods: selectedPayment ? [selectedPayment] : null,
-        latitudine: lat,
-        longitudine: lng
+        latitude: lat,
+        longitude: lng
       });
 
       if (error) { toast.error(error.message || "Errore nella creazione dell'evento."); return; }
@@ -427,34 +532,169 @@ export default function PartnerDashboard() {
 
       <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 space-y-6">
 
-        {/* STRIPE STATUS BANNER (Gating) */}
-        {!partner?.charges_enabled && (
+        {/* STRIPE STATUS BANNER — only show if profile is complete (is_active) */}
+        {(partner?.is_active || isProfileComplete) && (partner?.charges_enabled ? (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-3"
+          >
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+            <p className="text-[13px] font-bold text-emerald-800">Conto verificato ✓ — Puoi pubblicare eventi e incassare pagamenti.</p>
+          </motion.div>
+        ) : (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-3xl bg-amber-50 border border-amber-200 p-6 flex flex-col md:flex-row items-center gap-6 shadow-sm"
+            className="group relative bg-[#FAF7F0] border border-[#E8DDD0] rounded-[32px] p-6 md:p-8 shadow-sm overflow-hidden"
           >
-            <div className="w-16 h-16 rounded-[2rem] bg-amber-100 flex items-center justify-center shrink-0 border border-amber-200">
-              <CreditCard size={32} className="text-amber-700" />
+            {/* Background texture/glass effect */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4793A]/5 rounded-full blur-[100px] -mr-32 -mt-32" />
+
+            <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+              {/* Sticker/Icon area */}
+              <div className="shrink-0 relative">
+                <div className="w-16 h-16 rounded-full bg-white shadow-lg flex items-center justify-center border border-[#E8DDD0] rotate-[-5deg] group-hover:rotate-0 transition-transform duration-500">
+                  <CreditCard className="w-7 h-7 text-[#D4793A]" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-amber-400 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                  <Sparkles size={12} className="text-white" />
+                </div>
+              </div>
+
+              <div className="flex-1 text-center md:text-left space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4793A]">Configurazione Pagamenti</span>
+                <h3 className="text-2xl font-black text-zinc-900 leading-tight" style={{ fontFamily: 'serif' }}>
+                  Configura il conto per incassare
+                </h3>
+                <p className="text-[13px] text-zinc-500 leading-relaxed max-w-lg">
+                  Per creare eventi e ricevere pagamenti, collega il tuo conto bancario tramite Stripe.
+                </p>
+              </div>
+
+              <div className="shrink-0 flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
+                <button
+                  onClick={openStripeConnectOnboarding}
+                  disabled={openingConnect}
+                  className="w-full md:w-auto h-14 px-8 rounded-2xl bg-zinc-950 text-white font-bold text-[13px] uppercase tracking-widest shadow-xl hover:bg-zinc-800 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-70"
+                >
+                  {openingConnect ? "Apertura..." : "Configura ora"}
+                  {!openingConnect && <ArrowRight className="w-4 h-4" />}
+                </button>
+
+                {/* Information text about Stripe requests */}
+                <p className="text-[10px] font-bold text-zinc-400 italic text-center md:text-right max-w-[220px] leading-tight opacity-70">
+                  Nota: Stripe potrebbe richiedere documenti aggiuntivi per la verifica dell'identità.
+                </p>
+              </div>
             </div>
-            <div className="flex-1 text-center md:text-left">
-              <h3 className="text-lg font-bold text-amber-900">Incassi non ancora attivi</h3>
-              <p className="text-sm text-amber-800 leading-relaxed mt-1">
-                Per pubblicare eventi e incassare, devi completare l’attivazione degli incassi.
-              </p>
-            </div>
-            <button
-              onClick={openStripeConnectOnboarding}
-              className="h-12 px-8 rounded-full bg-amber-900 text-white font-bold text-sm shadow-lg whitespace-nowrap active:scale-95 transition"
-            >
-              {openingConnect ? "Apertura..." : "Completa configurazione pagamenti"}
-            </button>
           </motion.div>
+        ))}
+
+        {/* --- TABS --- */}
+        <div className="flex bg-white/60 p-1.5 rounded-2xl border border-zinc-200/50 shadow-sm w-fit">
+          <button
+            onClick={() => setCurrentTab('profilo')}
+            className={`px-6 py-2 rounded-xl text-[13px] font-bold transition-all ${currentTab === 'profilo' ? 'bg-zinc-950 text-white shadow-md' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'}`}
+          >
+            Profilo
+          </button>
+          <button
+            onClick={() => setCurrentTab('analytics')}
+            className={`px-6 py-2 rounded-xl text-[13px] font-bold transition-all ${currentTab === 'analytics' ? 'bg-zinc-950 text-white shadow-md' : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900'}`}
+          >
+            Insight
+          </button>
+        </div>
+
+        {currentTab === "profilo" && (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key="profilo-tab"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              className="space-y-6"
+            >
+              {/* Box Profilo */}
+              <div className="bg-white rounded-[32px] p-6 md:p-8 border border-[#E8DDD0] shadow-sm relative overflow-hidden">
+                {!isProfileComplete && (
+                  <div className="absolute inset-0 z-10 bg-white/50 backdrop-blur-sm flex items-center justify-center p-6">
+                    <div className="bg-white border-2 border-[#D4793A]/30 p-8 rounded-[32px] shadow-2xl text-center max-w-sm">
+                      <div className="w-16 h-16 bg-[#D4793A]/10 text-[#D4793A] rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Camera size={28} />
+                      </div>
+                      <h3 className="text-xl font-black text-zinc-900 mb-2 font-serif">Profilo Incompleto</h3>
+                      <p className="text-[13px] text-zinc-500 mb-6 leading-relaxed">Racconta ai membri la tua storia, aggiungi foto e configura i tuoi dati di contatto per entrare nella mappa del Club.</p>
+                      <button 
+                        onClick={() => setShowProfileModal(true)}
+                        className="w-full py-4 rounded-xl bg-[#D4793A] text-white font-bold tracking-widest text-[13px] uppercase shadow-lg hover:scale-105 active:scale-95 transition-all"
+                      >
+                        Completa Profilo
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="flex flex-col md:flex-row gap-8">
+                  <div className="w-full md:w-1/3 space-y-4">
+                    <div className="w-full aspect-square rounded-2xl bg-zinc-100 border border-zinc-200 overflow-hidden relative group">
+                      {partner?.logo_url ? <img src={partner.logo_url} alt="Logo" className="w-full h-full object-cover" /> : <div className="absolute inset-0 flex items-center justify-center text-zinc-300"><Sparkles size={48} /></div>}
+                      <button onClick={() => setShowProfileModal(true)} className="absolute bottom-4 right-4 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center text-zinc-900 opacity-0 group-hover:opacity-100 transition-opacity"><Edit3 size={16}/></button>
+                    </div>
+                  </div>
+                  <div className="w-full md:w-2/3 space-y-6 pt-2">
+                     <div>
+                       <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4793A]">{partner?.category || "Categoria non definita"}</span>
+                       <h2 className="text-4xl font-black text-zinc-900 leading-tight mt-1" style={{ fontFamily: "serif" }}>{partner?.name || "Nuovo Partner"}</h2>
+                       <p className="text-zinc-500 font-medium text-sm flex items-center gap-2 mt-2"><MapPin size={16}/> {partner?.city || "Città"}, {partner?.address || "Indirizzo manca"}</p>
+                     </div>
+                     <div className="h-px w-full bg-[#E8DDD0]" />
+                     <p className="text-zinc-600 leading-relaxed text-[15px]">{partner?.description || "Nessuna descrizione inserita. Racconta la tua storia."}</p>
+                     <div className="flex gap-4 pt-4">
+                        {partner?.website_url && <a href={partner.website_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[12px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors"><Globe size={16}/> SITO WEB</a>}
+                        {partner?.instagram_url && <a href={partner.instagram_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[12px] font-bold text-pink-400 hover:text-pink-600 transition-colors"><Instagram size={16}/> INSTAGRAM</a>}
+                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gestione piano */}
+              <div className="flex items-center justify-between bg-[#FAF7F0] border border-[#E8DDD0] rounded-2xl px-5 py-4">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-0.5">Piano attivo</p>
+                  <p className="text-[15px] font-bold text-zinc-900">
+                    {partner?.plan_tier ? String(partner.plan_tier).charAt(0).toUpperCase() + String(partner.plan_tier).slice(1) : "Nessun piano"}
+                    {partner?.subscription_status && (
+                      <span className="ml-2 text-[10px] font-black uppercase tracking-wider text-zinc-400">
+                        · {partner.subscription_status}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <button
+                  onClick={() => navigate('/partner/subscription')}
+                  className="px-4 py-2 rounded-full bg-white border border-[#E8DDD0] text-zinc-700 text-[11px] font-black uppercase tracking-wider shadow-sm active:scale-95 transition hover:border-zinc-300"
+                >
+                  Modifica o disdici piano
+                </button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         )}
 
-        {/* Piano + trasparenza economica */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="rounded-2xl bg-white border border-zinc-200/60 p-5 shadow-sm">
+        {currentTab === "analytics" && (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key="analytics-tab"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              className="space-y-6"
+            >
+              {/* Piano + trasparenza economica */}
+              <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="rounded-2xl bg-white border border-zinc-200/60 p-5 shadow-sm">
             <p className="text-[10px] uppercase tracking-widest font-bold text-zinc-400">Piano Attivo</p>
             <p className="text-[20px] font-black text-zinc-950 mt-1">
               {partner.plan_tier ? String(partner.plan_tier).toUpperCase() : "NON ATTIVO"}
@@ -798,6 +1038,10 @@ export default function PartnerDashboard() {
           </form>
         )}
 
+      </motion.div>
+    </AnimatePresence>
+  )}
+
       </div>
 
       {/* Badge verificato rimosso su richiesta utente */}
@@ -815,6 +1059,17 @@ export default function PartnerDashboard() {
 
       {/* QR Scanner Modal */}
       <QRScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />
+
+      <PartnerProfileModal 
+        isOpen={showProfileModal} 
+        onClose={() => setShowProfileModal(false)}
+        partner={partner}
+        onSuccess={(updatedData) => {
+          setPartner({ ...partner, ...updatedData });
+          setShowProfileModal(false);
+          toast.success("I tuoi dati sono stati aggiornati su tutte le piattaforme!");
+        }}
+      />
 
       {/* Participants Modal */}
       <AnimatePresence>
@@ -949,6 +1204,59 @@ export default function PartnerDashboard() {
                 >
                   {openingConnect ? "Apertura..." : "Completa configurazione pagamenti"}
                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      {/* Celebration Modal */}
+      <AnimatePresence>
+        {showCelebration && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-zinc-950/80 backdrop-blur-xl"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, y: 40, rotate: -2 }}
+              animate={{ opacity: 1, scale: 1, y: 0, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 40 }}
+              className="relative w-full max-w-sm bg-white rounded-[3rem] p-8 shadow-[0_32px_120px_rgba(0,0,0,0.5)] border border-zinc-200 text-center overflow-hidden"
+            >
+              {/* Background decorative elements */}
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-100 rounded-full blur-3xl opacity-60" />
+              <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-sky-100 rounded-full blur-3xl opacity-60" />
+              
+              <div className="relative z-10 flex flex-col items-center">
+                <div className="w-20 h-20 rounded-3xl bg-zinc-950 flex items-center justify-center mb-6 shadow-xl rotate-3">
+                  <Sparkles className="w-10 h-10 text-amber-400 animate-pulse" />
+                </div>
+                
+                <h2 className="text-[28px] font-black tracking-tight text-zinc-900 leading-none mb-4" style={{ fontFamily: '"Playfair Display", serif' }}>
+                  Benvenuto nel Club!
+                </h2>
+                
+                <p className="text-[14px] text-zinc-600 font-medium leading-relaxed mb-8 px-2">
+                  È ufficiale: da oggi sei il nostro <span className="text-zinc-950 font-black">#{partnerRank}</span> partner. Inizia ora la tua avventura artistica e turistica.
+                </p>
+
+                <div className="w-full space-y-3">
+                  <button
+                    onClick={() => {
+                      setShowCelebration(false);
+                      // Clear params to avoid repeat
+                      window.history.replaceState({}, '', window.location.pathname);
+                    }}
+                    className="w-full h-14 rounded-2xl bg-zinc-950 text-white font-black uppercase tracking-widest text-[13px] shadow-lg active:scale-95 transition"
+                  >
+                    Inizia ora
+                  </button>
+                  <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">
+                    Desideri di Puglia Business
+                  </p>
+                </div>
               </div>
             </motion.div>
           </div>

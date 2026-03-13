@@ -1,5 +1,5 @@
-import { getStripe } from './_lib/stripeClient'
-import { createSupabaseAdmin } from './_lib/supabaseAdmin'
+import { getStripe } from './_lib/stripeClient.js'
+import { createSupabaseAdmin } from './_lib/supabaseAdmin.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -59,20 +59,24 @@ export default async function handler(req, res) {
         .eq('id', partner.id)
     }
 
-    await stripe.accounts.update(accountId, {
-      settings: {
-        payouts: {
-          schedule: { delay_days: 3 },
+    try {
+      await stripe.accounts.update(accountId, {
+        settings: {
+          payouts: {
+            schedule: { delay_days: 3 },
+          },
         },
-      },
-    })
+      })
+    } catch (e) {
+      console.warn('Optional account update failed:', e.message)
+    }
 
-    const origin = req.headers.origin || 'https://desideri-puglia-club-frontend.vercel.app'
+    const appUrl = process.env.VITE_APP_URL || process.env.APP_URL || req.headers.origin || 'https://desideri-puglia-club-frontend.vercel.app'
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
       type: 'account_onboarding',
-      return_url: returnUrl || `${origin}/partner/dashboard?connect=success`,
-      refresh_url: refreshUrl || `${origin}/partner/join`,
+      return_url: returnUrl || `${appUrl}/partner/dashboard?stripe_success=1`,
+      refresh_url: refreshUrl || `${appUrl}/partner/dashboard?stripe_refresh=1`,
     })
 
     return res.status(200).json({ url: accountLink.url, accountId })

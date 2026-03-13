@@ -9,24 +9,21 @@ import {
   UserCircle, PencilSimple, SignOut, ShareNetwork, ShieldCheck,
   Trash, Lock, MapPin, Medal, Path, Books, X, CardsThree, Compass, Key,
   ArrowRight, Warning, Camera, FloppyDisk, InstagramLogo, TiktokLogo,
-  FacebookLogo, YoutubeLogo, BookOpenText
+  FacebookLogo, YoutubeLogo, BookOpenText, CheckCircle
 } from '@phosphor-icons/react'
 import { useTheme } from '../contexts/ThemeContext'
-
+import { motion, AnimatePresence } from 'framer-motion'
+import { colors as TOKENS, typography } from "../utils/designTokens"
 
 export default function Profilo() {
   const navigate = useNavigate()
   const { profile, refreshProfile, isAdmin } = useAuth()
   const { theme } = useTheme()
 
-
   const [loading, setLoading] = useState(true)
   const [partner, setPartner] = useState(null)
-
-  // -- Stats Nuove (Cards/Km/XP) --
   const [stats, setStats] = useState({ cards: 0, km: 0, xp: 0 })
 
-  // -- Form Data --
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [formData, setFormData] = useState({
@@ -35,7 +32,6 @@ export default function Profilo() {
     tiktok_url: '', youtube_url: ''
   })
 
-  // -- Modali --
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirmText, setDeleteConfirmText] = useState('')
   const [deletingAccount, setDeletingAccount] = useState(false)
@@ -117,7 +113,7 @@ export default function Profilo() {
   const handleShare = async () => {
     const shareData = {
       title: 'Desideri di Puglia',
-      text: 'Scopri le bellezze della Puglia con me su Desideri di Puglia! Scarica l\'app.',
+      text: 'Scopri le bellezze della Puglia con me su Desideri di Puglia!',
       url: window.location.origin
     }
     try {
@@ -158,38 +154,67 @@ export default function Profilo() {
   const initials = (profile?.nome?.[0] || profile?.nickname?.[0] || '?').toUpperCase()
 
   return (
-    <div className="min-h-[100dvh] bg-bg-primary font-sans pb-32">
-      {/* ── HERO ── */}
-      <div className="relative w-full bg-zinc-950 pt-12 pb-16 px-6 flex flex-col items-center text-center overflow-hidden transition-colors duration-400">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-20 -left-20 w-72 h-72 bg-orange-400/10 rounded-full blur-[80px]" />
-          <div className="absolute -bottom-10 -right-20 w-56 h-56 bg-emerald-400/10 rounded-full blur-[60px]" />
-        </div>
+    <div className="min-h-[100dvh] pb-32 selection:bg-[#D4793A]/30"
+      style={{
+        background: '#FAF7F0',
+        backgroundImage: 'radial-gradient(circle, rgba(60,40,20,0.04) 1px, transparent 1px)',
+        backgroundSize: '24px 24px',
+      }}>
 
+      {/* Decorative ribbons */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <div className="absolute top-10 left-[-20px] w-32 h-8 rounded-sm rotate-[-30deg] opacity-20"
+          style={{ background: '#D4793A' }} />
+        <div className="absolute top-20 right-[-10px] w-24 h-6 rounded-sm rotate-[10deg] opacity-15"
+          style={{ background: '#B8882F' }} />
+      </div>
+
+      {/* ── HERO / POLAROID ── */}
+      <div className="relative pt-12 pb-16 px-6 flex flex-col items-center text-center">
         <div className="w-full flex justify-between items-center absolute top-4 px-4 z-20">
-          {isAdmin ? <Link to="/admin" className="px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-[11px] font-bold tracking-widest text-white backdrop-blur-md">ADMIN</Link> : <div />}
-          <button onClick={handleLogout} className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white backdrop-blur-md active:scale-95 transition hover:bg-rose-500/80 hover:border-rose-500"><SignOut weight="bold" className="w-4 h-4 ml-0.5" /></button>
+          {isAdmin ? <Link to="/admin" className="px-3 py-1.5 rounded-xl bg-white border border-[#E8DDD0] text-[9px] font-black tracking-widest text-[#1A1A1A] shadow-sm">ADMIN</Link> : <div />}
+          <button onClick={handleLogout} className="w-9 h-9 rounded-xl bg-white border border-[#E8DDD0] flex items-center justify-center text-[#1A1A1A] shadow-sm active:scale-95 transition hover:bg-rose-50 hover:border-rose-200 hover:text-rose-500">
+            <SignOut weight="bold" className="w-4 h-4 ml-0.5" />
+          </button>
         </div>
 
-        <label className="relative cursor-pointer group z-10 mb-4 mt-6">
+        {/* Polaroid Avatar */}
+        <motion.label 
+          initial={{ rotate: -3 }}
+          whileHover={{ rotate: 1, scale: 1.05 }}
+          className="relative cursor-pointer z-10 mb-8 mt-6 p-3 bg-white shadow-2xl rounded-sm border border-stone-200/50"
+        >
           <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-          <div className="w-24 h-24 rounded-full border-2 border-white/20 overflow-hidden shadow-xl bg-zinc-800 flex items-center justify-center text-3xl font-bold text-white/70">
-            {profile?.avatar_url ? <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" /> : initials}
+          <div className="w-28 h-28 overflow-hidden bg-stone-100 flex items-center justify-center text-3xl font-black text-stone-300">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover grayscale-[20%]" />
+            ) : initials}
+            {/* Grain effect on photo */}
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-20 pointer-events-none" />
           </div>
-          <div className="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-md border border-white/30 text-zinc-900"><Camera weight="fill" className="w-3.5 h-3.5" /></div>
-        </label>
+          <div className="pt-3 pb-1">
+            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest italic">{profile?.ruolo || 'Esploratore'}</span>
+          </div>
+          <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-[#D4793A] flex items-center justify-center shadow-lg border-2 border-white text-white">
+            <Camera weight="fill" className="w-3.5 h-3.5" />
+          </div>
+          {/* Taped effect */}
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 bg-[#B8882F30] rotate-[-2deg] rounded-sm pointer-events-none" />
+        </motion.label>
 
-        <h1 className="text-[22px] font-serif font-black text-white tracking-tight z-10">{displayName}</h1>
-        <p className="text-[12px] font-sans text-white/75 mt-1 z-10 flex items-center gap-1"><MapPin weight="bold" className="w-3 h-3" />{profile?.citta || 'Puglia, Italia'}</p>
+        <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tight z-10" style={{ fontFamily: typography.serif }}>{displayName}</h1>
+        <p className="text-[13px] font-bold text-stone-500 mt-2 z-10 flex items-center gap-1.5 uppercase tracking-wide">
+          <MapPin weight="fill" className="text-[#D4793A] w-3.5 h-3.5" /> {profile?.citta || 'Puglia, Italia'}
+        </p>
 
-        <div className="flex items-center gap-2 mt-3 z-10 no-theme-flip">
-          <span className="px-3 py-1 rounded-full bg-stone-100 border border-zinc-950 text-[10px] font-bold text-zinc-950 uppercase tracking-widest">
+        <div className="flex items-center gap-2 mt-6 z-10">
+          <div className="px-4 py-1.5 rounded-full bg-white border border-[#E8DDD0] text-[10px] font-black text-[#1A1A1A] uppercase tracking-widest shadow-sm">
             Passaporto Digitale
-          </span>
+          </div>
           {partner && (
             <button
               onClick={() => handleModeSwitch('partner')}
-              className="px-3 py-1 rounded-full bg-stone-100 border border-zinc-950 text-[10px] font-bold text-zinc-950 uppercase tracking-widest active:scale-95 transition-transform shadow-sm"
+              className="px-4 py-1.5 rounded-full bg-[#D4793A] border border-[#B8882F50] text-[10px] font-black text-white uppercase tracking-widest shadow-md active:scale-95 transition-transform"
             >
               HUB Partner
             </button>
@@ -197,77 +222,90 @@ export default function Profilo() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 -mt-6 relative z-30 space-y-4">
-        {/* ── BENTO STATS ── */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="rounded-card bg-white border border-border-default p-4 shadow-sm text-center flex flex-col justify-center">
-            <CardsThree weight="bold" className="w-6 h-6 text-success mx-auto" />
-            <p className="text-[28px] font-serif font-black tracking-tighter text-text-primary mt-2 leading-none">{loading ? '...' : stats.cards}</p>
-            <p className="overline mt-2">Card</p>
-          </div>
-          <div className="rounded-card bg-white border border-border-default p-4 shadow-sm text-center flex flex-col justify-center">
-            <Path weight="bold" className="w-6 h-6 text-accent mx-auto" />
-            <p className="text-[28px] font-serif font-black tracking-tighter text-text-primary mt-2 leading-none">{loading ? '...' : stats.km}</p>
-            <p className="overline mt-2">Km</p>
-          </div>
-          <div className="rounded-card bg-surface border border-border-default p-4 shadow-sm text-center flex flex-col justify-center relative overflow-hidden no-theme-flip">
-            <Medal weight="bold" className="w-6 h-6 text-accent-gold mx-auto relative z-10" />
-            <p className="text-[28px] font-serif font-black tracking-tighter text-text-primary mt-2 relative z-10 leading-none">{loading ? '...' : stats.xp}</p>
-            <p className="overline mt-2 relative z-10">Punti XP</p>
-          </div>
+      <div className="max-w-3xl mx-auto px-6 space-y-8 relative z-30 pb-10">
+        {/* ── STATS SCRAPBOOK ── */}
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { Icon: CardsThree, val: stats.cards, label: 'Card', color: '#16a34a' },
+            { Icon: Path, val: stats.km, label: 'Km', color: '#D4793A' },
+            { Icon: Medal, val: stats.xp, label: 'Punti', color: '#B8882F' }
+          ].map((s, i) => (
+            <div key={i} className="rounded-3xl bg-white border-2 border-dashed border-[#D5C8B8] p-4 text-center shadow-sm relative rotate-[1deg] odd:rotate-[-1deg] transition-transform hover:rotate-0">
+              <s.Icon weight="bold" className="w-6 h-6 mx-auto" style={{ color: s.color }} />
+              <p className="text-2xl font-black text-[#1A1A1A] mt-2 mb-1" style={{ fontFamily: typography.serif }}>{loading ? '...' : s.val}</p>
+              <p className="text-[9px] font-black uppercase tracking-widest text-stone-400">{s.label}</p>
+              {/* Decorative tape on one corner */}
+              <div className="absolute -top-2 left-2 w-6 h-3 bg-stone-200/50 rotate-[-15deg] rounded-sm" />
+            </div>
+          ))}
         </div>
 
-        {/* ── SHARE APP ── */}
-        <button onClick={handleShare} className="w-full rounded-card bg-bg-dark text-white p-5 flex items-center justify-between shadow-md hover:shadow-lg active:scale-[0.98] transition-all">
-          <div className="flex items-center gap-4">
-            <div className="w-11 h-11 rounded-lg bg-white/10 flex items-center justify-center"><ShareNetwork weight="bold" className="w-6 h-6 text-white" /></div>
+        {/* ── SHARE ── */}
+        <motion.button 
+          whileHover={{ y: -2 }}
+          onClick={handleShare} 
+          className="w-full rounded-3xl bg-white border-2 border-[#E8DDD0] p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
+        >
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="w-12 h-12 rounded-2xl bg-[#F0EAE2] flex items-center justify-center group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
+              <ShareNetwork weight="bold" className="w-6 h-6" />
+            </div>
             <div className="text-left">
-              <p className="text-[15px] font-bold tracking-tight family-sans">Invita un Amico</p>
-              <p className="text-[12px] text-white/50">Mostra le bellezze della Puglia</p>
+              <p className="text-[15px] font-black tracking-tight text-[#1A1A1A]">Invita un Amico</p>
+              <p className="text-[12px] font-medium text-stone-500">Mostra le bellezze della Puglia</p>
             </div>
           </div>
-          <ArrowRight weight="bold" className="w-4 h-4 text-white/30" />
-        </button>
+          <ArrowRight weight="bold" className="w-4 h-4 text-stone-300 group-hover:text-[#D4793A] transition-colors" />
+          <div className="absolute top-0 right-0 w-24 h-full bg-[#D4793A]/5 -skew-x-12 translate-x-12 group-hover:translate-x-8 transition-transform" />
+        </motion.button>
 
         {!partner && (
           <button
-            onClick={() => navigate('/partner/join')}
-            className="w-full rounded-card p-6 text-left border border-white/10 bg-bg-dark text-white shadow-card hover:shadow-2xl active:scale-[0.99] transition-all relative overflow-hidden"
+            onClick={() => navigate('/partner/subscription')}
+            className="w-full rounded-3xl p-6 text-left border-2 border-[#D5C8B8] bg-white shadow-xl hover:-translate-y-1 transition-all relative overflow-hidden group"
           >
-             <div className="absolute top-0 left-5 right-5 h-[2px] bg-accent opacity-80" />
-            <p className="overline text-accent-gold mb-2">Area Business</p>
-            <p className="text-[20px] leading-tight font-serif font-black tracking-tight mb-2">Hai un&apos;attività? Diventa nostro Partner</p>
-            <p className="text-[13px] text-white/60 leading-relaxed">
-              Entra nella rete Desideri di Puglia, vendi eventi, ottieni visibilità premium e monitora i guadagni.
+            <div className="absolute top-0 left-0 w-full h-1.5 bg-[#D4793A]" />
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B8882F] mb-2">Area Business</p>
+            <p className="text-2xl leading-tight font-black tracking-tight mb-3 text-[#1A1A1A]" style={{ fontFamily: typography.serif }}>Diventa nostro Partner</p>
+            <p className="text-[14px] text-stone-500 font-medium leading-relaxed mb-4">
+              Vendi eventi, ottieni visibilità premium e monitora i tuoi guadagni.
             </p>
-            <div className="mt-4 inline-flex items-center gap-2 text-[14px] font-bold text-accent">
-              Inizia onboarding <ArrowRight weight="bold" className="w-3.5 h-3.5" />
+            <div className="inline-flex items-center gap-2 text-[13px] font-black text-[#D4793A] group-hover:translate-x-1 transition-transform uppercase tracking-widest">
+              Dettagli <ArrowRight weight="bold" className="w-3.5 h-3.5" />
             </div>
           </button>
         )}
 
-        {/* ── MODIFICA PROFILO ── */}
-        <section className="card">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-[16px] font-serif font-black text-text-primary tracking-tight flex items-center gap-3">
-              <UserCircle weight="bold" className="w-5 h-5 text-text-light" /> Il tuo Profilo
-            </h2>
+        {/* ── SEZIONE PROFILO ── */}
+        <section className="rounded-3xl border-2 border-[#E8DDD0] bg-white p-7 relative">
+          <div className="absolute -top-4 left-6 px-4 py-1 rounded-full border-2 border-[#E8DDD0] bg-[#FAF7F0] text-[10px] font-black uppercase tracking-[0.3em] text-[#B8882F]">
+            Il tuo Profilo
+          </div>
+          
+          <div className="flex items-center justify-end mb-6">
             {!editing ? (
-              <button onClick={() => setEditing(true)} className="btn-ghost !px-4 !py-2 !text-[11px]">
+              <button 
+                onClick={() => setEditing(true)} 
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-black uppercase tracking-widest text-stone-500 hover:bg-stone-50 transition"
+              >
                 <PencilSimple weight="bold" className="w-3.5 h-3.5" /> Modifica
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <button onClick={() => setEditing(false)} className="w-8 h-8 rounded-full bg-bg-secondary border border-border-default flex items-center justify-center hover:bg-zinc-200 transition"><X weight="bold" className="w-4 h-4 text-text-muted" /></button>
-                <button onClick={handleSave} disabled={saving} className="btn-primary !px-4 !py-2 !text-[11px] !shadow-none">
-                  <FloppyDisk weight="bold" className="w-3.5 h-3.5" /> {saving ? 'Salvo...' : 'Salva'}
+                <button onClick={() => setEditing(false)} className="w-9 h-9 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-400 hover:text-stone-600 transition"><X weight="bold" className="w-4 h-4" /></button>
+                <button 
+                  onClick={handleSave} 
+                  disabled={saving} 
+                  className="px-5 py-2 rounded-full bg-[#1A1A1A] text-white text-[11px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 disabled:opacity-50"
+                >
+                  <FloppyDisk weight="bold" className="w-4 h-4" /> {saving ? '...' : 'Salva'}
                 </button>
               </div>
             )}
           </div>
 
           {!editing ? (
-            <div className="space-y-3">
+            <div className="space-y-4 pt-2">
               <ProfileRow label="Nome" value={`${profile?.nome || ''} ${profile?.cognome || ''}`.trim() || '—'} />
               <ProfileRow label="Nickname" value={profile?.nickname || '—'} />
               <ProfileRow label="Email" value={profile?.email || '—'} />
@@ -275,102 +313,153 @@ export default function Profilo() {
               {profile?.biografia && <ProfileRow label="Bio" value={profile.biografia} />}
             </div>
           ) : (
-            <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={handleSave} className="space-y-6 pt-2">
+              <div className="grid grid-cols-2 gap-4">
                 <FormField label="Nome" value={formData.nome} onChange={v => setFormData({ ...formData, nome: v })} />
                 <FormField label="Cognome" value={formData.cognome} onChange={v => setFormData({ ...formData, cognome: v })} />
               </div>
               <FormField label="Nickname" value={formData.nickname} onChange={v => setFormData({ ...formData, nickname: v })} />
-              <FormField label="Città (Residenza)" value={formData.citta} onChange={v => setFormData({ ...formData, citta: v })} />
+              <FormField label="Città" value={formData.citta} onChange={v => setFormData({ ...formData, citta: v })} />
               <FormField label="Biografia" value={formData.biografia} multiline onChange={v => setFormData({ ...formData, biografia: v })} />
 
-              <h3 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mt-6 mb-2 border-b border-zinc-100 pb-2">Social Hub</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <FormField label="Instagram" value={formData.instagram_url} icon={<InstagramLogo />} onChange={v => setFormData({ ...formData, instagram_url: v })} />
-                <FormField label="TikTok" value={formData.tiktok_url} icon={<TiktokLogo />} onChange={v => setFormData({ ...formData, tiktok_url: v })} />
-                <FormField label="Facebook" value={formData.facebook_url} icon={<FacebookLogo />} onChange={v => setFormData({ ...formData, facebook_url: v })} />
-                <FormField label="YouTube" value={formData.youtube_url} icon={<YoutubeLogo />} onChange={v => setFormData({ ...formData, youtube_url: v })} />
+              <div className="pt-4">
+                <h3 className="text-[11px] font-black text-stone-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <span className="h-px bg-stone-200 flex-1" /> Social Hub <span className="h-px bg-stone-200 flex-1" />
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField label="Instagram" value={formData.instagram_url} icon={<InstagramLogo className="text-pink-500" />} onChange={v => setFormData({ ...formData, instagram_url: v })} />
+                  <FormField label="TikTok" value={formData.tiktok_url} icon={<TiktokLogo className="text-zinc-900" />} onChange={v => setFormData({ ...formData, tiktok_url: v })} />
+                  <FormField label="Facebook" value={formData.facebook_url} icon={<FacebookLogo className="text-blue-600" />} onChange={v => setFormData({ ...formData, facebook_url: v })} />
+                  <FormField label="YouTube" value={formData.youtube_url} icon={<YoutubeLogo className="text-red-600" />} onChange={v => setFormData({ ...formData, youtube_url: v })} />
+                </div>
               </div>
             </form>
           )}
         </section>
 
-        {/* ── HOW-TO EDUCATIONAL ── */}
-        <section className="card">
-          <h2 className="text-[16px] font-serif font-black text-text-primary tracking-tight mb-6 flex items-center gap-3">
-            <Books weight="bold" className="w-5 h-5 text-text-light" /> Come Funziona
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <HowToCard icon={<Compass weight="bold" className="w-6 h-6 text-accent" />} title="Sblocco GPS" desc="Avvicinati a un monumento entro 50m per ottenere la Card." />
-            <HowToCard icon={<Key weight="bold" className="w-6 h-6 text-accent-gold" />} title="PIN Partner" desc="Visita un locale affiliato e richiedi il codice segreto." />
-            <HowToCard icon={<CardsThree weight="bold" className="w-6 h-6 text-success" />} title="Collezione" desc="Completa i Set Regionali sfidando gli altri esploratori." />
+        {/* ── COME FUNZIONA ── */}
+        <section className="rounded-3xl border-2 border-dashed border-[#D5C8B8] bg-white p-7 relative">
+          <div className="absolute -top-4 left-6 px-4 py-1 rounded-full border-2 border-dashed border-[#D5C8B8] bg-[#FAF7F0] text-[10px] font-black uppercase tracking-[0.3em] text-[#B8882F]">
+            Guida Esplorativa
           </div>
-          <div className="mt-6 p-4 rounded-xl bg-bg-secondary border border-border-default text-[12px] text-text-muted leading-relaxed">
-            <strong className="text-text-primary font-bold">Le Saghe (Set di Carte):</strong> Sono percorsi tematici legati alla cultura pugliese. Completando internamente i set si ottengono punti XP massimizzati. Visita i tab "Missioni" per scoprire le sfide in corso!
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-4">
+            <HowToCard icon={<Compass weight="bold" />} title="GPS" desc="Avvicinati a un monumento per ottenere la Card." />
+            <HowToCard icon={<Key weight="bold" />} title="PIN" desc="Visita un partner e richiedi il codice." />
+            <HowToCard icon={<CardsThree weight="bold" />} title="Set" desc="Completa le Saghe per XP massimi." />
           </div>
         </section>
 
-        {/* ── SICUREZZA E LEGAL ── */}
+        {/* ── AZIONI ── */}
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="card !p-2 space-y-1">
+          <div className="rounded-3xl border-2 border-[#E8DDD0] bg-white p-2 space-y-1">
             {profile?.ruolo !== 'creator' && (
               <ActionRow
                 icon={<Compass weight="bold" />}
-                color="text-accent"
+                color="text-[#D4793A]"
                 label="Diventa Creator"
                 onClick={() => navigate('/diventa-creator')}
               />
             )}
-            <ActionRow icon={<Lock weight="bold" />} color="text-text-muted" label="Reimposta Password" onClick={() => setShowPasswordModal(true)} />
-            <ActionRow icon={<ShieldCheck weight="bold" />} color="text-success" label="Informativa sulla Privacy" onClick={() => navigate('/privacy')} />
-            <ActionRow icon={<BookOpenText weight="bold" />} color="text-accent-orange" label="Termini e Condizioni" onClick={() => navigate('/termini')} />
+            <ActionRow icon={<Lock weight="bold" />} color="text-stone-400" label="Reimposta Password" onClick={() => setShowPasswordModal(true)} />
+            <ActionRow icon={<ShieldCheck weight="bold" />} color="text-green-500" label="Privacy Policy" onClick={() => navigate('/privacy')} />
+            <ActionRow icon={<BookOpenText weight="bold" />} color="text-[#B8882F]" label="Termini & Condizioni" onClick={() => navigate('/termini')} />
           </div>
-          <div className="rounded-card bg-red-50/50 border border-red-100 p-2 shadow-sm">
-            <ActionRow icon={<Warning weight="fill" />} color="text-danger" label="Elimina Account" onClick={() => setShowDeleteModal(true)} />
+          <div className="rounded-3xl border-2 border-red-100 bg-red-50/30 p-2 flex items-center">
+            <ActionRow icon={<Warning weight="fill" />} color="text-red-500" label="Elimina Account" onClick={() => setShowDeleteModal(true)} />
           </div>
         </div>
-
       </div>
 
       {/* ════ MODALI ════ */}
-      <BottomModal open={showPasswordModal} onClose={() => setShowPasswordModal(false)} title="Reset Password">
-        <p className="text-[13px] text-text-muted mb-6 leading-relaxed">Riceverai un'email su <strong className="text-text-primary">{profile?.email}</strong> per reimpostare la tua password.</p>
-        <button onClick={handleResetPassword} disabled={passwordSending} className="btn-primary w-full">{passwordSending ? 'Invio in corso...' : 'Invia Modulo Reset'}</button>
-      </BottomModal>
+      <AnimatePresence>
+        {(showPasswordModal || showDeleteModal) && (
+          <BottomModal 
+            open={true} 
+            onClose={() => { setShowPasswordModal(false); setShowDeleteModal(false); setDeleteConfirmText('') }} 
+            title={showPasswordModal ? "Reset Password" : "Danger Zone"}
+          >
+            {showPasswordModal ? (
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-4">
+                  <Lock weight="bold" className="text-stone-400 w-8 h-8" />
+                </div>
+                <p className="text-[14px] font-medium text-stone-600 mb-6 leading-relaxed">
+                  Ti invieremo un link su <strong className="text-[#1A1A1A]">{profile?.email}</strong> per reimpostare la tua password in totale sicurezza.
+                </p>
+                <button 
+                  onClick={handleResetPassword} 
+                  disabled={passwordSending} 
+                  className="w-full py-4 rounded-2xl bg-[#1A1A1A] text-white font-black uppercase tracking-widest shadow-xl active:scale-95 transition"
+                >
+                  {passwordSending ? 'Invio...' : 'Invia Email Reset'}
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                  <Warning weight="fill" className="text-red-500 w-8 h-8" />
+                </div>
+                <p className="text-[14px] font-medium text-stone-600 mb-6 leading-relaxed text-center">
+                  Eliminando l'account perderai per sempre le card sbloccate e gli XP. <strong>Questa azione è definitiva.</strong>
+                </p>
+                <input 
+                  type="text" 
+                  value={deleteConfirmText} 
+                  onChange={e => setDeleteConfirmText(e.target.value)} 
+                  placeholder='Scrivi "elimina"' 
+                  className="w-full px-5 py-4 bg-white border-2 border-red-100 rounded-2xl mb-4 text-[14px] font-bold outline-none focus:border-red-400 transition text-center" 
+                />
+                <button 
+                  onClick={handleDeleteAccount} 
+                  disabled={deletingAccount || deleteConfirmText.trim().toLowerCase() !== 'elimina'} 
+                  className="w-full py-4 rounded-2xl bg-red-500 text-white font-black uppercase tracking-widest shadow-xl disabled:opacity-40 active:scale-95 transition"
+                >
+                  {deletingAccount ? '...' : 'Elimina Definitivamente'}
+                </button>
+              </div>
+            )}
+          </BottomModal>
+        )}
+      </AnimatePresence>
 
-      <BottomModal open={showDeleteModal} onClose={() => { setShowDeleteModal(false); setDeleteConfirmText('') }} title={<span className="text-danger flex items-center gap-2"><Warning weight="fill" /> Danger Zone</span>}>
-        <p className="text-[13px] text-text-muted mb-4 leading-relaxed">Eliminando l'account perderai per sempre le card sbloccate, gli XP e il ranking nel Club. <strong>L'azione non è reversibile.</strong></p>
-        <input type="text" value={deleteConfirmText} onChange={e => setDeleteConfirmText(e.target.value)} placeholder='Scrivi "elimina" per confermare' className="w-full px-4 py-3 bg-bg-secondary border border-border-default rounded-md mb-4 text-[14px] outline-none focus:border-danger transition" />
-        <button onClick={handleDeleteAccount} disabled={deletingAccount || deleteConfirmText.trim().toLowerCase() !== 'elimina'} className="w-full py-4 rounded-pill bg-danger text-white text-[14px] font-black disabled:opacity-40 active:scale-95 transition shadow-lg">Conferma Eliminazione</button>
-      </BottomModal>
-
-      {modeTransition.active && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
-          <div className="relative w-32 h-32 mb-6">
-            <img src="/cambioview/partner.png" className="absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out" style={{ opacity: modeTransition.flip ? 0 : 1, transform: modeTransition.flip ? "translateX(-50px) scale(0.9)" : "translateX(0) scale(1)" }} />
-            <img src="/cambioview/utente.png" className={`absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out ${modeTransition.flip ? "animate-pulse" : ""}`} style={{ opacity: modeTransition.flip ? 1 : 0, transform: modeTransition.flip ? "translateX(0) scale(1)" : "translateX(50px) scale(0.9)" }} />
-          </div>
-          <p className="text-[16px] font-bold text-zinc-950">Avvio HUB Partner...</p>
-        </div>
-      )}
+      {/* Transition Overlay */}
+      <AnimatePresence>
+        {modeTransition.active && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#FAF7F0]"
+          >
+            <div className="relative w-48 h-48 mb-8">
+              <img src="/cambioview/partner.png" className="absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out shadow-2xl rounded-3xl" style={{ opacity: modeTransition.flip ? 0 : 1, transform: modeTransition.flip ? "scale(0.8) translateY(-20px)" : "scale(1)" }} />
+              <img src="/cambioview/utente.png" className={`absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out`} style={{ opacity: modeTransition.flip ? 1 : 0, transform: modeTransition.flip ? "scale(1)" : "scale(0.8) translateY(20px)" }} />
+            </div>
+            <p className="text-xl font-black text-[#1A1A1A] tracking-widest uppercase italic" style={{ fontFamily: typography.serif }}>
+              {modeTransition.flip ? "Benvenuto in HUB" : "In preparazione..."}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
 
 function ProfileRow({ label, value }) {
   return (
-    <div className="flex gap-4 py-3 border-b border-border-default last:border-0 justify-between items-start">
-      <span className="overline !mb-0 shrink-0">{label}</span>
-      <span className="text-[13px] text-text-primary font-medium text-right break-words">{value}</span>
+    <div className="flex gap-4 py-3 border-b border-stone-100 last:border-0 justify-between items-start">
+      <span className="text-[10px] font-black uppercase tracking-widest text-stone-400 shrink-0 mt-0.5">{label}</span>
+      <span className="text-[14px] text-[#1A1A1A] font-bold text-right break-all">{value}</span>
     </div>
   )
 }
 
 function FormField({ label, value, onChange, type = "text", multiline = false, icon = null }) {
-  const cls = "w-full pl-3 pr-3 py-3 bg-white border border-border-default rounded-md text-[14px] text-text-primary placeholder:text-text-light focus:outline-none focus:border-accent transition resize-none shadow-sm"
+  const cls = "w-full px-4 py-3.5 bg-white border-2 border-[#E8DDD0] rounded-2xl text-[14px] font-bold text-[#1A1A1A] placeholder:text-stone-300 focus:outline-none focus:border-[#D4793A] transition resize-none shadow-sm"
   return (
-    <div className="relative">
-      <label className="overline !text-text-muted flex items-center gap-2">{icon}{label}</label>
+    <div className="relative flex-1">
+      <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-2 px-1 flex items-center gap-2">
+        {icon}{label}
+      </label>
       {multiline
         ? <textarea rows={3} className={cls} value={value} onChange={e => onChange(e.target.value)} />
         : <input type={type} className={cls} value={value} onChange={e => onChange(e.target.value)} />}
@@ -380,25 +469,27 @@ function FormField({ label, value, onChange, type = "text", multiline = false, i
 
 function ActionRow({ icon, color, label, onClick }) {
   return (
-    <button onClick={onClick} className="w-full flex items-center justify-between p-3 hover:bg-zinc-50 active:scale-95 rounded-xl transition group">
+    <button onClick={onClick} className="w-full flex items-center justify-between p-3.5 hover:bg-stone-50 active:scale-95 rounded-2xl transition group">
       <div className={`flex items-center gap-3 ${color}`}>
-        {icon}
-        <span className="text-[13px] font-bold text-zinc-900">{label}</span>
+        <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center shadow-sm border border-stone-100 group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
+          {icon}
+        </div>
+        <span className="text-[13px] font-black text-[#1A1A1A] uppercase tracking-wide">{label}</span>
       </div>
-      <ArrowRight weight="bold" className="w-4 h-4 text-zinc-500" />
+      <ArrowRight weight="bold" className="w-4 h-4 text-stone-300 group-hover:text-[#D4793A] transition-colors" />
     </button>
   )
 }
 
 function HowToCard({ icon, title, desc }) {
   return (
-    <div className="rounded-lg bg-bg-secondary border border-border-default p-5 flex flex-col gap-4 hover:bg-white hover:shadow-md transition-all duration-300">
-      <div className="w-12 h-12 rounded-lg bg-white border border-border-default flex items-center justify-center shadow-sm text-text-light">
+    <div className="rounded-2xl bg-[#F9F6F2] border border-[#E8DDD0] p-4 flex flex-col items-center text-center gap-3 hover:bg-white hover:shadow-lg transition-all">
+      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm text-[#D4793A]">
         {icon}
       </div>
       <div>
-        <p className="text-[14px] font-serif font-black text-text-primary">{title}</p>
-        <p className="text-[12px] text-text-muted mt-1 leading-relaxed">{desc}</p>
+        <p className="text-[13px] font-black text-[#1A1A1A] uppercase tracking-tighter" style={{ fontFamily: typography.serif }}>{title}</p>
+        <p className="text-[11px] font-medium text-stone-500 mt-1 leading-tight">{desc}</p>
       </div>
     </div>
   )
@@ -407,17 +498,22 @@ function HowToCard({ icon, title, desc }) {
 function BottomModal({ open, onClose, title, children }) {
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end sm:justify-center sm:items-center bg-bg-dark/60 backdrop-blur-md p-4 animate-in fade-in duration-300" onClick={onClose}>
-      <div className="w-full max-w-sm bg-bg-primary rounded-t-lg sm:rounded-lg p-7 shadow-card animate-in slide-in-from-bottom-10 sm:scale-95 flex flex-col max-h-[85vh] mb-24 sm:mb-0 relative" onClick={e => e.stopPropagation()}>
-        <div className="absolute top-0 left-10 right-10 h-[2px] bg-accent rounded-full opacity-50" />
-        <div className="flex items-center justify-between mb-6 shrink-0 pt-2">
-          <h3 className="text-[20px] font-serif font-black text-text-primary tracking-tight">{title}</h3>
-          <button onClick={onClose} className="w-9 h-9 rounded-full bg-white border border-border-default flex items-center justify-center text-text-muted hover:bg-zinc-100 transition shadow-sm"><X weight="bold" /></button>
+    <div className="fixed inset-0 z-[110] flex flex-col justify-end bg-zinc-950/40 backdrop-blur-md p-4" onClick={onClose}>
+      <motion.div 
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        className="w-full max-w-sm mx-auto bg-[#FAF7F0] rounded-3xl p-8 shadow-2xl relative border-2 border-[#E8DDD0]" 
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-8 bg-[#B8881F40] rotate-[3deg] rounded-sm" />
+        <div className="flex items-center justify-between mb-8">
+          <h3 className="text-2xl font-black text-[#1A1A1A] tracking-tight" style={{ fontFamily: typography.serif }}>{title}</h3>
+          <button onClick={onClose} className="w-9 h-9 rounded-xl bg-white border border-[#E8DDD0] flex items-center justify-center text-stone-400 hover:text-stone-900 transition shadow-sm"><X weight="bold" /></button>
         </div>
-        <div className="overflow-y-auto overflow-x-hidden pr-2 -mr-2 pb-4 scrollbar-hide">
+        <div>
           {children}
         </div>
-      </div>
+      </motion.div>
     </div>
   )
 }
