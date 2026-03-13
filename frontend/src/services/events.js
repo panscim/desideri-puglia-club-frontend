@@ -73,8 +73,11 @@ export const EventsService = {
             }))
 
             const allEvents = [...clubEvents, ...partnerEvents]
-                .sort((a, b) => new Date(a.data_inizio).getTime() - new Date(b.data_inizio).getTime())
-                .filter(ev => new Date(ev.data_inizio).getTime() >= new Date().getTime() - 86400000) // Filtro nasconde i passati (circa 1 giorno di tolleranza)
+                .sort((a, b) => {
+                    const aTime = new Date(a.data_inizio).getTime() || 0;
+                    const bTime = new Date(b.data_inizio).getTime() || 0;
+                    return aTime - bTime;
+                })
                 .slice(0, 15) // Limit finale
 
             return allEvents
