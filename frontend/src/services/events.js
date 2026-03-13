@@ -51,7 +51,8 @@ export const EventsService = {
             const clubEvents = (clubRes.data || []).map(ev => ({
                 ...ev,
                 isGuestEvent: false, // Per distinguere il tipo di routing
-                iscritti_count: countsMap[ev.id] || 0
+                iscritti_count: countsMap[ev.id] || 0,
+                data_inizio: ev.data_inizio || ev.event_date, // normalizza il campo data
             }))
 
             // Normalizziamo i dati del partner in formato compatibile con Eventi.jsx
@@ -211,15 +212,17 @@ export const EventsService = {
     async getEventById(id) {
         try {
             // Prova in eventi_club
-            const { data: clubData } = await supabase
+            const { data: clubData, error: clubError } = await supabase
                 .from('eventi_club')
                 .select(`
                     *,
                     partners ( id, name, city, logo_url, description ),
-                    cards:ricompensa_card_id ( id, image_url, rarity, title, description )
+                    cards:ricompensa_card_id ( id, image_url, rarity, title, curiosity1_it )
                 `)
                 .eq('id', id)
                 .maybeSingle()
+            
+            if (clubError) console.error("Error fetching club event:", clubError);
 
             // Recuperiamo il conteggio iscritti reale per questo evento
             const { count: iscrittiCount } = await supabase
@@ -240,7 +243,7 @@ export const EventsService = {
                 .eq('id', id)
                 .maybeSingle()
 
-            if (partnerData && partnerData.partners?.subscription_status === 'active') {
+            if (partnerData) {
                 return {
                     id: partnerData.id,
                     titolo: partnerData.title,
