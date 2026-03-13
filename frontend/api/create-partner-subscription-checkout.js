@@ -80,7 +80,10 @@ export default async function handler(req, res) {
           quantity: 1,
           price_data: {
             currency: 'eur',
-            product: plan.productId,
+            product_data: {
+              name: plan.name,
+              metadata: { product_id: plan.productId },
+            },
             recurring: { interval: 'month' },
             unit_amount: plan.unitAmount,
           },
