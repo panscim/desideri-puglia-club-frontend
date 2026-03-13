@@ -358,7 +358,7 @@ export default function PartnerSubscription() {
       </div>
 
       {/* ── STICKY CTA BOTTOM ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-xl border-t border-black/5 px-5 pt-4 pb-8 safe-area-inset-bottom">
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#FAF7F2]/95 backdrop-blur-xl border-t border-black/5 px-5 pt-4 pb-24" style={{ paddingBottom: 'max(96px, calc(env(safe-area-inset-bottom, 0px) + 80px))' }}>
         <div className="max-w-sm mx-auto flex flex-col gap-3">
           {/* Price summary */}
           <div className="flex items-center justify-between px-1">
