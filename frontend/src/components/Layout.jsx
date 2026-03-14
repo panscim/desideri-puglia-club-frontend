@@ -63,7 +63,7 @@ const Layout = () => {
   const navItems = [
     { path: '/dashboard', icon: Compass, label: t('nav.home') || 'Scopri' },
     { path: '/daily-plans', icon: Scroll, label: 'Piani' },
-    { path: '/biglietti', icon: Ticket, label: 'Biglietti' },
+    { path: '/partner', icon: Buildings, label: 'Partner' },
     { path: '/album', icon: BookOpen, label: 'Album' },
     { path: '/profilo', icon: User, label: t('nav.profile') || 'Profilo' },
   ]
@@ -143,7 +143,7 @@ const Layout = () => {
             {[
               { path: '/dashboard', icon: Sparkle, label: 'Scopri' },
               { path: '/daily-plans', icon: Scroll, label: 'Piani' },
-              { path: '/biglietti', icon: Ticket, label: 'Biglietti' },
+              { path: '/partner', icon: Buildings, label: 'Partner' },
               { path: '/album', icon: BookBookmark, label: 'Album' },
               { path: '/profilo', icon: UserCircle, label: 'Profilo' }
             ].map((item) => {

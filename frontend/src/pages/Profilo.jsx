@@ -9,8 +9,12 @@ import {
   UserCircle, PencilSimple, SignOut, ShareNetwork, ShieldCheck,
   Trash, Lock, MapPin, Medal, Path, Books, X, CardsThree, Compass, Key,
   ArrowRight, Warning, Camera, FloppyDisk, InstagramLogo, TiktokLogo,
-  FacebookLogo, YoutubeLogo, BookOpenText, CheckCircle
+  FacebookLogo, YoutubeLogo, BookOpenText, CheckCircle,
+  Ticket, CalendarBlank, QrCode, CaretRight
 } from '@phosphor-icons/react'
+import { EventsService } from '../services/events'
+import { format } from 'date-fns'
+import { it as itLocale } from 'date-fns/locale'
 import { useTheme } from '../contexts/ThemeContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import { colors as TOKENS, typography } from "../utils/designTokens"
@@ -23,6 +27,8 @@ export default function Profilo() {
   const [loading, setLoading] = useState(true)
   const [partner, setPartner] = useState(null)
   const [stats, setStats] = useState({ cards: 0, km: 0, xp: 0 })
+  const [bookings, setBookings] = useState([])
+  const [loadingBookings, setLoadingBookings] = useState(true)
 
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -66,7 +72,22 @@ export default function Profilo() {
         setLoading(false)
       }
     }
+
+    const loadBookings = async () => {
+      try {
+        setLoadingBookings(true)
+        const data = await EventsService.getUserDetailedBookings()
+        setBookings(data || [])
+      } catch (e) {
+        console.error('Errore loadBookings:', e)
+        setBookings([])
+      } finally {
+        setLoadingBookings(false)
+      }
+    }
+
     loadData()
+    loadBookings()
   }, [profile?.id])
 
   // --- AZIONI ---
@@ -258,6 +279,84 @@ export default function Profilo() {
           <ArrowRight weight="bold" className="w-4 h-4 text-stone-300 group-hover:text-[#D4793A] transition-colors" />
           <div className="absolute top-0 right-0 w-24 h-full bg-[#D4793A]/5 -skew-x-12 translate-x-12 group-hover:translate-x-8 transition-transform" />
         </motion.button>
+
+        {/* ── I TUOI BIGLIETTI ── */}
+        <section className="rounded-3xl border-2 border-[#E8DDD0] bg-white p-7 relative">
+          <div className="absolute -top-4 left-6 px-4 py-1 rounded-full border-2 border-[#E8DDD0] bg-[#FAF7F0] text-[10px] font-black uppercase tracking-[0.3em] text-[#B8882F]">
+            I tuoi Biglietti
+          </div>
+
+          {loadingBookings ? (
+            <div className="flex justify-center py-6 mt-2">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#D4793A]" />
+            </div>
+          ) : bookings.length === 0 ? (
+            <div className="flex flex-col items-center text-center py-4 mt-2 gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-[#FAF7F0] flex items-center justify-center border-2 border-dashed border-[#D5C8B8]">
+                <Ticket weight="bold" className="w-6 h-6 text-[#D4793A]" />
+              </div>
+              <div>
+                <p className="text-[14px] font-black text-[#1A1A1A]">Nessun biglietto</p>
+                <p className="text-[12px] text-stone-400 mt-0.5">Prenota un evento per trovarlo qui</p>
+              </div>
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="px-5 py-2 rounded-full bg-[#1A1A1A] text-white text-[11px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition"
+              >
+                Scopri eventi
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3 mt-4">
+              {bookings.slice(0, 3).map((booking) => {
+                const ev = booking.event
+                if (!ev) return null
+                const date = ev.data_inizio ? new Date(ev.data_inizio) : null
+                return (
+                  <div
+                    key={booking.id}
+                    onClick={() => navigate(`/booking-confirmation/${ev.id}`)}
+                    className="flex items-center gap-3 p-3 rounded-2xl border border-[#E8DDD0] hover:bg-[#FAF7F0] transition cursor-pointer group"
+                  >
+                    <div className="w-12 h-12 rounded-2xl overflow-hidden bg-stone-100 flex-shrink-0">
+                      {(ev.immagine_url || ev.image_url) ? (
+                        <img src={ev.immagine_url || ev.image_url} className="w-full h-full object-cover" alt={ev.titolo || ev.title} />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Ticket weight="bold" className="w-5 h-5 text-[#D4793A]" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-black text-[#1A1A1A] truncate">{ev.titolo || ev.title}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        {date && (
+                          <span className="text-[10px] font-bold text-stone-400 flex items-center gap-1">
+                            <CalendarBlank size={10} weight="bold" />
+                            {format(date, 'dd MMM', { locale: itLocale })}
+                          </span>
+                        )}
+                        <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full ${booking.status === 'confermato' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
+                          {booking.status === 'confermato' ? 'Confermato' : 'In loco'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="w-8 h-8 rounded-xl bg-[#1A1A1A] flex items-center justify-center flex-shrink-0 group-hover:bg-[#D4793A] transition-colors">
+                      <QrCode size={16} weight="bold" className="text-white" />
+                    </div>
+                  </div>
+                )
+              })}
+              <button
+                onClick={() => navigate('/biglietti')}
+                className="w-full py-3 rounded-2xl border-2 border-dashed border-[#D5C8B8] text-[11px] font-black uppercase tracking-widest text-[#B8882F] hover:border-[#D4793A] hover:text-[#D4793A] transition flex items-center justify-center gap-2"
+              >
+                <Ticket weight="bold" className="w-3.5 h-3.5" />
+                Vedi tutti i biglietti ({bookings.length})
+              </button>
+            </div>
+          )}
+        </section>
 
         {!partner && (
           <button
