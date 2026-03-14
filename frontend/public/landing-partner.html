@@ -151,8 +151,10 @@
     ============================================ */
     #step1 {
       background:
-        radial-gradient(ellipse at 30% 60%, rgba(212,121,58,0.25) 0%, transparent 55%),
-        linear-gradient(160deg, #0A0D0A 0%, #131A12 40%, #080C08 100%);
+        radial-gradient(ellipse at 30% 60%, rgba(212,121,58,0.22) 0%, transparent 50%),
+        linear-gradient(160deg, rgba(10,13,10,0.93) 0%, rgba(19,26,18,0.90) 40%, rgba(8,12,8,0.95) 100%),
+        url('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+      background-color: #0A0D0A;
       min-height: 100dvh;
       align-items: center;
       justify-content: flex-end;
@@ -711,6 +713,139 @@
     }
 
     /* ============================================
+       3D PARTNER CARD
+    ============================================ */
+    .card3d-wrap {
+      text-align: center;
+      margin: 4px 0 8px;
+    }
+    .card3d-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 18px;
+    }
+    .partner-card-3d {
+      width: 260px;
+      margin: 0 auto;
+      border-radius: 20px;
+      background: #1C1C1C;
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+      transform: perspective(900px) rotateX(7deg) rotateY(-13deg);
+      transition: transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.7s ease;
+      animation: float3d 5s ease-in-out infinite;
+      box-shadow:
+        0 28px 64px rgba(0,0,0,0.65),
+        0 4px 20px rgba(212,121,58,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.08);
+      cursor: pointer;
+    }
+    .partner-card-3d:hover {
+      transform: perspective(900px) rotateX(0deg) rotateY(0deg) scale(1.03);
+      animation: none;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 40px rgba(212,121,58,0.25);
+    }
+    @keyframes float3d {
+      0%,100% { transform: perspective(900px) rotateX(7deg) rotateY(-13deg) translateY(0px); }
+      50%      { transform: perspective(900px) rotateX(7deg) rotateY(-13deg) translateY(-9px); }
+    }
+    .card3d-cover {
+      height: 130px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #2C1A0E 0%, #1A2C1A 100%);
+    }
+    .card3d-cover img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .card3d-cover-grad {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 30%, rgba(28,28,28,0.85) 100%);
+    }
+    .card3d-body { padding: 10px 14px 14px; }
+    .card3d-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .card3d-logo {
+      width: 38px; height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #D4793A, #E8AB5C);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      margin-top: -22px;
+      border: 2px solid #1C1C1C;
+      box-shadow: 0 4px 12px rgba(212,121,58,0.4);
+    }
+    .card3d-badge {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #4ade80;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.2);
+      padding: 3px 8px;
+      border-radius: 100px;
+    }
+    .card3d-name {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 4px;
+      text-align: left;
+    }
+    .card3d-location {
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .card3d-stats {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 12px;
+    }
+    .card3d-sep { opacity: 0.3; }
+    .blurred-text {
+      filter: blur(4px);
+      user-select: none;
+      pointer-events: none;
+    }
+    .card3d-locked {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 100px;
+      padding: 6px 10px;
+    }
+    .card3d-hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      margin-top: 14px;
+      font-style: italic;
+    }
+
+    /* ============================================
        REVEAL ANIMATIONS
     ============================================ */
     .reveal {
@@ -1080,16 +1215,48 @@
         </div>
       </div>
 
-      <div class="value-box reveal" style="transition-delay:0.24s">
+      <!-- 3D Partner Card Preview -->
+      <div class="card3d-wrap reveal" style="transition-delay:0.24s">
+        <p class="card3d-label">Come appari nell'app:</p>
+        <div class="partner-card-3d" id="card3d">
+          <div class="card3d-cover">
+            <img src="https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=400&h=180&q=80"
+              alt="Cover" loading="lazy" onerror="this.style.opacity='0'">
+            <div class="card3d-cover-grad"></div>
+          </div>
+          <div class="card3d-body">
+            <div class="card3d-top-row">
+              <div class="card3d-logo">🌿</div>
+              <span class="card3d-badge">✓ Partner verificato</span>
+            </div>
+            <div class="card3d-name blurred-text">La Tua Masseria</div>
+            <div class="card3d-location">📍 Puglia · Ristorante / Masseria</div>
+            <div class="card3d-stats">
+              <span class="blurred-text">⭐ 4.9</span>
+              <span class="card3d-sep">·</span>
+              <span class="blurred-text">❤️ 312 soci</span>
+              <span class="card3d-sep">·</span>
+              <span class="blurred-text">🗺 124 card</span>
+            </div>
+            <div class="card3d-locked">
+              <span>🔒</span>
+              <span>Visibile ai soci dal 31 Marzo 2026</span>
+            </div>
+          </div>
+        </div>
+        <p class="card3d-hint">Il nome e i numeri saranno i tuoi</p>
+      </div>
+
+      <div class="value-box reveal" style="transition-delay:0.36s">
         <span class="value-icon">📍</span>
         <p class="value-text">
-          I soci del club cercano attività autentiche.
-          Non trovano strade battute.
-          Trovano quello che i locals consiglierebbero.
+          <strong>I soci del club cercano esperienze autentiche.</strong><br>
+          L'app è gratuita, gamificata, dedicata a tutta la Puglia.<br>
+          Card GPS collezionabili portano i viaggiatori <em>da te</em>.
         </p>
       </div>
 
-      <div class="numbers-row reveal" style="transition-delay:0.28s">
+      <div class="numbers-row reveal" style="transition-delay:0.44s">
         <div class="number-item">
           <span class="number-big">63%</span>
           <span class="number-desc">dei turisti cerca esperienze autentiche, non hotel</span>
@@ -1104,10 +1271,10 @@
         </div>
       </div>
 
-      <button class="btn-primary reveal" id="step2-cta" style="transition-delay:0.32s">
+      <button class="btn-primary reveal" id="step2-cta" style="transition-delay:0.52s">
         Voglio sapere di più →
       </button>
-      <button class="btn-ghost reveal" id="step2-back" style="transition-delay:0.36s">
+      <button class="btn-ghost reveal" id="step2-back" style="transition-delay:0.56s">
         ← Torna indietro
       </button>
 
@@ -1224,8 +1391,8 @@
     // ============================================
     // SUPABASE CONFIG
     // ============================================
-    const SUPABASE_URL = '';
-    const SUPABASE_KEY = '';
+    const SUPABASE_URL = 'https://edzwtxatihiqyvqvqqe.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkend0eGF0aWhpcXl2cXZxcXFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyOTg0OTQsImV4cCI6MjA3Njg3NDQ5NH0.WJE8bHjYaY6rB2NaPv9z26mHmO6r2UA5gu2yHNGJ8XQ';
 
     // ============================================
     // STATE
