@@ -665,6 +665,7 @@ export default function PartnerJoin() {
 
       if (partnerId) {
         await supabase.from("utenti").update({ partner_id: partnerId }).eq("id", profile.id);
+        try { await saveOpeningHours(partnerId); } catch (e) { console.warn("Saving opening hours failed:", e); }
       }
 
       if (startCheckout && selectedPlan && partnerId) {
@@ -916,7 +917,7 @@ export default function PartnerJoin() {
               <div className="h-1.5 w-full bg-stone-200">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: `${(businessStep / 4) * 100}%` }}
+                  animate={{ width: `${(businessStep / 5) * 100}%` }}
                   className="h-full bg-zinc-950"
                 />
               </div>
@@ -924,7 +925,7 @@ export default function PartnerJoin() {
               <div className="p-8 sm:p-12 overflow-y-auto">
                 <div className="flex items-center justify-between mb-8">
                   <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4793A]">
-                    Step {businessStep} di 4
+                    Step {businessStep} di 5
                   </span>
                   <button onClick={() => navigate('/partner/join')} className="w-8 h-8 rounded-full bg-stone-200 flex items-center justify-center">
                     <X size={16} className="text-zinc-900" />
@@ -1023,6 +1024,96 @@ export default function PartnerJoin() {
                 )}
 
                 {businessStep === 4 && (
+                  <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+                    <div>
+                      <h3 className="text-4xl font-black text-zinc-950 mb-3" style={{ fontFamily: typography.serif }}>
+                        Orari di <br />apertura.
+                      </h3>
+                      <p className="text-zinc-500 mb-6 font-medium">Indicaci quando sei aperto. Potrai modificarli in seguito.</p>
+                    </div>
+
+                    <div className="space-y-3">
+                      {openingHours.map((day, idx) => {
+                        const DAYS = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+                        return (
+                          <div key={idx} className="rounded-2xl bg-white border border-stone-200 overflow-hidden">
+                            {/* Day header */}
+                            <div
+                              className="flex items-center justify-between px-5 py-4 cursor-pointer"
+                              onClick={() => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, closed: !d.closed } : d))}>
+                              <span className="text-[14px] font-black text-zinc-950">{DAYS[idx]}</span>
+                              <div className="flex items-center gap-3">
+                                {day.closed
+                                  ? <span className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Chiuso</span>
+                                  : <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600">Aperto</span>}
+                                <div
+                                  className="w-12 h-6 rounded-full relative transition-colors"
+                                  style={{ background: day.closed ? '#E5E7EB' : '#D4793A' }}>
+                                  <div
+                                    className="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all"
+                                    style={{ left: day.closed ? '4px' : '28px' }} />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Time inputs */}
+                            {!day.closed && (
+                              <div className="px-5 pb-4 space-y-3 border-t border-stone-100 pt-3">
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 block">Apertura</label>
+                                    <input
+                                      type="time"
+                                      value={day.open_time}
+                                      onChange={e => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, open_time: e.target.value } : d))}
+                                      className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-stone-50 text-[14px] font-bold text-zinc-950 focus:outline-none focus:border-zinc-950"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 block">Chiusura</label>
+                                    <input
+                                      type="time"
+                                      value={day.close_time}
+                                      onChange={e => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, close_time: e.target.value } : d))}
+                                      className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-stone-50 text-[14px] font-bold text-zinc-950 focus:outline-none focus:border-zinc-950"
+                                    />
+                                  </div>
+                                </div>
+                                <details className="group">
+                                  <summary className="text-[10px] font-black uppercase tracking-widest text-zinc-400 cursor-pointer list-none flex items-center gap-1.5">
+                                    <Plus size={10} /> Pausa pranzo
+                                  </summary>
+                                  <div className="grid grid-cols-2 gap-3 mt-3">
+                                    <div>
+                                      <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 block">Inizio pausa</label>
+                                      <input
+                                        type="time"
+                                        value={day.break_open_time}
+                                        onChange={e => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, break_open_time: e.target.value } : d))}
+                                        className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-stone-50 text-[14px] font-bold text-zinc-950 focus:outline-none focus:border-zinc-950"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 block">Fine pausa</label>
+                                      <input
+                                        type="time"
+                                        value={day.break_close_time}
+                                        onChange={e => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, break_close_time: e.target.value } : d))}
+                                        className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-stone-50 text-[14px] font-bold text-zinc-950 focus:outline-none focus:border-zinc-950"
+                                      />
+                                    </div>
+                                  </div>
+                                </details>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+
+                {businessStep === 5 && (
                   <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
                     <div>
                       <h3 className="text-4xl font-black text-zinc-950 mb-3" style={{ fontFamily: typography.serif }}>
@@ -1065,7 +1156,7 @@ export default function PartnerJoin() {
                     Indietro
                   </button>
                 )}
-                {businessStep < 4 ? (
+                {businessStep < 5 ? (
                   <button
                     onClick={() => {
                       if (businessStep === 1 && !businessData.name.trim()) return toast.error("Inserisci il nome.");
