@@ -148,7 +148,10 @@ function PartnerCard({ p }) {
               </span>
             )}
             {p.distance != null && (
-              <span className="text-[10px] font-semibold ml-auto" style={{ color: T.orange }}>
+              <span
+                className="flex items-center gap-1 text-[10px] font-black ml-auto px-2.5 py-0.5 rounded-full"
+                style={{ background: `${T.orange}18`, color: T.orange }}>
+                <NavigationArrow size={9} weight="bold" />
                 {p.distance} km
               </span>
             )}
@@ -210,7 +213,21 @@ export default function Partner() {
   const [mapCenter, setMapCenter] = useState([41.1171, 16.8719]);
   const [mapZoom, setMapZoom] = useState(9);
 
-  useEffect(() => { loadPartners(); }, []);
+  useEffect(() => {
+    loadPartners();
+    // Auto-request GPS silently on mount (only sets position, not the filter)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords: { latitude, longitude } }) => {
+          setUserPos([latitude, longitude]);
+          setMapCenter([latitude, longitude]);
+          setMapZoom(12);
+        },
+        () => {}, // silent fail — user can still click "Vicino a me"
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  }, []);
 
   const loadPartners = async () => {
     try {
@@ -232,6 +249,13 @@ export default function Partner() {
   };
 
   const requestGPS = () => {
+    // If we already have position from the silent auto-request, just activate the filter
+    if (userPos) {
+      setGpsActive(true);
+      setMapCenter(userPos);
+      setMapZoom(12);
+      return;
+    }
     if (!navigator.geolocation) return toast.error("GPS non disponibile.");
     setGpsLoading(true);
     navigator.geolocation.getCurrentPosition(
@@ -258,9 +282,16 @@ export default function Partner() {
     if (activeCategory !== ALL_KEY) list = list.filter(p => p.category === activeCategory);
     if (activeCity !== ALL_KEY) list = list.filter(p => p.city === activeCity);
     if (q) list = list.filter(p => `${p.name} ${p.city} ${p.category}`.toLowerCase().includes(q));
+    // Always compute distance when GPS position is available
+    if (userPos) {
+      list = list.map(p => ({
+        ...p,
+        distance: p.coords ? Math.round(haversineKm(userPos[0], userPos[1], p.coords[0], p.coords[1]) * 10) / 10 : null,
+      }));
+    }
+    // Filter by radius only when "Vicino a me" is active
     if (gpsActive && userPos) {
       list = list
-        .map(p => ({ ...p, distance: p.coords ? Math.round(haversineKm(userPos[0], userPos[1], p.coords[0], p.coords[1]) * 10) / 10 : null }))
         .filter(p => p.distance !== null && p.distance <= radius)
         .sort((a, b) => (a.distance ?? 999) - (b.distance ?? 999));
     } else {
