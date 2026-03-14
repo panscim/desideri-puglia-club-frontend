@@ -10,19 +10,29 @@ import {
   Trash, Lock, MapPin, Medal, Path, Books, X, CardsThree, Compass, Key,
   ArrowRight, Warning, Camera, FloppyDisk, InstagramLogo, TiktokLogo,
   FacebookLogo, YoutubeLogo, BookOpenText, CheckCircle,
-  Ticket, CalendarBlank, QrCode, CaretRight
+  Ticket, CalendarBlank, QrCode, CaretRight, Buildings
 } from '@phosphor-icons/react'
 import { EventsService } from '../services/events'
 import { format } from 'date-fns'
 import { it as itLocale } from 'date-fns/locale'
-import { useTheme } from '../contexts/ThemeContext'
 import { motion, AnimatePresence } from 'framer-motion'
-import { colors as TOKENS, typography } from "../utils/designTokens"
+import { typography } from '../utils/designTokens'
+
+// ── Design Tokens (stessa palette di Partner.jsx) ──
+const T = {
+  serif: "'Libre Baskerville', 'Playfair Display', Georgia, serif",
+  bgPage: '#F9F9F7',
+  bgNavbar: '#0f0f0f',
+  orange: '#f97316',
+  terracotta: '#D4793A',
+  textPri: '#1F2933',
+  textMut: '#6B7280',
+  border: '#E5E7EB',
+}
 
 export default function Profilo() {
   const navigate = useNavigate()
   const { profile, refreshProfile, isAdmin } = useAuth()
-  const { theme } = useTheme()
 
   const [loading, setLoading] = useState(true)
   const [partner, setPartner] = useState(null)
@@ -90,7 +100,6 @@ export default function Profilo() {
     loadBookings()
   }, [profile?.id])
 
-  // --- AZIONI ---
   const handleLogout = async () => {
     await supabase.auth.signOut()
     localStorage.clear()
@@ -132,11 +141,7 @@ export default function Profilo() {
   }
 
   const handleShare = async () => {
-    const shareData = {
-      title: 'Desideri di Puglia',
-      text: 'Scopri le bellezze della Puglia con me su Desideri di Puglia!',
-      url: window.location.origin
-    }
+    const shareData = { title: 'Desideri di Puglia', text: 'Scopri le bellezze della Puglia con me!', url: window.location.origin }
     try {
       if (navigator.share) await navigator.share(shareData)
       else { await navigator.clipboard.writeText(shareData.url); toast.success('Link copiato!') }
@@ -161,7 +166,7 @@ export default function Profilo() {
       localStorage.clear()
       sessionStorage.clear()
       navigate('/login')
-    } catch (err) { toast.error('Errore durante l\'eliminazione') }
+    } catch (err) { toast.error("Errore durante l'eliminazione") }
     finally { setDeletingAccount(false) }
   }
 
@@ -171,348 +176,391 @@ export default function Profilo() {
     setTimeout(() => navigate(target === 'partner' ? '/partner/dashboard' : '/dashboard'), 3000)
   }
 
-  const displayName = profile?.nome && profile?.cognome ? `${profile.nome} ${profile.cognome}` : profile?.nickname || profile?.email?.split('@')[0] || 'Esploratore'
+  const displayName = profile?.nome && profile?.cognome
+    ? `${profile.nome} ${profile.cognome}`
+    : profile?.nickname || profile?.email?.split('@')[0] || 'Esploratore'
   const initials = (profile?.nome?.[0] || profile?.nickname?.[0] || '?').toUpperCase()
 
   return (
-    <div className="min-h-[100dvh] pb-32 selection:bg-[#D4793A]/30"
-      style={{
-        background: '#FAF7F0',
-        backgroundImage: 'radial-gradient(circle, rgba(60,40,20,0.04) 1px, transparent 1px)',
-        backgroundSize: '24px 24px',
-      }}>
+    <div style={{ background: T.bgPage, minHeight: '100vh' }}>
 
-      {/* Decorative ribbons */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-        <div className="absolute top-10 left-[-20px] w-32 h-8 rounded-sm rotate-[-30deg] opacity-20"
-          style={{ background: '#D4793A' }} />
-        <div className="absolute top-20 right-[-10px] w-24 h-6 rounded-sm rotate-[10deg] opacity-15"
-          style={{ background: '#B8882F' }} />
-      </div>
+      {/* ══ NAVBAR ══ */}
+      <nav
+        className="fixed top-0 inset-x-0 z-[100] px-5 h-16 flex items-center justify-between no-theme-flip"
+        style={{ backgroundColor: T.bgNavbar, borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
 
-      {/* ── HERO / POLAROID ── */}
-      <div className="relative pt-12 pb-16 px-6 flex flex-col items-center text-center">
-        <div className="w-full flex justify-between items-center absolute top-4 px-4 z-20">
-          {isAdmin ? <Link to="/admin" className="px-3 py-1.5 rounded-xl bg-white border border-[#E8DDD0] text-[9px] font-black tracking-widest text-[#1A1A1A] shadow-sm">ADMIN</Link> : <div />}
-          <button onClick={handleLogout} className="w-9 h-9 rounded-xl bg-white border border-[#E8DDD0] flex items-center justify-center text-[#1A1A1A] shadow-sm active:scale-95 transition hover:bg-rose-50 hover:border-rose-200 hover:text-rose-500">
-            <SignOut weight="bold" className="w-4 h-4 ml-0.5" />
-          </button>
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <Link
+              to="/admin"
+              className="px-3 py-1.5 rounded-xl text-[9px] font-black tracking-[0.2em] uppercase"
+              style={{ background: '#27272a', border: '1px solid #3f3f46', color: 'white' }}>
+              ADMIN
+            </Link>
+          )}
         </div>
 
-        {/* Polaroid Avatar */}
-        <motion.label 
-          initial={{ rotate: -3 }}
-          whileHover={{ rotate: 1, scale: 1.05 }}
-          className="relative cursor-pointer z-10 mb-8 mt-6 p-3 bg-white shadow-2xl rounded-sm border border-stone-200/50"
-        >
-          <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-          <div className="w-28 h-28 overflow-hidden bg-stone-100 flex items-center justify-center text-3xl font-black text-stone-300">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover grayscale-[20%]" />
-            ) : initials}
-            {/* Grain effect on photo */}
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-20 pointer-events-none" />
-          </div>
-          <div className="pt-3 pb-1">
-            <span className="text-[10px] font-bold text-stone-400 uppercase tracking-widest italic">{profile?.ruolo || 'Esploratore'}</span>
-          </div>
-          <div className="absolute -bottom-2 -right-2 w-7 h-7 rounded-full bg-[#D4793A] flex items-center justify-center shadow-lg border-2 border-white text-white">
-            <Camera weight="fill" className="w-3.5 h-3.5" />
-          </div>
-          {/* Taped effect */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-6 bg-[#B8882F30] rotate-[-2deg] rounded-sm pointer-events-none" />
-        </motion.label>
-
-        <h1 className="text-3xl font-black text-[#1A1A1A] tracking-tight z-10" style={{ fontFamily: typography.serif }}>{displayName}</h1>
-        <p className="text-[13px] font-bold text-stone-500 mt-2 z-10 flex items-center gap-1.5 uppercase tracking-wide">
-          <MapPin weight="fill" className="text-[#D4793A] w-3.5 h-3.5" /> {profile?.citta || 'Puglia, Italia'}
+        <p className="text-[10px] font-black uppercase tracking-[0.4em]" style={{ color: 'white' }}>
+          Profilo
         </p>
 
-        <div className="flex items-center gap-2 mt-6 z-10">
-          <div className="px-4 py-1.5 rounded-full bg-white border border-[#E8DDD0] text-[10px] font-black text-[#1A1A1A] uppercase tracking-widest shadow-sm">
-            Passaporto Digitale
-          </div>
-          {partner && (
-            <button
-              onClick={() => handleModeSwitch('partner')}
-              className="px-4 py-1.5 rounded-full bg-[#D4793A] border border-[#B8882F50] text-[10px] font-black text-white uppercase tracking-widest shadow-md active:scale-95 transition-transform"
-            >
-              HUB Partner
-            </button>
-          )}
-        </div>
-      </div>
+        <button
+          onClick={handleLogout}
+          className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform no-theme-flip"
+          style={{ background: '#27272a', border: '1px solid #3f3f46' }}>
+          <SignOut size={17} weight="bold" color="white" />
+        </button>
+      </nav>
 
-      <div className="max-w-3xl mx-auto px-6 space-y-8 relative z-30 pb-10">
-        {/* ── STATS SCRAPBOOK ── */}
-        <div className="grid grid-cols-3 gap-4">
+      <main className="pt-24 pb-32 px-5 max-w-lg mx-auto">
+
+        {/* ══ HERO AVATAR ══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center text-center mb-10">
+
+          {/* Avatar */}
+          <motion.label
+            whileTap={{ scale: 0.96 }}
+            className="relative cursor-pointer mb-6 mt-2">
+            <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+            <div
+              className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center text-3xl font-black"
+              style={{ background: '#E5E7EB', color: T.textMut, border: `3px solid white`, boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}>
+              {profile?.avatar_url
+                ? <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                : <span style={{ color: T.terracotta }}>{initials}</span>}
+            </div>
+            <div
+              className="absolute bottom-0 right-0 w-8 h-8 rounded-full flex items-center justify-center border-2 border-white"
+              style={{ background: T.terracotta, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+              <Camera size={14} weight="fill" color="white" />
+            </div>
+          </motion.label>
+
+          <h1
+            className="text-3xl font-black leading-tight tracking-tight mb-1"
+            style={{ fontFamily: T.serif, color: T.textPri }}>
+            {displayName}
+          </h1>
+
+          {profile?.citta && (
+            <p className="flex items-center gap-1 text-[12px] font-semibold mb-4" style={{ color: T.textMut }}>
+              <MapPin size={12} weight="fill" style={{ color: T.terracotta }} />
+              {profile.citta}
+            </p>
+          )}
+
+          {/* Mode pills */}
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+            <span
+              className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em]"
+              style={{ background: `${T.terracotta}15`, color: T.terracotta, border: `1px solid ${T.terracotta}30` }}>
+              {profile?.ruolo || 'Esploratore'}
+            </span>
+            {partner && (
+              <button
+                onClick={() => handleModeSwitch('partner')}
+                className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] active:scale-95 transition-transform flex items-center gap-1.5"
+                style={{ background: T.textPri, color: 'white' }}>
+                <Buildings size={11} weight="bold" />
+                HUB Partner
+              </button>
+            )}
+          </div>
+        </motion.div>
+
+        {/* ══ STATS ══ */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="grid grid-cols-3 gap-3 mb-8">
           {[
-            { Icon: CardsThree, val: stats.cards, label: 'Card', color: '#16a34a' },
-            { Icon: Path, val: stats.km, label: 'Km', color: '#D4793A' },
-            { Icon: Medal, val: stats.xp, label: 'Punti', color: '#B8882F' }
+            { val: loading ? '·' : stats.cards, label: 'Card', color: '#16a34a' },
+            { val: loading ? '·' : stats.km, label: 'Km', color: T.terracotta },
+            { val: loading ? '·' : stats.xp, label: 'Punti', color: '#B8882F' },
           ].map((s, i) => (
-            <div key={i} className="rounded-3xl bg-white border-2 border-dashed border-[#D5C8B8] p-4 text-center shadow-sm relative rotate-[1deg] odd:rotate-[-1deg] transition-transform hover:rotate-0">
-              <s.Icon weight="bold" className="w-6 h-6 mx-auto" style={{ color: s.color }} />
-              <p className="text-2xl font-black text-[#1A1A1A] mt-2 mb-1" style={{ fontFamily: typography.serif }}>{loading ? '...' : s.val}</p>
-              <p className="text-[9px] font-black uppercase tracking-widest text-stone-400">{s.label}</p>
-              {/* Decorative tape on one corner */}
-              <div className="absolute -top-2 left-2 w-6 h-3 bg-stone-200/50 rotate-[-15deg] rounded-sm" />
+            <div key={i} className="rounded-2xl bg-white p-4 text-center" style={{ border: `1px solid ${T.border}`, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+              <p className="text-2xl font-black mb-0.5" style={{ fontFamily: T.serif, color: s.color }}>{s.val}</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: T.textMut }}>{s.label}</p>
             </div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* ── SHARE ── */}
-        <motion.button 
-          whileHover={{ y: -2 }}
-          onClick={handleShare} 
-          className="w-full rounded-3xl bg-white border-2 border-[#E8DDD0] p-5 flex items-center justify-between shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
-        >
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="w-12 h-12 rounded-2xl bg-[#F0EAE2] flex items-center justify-center group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
-              <ShareNetwork weight="bold" className="w-6 h-6" />
-            </div>
-            <div className="text-left">
-              <p className="text-[15px] font-black tracking-tight text-[#1A1A1A]">Invita un Amico</p>
-              <p className="text-[12px] font-medium text-stone-500">Mostra le bellezze della Puglia</p>
-            </div>
+        {/* ══ CONDIVIDI ══ */}
+        <motion.button
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          onClick={handleShare}
+          className="w-full rounded-2xl bg-white p-4 flex items-center gap-4 mb-8 active:scale-[0.98] transition-transform"
+          style={{ border: `1px solid ${T.border}`, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${T.terracotta}12` }}>
+            <ShareNetwork size={20} weight="bold" style={{ color: T.terracotta }} />
           </div>
-          <ArrowRight weight="bold" className="w-4 h-4 text-stone-300 group-hover:text-[#D4793A] transition-colors" />
-          <div className="absolute top-0 right-0 w-24 h-full bg-[#D4793A]/5 -skew-x-12 translate-x-12 group-hover:translate-x-8 transition-transform" />
+          <div className="flex-1 text-left">
+            <p className="text-[14px] font-black" style={{ color: T.textPri }}>Invita un Amico</p>
+            <p className="text-[11px] font-medium" style={{ color: T.textMut }}>Mostra le bellezze della Puglia</p>
+          </div>
+          <ArrowRight size={16} weight="bold" style={{ color: T.textMut }} />
         </motion.button>
 
-        {/* ── I TUOI BIGLIETTI ── */}
-        <section className="rounded-3xl border-2 border-[#E8DDD0] bg-white p-7 relative">
-          <div className="absolute -top-4 left-6 px-4 py-1 rounded-full border-2 border-[#E8DDD0] bg-[#FAF7F0] text-[10px] font-black uppercase tracking-[0.3em] text-[#B8882F]">
-            I tuoi Biglietti
-          </div>
+        {/* ══ I TUOI BIGLIETTI ══ */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="rounded-2xl bg-white mb-8 overflow-hidden"
+          style={{ border: `1px solid ${T.border}`, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
 
-          {loadingBookings ? (
-            <div className="flex justify-center py-6 mt-2">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#D4793A]" />
+          <div className="px-5 pt-5 pb-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${T.border}` }}>
+            <div className="flex items-center gap-2">
+              <Ticket size={16} weight="bold" style={{ color: T.terracotta }} />
+              <span className="text-[13px] font-black uppercase tracking-[0.1em]" style={{ color: T.textPri }}>I tuoi Biglietti</span>
             </div>
-          ) : bookings.length === 0 ? (
-            <div className="flex flex-col items-center text-center py-4 mt-2 gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-[#FAF7F0] flex items-center justify-center border-2 border-dashed border-[#D5C8B8]">
-                <Ticket weight="bold" className="w-6 h-6 text-[#D4793A]" />
-              </div>
-              <div>
-                <p className="text-[14px] font-black text-[#1A1A1A]">Nessun biglietto</p>
-                <p className="text-[12px] text-stone-400 mt-0.5">Prenota un evento per trovarlo qui</p>
-              </div>
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="px-5 py-2 rounded-full bg-[#1A1A1A] text-white text-[11px] font-black uppercase tracking-widest shadow-lg active:scale-95 transition"
-              >
-                Scopri eventi
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3 mt-4">
-              {bookings.slice(0, 3).map((booking) => {
-                const ev = booking.event
-                if (!ev) return null
-                const date = ev.data_inizio ? new Date(ev.data_inizio) : null
-                return (
-                  <div
-                    key={booking.id}
-                    onClick={() => navigate(`/booking-confirmation/${ev.id}`)}
-                    className="flex items-center gap-3 p-3 rounded-2xl border border-[#E8DDD0] hover:bg-[#FAF7F0] transition cursor-pointer group"
-                  >
-                    <div className="w-12 h-12 rounded-2xl overflow-hidden bg-stone-100 flex-shrink-0">
-                      {(ev.immagine_url || ev.image_url) ? (
-                        <img src={ev.immagine_url || ev.image_url} className="w-full h-full object-cover" alt={ev.titolo || ev.title} />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Ticket weight="bold" className="w-5 h-5 text-[#D4793A]" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-black text-[#1A1A1A] truncate">{ev.titolo || ev.title}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        {date && (
-                          <span className="text-[10px] font-bold text-stone-400 flex items-center gap-1">
-                            <CalendarBlank size={10} weight="bold" />
-                            {format(date, 'dd MMM', { locale: itLocale })}
-                          </span>
-                        )}
-                        <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full ${booking.status === 'confermato' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
-                          {booking.status === 'confermato' ? 'Confermato' : 'In loco'}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="w-8 h-8 rounded-xl bg-[#1A1A1A] flex items-center justify-center flex-shrink-0 group-hover:bg-[#D4793A] transition-colors">
-                      <QrCode size={16} weight="bold" className="text-white" />
-                    </div>
-                  </div>
-                )
-              })}
+            {bookings.length > 0 && (
               <button
                 onClick={() => navigate('/biglietti')}
-                className="w-full py-3 rounded-2xl border-2 border-dashed border-[#D5C8B8] text-[11px] font-black uppercase tracking-widest text-[#B8882F] hover:border-[#D4793A] hover:text-[#D4793A] transition flex items-center justify-center gap-2"
-              >
-                <Ticket weight="bold" className="w-3.5 h-3.5" />
-                Vedi tutti i biglietti ({bookings.length})
+                className="text-[10px] font-black uppercase tracking-[0.15em]"
+                style={{ color: T.terracotta }}>
+                Vedi tutti →
               </button>
-            </div>
-          )}
-        </section>
+            )}
+          </div>
 
+          <div className="p-4">
+            {loadingBookings ? (
+              <div className="flex justify-center py-6">
+                <div className="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: `${T.terracotta} transparent transparent transparent` }} />
+              </div>
+            ) : bookings.length === 0 ? (
+              <div className="flex flex-col items-center text-center py-6 gap-3">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: `${T.terracotta}10` }}>
+                  <Ticket size={22} weight="bold" style={{ color: T.terracotta }} />
+                </div>
+                <div>
+                  <p className="text-[14px] font-black" style={{ color: T.textPri }}>Nessun biglietto</p>
+                  <p className="text-[12px] font-medium mt-0.5" style={{ color: T.textMut }}>Prenota un evento per trovarlo qui</p>
+                </div>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest"
+                  style={{ background: T.textPri, color: 'white' }}>
+                  Scopri eventi
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {bookings.slice(0, 3).map((booking) => {
+                  const ev = booking.event
+                  if (!ev) return null
+                  const date = ev.data_inizio ? new Date(ev.data_inizio) : null
+                  return (
+                    <div
+                      key={booking.id}
+                      onClick={() => navigate(`/booking-confirmation/${ev.id}`)}
+                      className="flex items-center gap-3 p-3 rounded-xl cursor-pointer active:scale-[0.98] transition-transform"
+                      style={{ background: '#F9F9F7', border: `1px solid ${T.border}` }}>
+                      <div className="w-11 h-11 rounded-xl overflow-hidden shrink-0" style={{ background: T.border }}>
+                        {(ev.immagine_url || ev.image_url) ? (
+                          <img src={ev.immagine_url || ev.image_url} className="w-full h-full object-cover" alt="" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Ticket size={18} weight="bold" style={{ color: T.terracotta }} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] font-black truncate" style={{ color: T.textPri }}>{ev.titolo || ev.title}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          {date && (
+                            <span className="text-[10px] font-semibold flex items-center gap-1" style={{ color: T.textMut }}>
+                              <CalendarBlank size={9} weight="bold" />
+                              {format(date, 'dd MMM', { locale: itLocale })}
+                            </span>
+                          )}
+                          <span
+                            className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full"
+                            style={booking.status === 'confermato'
+                              ? { background: '#dcfce7', color: '#16a34a' }
+                              : { background: '#dbeafe', color: '#2563eb' }}>
+                            {booking.status === 'confermato' ? 'Confermato' : 'In loco'}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ background: T.textPri }}>
+                        <QrCode size={15} weight="bold" color="white" />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        </motion.section>
+
+        {/* ══ PARTNER CTA ══ */}
         {!partner && (
-          <button
+          <motion.button
+            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
             onClick={() => navigate('/partner/subscription')}
-            className="w-full rounded-3xl p-6 text-left border-2 border-[#D5C8B8] bg-white shadow-xl hover:-translate-y-1 transition-all relative overflow-hidden group"
-          >
-            <div className="absolute top-0 left-0 w-full h-1.5 bg-[#D4793A]" />
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#B8882F] mb-2">Area Business</p>
-            <p className="text-2xl leading-tight font-black tracking-tight mb-3 text-[#1A1A1A]" style={{ fontFamily: typography.serif }}>Diventa nostro Partner</p>
-            <p className="text-[14px] text-stone-500 font-medium leading-relaxed mb-4">
+            className="w-full rounded-2xl p-6 text-left mb-8 active:scale-[0.98] transition-transform overflow-hidden relative"
+            style={{ background: T.textPri, boxShadow: '0 8px 32px rgba(0,0,0,0.18)' }}>
+            <div
+              className="absolute top-0 right-0 w-32 h-32 rounded-full opacity-10 -translate-y-8 translate-x-8"
+              style={{ background: T.terracotta }} />
+            <p className="text-[9px] font-black uppercase tracking-[0.3em] mb-2" style={{ color: T.terracotta }}>Area Business</p>
+            <p className="text-xl font-black leading-tight mb-2 text-white" style={{ fontFamily: T.serif }}>
+              Diventa nostro Partner
+            </p>
+            <p className="text-[12px] font-medium mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
               Vendi eventi, ottieni visibilità premium e monitora i tuoi guadagni.
             </p>
-            <div className="inline-flex items-center gap-2 text-[13px] font-black text-[#D4793A] group-hover:translate-x-1 transition-transform uppercase tracking-widest">
-              Dettagli <ArrowRight weight="bold" className="w-3.5 h-3.5" />
-            </div>
-          </button>
+            <span className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: T.terracotta }}>
+              Scopri i piani <ArrowRight size={12} weight="bold" />
+            </span>
+          </motion.button>
         )}
 
-        {/* ── SEZIONE PROFILO ── */}
-        <section className="rounded-3xl border-2 border-[#E8DDD0] bg-white p-7 relative">
-          <div className="absolute -top-4 left-6 px-4 py-1 rounded-full border-2 border-[#E8DDD0] bg-[#FAF7F0] text-[10px] font-black uppercase tracking-[0.3em] text-[#B8882F]">
-            Il tuo Profilo
-          </div>
-          
-          <div className="flex items-center justify-end mb-6">
+        {/* ══ IL TUO PROFILO ══ */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="rounded-2xl bg-white mb-8 overflow-hidden"
+          style={{ border: `1px solid ${T.border}`, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+
+          <div className="px-5 pt-5 pb-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${T.border}` }}>
+            <span className="text-[13px] font-black uppercase tracking-[0.1em]" style={{ color: T.textPri }}>Il tuo Profilo</span>
             {!editing ? (
-              <button 
-                onClick={() => setEditing(true)} 
-                className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-stone-200 text-[11px] font-black uppercase tracking-widest text-stone-500 hover:bg-stone-50 transition"
-              >
-                <PencilSimple weight="bold" className="w-3.5 h-3.5" /> Modifica
+              <button
+                onClick={() => setEditing(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] active:scale-95 transition-transform"
+                style={{ background: '#F4F4F5', color: T.textMut }}>
+                <PencilSimple size={11} weight="bold" /> Modifica
               </button>
             ) : (
               <div className="flex items-center gap-2">
-                <button onClick={() => setEditing(false)} className="w-9 h-9 rounded-full bg-stone-50 border border-stone-200 flex items-center justify-center text-stone-400 hover:text-stone-600 transition"><X weight="bold" className="w-4 h-4" /></button>
-                <button 
-                  onClick={handleSave} 
-                  disabled={saving} 
-                  className="px-5 py-2 rounded-full bg-[#1A1A1A] text-white text-[11px] font-black uppercase tracking-widest shadow-lg flex items-center gap-2 disabled:opacity-50"
-                >
-                  <FloppyDisk weight="bold" className="w-4 h-4" /> {saving ? '...' : 'Salva'}
+                <button
+                  onClick={() => setEditing(false)}
+                  className="w-8 h-8 rounded-xl flex items-center justify-center"
+                  style={{ background: '#F4F4F5' }}>
+                  <X size={14} weight="bold" style={{ color: T.textMut }} />
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] disabled:opacity-50"
+                  style={{ background: T.textPri, color: 'white' }}>
+                  <FloppyDisk size={11} weight="bold" /> {saving ? '...' : 'Salva'}
                 </button>
               </div>
             )}
           </div>
 
-          {!editing ? (
-            <div className="space-y-4 pt-2">
-              <ProfileRow label="Nome" value={`${profile?.nome || ''} ${profile?.cognome || ''}`.trim() || '—'} />
-              <ProfileRow label="Nickname" value={profile?.nickname || '—'} />
-              <ProfileRow label="Email" value={profile?.email || '—'} />
-              <ProfileRow label="Città" value={profile?.citta || '—'} />
-              {profile?.biografia && <ProfileRow label="Bio" value={profile.biografia} />}
-            </div>
-          ) : (
-            <form onSubmit={handleSave} className="space-y-6 pt-2">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField label="Nome" value={formData.nome} onChange={v => setFormData({ ...formData, nome: v })} />
-                <FormField label="Cognome" value={formData.cognome} onChange={v => setFormData({ ...formData, cognome: v })} />
+          <div className="p-5">
+            {!editing ? (
+              <div className="space-y-0">
+                <ProfileRow label="Nome" value={`${profile?.nome || ''} ${profile?.cognome || ''}`.trim() || '—'} />
+                <ProfileRow label="Nickname" value={profile?.nickname || '—'} />
+                <ProfileRow label="Email" value={profile?.email || '—'} />
+                <ProfileRow label="Città" value={profile?.citta || '—'} />
+                {profile?.biografia && <ProfileRow label="Bio" value={profile.biografia} />}
               </div>
-              <FormField label="Nickname" value={formData.nickname} onChange={v => setFormData({ ...formData, nickname: v })} />
-              <FormField label="Città" value={formData.citta} onChange={v => setFormData({ ...formData, citta: v })} />
-              <FormField label="Biografia" value={formData.biografia} multiline onChange={v => setFormData({ ...formData, biografia: v })} />
-
-              <div className="pt-4">
-                <h3 className="text-[11px] font-black text-stone-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <span className="h-px bg-stone-200 flex-1" /> Social Hub <span className="h-px bg-stone-200 flex-1" />
-                </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField label="Instagram" value={formData.instagram_url} icon={<InstagramLogo className="text-pink-500" />} onChange={v => setFormData({ ...formData, instagram_url: v })} />
-                  <FormField label="TikTok" value={formData.tiktok_url} icon={<TiktokLogo className="text-zinc-900" />} onChange={v => setFormData({ ...formData, tiktok_url: v })} />
-                  <FormField label="Facebook" value={formData.facebook_url} icon={<FacebookLogo className="text-blue-600" />} onChange={v => setFormData({ ...formData, facebook_url: v })} />
-                  <FormField label="YouTube" value={formData.youtube_url} icon={<YoutubeLogo className="text-red-600" />} onChange={v => setFormData({ ...formData, youtube_url: v })} />
+            ) : (
+              <form onSubmit={handleSave} className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField label="Nome" value={formData.nome} onChange={v => setFormData({ ...formData, nome: v })} />
+                  <FormField label="Cognome" value={formData.cognome} onChange={v => setFormData({ ...formData, cognome: v })} />
                 </div>
-              </div>
-            </form>
-          )}
-        </section>
+                <FormField label="Nickname" value={formData.nickname} onChange={v => setFormData({ ...formData, nickname: v })} />
+                <FormField label="Città" value={formData.citta} onChange={v => setFormData({ ...formData, citta: v })} />
+                <FormField label="Biografia" value={formData.biografia} multiline onChange={v => setFormData({ ...formData, biografia: v })} />
 
-        {/* ── COME FUNZIONA ── */}
-        <section className="rounded-3xl border-2 border-dashed border-[#D5C8B8] bg-white p-7 relative">
-          <div className="absolute -top-4 left-6 px-4 py-1 rounded-full border-2 border-dashed border-[#D5C8B8] bg-[#FAF7F0] text-[10px] font-black uppercase tracking-[0.3em] text-[#B8882F]">
-            Guida Esplorativa
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-4">
-            <HowToCard icon={<Compass weight="bold" />} title="GPS" desc="Avvicinati a un monumento per ottenere la Card." />
-            <HowToCard icon={<Key weight="bold" />} title="PIN" desc="Visita un partner e richiedi il codice." />
-            <HowToCard icon={<CardsThree weight="bold" />} title="Set" desc="Completa le Saghe per XP massimi." />
-          </div>
-        </section>
-
-        {/* ── AZIONI ── */}
-        <div className="grid sm:grid-cols-2 gap-4">
-          <div className="rounded-3xl border-2 border-[#E8DDD0] bg-white p-2 space-y-1">
-            {profile?.ruolo !== 'creator' && (
-              <ActionRow
-                icon={<Compass weight="bold" />}
-                color="text-[#D4793A]"
-                label="Diventa Creator"
-                onClick={() => navigate('/diventa-creator')}
-              />
+                <div className="pt-2">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: T.textMut }}>Social</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <FormField label="Instagram" value={formData.instagram_url} icon={<InstagramLogo style={{ color: '#e1306c' }} />} onChange={v => setFormData({ ...formData, instagram_url: v })} />
+                    <FormField label="TikTok" value={formData.tiktok_url} icon={<TiktokLogo style={{ color: T.textPri }} />} onChange={v => setFormData({ ...formData, tiktok_url: v })} />
+                    <FormField label="Facebook" value={formData.facebook_url} icon={<FacebookLogo style={{ color: '#1877f2' }} />} onChange={v => setFormData({ ...formData, facebook_url: v })} />
+                    <FormField label="YouTube" value={formData.youtube_url} icon={<YoutubeLogo style={{ color: '#ff0000' }} />} onChange={v => setFormData({ ...formData, youtube_url: v })} />
+                  </div>
+                </div>
+              </form>
             )}
-            <ActionRow icon={<Lock weight="bold" />} color="text-stone-400" label="Reimposta Password" onClick={() => setShowPasswordModal(true)} />
-            <ActionRow icon={<ShieldCheck weight="bold" />} color="text-green-500" label="Privacy Policy" onClick={() => navigate('/privacy')} />
-            <ActionRow icon={<BookOpenText weight="bold" />} color="text-[#B8882F]" label="Termini & Condizioni" onClick={() => navigate('/termini')} />
           </div>
-          <div className="rounded-3xl border-2 border-red-100 bg-red-50/30 p-2 flex items-center">
-            <ActionRow icon={<Warning weight="fill" />} color="text-red-500" label="Elimina Account" onClick={() => setShowDeleteModal(true)} />
-          </div>
-        </div>
-      </div>
+        </motion.section>
+
+        {/* ══ IMPOSTAZIONI ══ */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
+          className="rounded-2xl bg-white mb-4 overflow-hidden"
+          style={{ border: `1px solid ${T.border}`, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+
+          {profile?.ruolo !== 'creator' && (
+            <ActionRow icon={<Compass size={18} weight="bold" />} iconBg={`${T.terracotta}15`} iconColor={T.terracotta}
+              label="Diventa Creator" onClick={() => navigate('/diventa-creator')} />
+          )}
+          <ActionRow icon={<Lock size={18} weight="bold" />} iconBg="#F4F4F5" iconColor={T.textMut}
+            label="Reimposta Password" onClick={() => setShowPasswordModal(true)} />
+          <ActionRow icon={<ShieldCheck size={18} weight="bold" />} iconBg="#f0fdf4" iconColor="#16a34a"
+            label="Privacy Policy" onClick={() => navigate('/privacy')} />
+          <ActionRow icon={<BookOpenText size={18} weight="bold" />} iconBg="#fefce8" iconColor="#ca8a04"
+            label="Termini & Condizioni" onClick={() => navigate('/termini')} last />
+        </motion.section>
+
+        {/* ══ DANGER ZONE ══ */}
+        <motion.section
+          initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+          className="rounded-2xl overflow-hidden mb-4"
+          style={{ border: '1px solid #fecaca', background: '#fff5f5' }}>
+          <ActionRow icon={<Warning size={18} weight="fill" />} iconBg="#fee2e2" iconColor="#ef4444"
+            label="Elimina Account" labelColor="#ef4444" onClick={() => setShowDeleteModal(true)} last />
+        </motion.section>
+
+      </main>
 
       {/* ════ MODALI ════ */}
       <AnimatePresence>
         {(showPasswordModal || showDeleteModal) && (
-          <BottomModal 
-            open={true} 
-            onClose={() => { setShowPasswordModal(false); setShowDeleteModal(false); setDeleteConfirmText('') }} 
-            title={showPasswordModal ? "Reset Password" : "Danger Zone"}
-          >
+          <BottomModal
+            open={true}
+            onClose={() => { setShowPasswordModal(false); setShowDeleteModal(false); setDeleteConfirmText('') }}
+            title={showPasswordModal ? 'Reset Password' : 'Danger Zone'}>
             {showPasswordModal ? (
               <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mx-auto mb-4">
-                  <Lock weight="bold" className="text-stone-400 w-8 h-8" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: '#F4F4F5' }}>
+                  <Lock size={28} weight="bold" style={{ color: T.textMut }} />
                 </div>
-                <p className="text-[14px] font-medium text-stone-600 mb-6 leading-relaxed">
-                  Ti invieremo un link su <strong className="text-[#1A1A1A]">{profile?.email}</strong> per reimpostare la tua password in totale sicurezza.
+                <p className="text-[14px] font-medium leading-relaxed mb-6" style={{ color: T.textMut }}>
+                  Ti invieremo un link su <strong style={{ color: T.textPri }}>{profile?.email}</strong> per reimpostare la password.
                 </p>
-                <button 
-                  onClick={handleResetPassword} 
-                  disabled={passwordSending} 
-                  className="w-full py-4 rounded-2xl bg-[#1A1A1A] text-white font-black uppercase tracking-widest shadow-xl active:scale-95 transition"
-                >
+                <button
+                  onClick={handleResetPassword}
+                  disabled={passwordSending}
+                  className="w-full py-4 rounded-2xl text-white font-black uppercase tracking-widest disabled:opacity-50"
+                  style={{ background: T.textPri }}>
                   {passwordSending ? 'Invio...' : 'Invia Email Reset'}
                 </button>
               </div>
             ) : (
               <div>
-                <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                  <Warning weight="fill" className="text-red-500 w-8 h-8" />
+                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: '#fee2e2' }}>
+                  <Warning size={28} weight="fill" style={{ color: '#ef4444' }} />
                 </div>
-                <p className="text-[14px] font-medium text-stone-600 mb-6 leading-relaxed text-center">
-                  Eliminando l'account perderai per sempre le card sbloccate e gli XP. <strong>Questa azione è definitiva.</strong>
+                <p className="text-[14px] font-medium leading-relaxed text-center mb-6" style={{ color: T.textMut }}>
+                  Perderai per sempre tutte le card e gli XP. <strong style={{ color: T.textPri }}>Azione definitiva.</strong>
                 </p>
-                <input 
-                  type="text" 
-                  value={deleteConfirmText} 
-                  onChange={e => setDeleteConfirmText(e.target.value)} 
-                  placeholder='Scrivi "elimina"' 
-                  className="w-full px-5 py-4 bg-white border-2 border-red-100 rounded-2xl mb-4 text-[14px] font-bold outline-none focus:border-red-400 transition text-center" 
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={e => setDeleteConfirmText(e.target.value)}
+                  placeholder='Scrivi "elimina"'
+                  className="w-full px-5 py-4 rounded-2xl mb-4 text-[14px] font-bold outline-none text-center transition"
+                  style={{ border: '2px solid #fecaca', background: 'white' }}
+                  onFocus={e => e.target.style.borderColor = '#ef4444'}
+                  onBlur={e => e.target.style.borderColor = '#fecaca'}
                 />
-                <button 
-                  onClick={handleDeleteAccount} 
-                  disabled={deletingAccount || deleteConfirmText.trim().toLowerCase() !== 'elimina'} 
-                  className="w-full py-4 rounded-2xl bg-red-500 text-white font-black uppercase tracking-widest shadow-xl disabled:opacity-40 active:scale-95 transition"
-                >
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deletingAccount || deleteConfirmText.trim().toLowerCase() !== 'elimina'}
+                  className="w-full py-4 rounded-2xl text-white font-black uppercase tracking-widest disabled:opacity-40"
+                  style={{ background: '#ef4444' }}>
                   {deletingAccount ? '...' : 'Elimina Definitivamente'}
                 </button>
               </div>
@@ -524,17 +572,17 @@ export default function Profilo() {
       {/* Transition Overlay */}
       <AnimatePresence>
         {modeTransition.active && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#FAF7F0]"
-          >
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center"
+            style={{ background: T.bgPage }}>
             <div className="relative w-48 h-48 mb-8">
               <img src="/cambioview/partner.png" className="absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out shadow-2xl rounded-3xl" style={{ opacity: modeTransition.flip ? 0 : 1, transform: modeTransition.flip ? "scale(0.8) translateY(-20px)" : "scale(1)" }} />
-              <img src="/cambioview/utente.png" className={`absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out`} style={{ opacity: modeTransition.flip ? 1 : 0, transform: modeTransition.flip ? "scale(1)" : "scale(0.8) translateY(20px)" }} />
+              <img src="/cambioview/utente.png" className="absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out" style={{ opacity: modeTransition.flip ? 1 : 0, transform: modeTransition.flip ? "scale(1)" : "scale(0.8) translateY(20px)" }} />
             </div>
-            <p className="text-xl font-black text-[#1A1A1A] tracking-widest uppercase italic" style={{ fontFamily: typography.serif }}>
-              {modeTransition.flip ? "Benvenuto in HUB" : "In preparazione..."}
+            <p className="text-xl font-black tracking-widest uppercase" style={{ fontFamily: T.serif, color: T.textPri }}>
+              {modeTransition.flip ? 'Benvenuto in HUB' : 'In preparazione...'}
             </p>
           </motion.div>
         )}
@@ -545,73 +593,75 @@ export default function Profilo() {
 
 function ProfileRow({ label, value }) {
   return (
-    <div className="flex gap-4 py-3 border-b border-stone-100 last:border-0 justify-between items-start">
-      <span className="text-[10px] font-black uppercase tracking-widest text-stone-400 shrink-0 mt-0.5">{label}</span>
-      <span className="text-[14px] text-[#1A1A1A] font-bold text-right break-all">{value}</span>
+    <div className="flex gap-4 py-3.5 justify-between items-start" style={{ borderBottom: '1px solid #F4F4F5' }}>
+      <span className="text-[10px] font-black uppercase tracking-[0.2em] shrink-0 mt-0.5" style={{ color: '#9CA3AF' }}>{label}</span>
+      <span className="text-[13px] font-bold text-right break-all" style={{ color: '#1F2933' }}>{value}</span>
     </div>
   )
 }
 
-function FormField({ label, value, onChange, type = "text", multiline = false, icon = null }) {
-  const cls = "w-full px-4 py-3.5 bg-white border-2 border-[#E8DDD0] rounded-2xl text-[14px] font-bold text-[#1A1A1A] placeholder:text-stone-300 focus:outline-none focus:border-[#D4793A] transition resize-none shadow-sm"
+function FormField({ label, value, onChange, type = 'text', multiline = false, icon = null }) {
+  const style = {
+    width: '100%', padding: '12px 16px', borderRadius: '14px',
+    border: '1.5px solid #E5E7EB', background: '#F9F9F7',
+    fontSize: '13px', fontWeight: 700, color: '#1F2933',
+    outline: 'none', resize: 'none',
+  }
   return (
-    <div className="relative flex-1">
-      <label className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-2 px-1 flex items-center gap-2">
+    <div className="flex-1">
+      <label className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] mb-1.5 px-1" style={{ color: '#9CA3AF' }}>
         {icon}{label}
       </label>
       {multiline
-        ? <textarea rows={3} className={cls} value={value} onChange={e => onChange(e.target.value)} />
-        : <input type={type} className={cls} value={value} onChange={e => onChange(e.target.value)} />}
+        ? <textarea rows={3} style={style} value={value} onChange={e => onChange(e.target.value)}
+            onFocus={e => e.target.style.borderColor = '#D4793A'}
+            onBlur={e => e.target.style.borderColor = '#E5E7EB'} />
+        : <input type={type} style={style} value={value} onChange={e => onChange(e.target.value)}
+            onFocus={e => e.target.style.borderColor = '#D4793A'}
+            onBlur={e => e.target.style.borderColor = '#E5E7EB'} />}
     </div>
   )
 }
 
-function ActionRow({ icon, color, label, onClick }) {
+function ActionRow({ icon, iconBg, iconColor, label, labelColor, onClick, last = false }) {
   return (
-    <button onClick={onClick} className="w-full flex items-center justify-between p-3.5 hover:bg-stone-50 active:scale-95 rounded-2xl transition group">
-      <div className={`flex items-center gap-3 ${color}`}>
-        <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center shadow-sm border border-stone-100 group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors">
-          {icon}
-        </div>
-        <span className="text-[13px] font-black text-[#1A1A1A] uppercase tracking-wide">{label}</span>
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-4 px-5 py-4 active:bg-black/5 transition-colors"
+      style={last ? {} : { borderBottom: '1px solid #F4F4F5' }}>
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: iconBg }}>
+        <span style={{ color: iconColor }}>{icon}</span>
       </div>
-      <ArrowRight weight="bold" className="w-4 h-4 text-stone-300 group-hover:text-[#D4793A] transition-colors" />
+      <span className="flex-1 text-left text-[13px] font-black" style={{ color: labelColor || '#1F2933' }}>{label}</span>
+      <ArrowRight size={15} weight="bold" style={{ color: '#D1D5DB' }} />
     </button>
-  )
-}
-
-function HowToCard({ icon, title, desc }) {
-  return (
-    <div className="rounded-2xl bg-[#F9F6F2] border border-[#E8DDD0] p-4 flex flex-col items-center text-center gap-3 hover:bg-white hover:shadow-lg transition-all">
-      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm text-[#D4793A]">
-        {icon}
-      </div>
-      <div>
-        <p className="text-[13px] font-black text-[#1A1A1A] uppercase tracking-tighter" style={{ fontFamily: typography.serif }}>{title}</p>
-        <p className="text-[11px] font-medium text-stone-500 mt-1 leading-tight">{desc}</p>
-      </div>
-    </div>
   )
 }
 
 function BottomModal({ open, onClose, title, children }) {
   if (!open) return null
   return (
-    <div className="fixed inset-0 z-[110] flex flex-col justify-end bg-zinc-950/40 backdrop-blur-md p-4" onClick={onClose}>
-      <motion.div 
-        initial={{ y: "100%" }}
+    <div
+      className="fixed inset-0 z-[110] flex flex-col justify-end p-4"
+      style={{ background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(8px)' }}
+      onClick={onClose}>
+      <motion.div
+        initial={{ y: '100%' }}
         animate={{ y: 0 }}
-        className="w-full max-w-sm mx-auto bg-[#FAF7F0] rounded-3xl p-8 shadow-2xl relative border-2 border-[#E8DDD0]" 
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-8 bg-[#B8881F40] rotate-[3deg] rounded-sm" />
-        <div className="flex items-center justify-between mb-8">
-          <h3 className="text-2xl font-black text-[#1A1A1A] tracking-tight" style={{ fontFamily: typography.serif }}>{title}</h3>
-          <button onClick={onClose} className="w-9 h-9 rounded-xl bg-white border border-[#E8DDD0] flex items-center justify-center text-stone-400 hover:text-stone-900 transition shadow-sm"><X weight="bold" /></button>
+        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+        className="w-full max-w-sm mx-auto rounded-3xl p-7 shadow-2xl relative"
+        style={{ background: '#F9F9F7', border: '1px solid #E5E7EB' }}
+        onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-7">
+          <h3 className="text-xl font-black tracking-tight" style={{ fontFamily: "'Libre Baskerville', serif", color: '#1F2933' }}>{title}</h3>
+          <button
+            onClick={onClose}
+            className="w-9 h-9 rounded-xl flex items-center justify-center"
+            style={{ background: '#F4F4F5' }}>
+            <X size={15} weight="bold" style={{ color: '#6B7280' }} />
+          </button>
         </div>
-        <div>
-          {children}
-        </div>
+        {children}
       </motion.div>
     </div>
   )
