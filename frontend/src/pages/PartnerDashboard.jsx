@@ -84,7 +84,6 @@ export default function PartnerDashboard() {
   });
   const [events, setEvents] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
-  const [modeTransition, setModeTransition] = useState({ active: false, target: null, flip: false });
   const [showPin, setShowPin] = useState(false);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [showPaymentsModal, setShowPaymentsModal] = useState(false);
@@ -400,9 +399,7 @@ export default function PartnerDashboard() {
   };
 
   const handleModeSwitch = (target) => {
-    setModeTransition({ active: true, target, flip: false });
-    setTimeout(() => setModeTransition((prev) => ({ ...prev, flip: true })), 500);
-    setTimeout(() => { if (target === "user") navigate("/dashboard"); else navigate("/partner/dashboard"); }, 1500);
+    if (target === "user") navigate("/dashboard"); else navigate("/partner/dashboard");
   };
 
   const goEditProfile = () => navigate("/partner/join");
@@ -1040,16 +1037,6 @@ export default function PartnerDashboard() {
 
       {/* Badge verificato rimosso su richiesta utente */}
 
-      {/* Overlay Modalità Animata */}
-      {modeTransition.active && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
-          <div className="relative w-32 h-32 mb-6">
-            <img src={modeTransition.target === "user" ? "/cambioview/partner.png" : "/cambioview/utente.png"} alt="Icona" className="absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out" style={{ opacity: modeTransition.flip ? 0 : 1, transform: modeTransition.flip ? "translateX(-50px) scale(0.9)" : "translateX(0) scale(1)" }} />
-            <img src={modeTransition.target === "user" ? "/cambioview/utente.png" : "/cambioview/partner.png"} alt="Nuova Icona" className={`absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out ${modeTransition.flip ? "animate-pulse" : ""}`} style={{ opacity: modeTransition.flip ? 1 : 0, transform: modeTransition.flip ? "translateX(0) scale(1)" : "translateX(50px) scale(0.9)" }} />
-          </div>
-          <p className="text-[16px] font-bold text-zinc-950 tracking-tight">Cambiando modalità...</p>
-        </div>
-      )}
 
       {/* QR Scanner Modal */}
       <QRScannerModal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} />

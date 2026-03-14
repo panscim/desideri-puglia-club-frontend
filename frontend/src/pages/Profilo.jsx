@@ -53,7 +53,6 @@ export default function Profilo() {
   const [deletingAccount, setDeletingAccount] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [passwordSending, setPasswordSending] = useState(false)
-  const [modeTransition, setModeTransition] = useState({ active: false, target: null, flip: false })
 
   useEffect(() => {
     if (!profile?.id) return
@@ -171,9 +170,7 @@ export default function Profilo() {
   }
 
   const handleModeSwitch = (target) => {
-    setModeTransition({ active: true, target, flip: false })
-    setTimeout(() => setModeTransition((prev) => ({ ...prev, flip: true })), 1500)
-    setTimeout(() => navigate(target === 'partner' ? '/partner/dashboard' : '/dashboard'), 3000)
+    navigate(target === 'partner' ? '/partner/dashboard' : '/dashboard')
   }
 
   const displayName = profile?.nome && profile?.cognome
@@ -569,24 +566,6 @@ export default function Profilo() {
         )}
       </AnimatePresence>
 
-      {/* Transition Overlay */}
-      <AnimatePresence>
-        {modeTransition.active && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center"
-            style={{ background: T.bgPage }}>
-            <div className="relative w-48 h-48 mb-8">
-              <img src="/cambioview/partner.png" className="absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out shadow-2xl rounded-3xl" style={{ opacity: modeTransition.flip ? 0 : 1, transform: modeTransition.flip ? "scale(0.8) translateY(-20px)" : "scale(1)" }} />
-              <img src="/cambioview/utente.png" className="absolute inset-0 w-full h-full object-contain transition-all duration-700 ease-out" style={{ opacity: modeTransition.flip ? 1 : 0, transform: modeTransition.flip ? "scale(1)" : "scale(0.8) translateY(20px)" }} />
-            </div>
-            <p className="text-xl font-black tracking-widest uppercase" style={{ fontFamily: T.serif, color: T.textPri }}>
-              {modeTransition.flip ? 'Benvenuto in HUB' : 'In preparazione...'}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
