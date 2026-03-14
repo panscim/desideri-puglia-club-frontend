@@ -8,6 +8,7 @@ import {
   MapPin, X, Star, MapTrifold, List, ArrowUpRight as NavigationArrow, ShieldCheck,
   MagnifyingGlass, CaretLeft
 } from "@phosphor-icons/react";
+import { toThumbUrl } from "../utils/imageUtils";
 
 // ── LEAFLET ──
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
@@ -84,7 +85,8 @@ const itemVariants = { hidden: { opacity: 0, y: 30, scale: 0.95 }, show: { opaci
 function PartnerCard({ p }) {
   const rating = (4.5 + ((p.name?.length || 0) % 6) * 0.1).toFixed(1);
   const reviews = 12 + ((p.name?.length || 0) * 3) % 80;
-  const imgSrc = p.cover_image_url || p.logo_url || `https://picsum.photos/seed/${p.id}/600/400`;
+  const imgFull = p.cover_image_url || p.logo_url || `https://picsum.photos/seed/${p.id}/600/400`;
+  const imgSrc = toThumbUrl(imgFull);
 
   return (
     <motion.div variants={itemVariants} className="mb-5">
@@ -105,6 +107,8 @@ function PartnerCard({ p }) {
             src={imgSrc} alt={p.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
+            decoding="async"
+            onError={e => { if (e.target.src !== imgFull) e.target.src = imgFull; }}
           />
 
           {/* Scrim leggero solo in basso per leggere il badge */}

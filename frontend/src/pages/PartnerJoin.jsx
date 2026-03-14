@@ -38,6 +38,7 @@ import {
 } from '@phosphor-icons/react';
 import { useTranslation } from "react-i18next";
 import { colors as TOKENS, typography, motion as springMotion } from "../utils/designTokens";
+import { compressImage } from "../utils/imageUtils";
 
 const TypewriterText = ({ words }) => {
   const [index, setIndex] = useState(0);
@@ -184,76 +185,6 @@ const getPartnerPlanByTier = (tier) =>
   PARTNER_PLANS.find((plan) => plan.tier === String(tier || "").toLowerCase()) || null;
 
 const toPgTime = (v) => (v ? `${v}:00` : null); // "HH:MM" -> "HH:MM:00"
-
-async function compressImage(file, { maxWidth, maxHeight, quality = 0.82, mimeType = "image/webp" }) {
-  // fallback: se non è un'immagine
-  if (!file?.type?.startsWith("image/")) throw new Error("File non immagine");
-
-  // Carica immagine
-  const bitmap = await new Promise((resolve, reject) => {
-    // createImageBitmap è veloce ma non sempre disponibile su ogni caso
-    if ("createImageBitmap" in window) {
-      createImageBitmap(file)
-        .then(resolve)
-        .catch(() => {
-          // fallback Image()
-          const img = new Image();
-          img.onload = () => resolve(img);
-          img.onerror = reject;
-          img.src = URL.createObjectURL(file);
-        });
-    } else {
-      const img = new Image();
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = URL.createObjectURL(file);
-    }
-  });
-
-  const originalWidth = bitmap.width;
-  const originalHeight = bitmap.height;
-
-  // Calcolo resize mantenendo proporzioni
-  const ratioW = maxWidth ? maxWidth / originalWidth : 1;
-  const ratioH = maxHeight ? maxHeight / originalHeight : 1;
-  const ratio = Math.min(ratioW, ratioH, 1); // non ingrandire mai
-
-  const targetWidth = Math.round(originalWidth * ratio);
-  const targetHeight = Math.round(originalHeight * ratio);
-
-  const canvas = document.createElement("canvas");
-  canvas.width = targetWidth;
-  canvas.height = targetHeight;
-
-  const ctx = canvas.getContext("2d", { alpha: true });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = "high";
-  ctx.drawImage(bitmap, 0, 0, targetWidth, targetHeight);
-
-  // Converti in blob compresso
-  const blob = await new Promise((resolve) => {
-    canvas.toBlob(
-      (b) => resolve(b),
-      mimeType,
-      quality
-    );
-  });
-
-  if (!blob) throw new Error("Compressione fallita");
-
-  // Crea un nuovo File per Supabase upload
-  const ext = mimeType === "image/webp" ? "webp" : mimeType === "image/jpeg" ? "jpg" : "png";
-  const safeName = (file.name || "image").replace(/\.[^/.]+$/, "");
-  const compressedFile = new File([blob], `${safeName}.${ext}`, { type: blob.type });
-
-  return {
-    file: compressedFile,
-    originalSize: file.size,
-    newSize: compressedFile.size,
-    width: targetWidth,
-    height: targetHeight,
-  };
-}
 
 export default function PartnerJoin() {
   const { t } = useTranslation();
@@ -557,17 +488,19 @@ export default function PartnerJoin() {
         return;
       }
 
-      const ext = "webp";
-      const path = `${profile.id}/cover-${Date.now()}.${ext}`;
+      const ts = Date.now();
+      const path = `${profile.id}/cover-${ts}.webp`;
+      const thumbPath = `${profile.id}/cover-${ts}-thumb.webp`;
 
-      const { error: upErr } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, compressed.file, {
-          upsert: true,
-          contentType: compressed.file.type,
-        });
+      // Compress thumbnail (card view)
+      const thumb = await compressImage(file, { maxWidth: 480, maxHeight: 270, quality: 0.72, mimeType: 'image/webp' });
 
-      if (upErr) throw upErr;
+      const [upResult] = await Promise.all([
+        supabase.storage.from(BUCKET).upload(path, compressed.file, { upsert: true, contentType: 'image/webp' }),
+        supabase.storage.from(BUCKET).upload(thumbPath, thumb.file, { upsert: true, contentType: 'image/webp' }),
+      ]);
+
+      if (upResult.error) throw upResult.error;
 
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
       setForm((f) => ({ ...f, cover_image_url: data?.publicUrl || "" }));
@@ -588,17 +521,16 @@ export default function PartnerJoin() {
     }
     setUploadingBusinessPhoto(true);
     try {
-      const compressed = await compressImage(file, {
-        maxWidth: 1400,
-        maxHeight: 1000,
-        quality: 0.84,
-        mimeType: "image/webp",
-      });
-      const path = `${profile.id}/business-${Date.now()}.webp`;
-      const { error: upErr } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, compressed.file, { upsert: true, contentType: compressed.file.type });
-      if (upErr) throw upErr;
+      const compressed = await compressImage(file, { maxWidth: 1200, maxHeight: 800, quality: 0.82, mimeType: 'image/webp' });
+      const thumb = await compressImage(file, { maxWidth: 480, maxHeight: 320, quality: 0.72, mimeType: 'image/webp' });
+      const ts = Date.now();
+      const path = `${profile.id}/business-${ts}.webp`;
+      const thumbPath = `${profile.id}/business-${ts}-thumb.webp`;
+      const [upResult] = await Promise.all([
+        supabase.storage.from(BUCKET).upload(path, compressed.file, { upsert: true, contentType: 'image/webp' }),
+        supabase.storage.from(BUCKET).upload(thumbPath, thumb.file, { upsert: true, contentType: 'image/webp' }),
+      ]);
+      if (upResult.error) throw upResult.error;
       const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
       setBusinessData((prev) => ({ ...prev, photo: data?.publicUrl || "" }));
       toast.success("Foto attività caricata.");

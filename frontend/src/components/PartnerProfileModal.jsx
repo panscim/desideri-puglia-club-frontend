@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { colors as TOKENS, typography } from "../utils/designTokens";
 import { supabase } from "../services/supabase";
 import toast from "react-hot-toast";
+import { compressImage } from "../utils/imageUtils";
 
 const BUCKET = "partner_assets";
 
@@ -51,58 +52,49 @@ export default function PartnerProfileModal({
         toast.error("Formato non valido. Scegli un'immagine.");
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Immagine troppo pesante (max 5MB).");
+      if (file.size > 15 * 1024 * 1024) {
+        toast.error("Immagine troppo pesante (max 15MB).");
         return;
       }
 
-      // --- CREAZIONE PREVIEW LOCALE ---
+      // Preview locale immediata
       const localUrl = URL.createObjectURL(file);
       setPreviews(prev => ({ ...prev, [type]: localUrl }));
-      
-      // Update form tentatively (so save doesn't fail if they save immediately)
-      // but the UI will use 'previews' primarily
-      setForm((prev) => ({ 
-        ...prev, 
-        [type === 'logo' ? 'logo_url' : 'cover_image_url']: localUrl 
-      }));
+      setForm(prev => ({ ...prev, [type === 'logo' ? 'logo_url' : 'cover_image_url']: localUrl }));
 
-      const toastId = toast.loading("Caricamento...");
-      const ext = file.name.split(".").pop();
-      const filename = `${partner.id}/${type}-${Date.now()}.${ext}`;
+      const toastId = toast.loading("Ottimizzazione...");
+      const ts = Date.now();
 
-      console.log(`[Upload] Start: ${filename} (bucket: ${BUCKET})`);
+      try {
+        const isCover = type === 'cover';
+        const [fullW, fullH, thumbW, thumbH] = isCover ? [1200, 675, 480, 270] : [500, 500, 0, 0];
 
-      const { error: upErr } = await supabase.storage
-        .from(BUCKET)
-        .upload(filename, file, { 
-          upsert: true,
-          contentType: file.type 
-        });
+        const compressed = await compressImage(file, { maxWidth: fullW, maxHeight: fullH, quality: 0.82, mimeType: 'image/webp' });
+        const filename = `${partner.id}/${type}-${ts}.webp`;
 
-      if (upErr) {
-        console.error("[Upload Error]", upErr);
-        if (upErr.message?.includes("not found")) {
-          toast.error("Errore: Bucket non trovato.", { id: toastId });
-        } else {
-          toast.error("Caricamento fallito (ma vedi l'anteprima)", { id: toastId });
+        const uploads = [
+          supabase.storage.from(BUCKET).upload(filename, compressed.file, { upsert: true, contentType: 'image/webp' }),
+        ];
+
+        // Thumbnail only for cover (logos shown small are already tiny after full compression)
+        if (isCover) {
+          const thumb = await compressImage(file, { maxWidth: thumbW, maxHeight: thumbH, quality: 0.72, mimeType: 'image/webp' });
+          uploads.push(supabase.storage.from(BUCKET).upload(`${partner.id}/${type}-${ts}-thumb.webp`, thumb.file, { upsert: true, contentType: 'image/webp' }));
         }
+
+        const [{ error: upErr }] = await Promise.all(uploads);
+        if (upErr) throw upErr;
+
+        const { data } = supabase.storage.from(BUCKET).getPublicUrl(filename);
+        const url = data?.publicUrl;
+        setForm(prev => ({ ...prev, [type === 'logo' ? 'logo_url' : 'cover_image_url']: url }));
+        setPreviews(prev => ({ ...prev, [type]: url }));
+        toast.success("Immagine salvata!", { id: toastId });
+      } catch (upErr) {
+        console.error("[Upload Error]", upErr);
+        toast.error("Caricamento fallito.", { id: toastId });
         return;
       }
-
-      const { data } = supabase.storage.from(BUCKET).getPublicUrl(filename);
-      const url = data?.publicUrl;
-      
-      console.log(`[Upload Success] Public URL: ${url}`);
-      
-      // Update with final remote URL
-      setForm((prev) => ({ 
-        ...prev, 
-        [type === 'logo' ? 'logo_url' : 'cover_image_url']: url 
-      }));
-      setPreviews(prev => ({ ...prev, [type]: url }));
-      
-      toast.success("Immagine salvata!", { id: toastId });
     } catch (e) {
       console.error("[Catch Upload]", e);
       toast.error("Errore durante l'upload.");
