@@ -91,6 +91,7 @@ export default function PartnerDashboard() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [partnerRank, setPartnerRank] = useState(null);
   const [syncingStripe, setSyncingStripe] = useState(false);
+  const [waitingPaymentConfirmation, setWaitingPaymentConfirmation] = useState(false);
 
   // New Tabs & Modal state
   const [currentTab, setCurrentTab] = useState("profilo"); // "profilo" | "analytics"
@@ -256,8 +257,11 @@ export default function PartnerDashboard() {
 
         if (error) console.error(error);
 
-        // Se non trovo il partner ma ho subscribed=1, aspetto un attimo (eventual consistency)
-        if (!data && params.get("subscribed") === "1") {
+        const isPaymentSuccess = params.get("payment_success") === "1";
+        const isFreshlySubscribed = params.get("subscribed") === "1";
+
+        // Se non trovo il partner ma ho subscribed=1 o payment_success=1, aspetto un attimo (eventual consistency)
+        if (!data && (isFreshlySubscribed || isPaymentSuccess)) {
           console.log("[PartnerDashboard] Partner non trovato post-payment, riprovo tra 3s...");
           await new Promise(r => setTimeout(r, 3000));
           const retry = await supabase
@@ -275,12 +279,38 @@ export default function PartnerDashboard() {
           return;
         }
 
-        // Se ho appena pagato (subscribed=1), ignoro il flag di scelta piano forzata
-        const isFreshlySubscribed = params.get("subscribed") === "1";
-        
         // --- SUBSCRIPTION GUARD ---
-        const subStatus = String(data.subscription_status || "").toLowerCase();
-        const isSubscribed = subStatus === "active" || subStatus === "trialing" || isFreshlySubscribed;
+        let subStatus = String(data.subscription_status || "").toLowerCase();
+        let isSubscribed = subStatus === "active" || subStatus === "trialing" || isFreshlySubscribed;
+
+        // Se payment_success=1 ma il webhook non ha ancora aggiornato lo status, polling
+        if (isPaymentSuccess && !isSubscribed) {
+          setWaitingPaymentConfirmation(true);
+          let attempts = 0;
+          while (attempts < 15 && !isSubscribed) {
+            await new Promise(r => setTimeout(r, 2000));
+            attempts++;
+            const retry = await supabase
+              .from("partners")
+              .select("*")
+              .eq("owner_user_id", profile.id)
+              .maybeSingle();
+            if (retry.data) {
+              const retryStatus = String(retry.data.subscription_status || "").toLowerCase();
+              if (retryStatus === "active" || retryStatus === "trialing") {
+                data = retry.data;
+                subStatus = retryStatus;
+                isSubscribed = true;
+              }
+            }
+          }
+          setWaitingPaymentConfirmation(false);
+          if (!isSubscribed) {
+            // Webhook non ha confermato entro il timeout — pagamento non riuscito o annullato
+            navigate("/partner/subscription?payment_error=1");
+            return;
+          }
+        }
 
         if (!isSubscribed) {
           console.log("[PartnerDashboard] Subscription not active, redirecting to /partner/subscription");
@@ -288,7 +318,7 @@ export default function PartnerDashboard() {
           return;
         }
 
-        if (Boolean(data.must_choose_plan_once) && !isFreshlySubscribed) {
+        if (Boolean(data.must_choose_plan_once) && !isFreshlySubscribed && !isPaymentSuccess) {
           navigate("/partner/subscription");
           return;
         }
@@ -296,7 +326,7 @@ export default function PartnerDashboard() {
         setPartner(data);
 
         // --- CELEBRATION LOGIC ---
-        if (params.get("subscribed") === "1") {
+        if (isFreshlySubscribed || isPaymentSuccess) {
           // Trigger confetti
           confetti({
             particleCount: 150,
@@ -310,12 +340,12 @@ export default function PartnerDashboard() {
             .from('partners')
             .select('*', { count: 'exact', head: true })
             .eq('subscription_status', 'active');
-          
+
           setPartnerRank(count || 1);
           setShowCelebration(true);
         }
 
-        if (params.get("subscribed") === "1") {
+        if (isFreshlySubscribed || isPaymentSuccess) {
           toast.success("Abbonamento attivo! Benvenuto nel Club.");
         }
         if (!data?.charges_enabled && params.get("payments_setup_required") === "1") {
@@ -494,10 +524,31 @@ export default function PartnerDashboard() {
     return d.toLocaleString("it-IT", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
   };
 
-  if (loading) {
+  if (loading || waitingPaymentConfirmation) {
     return (
-      <div className="flex items-center justify-center min-h-[100dvh] bg-[#f5f5f5]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-950" />
+      <div className="flex flex-col items-center justify-center min-h-[100dvh] bg-[#FAF7F2] gap-6 px-8">
+        {waitingPaymentConfirmation ? (
+          <>
+            <div className="w-16 h-16 rounded-full bg-[#D4793A]/10 flex items-center justify-center animate-pulse">
+              <CreditCard size={32} className="text-[#D4793A]" />
+            </div>
+            <div className="text-center">
+              <h2
+                className="text-[20px] font-black text-zinc-900"
+                style={{ fontFamily: '"Playfair Display", Georgia, serif' }}
+              >
+                Conferma pagamento in corso
+              </h2>
+              <p className="text-[14px] text-zinc-500 mt-2 leading-relaxed">
+                Stiamo verificando il tuo pagamento con Stripe.<br />
+                Non chiudere questa pagina.
+              </p>
+            </div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#D4793A]" />
+          </>
+        ) : (
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-950" />
+        )}
       </div>
     );
   }

@@ -97,6 +97,9 @@ export default function PartnerSubscription() {
         if (params.get('canceled') === '1') {
           toast.error('Checkout annullato')
         }
+        if (params.get('payment_error') === '1') {
+          toast.error('Pagamento non confermato da Stripe. Riprova o contatta il supporto.')
+        }
 
         const { data, error } = await supabase
           .from('partners')
