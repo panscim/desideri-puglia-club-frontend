@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { userId, tier, successUrl, cancelUrl } = req.body || {}
+    const { userId, tier } = req.body || {}
     if (!userId || !tier) {
       return res.status(400).json({ error: 'Missing userId or tier' })
     }
@@ -57,9 +57,22 @@ export default async function handler(req, res) {
       await supabase.from('partners').update({ stripe_customer_id: customerId }).eq('id', partner.id)
     }
 
-    const origin = req.headers.origin || 'https://desideri-puglia-club-frontend.vercel.app'
-    const okUrl = successUrl || `${origin}/partner/subscription?success=1`
-    const koUrl = cancelUrl || `${origin}/partner/subscription?canceled=1`
+    // Costruisce le URL lato server per evitare pattern invalidi da client (iOS WebView, Capacitor, ecc.)
+    const PRODUCTION_BASE = 'https://desideri-puglia-club-frontend.vercel.app'
+    let baseUrl = PRODUCTION_BASE
+    try {
+      const rawOrigin = req.headers.origin || req.headers.referer || ''
+      if (rawOrigin) {
+        const parsed = new URL(rawOrigin)
+        if (parsed.origin && parsed.origin !== 'null') {
+          baseUrl = parsed.origin
+        }
+      }
+    } catch {
+      baseUrl = PRODUCTION_BASE
+    }
+    const okUrl = `${baseUrl}/partner/dashboard?payment_success=1`
+    const koUrl = `${baseUrl}/partner/subscription/${tier}?canceled=1`
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
