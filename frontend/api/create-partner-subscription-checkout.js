@@ -57,22 +57,10 @@ export default async function handler(req, res) {
       await supabase.from('partners').update({ stripe_customer_id: customerId }).eq('id', partner.id)
     }
 
-    // Costruisce le URL lato server per evitare pattern invalidi da client (iOS WebView, Capacitor, ecc.)
-    const PRODUCTION_BASE = 'https://desideri-puglia-club-frontend.vercel.app'
-    let baseUrl = PRODUCTION_BASE
-    try {
-      const rawOrigin = req.headers.origin || req.headers.referer || ''
-      if (rawOrigin) {
-        const parsed = new URL(rawOrigin)
-        if (parsed.origin && parsed.origin !== 'null') {
-          baseUrl = parsed.origin
-        }
-      }
-    } catch {
-      baseUrl = PRODUCTION_BASE
-    }
-    const okUrl = `${baseUrl}/partner/dashboard?payment_success=1`
-    const koUrl = `${baseUrl}/partner/subscription/${tier}?canceled=1`
+    // URL lato server con base hardcoded (evita problemi con window.location.origin = "null" in certi contesti)
+    const base = 'https://desideri-puglia-club-frontend.vercel.app'
+    const okUrl = base + '/partner/dashboard?payment_success=1'
+    const koUrl = base + '/partner/subscription/' + tier + '?canceled=1'
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
@@ -95,14 +83,12 @@ export default async function handler(req, res) {
             currency: 'eur',
             product_data: {
               name: plan.name,
-              metadata: { product_id: plan.productId },
             },
             recurring: { interval: 'month' },
             unit_amount: plan.unitAmount,
           },
         },
       ],
-      allow_promotion_codes: true,
     })
 
     return res.status(200).json({ url: session.url })
