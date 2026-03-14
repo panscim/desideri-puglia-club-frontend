@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { X, Camera, MapPin, Instagram, Globe, CheckCircle2, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { colors as TOKENS, typography } from "../utils/designTokens";
@@ -38,6 +38,46 @@ export default function PartnerProfileModal({
     logo: partner?.logo_url || null,
     cover: partner?.cover_image_url || null
   });
+
+  const [openingHours, setOpeningHours] = useState(() =>
+    Array.from({ length: 7 }, (_, weekday) => ({
+      weekday,
+      closed: true,
+      open_time: '',
+      close_time: '',
+      break_open_time: '',
+      break_close_time: '',
+    }))
+  );
+
+  useEffect(() => {
+    if (!partner?.id) return;
+    supabase
+      .from('partner_opening_hours')
+      .select('weekday,open_time,close_time,break_open_time,break_close_time')
+      .eq('partner_id', partner.id)
+      .order('weekday', { ascending: true })
+      .then(({ data }) => {
+        if (!data?.length) return;
+        setOpeningHours(prev => {
+          const next = [...prev];
+          data.forEach(row => {
+            const i = row.weekday;
+            if (i >= 0 && i < 7) {
+              next[i] = {
+                weekday: i,
+                closed: !row.open_time && !row.close_time,
+                open_time: row.open_time ? row.open_time.slice(0, 5) : '',
+                close_time: row.close_time ? row.close_time.slice(0, 5) : '',
+                break_open_time: row.break_open_time ? row.break_open_time.slice(0, 5) : '',
+                break_close_time: row.break_close_time ? row.break_close_time.slice(0, 5) : '',
+              };
+            }
+          });
+          return next;
+        });
+      });
+  }, [partner?.id]);
 
   const uploadFile = async (file, type) => {
     if (!file) return;
@@ -101,6 +141,19 @@ export default function PartnerProfileModal({
     }
   };
 
+  const saveOpeningHours = async () => {
+    if (!partner?.id) return;
+    const rows = openingHours.map(d => ({
+      partner_id: partner.id,
+      weekday: d.weekday,
+      open_time: d.closed ? null : d.open_time || null,
+      close_time: d.closed ? null : d.close_time || null,
+      break_open_time: d.closed ? null : d.break_open_time || null,
+      break_close_time: d.closed ? null : d.break_close_time || null,
+    }));
+    await supabase.from('partner_opening_hours').upsert(rows, { onConflict: 'partner_id,weekday' });
+  };
+
   const handleNext = () => {
     if (step === 1) {
       if (!form.name.trim()) return toast.error("Nome attività obbligatorio.");
@@ -110,13 +163,14 @@ export default function PartnerProfileModal({
       if (!form.city.trim()) return toast.error("La città è obbligatoria.");
       if (!form.address.trim()) return toast.error("L'indirizzo è obbligatorio.");
     }
-    setStep(s => Math.min(5, s + 1));
+    setStep(s => Math.min(6, s + 1));
   };
 
   const handleSave = async () => {
     if (!form.description.trim()) return toast.error("Descrivi la tua attività.");
     setSaving(true);
     const toastId = toast.loading("Salvataggio profilo...");
+    await saveOpeningHours().catch(() => {});
     
     try {
       // Geocoding manuale via Nominatim (Free, no-auth)
@@ -187,7 +241,7 @@ export default function PartnerProfileModal({
         <header className="px-6 py-5 border-b border-[#E8DDD0] flex items-center justify-between shrink-0 bg-white/50 backdrop-blur-md">
           <div>
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4793A]">
-              Step {step} di 5
+              Step {step} di 6
             </span>
             <h2 className="text-xl font-black text-zinc-900 leading-tight mt-1" style={{ fontFamily: typography.serif }}>
               Configura il tuo Scrapbook
@@ -405,13 +459,79 @@ export default function PartnerProfileModal({
               <motion.div
                 key="step5"
                 initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
+                className="space-y-3"
+              >
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">Orari di apertura</p>
+                {openingHours.map((day, idx) => {
+                  const DAYS = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+                  return (
+                    <div key={idx} className="rounded-2xl bg-white border border-[#E8DDD0] overflow-hidden">
+                      <div
+                        className="flex items-center justify-between px-5 py-4 cursor-pointer"
+                        onClick={() => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, closed: !d.closed } : d))}
+                      >
+                        <span className="text-[14px] font-black text-zinc-950">{DAYS[idx]}</span>
+                        <div className="flex items-center gap-3">
+                          {day.closed
+                            ? <span className="text-[11px] font-black uppercase tracking-widest text-zinc-400">Chiuso</span>
+                            : <span className="text-[11px] font-black uppercase tracking-widest text-emerald-600">Aperto</span>}
+                          <div className="w-12 h-6 rounded-full relative transition-colors" style={{ background: day.closed ? '#E5E7EB' : '#D4793A' }}>
+                            <div className="absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all" style={{ left: day.closed ? '4px' : '28px' }} />
+                          </div>
+                        </div>
+                      </div>
+                      {!day.closed && (
+                        <div className="px-5 pb-4 space-y-3 border-t border-stone-100 pt-3">
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 block">Apertura</label>
+                              <input type="time" value={day.open_time}
+                                onChange={e => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, open_time: e.target.value } : d))}
+                                className="w-full px-4 py-3 rounded-xl border border-[#E8DDD0] bg-[#FAF7F0] text-[14px] font-bold text-zinc-950 focus:outline-none" />
+                            </div>
+                            <div>
+                              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 block">Chiusura</label>
+                              <input type="time" value={day.close_time}
+                                onChange={e => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, close_time: e.target.value } : d))}
+                                className="w-full px-4 py-3 rounded-xl border border-[#E8DDD0] bg-[#FAF7F0] text-[14px] font-bold text-zinc-950 focus:outline-none" />
+                            </div>
+                          </div>
+                          <details>
+                            <summary className="text-[10px] font-black uppercase tracking-widest text-zinc-400 cursor-pointer list-none">+ Pausa pranzo</summary>
+                            <div className="grid grid-cols-2 gap-3 mt-3">
+                              <div>
+                                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 block">Inizio pausa</label>
+                                <input type="time" value={day.break_open_time}
+                                  onChange={e => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, break_open_time: e.target.value } : d))}
+                                  className="w-full px-4 py-3 rounded-xl border border-[#E8DDD0] bg-[#FAF7F0] text-[14px] font-bold text-zinc-950 focus:outline-none" />
+                              </div>
+                              <div>
+                                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-1.5 block">Fine pausa</label>
+                                <input type="time" value={day.break_close_time}
+                                  onChange={e => setOpeningHours(prev => prev.map((d, i) => i === idx ? { ...d, break_close_time: e.target.value } : d))}
+                                  className="w-full px-4 py-3 rounded-xl border border-[#E8DDD0] bg-[#FAF7F0] text-[14px] font-bold text-zinc-950 focus:outline-none" />
+                              </div>
+                            </div>
+                          </details>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </motion.div>
+            )}
+
+            {step === 6 && (
+              <motion.div
+                key="step6"
+                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}
                 className="space-y-6"
               >
                 <div className="bg-white p-6 rounded-2xl border border-[#E8DDD0] shadow-sm relative rotate-[1deg]">
                   <div className="absolute -top-3 left-6 px-3 py-1 bg-zinc-900 text-white text-[9px] font-black uppercase tracking-widest rounded-sm rotate-[-2deg]">La tua Storia</div>
                   <div className="pt-2">
                     <p className="text-sm text-zinc-500 mb-4 leading-relaxed">Racconta ai membri del club cosa rende unica la tua realtà. Sii creativo ed emozionante. Questo testo sarà il manifesto del tuo brand nell'app.</p>
-                    <textarea 
+                    <textarea
                       value={form.description} onChange={e => setForm({...form, description: e.target.value})}
                       className="w-full bg-[#FAF7F0] border-none rounded-xl px-4 py-3 text-base text-zinc-900 min-h-[160px] resize-none focus:ring-2 focus:ring-zinc-900/20"
                       placeholder="C'era una volta..."
@@ -433,7 +553,7 @@ export default function PartnerProfileModal({
             {step === 1 ? 'Indietro' : <><ArrowLeft size={16}/> Indietro</>}
           </button>
           
-          {step < 5 ? (
+          {step < 6 ? (
             <button 
               onClick={handleNext}
               className="px-6 py-3 rounded-xl font-bold text-sm text-white flex items-center gap-2 hover:scale-105 transition-all shadow-md"
