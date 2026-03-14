@@ -1,8 +1,14 @@
 {
   "name": "desideri-puglia-club-root",
   "private": true,
+  "type": "module",
   "scripts": {
-    "vercel-install": "cd frontend && npm install",
+    "vercel-install": "npm install && cd frontend && npm install",
     "vercel-build": "cd frontend && npm run build"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.76.1",
+    "micro": "^10.0.1",
+    "stripe": "^20.3.1"
   }
 }
