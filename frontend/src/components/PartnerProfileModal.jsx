@@ -50,6 +50,31 @@ export default function PartnerProfileModal({
     }))
   );
 
+  // Re-sync form when partner loads/changes (partner is null on first render)
+  useEffect(() => {
+    if (!partner?.id) return;
+    setForm({
+      name: partner.name || "",
+      category: partner.category || "",
+      logo_url: partner.logo_url || "",
+      cover_image_url: partner.cover_image_url || "",
+      city: partner.city || "",
+      address: partner.address || "",
+      google_maps_url: partner.google_maps_url || "",
+      phone: partner.phone || "",
+      whatsapp_phone: partner.whatsapp_phone || "",
+      website_url: partner.website_url || "",
+      instagram_url: partner.instagram_url || "",
+      facebook_url: partner.facebook_url || "",
+      tiktok_url: partner.tiktok_url || "",
+      description: partner.description || "",
+    });
+    setPreviews({
+      logo: partner.logo_url || null,
+      cover: partner.cover_image_url || null,
+    });
+  }, [partner?.id]);
+
   useEffect(() => {
     if (!partner?.id) return;
     supabase
