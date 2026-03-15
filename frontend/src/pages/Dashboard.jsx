@@ -34,6 +34,15 @@ const getGreeting = () => {
   return 'Buona sera';
 };
 
+const getContextualSub = () => {
+  const h = new Date().getHours();
+  if (h < 9)  return 'Cosa scopri stamattina?';
+  if (h < 13) return 'Cosa fai oggi in Puglia?';
+  if (h < 17) return 'Il pomeriggio è tutto tuo';
+  if (h < 20) return "L'ora giusta per esplorare";
+  return 'Come finisci questa serata?';
+};
+
 /* ─────────────────────────────────────────
    SUB-COMPONENTS
 ───────────────────────────────────────── */
@@ -303,7 +312,7 @@ const CATS = [
   { id: 'cultura', icon: '🏛️', label: 'Cultura' },
   { id: 'cibo', icon: '🍝', label: 'Cibo' },
   { id: 'natura', icon: '🌿', label: 'Natura' },
-  { id: 'concierge', icon: '✨', label: 'Concierge' },
+  { id: 'concierge', icon: '✨', label: 'Per te' },
 ];
 
 const DEFAULT_NEWS = [
@@ -437,7 +446,7 @@ export default function Dashboard() {
                 {profile?.nome || profile?.nickname || 'Esploratore'} 👋
               </h1>
               <p className="text-[12px] font-medium text-[#8A95AD] mt-1">
-                {saghe.length} saghe pronte per te
+                {getContextualSub()}
               </p>
             </div>
 
@@ -454,24 +463,67 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 2. STICKY SEARCH BAR (Stays at the top) */}
-        <div className="sticky top-0 z-30 bg-[#FDFAF5]/95 backdrop-blur-md px-5 py-3 -mt-4 mb-2">
+        {/* 2. STICKY SEARCH BAR — utility, non protagonista */}
+        <div className="sticky top-0 z-30 bg-[#FDFAF5]/95 backdrop-blur-md px-5 py-2 -mt-2 mb-1">
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="w-full flex items-center bg-white border border-[#EAE3D6] rounded-[22px] px-4 py-2.5 gap-3 shadow-sm active:scale-[0.99] transition-transform"
+            className="w-full flex items-center bg-white/80 border border-[#EAE3D6] rounded-2xl px-4 py-2 gap-2.5 active:scale-[0.99] transition-transform"
           >
-            <MagnifyingGlass size={20} weight="bold" className="text-[#8A95AD] shrink-0" />
-            <span className="flex-1 text-left text-[14px] font-medium text-[#8A95AD] truncate">
-              Cerca artista, evento o città…
+            <MagnifyingGlass size={16} weight="bold" className="text-[#8A95AD] shrink-0" />
+            <span className="flex-1 text-left text-[13px] font-medium text-[#8A95AD] truncate">
+              Cerca luoghi, eventi, esperienze…
             </span>
-            <span className="flex items-center gap-1.5 bg-[#F7F1E8] border border-[#EAE3D6] rounded-full px-3 py-1.5 text-[12px] font-bold text-[#16243E] shrink-0">
-              📍 {userLoc ? 'Vicino' : 'Barletta'}
+            <span className="text-[11px] font-bold text-[#8A95AD] shrink-0">
+              📍 {userLoc ? 'Qui vicino' : 'Barletta'}
             </span>
           </button>
         </div>
 
+        {/* ── Cosa faccio adesso? — HERO CARD ── */}
+        <motion.div variants={fadeUp} className="px-5 mt-4">
+          <button
+            onClick={() => setShowNow(true)}
+            className="w-full relative overflow-hidden rounded-[28px] text-left active:scale-[0.98] transition-all"
+            style={{ background: 'linear-gradient(135deg, #0f1922 0%, #1e1108 50%, #2d1408 100%)' }}
+          >
+            {/* Glow principale */}
+            <div className="absolute inset-0 pointer-events-none opacity-50"
+              style={{ background: 'radial-gradient(ellipse at 90% 10%, #D4793A 0%, transparent 55%)' }} />
+            {/* Glow secondario */}
+            <div className="absolute inset-0 pointer-events-none opacity-10"
+              style={{ background: 'radial-gradient(ellipse at 5% 95%, #D4793A 0%, transparent 50%)' }} />
+
+            <div className="relative px-7 pt-7 pb-6">
+              {/* Titolo grande — il vero protagonista */}
+              <h3 className="text-[42px] font-serif font-black text-white leading-[1] tracking-tight mb-3">
+                Cosa faccio<br />adesso?
+              </h3>
+
+              {/* Sottotitolo */}
+              <p className="text-[13px] text-white/50 font-medium mb-5 leading-relaxed">
+                4 domande · 3 posti perfetti per il tuo momento
+              </p>
+
+              {/* Hint chips — anticipano le opzioni */}
+              <div className="flex gap-2 mb-6 flex-wrap">
+                {['🍽️ Cena', '😌 Relax', '🌙 Serata', '👥 Amici'].map(hint => (
+                  <span key={hint} className="text-[11px] font-bold text-white/65 bg-white/8 border border-white/10 px-3 py-1.5 rounded-full">
+                    {hint}
+                  </span>
+                ))}
+              </div>
+
+              {/* CTA full-width */}
+              <div className="bg-[#D4793A] text-white font-black text-[13px] uppercase tracking-[0.15em] px-6 py-4 rounded-2xl flex items-center justify-between shadow-lg shadow-[#D4793A]/30">
+                <span>Dimmi cosa fare</span>
+                <ArrowRight size={18} weight="bold" />
+              </div>
+            </div>
+          </button>
+        </motion.div>
+
         {/* ── Category pills ── */}
-        <motion.div variants={fadeUp} className="flex gap-2 px-5 pb-1 overflow-x-auto no-scrollbar mt-1">
+        <motion.div variants={fadeUp} className="flex gap-2 px-5 pb-1 overflow-x-auto no-scrollbar mt-5">
           {CATS.map(c => (
             <CatPill
               key={c.id}
@@ -481,28 +533,6 @@ export default function Dashboard() {
               onClick={() => setActiveCat(c.id)}
             />
           ))}
-        </motion.div>
-
-        {/* ── Cosa faccio adesso? ── */}
-        <motion.div variants={fadeUp} className="px-5 mt-5">
-          <button
-            onClick={() => setShowNow(true)}
-            className="w-full relative overflow-hidden rounded-3xl text-left active:scale-[0.98] transition-all"
-            style={{ background: 'linear-gradient(120deg, #16243E 0%, #2d1a0e 60%, #3d2010 100%)' }}
-          >
-            {/* Glow */}
-            <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ background: 'radial-gradient(circle at 85% 20%, #D4793A, transparent 55%)' }} />
-            <div className="relative px-6 py-5 flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4793A]/80 mb-1">Suggerimento Istantaneo</p>
-                <h3 className="text-[22px] font-serif font-black text-white leading-tight">Cosa faccio adesso?</h3>
-                <p className="text-[12px] text-white/50 font-medium mt-1">3 consigli su misura · 30 secondi</p>
-              </div>
-              <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#D4793A] flex items-center justify-center shadow-lg">
-                <ArrowRight size={20} weight="bold" className="text-white" />
-              </div>
-            </div>
-          </button>
         </motion.div>
 
         {/* ── Le Mie Saghe ── (solo saghe con almeno 1 tappa completata) */}
