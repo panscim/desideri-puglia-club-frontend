@@ -10,9 +10,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { getLocalized } from '../utils/content';
 import { useGeolocation } from '../hooks/useGeolocation';
-import { LockedCardDetail } from '../components/LockedCardDetail';
-import { UnlockedCardDetail } from '../components/UnlockedCardDetail';
-import { AlbumService } from '../services/album';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 
@@ -125,8 +122,6 @@ export default function SagaDetail() {
   const [nearbyPartners, setNearbyPartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const { location, startWatching } = useGeolocation();
-  const [selectedStep, setSelectedStep] = useState(null);
-  const [unlockingStep, setUnlockingStep] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [expandedPartnerNode, setExpandedPartnerNode] = useState(null);
 
@@ -224,29 +219,18 @@ export default function SagaDetail() {
 
   const canUnlockProximity = distanceMeters !== null && distanceMeters <= (activeStep?.radius || 50);
 
-  const attemptUnlock = () => {
-    if (activeStep) setSelectedStep(activeStep);
-  };
-
   const handleUnlockStepSuccess = async (step) => {
-    setUnlockingStep(true);
     try {
-      if (step.reference_table === 'cards' && step.reference_id) {
-        await AlbumService.unlockCard(step.reference_id);
-      }
       const res = await QuestService.unlockQuestStep(user.id, step.id);
       if (res.success) {
         confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999 });
         toast.success(`Mistero svelato: ${step.title}!`, { duration: 5000, icon: '🗝️' });
         setCompletedStepsIds(prev => [...prev, step.id]);
-        setSelectedStep(prev => ({ ...prev, status: 'completed' }));
       } else {
         toast.error(res.error || 'Errore durante lo sblocco');
       }
     } catch (e) {
       toast.error('Errore imprevisto');
-    } finally {
-      setUnlockingStep(false);
     }
   };
 
@@ -381,7 +365,7 @@ export default function SagaDetail() {
                           {/* Unlock CTA */}
                           <motion.button
                             whileTap={{ scale: 0.97 }}
-                            onClick={attemptUnlock}
+                            onClick={() => handleUnlockStepSuccess(step)}
                             className={`mt-4 w-full py-3.5 rounded-2xl font-black uppercase tracking-wider text-[12px] flex items-center justify-center gap-2 transition-all ${
                               canUnlockProximity
                                 ? 'bg-accent text-white shadow-lg shadow-accent/30'
@@ -398,12 +382,9 @@ export default function SagaDetail() {
                       )}
 
                       {isDone && (
-                        <button
-                          onClick={() => setSelectedStep({ ...step, status: 'completed' })}
-                          className="mt-3 text-[11px] font-black text-accent flex items-center gap-1 uppercase tracking-widest"
-                        >
-                          Rivedi <ArrowRight size={12} />
-                        </button>
+                        <div className="mt-3 flex items-center gap-1 text-[11px] font-black text-accent uppercase tracking-widest">
+                          <CheckCircle2 size={12} /> Completata
+                        </div>
                       )}
                     </div>
                   </div>
@@ -484,7 +465,6 @@ export default function SagaDetail() {
                     style={{ rotate: idx % 2 === 0 ? '-1deg' : '1deg' }}
                     whileTap={{ scale: 0.98 }}
                     className="flex items-start gap-5 p-5 bg-white border border-black/5 rounded-[2rem] cursor-pointer hover:shadow-xl transition-all group shadow-sm relative"
-                    onClick={() => setSelectedStep({ ...step, status: 'completed' })}
                   >
                     <div className="absolute top-0 right-10 w-10 h-4 bg-accent-gold/15 -translate-y-2 rotate-6 z-20" />
                     <div className="w-20 h-20 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-md">
@@ -516,34 +496,6 @@ export default function SagaDetail() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* UNLOCK MODALS */}
-      {selectedStep && (() => {
-        const cardObj = selectedStep.reference_table === 'cards'
-          ? selectedStep.cardData
-          : {
-            ...selectedStep.partnerData,
-            title: selectedStep.partnerData?.nome || selectedStep.title,
-            image_url: selectedStep.partnerData?.logo_url || selectedStep.image_url,
-            description: selectedStep.description_it,
-            gps_lat: selectedStep.partnerData?.lat || selectedStep._latitude,
-            gps_lng: selectedStep.partnerData?.lng || selectedStep._longitude,
-            gps_radius: selectedStep.radius || 50,
-          };
-        if (!cardObj) return null;
-        if (selectedStep.status === 'completed') {
-          return <UnlockedCardDetail card={{ ...cardObj, isUnlocked: true }} onClose={() => setSelectedStep(null)} />;
-        }
-        return (
-          <LockedCardDetail
-            card={cardObj}
-            userLocation={location}
-            onClose={() => setSelectedStep(null)}
-            onUnlock={() => handleUnlockStepSuccess(selectedStep)}
-            unlocking={unlockingStep}
-          />
-        );
-      })()}
 
     </div>
   );

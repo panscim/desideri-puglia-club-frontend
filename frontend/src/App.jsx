@@ -72,11 +72,6 @@ const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
 const AdminPartners = lazy(() => import("./pages/admin/AdminPartners"));
 // (AdminOffers removed)
 const AdminTransazioni = lazy(() => import("./pages/admin/AdminTransazioni.jsx"));
-const AdminCards = lazy(() => import("./pages/admin/AdminCards.jsx"));
-
-
-// ⭐️ NEW ALBUM PAGE
-const Album = lazy(() => import("./pages/Album"));
 
 
 // ⭐️ EVENTI CLUB
@@ -258,7 +253,6 @@ function App() {
 
                 {/* Mercato */}
                 <Route path="/mappa" element={<Mappa />} />
-                <Route path="/album" element={<Album />} />
                 <Route path="/eventi" element={<Eventi />} />
                 <Route path="/eventi/:id" element={<EventDetail />} />
                 <Route path="/biglietti" element={<Biglietti />} />
@@ -296,7 +290,6 @@ function App() {
                 <Route path="/admin" element={<AdminDashboard />} />
 
                 <Route path="/admin/partner" element={<AdminPartners />} />
-                <Route path="/admin/cards" element={<AdminCards />} />
                 {/* <Route path="/admin/offerte" element={<AdminOffers />} /> Removed legacy route */}
                 <Route path="/admin/transazioni" element={<AdminTransazioni />} />
 
