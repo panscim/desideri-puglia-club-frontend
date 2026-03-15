@@ -216,25 +216,48 @@ export default function PartnerProfileModal({
         console.warn("Geocoding failed:", e);
       }
 
+      // Only send columns that definitely exist in the partners schema
       const payload = {
-        ...form,
-        latitude: lat,
-        longitude: lng,
-        is_active: true, // Profilo completato = visibile (se pagato)
+        name:            form.name,
+        category:        form.category,
+        logo_url:        form.logo_url || null,
+        cover_image_url: form.cover_image_url || null,
+        city:            form.city,
+        address:         form.address,
+        phone:           form.phone || null,
+        website_url:     form.website_url || null,
+        instagram_url:   form.instagram_url || null,
+        description:     form.description,
+        latitude:        lat,
+        longitude:       lng,
+        is_active:       true,
       };
 
-      const { error } = await supabase
-        .from("partners")
-        .update(payload)
-        .eq("id", partner.id);
+      // Optional columns — add only if they exist (wrapped to avoid schema errors)
+      const optionalCols = {
+        google_maps_url: form.google_maps_url || null,
+        whatsapp_phone:  form.whatsapp_phone || null,
+        facebook_url:    form.facebook_url || null,
+        tiktok_url:      form.tiktok_url || null,
+      };
+
+      // Try with optional cols first, fall back without them
+      let error = null;
+      ({ error } = await supabase.from("partners").update({ ...payload, ...optionalCols }).eq("id", partner.id));
+
+      if (error?.code === "42703") {
+        // Column doesn't exist — retry without optional cols
+        console.warn("Optional columns missing, retrying without them:", error.message);
+        ({ error } = await supabase.from("partners").update(payload).eq("id", partner.id));
+      }
 
       if (error) throw error;
-      
+
       toast.success("Profilo completato con successo!", { id: toastId });
       onSuccess(payload);
     } catch (e) {
-      console.error(e);
-      toast.error("Errore durante il salvataggio.", { id: toastId });
+      console.error("[PartnerProfileModal] Save error:", e);
+      toast.error(`Errore: ${e?.message || "Salvataggio fallito"}`, { id: toastId });
     } finally {
       setSaving(false);
     }
