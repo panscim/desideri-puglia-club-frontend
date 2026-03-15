@@ -9,6 +9,8 @@ import {
   MagnifyingGlass, CaretLeft
 } from "@phosphor-icons/react";
 import { toThumbUrl } from "../utils/imageUtils";
+import { rankPartners } from "../utils/matching";
+import SagaWizard from "../components/SagaWizard";
 
 // ── LEAFLET ──
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
@@ -217,6 +219,10 @@ export default function Partner() {
   const [mapCenter, setMapCenter] = useState([41.1171, 16.8719]);
   const [mapZoom, setMapZoom] = useState(9);
 
+  // Saga matching
+  const [showSaga, setShowSaga] = useState(false);
+  const [sagaPrefs, setSagaPrefs] = useState(null);
+
   useEffect(() => {
     loadPartners();
     // Auto-request GPS silently on mount (only sets position, not the filter)
@@ -298,11 +304,14 @@ export default function Partner() {
       list = list
         .filter(p => p.distance !== null && p.distance <= radius)
         .sort((a, b) => (a.distance ?? 999) - (b.distance ?? 999));
+    } else if (sagaPrefs) {
+      // Rank by saga matching score
+      list = rankPartners(list, sagaPrefs, userPos ? { lat: userPos[0], lng: userPos[1] } : null);
     } else {
       list.sort((a, b) => a.is_verified === b.is_verified ? (a.name || "").localeCompare(b.name || "") : a.is_verified ? -1 : 1);
     }
     return list;
-  }, [partners, search, activeCategory, activeCity, gpsActive, userPos, radius]);
+  }, [partners, search, activeCategory, activeCity, gpsActive, userPos, radius, sagaPrefs]);
 
   const mappablePartners = useMemo(() => filtered.filter(p => p.coords), [filtered]);
 
@@ -334,18 +343,37 @@ export default function Partner() {
           <CaretLeft size={18} weight="bold" color="white" />
         </button>
 
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-on-image" style={{ color: 'white' }}>
-          Partner
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-on-image" style={{ color: 'white' }}>
+            Partner
+          </p>
+          {sagaPrefs && (
+            <span
+              className="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full"
+              style={{ background: T.orange, color: 'white' }}>
+              ✨ Saga
+            </span>
+          )}
+        </div>
 
-        <button
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => sagaPrefs ? setSagaPrefs(null) : setShowSaga(true)}
+            className="px-3 py-1.5 rounded-xl text-[11px] font-black active:scale-95 transition-all no-theme-flip"
+            style={sagaPrefs
+              ? { background: '#27272a', border: '1px solid #3f3f46', color: T.orange }
+              : { background: T.orange, color: 'white' }}>
+            {sagaPrefs ? "✕ Saga" : "✨ Saga"}
+          </button>
+          <button
           onClick={() => setViewMode(v => v === 'list' ? 'map' : 'list')}
           className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-all no-theme-flip"
           style={viewMode === 'map'
             ? { background: T.orange, color: 'white' }
             : { background: '#27272a', border: '1px solid #3f3f46', color: 'white' }}>
           {viewMode === 'map' ? <List size={17} weight="bold" color="white" /> : <MapTrifold size={17} weight="bold" color="white" />}
-        </button>
+          </button>
+        </div>
       </nav>
 
       <main className="pt-28 px-5 max-w-lg mx-auto">
@@ -510,6 +538,16 @@ export default function Partner() {
         .leaflet-popup-content { margin: 8px !important; width: auto !important; }
         .leaflet-popup-tip { display: none; }
       `}</style>
+
+      {/* SAGA WIZARD */}
+      <AnimatePresence>
+        {showSaga && (
+          <SagaWizard
+            onComplete={(prefs) => { setSagaPrefs(prefs); setShowSaga(false); }}
+            onSkip={() => { setSagaPrefs(null); setShowSaga(false); }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

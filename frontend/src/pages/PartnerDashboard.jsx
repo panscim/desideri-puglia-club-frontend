@@ -30,6 +30,7 @@ import {
 import toast from "react-hot-toast";
 import QRScannerModal from "../components/QRScannerModal";
 import PartnerProfileModal from "../components/PartnerProfileModal";
+import PartnerAdvancedProfileModal from "../components/PartnerAdvancedProfileModal";
 import { PartnerService } from "../services/partner";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from 'canvas-confetti';
@@ -96,6 +97,12 @@ export default function PartnerDashboard() {
   // New Tabs & Modal state
   const [currentTab, setCurrentTab] = useState("profilo"); // "profilo" | "analytics"
   const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Advanced profile modal
+  const [showAdvancedModal, setShowAdvancedModal] = useState(false);
+  const [advancedDismissed, setAdvancedDismissed] = useState(
+    () => localStorage.getItem("adv_profile_dismissed") === "1"
+  );
 
   // Computed field per capire se il profilo è completo
   const isProfileComplete = 
@@ -591,6 +598,57 @@ export default function PartnerDashboard() {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 space-y-6">
+
+        {/* ADVANCED PROFILE VISIBILITY BANNER */}
+        {!advancedDismissed && !partner?.advanced_profile_completed_at && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative rounded-2xl px-5 py-4 flex items-center gap-4"
+            style={{ background: "linear-gradient(135deg,#fff7ed 0%,#fef3c7 100%)", border: "1px solid #fed7aa" }}
+          >
+            <div className="shrink-0 w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-orange-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-black text-orange-900 leading-tight">
+                Completa il profilo avanzato
+              </p>
+              <div className="flex items-center gap-2 mt-1">
+                <div style={{ flex: 1, height: 4, background: "#fed7aa", borderRadius: 99 }}>
+                  <div
+                    style={{
+                      height: 4, borderRadius: 99, background: "#f97316",
+                      width: `${partner?.profile_score || 0}%`, transition: "width 0.6s ease",
+                    }}
+                  />
+                </div>
+                <span className="text-[11px] font-black text-orange-500 shrink-0">
+                  {partner?.profile_score || 0}/100
+                </span>
+              </div>
+              <p className="text-[11px] text-orange-700 mt-0.5">
+                Aumenta la tua visibilità nel matching con gli utenti
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={() => setShowAdvancedModal(true)}
+                className="px-3 py-1.5 rounded-xl text-[12px] font-black text-white"
+                style={{ background: "#f97316" }}
+              >
+                Inizia →
+              </button>
+              <button
+                onClick={() => { setAdvancedDismissed(true); localStorage.setItem("adv_profile_dismissed","1"); }}
+                className="w-7 h-7 rounded-full flex items-center justify-center"
+                style={{ background: "#FED7AA" }}
+              >
+                <X className="w-3.5 h-3.5 text-orange-600" />
+              </button>
+            </div>
+          </motion.div>
+        )}
 
         {/* STRIPE STATUS BANNER — only show if profile is complete (is_active) */}
         {(partner?.is_active || isProfileComplete) && (partner?.charges_enabled ? (
@@ -1241,6 +1299,21 @@ export default function PartnerDashboard() {
               </div>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* ADVANCED PROFILE MODAL */}
+      <AnimatePresence>
+        {showAdvancedModal && (
+          <PartnerAdvancedProfileModal
+            partner={partner}
+            onClose={() => setShowAdvancedModal(false)}
+            onSaved={(updated) => {
+              setPartner(updated);
+              setAdvancedDismissed(true);
+              localStorage.setItem("adv_profile_dismissed", "1");
+            }}
+          />
         )}
       </AnimatePresence>
     </div>
