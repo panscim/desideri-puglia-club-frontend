@@ -162,15 +162,15 @@ const SagaIntro = () => {
           </div>
         )}
 
-        {/* Lore / Description - Notebook Entry */}
-        <div className="mb-14 relative px-4">
-             {/* Floating Emoji */}
-             <div className="absolute -top-6 -right-2 text-4xl opacity-20 rotate-12 pointer-events-none">📜</div>
-             
-             <p className="text-[18px] text-text-muted leading-[1.6] font-medium italic text-center font-serif">
-                "{loreText}"
-             </p>
-             <div className="w-12 h-[2px] bg-accent-gold/20 mx-auto mt-8" />
+        {/* Lore / Description - Editorial */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-8 h-[2px] bg-accent rounded-full" />
+            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">La Storia</span>
+          </div>
+          <p className="text-[17px] text-text-primary leading-[1.8] font-medium">
+            {loreText}
+          </p>
         </div>
 
         {/* ========== STATS GRID - Note Style ========== */}
@@ -247,8 +247,13 @@ const SagaIntro = () => {
                 )}
              </div>
 
-             <div className="mt-8 flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-accent/60 group-hover:text-accent transition-colors">
-                <Compass size={14} /> Espandi l'itinerario completo
+             <div className="mt-6 flex items-center justify-between">
+               <span className="text-[12px] font-black uppercase tracking-widest text-accent group-hover:translate-x-1 transition-transform flex items-center gap-2">
+                 Vedi percorso completo <ChevronRight size={14} strokeWidth={3} />
+               </span>
+               <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center shadow-lg shadow-accent/30 group-hover:scale-110 transition-transform">
+                 <Route size={18} className="text-white" />
+               </div>
              </div>
           </motion.div>
         )}

@@ -1,9 +1,11 @@
 // src/pages/SagaDetail.jsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, ChevronDown, Navigation2, Lock, Unlock, CheckCircle2, History, Target, ArrowRight, Route } from 'lucide-react';
+import { ChevronLeft, ChevronDown, Navigation2, Lock, Unlock, CheckCircle2, History, ArrowRight, ChevronRight } from 'lucide-react';
+import { Sparkle, Store, MapPin, ArrowUpRight } from '@phosphor-icons/react';
 import { QuestService } from '../services/quest';
+import { supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { getLocalized } from '../utils/content';
@@ -14,7 +16,7 @@ import { AlbumService } from '../services/album';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 
-// --- HELPER: Calcolo Distanza (Formula di Haversine) ---
+// --- HELPERS ---
 const getDistance = (lat1, lon1, lat2, lon2) => {
   if (!lat1 || !lon1 || !lat2 || !lon2) return null;
   const R = 6371e3;
@@ -22,12 +24,95 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
   const φ2 = lat2 * Math.PI / 180;
   const Δφ = (lat2 - lat1) * Math.PI / 180;
   const Δλ = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-    Math.cos(φ1) * Math.cos(φ2) *
-    Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+  const a = Math.sin(Δφ / 2) ** 2 + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
+
+const getPartnersBetween = (stepA, stepB, partners) => {
+  const midLat = ((stepA._latitude || 0) + (stepB._latitude || 0)) / 2;
+  const midLng = ((stepA._longitude || 0) + (stepB._longitude || 0)) / 2;
+  if (!midLat || !midLng) return partners.slice(0, 3);
+  return [...partners]
+    .filter(p => p.latitude && p.longitude)
+    .sort((a, b) => {
+      const dA = Math.hypot(a.latitude - midLat, a.longitude - midLng);
+      const dB = Math.hypot(b.latitude - midLat, b.longitude - midLng);
+      return dA - dB;
+    })
+    .slice(0, 3);
+};
+
+// --- SUB-COMPONENTS ---
+
+const PartnerMiniCard = ({ partner }) => (
+  <div className="shrink-0 w-40 bg-white rounded-2xl overflow-hidden border border-black/5 shadow-sm">
+    {partner.logo_url ? (
+      <img src={partner.logo_url} alt={partner.name} className="w-full h-24 object-cover" />
+    ) : (
+      <div className="w-full h-24 bg-accent/5 flex items-center justify-center">
+        <Store size={28} className="text-accent/30" />
+      </div>
+    )}
+    <div className="p-3">
+      <p className="text-[13px] font-black text-text-primary leading-tight truncate">{partner.name}</p>
+      {partner.category && (
+        <p className="text-[10px] text-text-muted font-bold uppercase tracking-wide mt-0.5 truncate">{partner.category}</p>
+      )}
+    </div>
+  </div>
+);
+
+const PartnerDiscoveryNode = ({ idx, partners, expanded, onToggle }) => {
+  if (!partners || partners.length === 0) return (
+    <div className="flex items-center pl-[27px] my-1">
+      <div className="w-px h-8 bg-accent/10 ml-px" />
+    </div>
+  );
+
+  return (
+    <div className="pl-[52px] my-2 relative">
+      {/* Dot on the line */}
+      <div className="absolute left-[25px] top-3 w-3 h-3 rounded-full bg-accent-gold/20 border-2 border-accent-gold/40 z-10" />
+
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-2 py-1.5 group"
+      >
+        <div className="w-7 h-7 rounded-full bg-accent-gold/10 border border-accent-gold/20 flex items-center justify-center shrink-0 group-hover:bg-accent-gold/20 transition-colors">
+          <Store size={13} className="text-accent-gold" />
+        </div>
+        <span className="text-[11px] font-black text-text-muted group-hover:text-accent-gold transition-colors uppercase tracking-widest">
+          {partners.length} partner vicini
+        </span>
+        <ChevronRight
+          size={13}
+          strokeWidth={3}
+          className={`text-text-muted transition-transform duration-200 ${expanded ? 'rotate-90' : ''}`}
+        />
+      </button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-3 pt-2 pr-4">
+              {partners.map(p => (
+                <PartnerMiniCard key={p.id} partner={p} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// --- MAIN PAGE ---
 
 export default function SagaDetail() {
   const { id } = useParams();
@@ -37,12 +122,13 @@ export default function SagaDetail() {
 
   const [saga, setSaga] = useState(null);
   const [completedStepsIds, setCompletedStepsIds] = useState([]);
+  const [nearbyPartners, setNearbyPartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const { location, startWatching } = useGeolocation();
   const [selectedStep, setSelectedStep] = useState(null);
   const [unlockingStep, setUnlockingStep] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [showItinerary, setShowItinerary] = useState(false);
+  const [expandedPartnerNode, setExpandedPartnerNode] = useState(null);
 
   useEffect(() => {
     startWatching();
@@ -55,9 +141,21 @@ export default function SagaDetail() {
       try {
         const detail = await QuestService.getSagaDetail(id);
         setSaga(detail || null);
+
         if (user?.id) {
           const progress = await QuestService.getUserProgress(user.id);
           setCompletedStepsIds(progress.completedSteps || []);
+        }
+
+        // Fetch nearby partners for this saga's city
+        if (detail?.city) {
+          const { data: partners } = await supabase
+            .from('partners')
+            .select('id, name, category, logo_url, city, latitude, longitude')
+            .eq('city', detail.city)
+            .eq('is_active', true)
+            .limit(30);
+          setNearbyPartners(partners || []);
         }
       } catch (err) {
         console.error(err);
@@ -70,15 +168,15 @@ export default function SagaDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-[#FCFAF2] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (!saga) {
     return (
-      <div className="min-h-screen bg-bg-primary text-text-primary flex flex-col items-center justify-center p-6">
+      <div className="min-h-screen bg-[#FCFAF2] text-text-primary flex flex-col items-center justify-center p-6">
         <h2 className="text-xl font-serif font-black mb-2">Saga non trovata</h2>
         <button onClick={() => navigate('/missioni')} className="text-accent underline">Torna indietro</button>
       </div>
@@ -126,7 +224,7 @@ export default function SagaDetail() {
 
   const canUnlockProximity = distanceMeters !== null && distanceMeters <= (activeStep?.radius || 50);
 
-  const attemptUnlock = async () => {
+  const attemptUnlock = () => {
     if (activeStep) setSelectedStep(activeStep);
   };
 
@@ -153,309 +251,264 @@ export default function SagaDetail() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#FCFAF2] text-text-primary flex flex-col font-sans relative overflow-x-hidden selection:bg-accent/20 transition-all duration-500">
-
-      {/* BACKGROUND SCENE - Softened for Scrapbook */}
-      <div className="absolute inset-x-0 top-0 z-0 h-[50vh] overflow-hidden pointer-events-none opacity-80">
-        {activeStep ? (
-          <img
-            src={activeStep.image_url}
-            alt="Luogo Misterioso"
-            className={`w-full h-full object-cover transition-all duration-[3000ms] ${canUnlockProximity ? 'blur-sm brightness-90' : 'blur-2xl brightness-75 grayscale'}`}
-          />
-        ) : isSagaComplete ? (
-          <img src={saga.image_url} alt="Saga Completata" className="w-full h-full object-cover blur-sm brightness-75" />
-        ) : (
-          <div className="w-full h-full bg-accent-gold/5" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#FCFAF2] via-[#FCFAF2]/40 to-transparent" />
-      </div>
+    <div className="min-h-[100dvh] bg-[#FCFAF2] text-text-primary font-sans relative overflow-x-hidden selection:bg-accent/20">
 
       {/* TOP BAR */}
-      <header className="relative z-50 pt-[env(safe-area-inset-top)] flex flex-col px-6">
+      <header className="relative z-50 pt-[env(safe-area-inset-top)] px-5">
         <div className="flex items-center justify-between h-20">
-          <button onClick={() => navigate('/missioni')} className="w-11 h-11 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-text-primary hover:border-accent/40 transition-all shadow-sm active:scale-90">
+          <button
+            onClick={() => navigate('/missioni')}
+            className="w-11 h-11 rounded-full bg-white border border-zinc-200 flex items-center justify-center shadow-sm active:scale-90 transition-all"
+          >
             <ChevronLeft size={22} strokeWidth={2.5} />
           </button>
-          
-          <motion.div 
+
+          <motion.div
             initial={{ rotate: -2 }}
             animate={{ rotate: 2 }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             className="bg-accent-gold text-white px-3 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-md rounded-sm border-b-2 border-black/10 flex items-center gap-2"
           >
-            <div className="flex items-center gap-1.5">
-              <span className="text-white">{completedSteps.length}</span>
-              <span className="text-white/40 opacity-50">/</span>
-              <span className="text-white">{steps.length}</span>
-            </div>
-            <Sparkle size={12} weight="fill" className="text-white animate-pulse" />
+            <span>{completedSteps.length}/{steps.length}</span>
+            <Sparkle size={12} weight="fill" className="animate-pulse" />
           </motion.div>
 
-          <button onClick={() => setShowHistory(true)} className="w-11 h-11 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-text-primary hover:border-accent/40 transition-all relative shadow-sm active:scale-90">
+          <button
+            onClick={() => setShowHistory(true)}
+            className="w-11 h-11 rounded-full bg-white border border-zinc-200 flex items-center justify-center shadow-sm relative active:scale-90 transition-all"
+          >
             <History size={20} />
-            {completedSteps.length > 0 && <span className="absolute top-0.5 right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-white shadow-sm animate-pulse"></span>}
+            {completedSteps.length > 0 && (
+              <span className="absolute top-0.5 right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-white animate-pulse" />
+            )}
           </button>
         </div>
       </header>
 
-      {/* PROGRESS BAR - Bubbly Style */}
-      <div className="relative z-50 h-2 px-6 mt-2">
-        <div className="h-full w-full bg-zinc-200/50 rounded-full overflow-hidden p-0.5">
+      {/* PROGRESS BAR */}
+      <div className="relative z-50 h-1.5 px-5 mt-1 mb-2">
+        <div className="h-full w-full bg-zinc-200/50 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-            className="h-full bg-accent rounded-full shadow-[0_0_15px_rgba(212,121,58,0.3)]"
+            className="h-full bg-accent rounded-full shadow-[0_0_12px_rgba(212,121,58,0.4)]"
           />
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <main className="relative z-10 flex-1 flex flex-col px-6 py-10 mt-2">
-        {!isSagaComplete && activeStep ? (
-          <div className="flex flex-col items-center max-w-sm mx-auto w-full animate-in fade-in slide-in-from-bottom-8 duration-700">
+      {/* MAIN CONTENT – ROAD MAP */}
+      <main className="relative z-10 px-5 pb-32 pt-4">
+        <div className="max-w-lg mx-auto">
 
-            {/* HEADER TITLE with HIGHLIGHTER */}
-            <div className="mb-10 text-center relative group">
-              <motion.div 
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-12 -right-8 text-4xl pointer-events-none select-none opacity-40"
-              >
-                🗝️
-              </motion.div>
-              
-              <h1 className="text-[42px] font-serif font-black text-text-primary leading-[1] mb-4 tracking-tight relative inline-block">
-                <span className="relative z-10">{title}</span>
-                <motion.div 
-                   initial={{ scaleX: 0 }}
-                   animate={{ scaleX: 1 }}
-                   transition={{ delay: 0.8, duration: 1 }}
-                   className="absolute left-0 bottom-1 w-full h-4 bg-accent-gold/20 -z-0 origin-left -rotate-1 rounded-sm"
-                />
-              </h1>
-              <p className="overline !text-accent-gold !mb-0 flex items-center justify-center gap-2 !tracking-[0.4em] font-black">
-                Prossima Tappa: {activeStep.title}
-              </p>
-            </div>
-
-            {/* ENIGMA POST-IT */}
-            <motion.div 
-              style={{ rotate: '1.5deg' }}
-              className="relative bg-white p-8 pb-10 shadow-[0_15px_45px_rgba(0,0,0,0.08)] mb-12 w-full border border-black/5"
-            >
-              {/* Washi Tape */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-7 bg-accent/20 backdrop-blur-sm -translate-y-3 -rotate-2 rounded-sm border-x border-black/5 z-20" />
-              
-              <div className="text-center">
-                <p className="text-[24px] sm:text-[28px] font-serif font-black text-text-primary leading-[1.3] tracking-tight italic">
-                  "{activeStep.hint}"
-                </p>
-                <div className="mt-6 flex flex-col items-center">
-                   <div className="w-10 h-[1px] bg-zinc-100 mb-2" />
-                   <span className="text-[8px] font-black uppercase tracking-[0.3em] text-text-muted">Messaggio in Codice</span>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* RADAR - Playful Design */}
-            <div className="relative w-56 h-56 mb-12 flex items-center justify-center">
-              <div className={`absolute inset-0 rounded-full border border-accent/15 ${!canUnlockProximity ? 'animate-[ping_4s_ease-out_infinite]' : ''}`}></div>
-              <div className={`absolute inset-6 rounded-full border border-accent/20 shadow-inner ${!canUnlockProximity ? 'animate-[ping_4s_ease-out_infinite_1000ms]' : ''}`}></div>
-              
-              <div className={`relative z-10 w-32 h-32 rounded-full flex flex-col items-center justify-center p-2 transition-all duration-1000 ${canUnlockProximity ? 'bg-accent text-white border-4 border-white shadow-2xl scale-110' : 'bg-white border-2 border-accent-gold/40 shadow-xl shadow-accent-gold/5'}`}>
-                {canUnlockProximity ? (
-                  <>
-                    <Unlock size={36} weight="fill" className="mb-2" />
-                    <span className="text-white text-[12px] font-black uppercase tracking-[0.2em] text-center mt-1 leading-tight">Sblocca<br />Il Mistero</span>
-                  </>
-                ) : (
-                  <>
-                    <Navigation2 size={28} weight="bold" className={`text-accent-gold mb-2 transition-transform duration-[2s] ${distanceMeters !== null ? 'animate-spin-slow' : ''}`} />
-                    {distanceMeters !== null ? (
-                      <div className="flex flex-col items-center">
-                        <span className="text-text-primary text-[32px] font-black font-serif leading-none tracking-tighter">{distanceMeters > 999 ? (distanceMeters / 1000).toFixed(1) : distanceMeters}</span>
-                        <span className="text-text-muted text-[11px] uppercase font-black tracking-widest mt-1">{distanceMeters > 999 ? 'km' : 'metri'}</span>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-1">
-                        <span className="text-text-muted text-[10px] font-black uppercase tracking-widest text-center px-2 animate-pulse">Segnale...</span>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* UNLOCK BUTTON - Playful Bouncy */}
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={attemptUnlock}
-              className={`w-full !py-5 flex items-center justify-center gap-3 rounded-[1.5rem] font-black uppercase tracking-widest text-[14px] transition-all duration-300 ${!canUnlockProximity ? 'bg-white border-2 border-zinc-200 text-text-muted' : 'bg-accent text-white shadow-xl shadow-accent/25 hover:bg-accent/90'}`}
-            >
-              {canUnlockProximity ? (
-                <>Rivela il Luogo <ArrowRight size={20} weight="bold" /></>
-              ) : (
-                <>
-                  <Lock size={18} weight="bold" />
-                  <span>{distanceMeters !== null ? `${Math.max(0, distanceMeters - activeStep.radius)}m per l'arrivo` : 'GPS Necessario'}</span>
-                </>
-              )}
-            </motion.button>
-            <p className="overline !text-text-muted !mt-6 text-center max-w-[280px] !normal-case !font-bold opacity-60 italic text-[11px]">
-              "Devi essere entro {activeStep.radius}m per catturare questa tappa."
+          {/* Saga title */}
+          <div className="mb-8 text-center">
+            <h1 className="text-[34px] font-serif font-black text-text-primary leading-[1.1] tracking-tight">{title}</h1>
+            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-accent mt-2">
+              {isSagaComplete ? 'Saga completata ✓' : activeStep ? `Prossima tappa: ${activeStep.title}` : 'In corso...'}
             </p>
+          </div>
 
-            {/* ITINERARIO LIST - Scrapbook Style */}
-            <div className="mt-16 w-full">
-              <div className="flex items-center justify-between mb-8">
-                 <div className="relative inline-block">
-                    <span className="text-[20px] font-serif font-black text-text-primary px-3 relative z-10">Cronologia Itinerario</span>
-                    <div className="absolute left-0 bottom-0.5 w-full h-3 bg-accent-gold/15 -z-0 -rotate-1" />
-                 </div>
-                 <span className="text-[10px] font-black uppercase tracking-widest text-text-muted">{steps.length} Tappe</span>
-              </div>
+          {/* Road Map */}
+          <div className="relative">
+            {/* Vertical connecting line */}
+            <div
+              className="absolute top-7 bottom-7 w-px bg-gradient-to-b from-accent/30 via-accent/20 to-transparent"
+              style={{ left: '27px' }}
+            />
 
-              <div className="space-y-4">
-                 {steps.map((step, idx) => {
-                    const isDone = step.status === 'completed';
-                    const isCurrent = step.status === 'active';
-                    const rotation = (idx % 2 === 0 ? '-1deg' : '1deg');
-                    
-                    return (
-                        <motion.div 
-                          key={step.id}
-                          style={{ rotate: rotation }}
-                          className={`flex items-start gap-4 p-5 rounded-[1.5rem] transition-all duration-500 shadow-sm border border-black/5 ${isDone ? 'bg-white opacity-80' : isCurrent ? 'bg-white shadow-lg border-accent-gold/20 scale-[1.02]' : 'bg-white/40 opacity-40'}`}
+            {steps.map((step, idx) => {
+              const isDone = step.status === 'completed';
+              const isCurrent = step.status === 'active';
+              const isLocked = step.status === 'locked';
+              const partnersForNode = idx < steps.length - 1
+                ? getPartnersBetween(step, steps[idx + 1], nearbyPartners)
+                : [];
+
+              return (
+                <React.Fragment key={step.id}>
+                  {/* ── Step Node ── */}
+                  <div className={`flex gap-4 py-2 ${isLocked ? 'opacity-40' : ''}`}>
+                    {/* Circle indicator */}
+                    <div className={`relative z-10 w-14 h-14 rounded-full shrink-0 flex items-center justify-center border-4 transition-all duration-500 ${
+                      isDone ? 'bg-accent border-white shadow-lg shadow-accent/25' :
+                      isCurrent ? 'bg-white border-accent shadow-2xl shadow-black/10 scale-110' :
+                      'bg-zinc-50 border-zinc-200'
+                    }`}>
+                      {isDone ? (
+                        <CheckCircle2 size={22} className="text-white" />
+                      ) : isCurrent ? (
+                        <span className="text-accent font-black text-[18px]">{idx + 1}</span>
+                      ) : (
+                        <Lock size={16} className="text-zinc-300" />
+                      )}
+                    </div>
+
+                    {/* Content card */}
+                    <div className={`flex-1 rounded-3xl p-5 border transition-all ${
+                      isDone ? 'bg-white border-black/5 shadow-sm' :
+                      isCurrent ? 'bg-white border-accent/20 shadow-xl shadow-black/5' :
+                      'bg-white/60 border-black/5'
+                    }`}>
+                      <span className="text-[9px] font-black uppercase tracking-[0.25em] text-accent-gold">
+                        {idx === 0 ? 'Partenza' : idx === steps.length - 1 ? 'Gran Finale' : `Tappa ${idx + 1}`}
+                      </span>
+                      <h4 className={`text-[16px] font-serif font-black mt-0.5 leading-snug ${
+                        isDone || isCurrent ? 'text-text-primary' : 'text-text-muted'
+                      }`}>
+                        {isDone || isCurrent ? step.title : `Mistero n.${idx + 1}`}
+                      </h4>
+
+                      {isCurrent && (
+                        <>
+                          <p className="text-[13px] text-text-muted mt-3 italic leading-relaxed border-l-2 border-accent-gold/30 pl-3">
+                            "{step.hint}"
+                          </p>
+
+                          {/* Distance */}
+                          {distanceMeters !== null && (
+                            <div className="mt-3 flex items-center gap-2">
+                              <Navigation2 size={13} className="text-accent-gold" />
+                              <span className="text-[12px] font-black text-text-primary">
+                                {distanceMeters > 999
+                                  ? `${(distanceMeters / 1000).toFixed(1)} km`
+                                  : `${distanceMeters} m`}
+                                <span className="text-text-muted font-medium ml-1">da questo luogo</span>
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Unlock CTA */}
+                          <motion.button
+                            whileTap={{ scale: 0.97 }}
+                            onClick={attemptUnlock}
+                            className={`mt-4 w-full py-3.5 rounded-2xl font-black uppercase tracking-wider text-[12px] flex items-center justify-center gap-2 transition-all ${
+                              canUnlockProximity
+                                ? 'bg-accent text-white shadow-lg shadow-accent/30'
+                                : 'bg-zinc-100 text-zinc-400'
+                            }`}
+                          >
+                            {canUnlockProximity ? (
+                              <><Unlock size={16} weight="bold" /> Sblocca il Mistero</>
+                            ) : (
+                              <><Lock size={15} /> {distanceMeters !== null ? `Ancora ${Math.max(0, distanceMeters - step.radius)}m` : 'GPS Necessario'}</>
+                            )}
+                          </motion.button>
+                        </>
+                      )}
+
+                      {isDone && (
+                        <button
+                          onClick={() => setSelectedStep({ ...step, status: 'completed' })}
+                          className="mt-3 text-[11px] font-black text-accent flex items-center gap-1 uppercase tracking-widest"
                         >
-                           <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center border-2 text-[11px] font-black ${isDone ? 'bg-accent border-accent text-white' : isCurrent ? 'border-accent-gold text-accent-gold animate-pulse' : 'border-zinc-200 text-text-muted'}`}>
-                              {isDone ? <CheckCircle2 size={16} weight="bold" /> : idx + 1}
-                           </div>
-                           <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                 <span className="text-[9px] font-black uppercase tracking-widest text-text-muted">{idx === 0 ? 'Partenza' : idx === steps.length - 1 ? 'Gran Finale' : `Passaggio ${idx + 1}`}</span>
-                                 {isDone && <span className="text-[7px] font-black bg-accent/10 text-accent px-1.5 py-0.5 rounded-full border border-accent/20">SVELATO</span>}
-                              </div>
-                              <h4 className={`text-[17px] font-serif font-black tracking-tight ${isDone || isCurrent ? 'text-text-primary' : 'text-text-muted'}`}>
-                                 {isDone || isCurrent ? step.title : `Mistero n. ${idx + 1}`}
-                              </h4>
-                              {isCurrent && (
-                                <p className="text-[13px] text-text-muted mt-2 font-medium italic border-l-2 border-accent-gold/30 pl-3 leading-relaxed">"{step.hint}"</p>
-                              )}
-                           </div>
-                        </motion.div>
-                    )
-                 })}
-              </div>
-            </div>
+                          Rivedi <ArrowRight size={12} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Partner Discovery Node (between steps) ── */}
+                  {idx < steps.length - 1 && (
+                    <PartnerDiscoveryNode
+                      idx={idx}
+                      partners={partnersForNode}
+                      expanded={expandedPartnerNode === idx}
+                      onToggle={() => setExpandedPartnerNode(expandedPartnerNode === idx ? null : idx)}
+                    />
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
-        ) : isSagaComplete ? (
-          <div className="flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-1000 flex-1 py-10 relative">
-            <motion.div 
-              animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }} 
-              transition={{ duration: 5, repeat: Infinity }}
-              className="w-28 h-28 bg-[#FCFAF2] rounded-[2rem] flex items-center justify-center mb-10 shadow-2xl border-2 border-accent-gold/40 relative"
+
+          {/* Saga Complete */}
+          {isSagaComplete && (
+            <motion.div
+              className="text-center py-12 mt-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              {/* Sticker Style Check */}
-              <div className="w-20 h-20 bg-accent rounded-full flex items-center justify-center shadow-lg border-4 border-white -rotate-12">
-                   <CheckCircle2 size={44} weight="bold" className="text-white" />
-              </div>
-              {/* Floating Star */}
-              <div className="absolute -top-4 -right-4 text-3xl">✨</div>
+              <div className="text-5xl mb-4">🏆</div>
+              <h2 className="text-3xl font-serif font-black text-text-primary mb-3 relative inline-block">
+                <span className="relative z-10">Saga Completata!</span>
+                <div className="absolute left-0 bottom-1 w-full h-4 bg-accent-gold/20 -z-0 -rotate-1 rounded-sm" />
+              </h2>
+              <p className="text-text-muted mb-8 italic font-medium">"{title}" è ora nel tuo diario.</p>
+              <button
+                onClick={() => navigate('/missioni')}
+                className="btn-primary inline-flex items-center gap-2"
+              >
+                Nuove Avventure <ArrowRight size={16} />
+              </button>
             </motion.div>
-            
-            <h2 className="text-[42px] font-serif font-black text-text-primary mb-4 tracking-tight leading-[1] relative inline-block">
-               <span className="relative z-10">Mistero Risolto!</span>
-               <div className="absolute left-0 bottom-2 w-full h-5 bg-accent-gold/20 -z-0 -rotate-1" />
-            </h2>
-            <p className="text-[17px] text-text-muted font-medium max-w-[280px] mb-12 italic leading-relaxed">Il diario di "{title}" è ora completo. La tua leggenda vive tra le pagine del Club.</p>
-            
-            <button
-              onClick={() => navigate('/missioni')}
-              className="w-full max-w-[260px] !py-4 btn-primary shadow-xl shadow-accent/20 group"
-            >
-              Nuove Avventure <ArrowRight size={18} weight="bold" className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        ) : null}
+          )}
+        </div>
       </main>
 
-      {/* FOOTER SIGNATURE */}
-      <footer className="py-20 flex flex-col items-center gap-5 opacity-30 mt-10">
-          <div className="w-10 h-[1px] bg-zinc-400/50" />
-          <p className="text-[8px] font-black uppercase tracking-[0.6em] text-zinc-500 text-center leading-relaxed">
-            Saga Dettagli <br /> Desideri Puglia Club © 2026
-          </p>
-      </footer>
-
-      {/* HISTORY DRAWER - Redesigned */}
+      {/* HISTORY DRAWER */}
       <AnimatePresence>
         {showHistory && (
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex flex-col bg-black/40 backdrop-blur-md"
           >
             <div className="flex-1" onClick={() => setShowHistory(false)} />
-            <motion.div 
+            <motion.div
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
               className="bg-[#FCFAF2] border-t border-zinc-200 rounded-t-[3.5rem] p-10 max-h-[85vh] overflow-y-auto w-full max-w-lg mx-auto shadow-2xl pb-[calc(40px+env(safe-area-inset-bottom))]"
             >
-              <div className="flex items-center justify-between mb-12">
+              <div className="flex items-center justify-between mb-10">
                 <div className="relative">
-                  <h3 className="text-[32px] font-serif font-black text-text-primary tracking-tight relative z-10">Le tue Scoperte</h3>
+                  <h3 className="text-[30px] font-serif font-black text-text-primary tracking-tight relative z-10">Le tue Scoperte</h3>
                   <div className="absolute left-0 bottom-1 w-full h-3 bg-accent/20 -z-0 -rotate-1" />
-                  <p className="overline !text-accent-gold !mb-0 !mt-2 !tracking-widest font-black">Registro Avventure</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-accent-gold mt-2">Registro Avventure</p>
                 </div>
-                <button onClick={() => setShowHistory(false)} className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-text-muted hover:text-text-primary transition-all active:scale-90 border border-zinc-100 shadow-sm">
+                <button
+                  onClick={() => setShowHistory(false)}
+                  className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-text-muted hover:text-text-primary transition-all active:scale-90 border border-zinc-100 shadow-sm"
+                >
                   <ChevronDown className="w-6 h-6" />
                 </button>
               </div>
 
-              <div className="grid gap-6">
-                {completedSteps.map((step, idx) => {
-                  const rotation = (idx % 2 === 0 ? '-1.5deg' : '1.5deg');
-                  return (
-                    <motion.div
-                      key={step.id}
-                      style={{ rotate: rotation }}
-                      whileTap={{ scale: 0.98 }}
-                      className="flex items-start gap-5 p-5 bg-white border border-black/5 rounded-[2rem] cursor-pointer hover:shadow-xl transition-all group shadow-[0_10px_30px_rgba(0,0,0,0.05)] relative"
-                      onClick={() => setSelectedStep({ ...step, status: 'completed' })}
-                    >
-                      {/* Decorative Tape small */}
-                      <div className="absolute top-0 right-10 w-10 h-4 bg-accent-gold/15 -translate-y-2 rotate-6 z-20" />
-
-                      <div className="w-20 h-20 shrink-0 rounded-2xl overflow-hidden relative border-2 border-white shadow-md group-hover:border-accent transition-colors">
-                        <img src={step.image_url} alt={step.title} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-500" />
-                        <div className="absolute inset-0 bg-accent/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <CheckCircle2 size={32} weight="fill" className="text-white drop-shadow-lg" />
-                        </div>
-                      </div>
-                      <div className="flex-1 pt-1">
-                        <span className="text-[8px] font-black uppercase tracking-[0.3em] text-accent-gold mb-1.5 block">Tappa {step.step_order}</span>
-                        <h4 className="text-[20px] font-serif font-black text-text-primary leading-[1.1] mb-2 tracking-tight">{step.title}</h4>
-                        <div className="flex items-center gap-1.5 text-accent font-black text-[10px] uppercase tracking-widest transition-all group-hover:translate-x-1">
-                          Esplora <ArrowRight size={14} />
-                        </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-
-                {lockedSteps.length > 0 && (
-                  <div className="mt-12 py-12 border-t-2 border-dashed border-zinc-200 flex flex-col items-center gap-6">
-                    <div className="flex items-center gap-4">
-                      {lockedSteps.map((s, idx) => (
-                        <div key={idx} className="w-3 h-3 rounded-full bg-zinc-200 border border-zinc-300 transform rotate-12 shadow-sm"></div>
-                      ))}
+              <div className="grid gap-5">
+                {completedSteps.map((step, idx) => (
+                  <motion.div
+                    key={step.id}
+                    style={{ rotate: idx % 2 === 0 ? '-1deg' : '1deg' }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-start gap-5 p-5 bg-white border border-black/5 rounded-[2rem] cursor-pointer hover:shadow-xl transition-all group shadow-sm relative"
+                    onClick={() => setSelectedStep({ ...step, status: 'completed' })}
+                  >
+                    <div className="absolute top-0 right-10 w-10 h-4 bg-accent-gold/15 -translate-y-2 rotate-6 z-20" />
+                    <div className="w-20 h-20 shrink-0 rounded-2xl overflow-hidden border-2 border-white shadow-md">
+                      <img src={step.image_url} alt={step.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                     </div>
-                    <span className="overline !text-text-muted !mb-0 opacity-40 !normal-case italic text-[13px] font-medium">Ancora misteri da incollare in questo diario...</span>
+                    <div className="flex-1 pt-1">
+                      <span className="text-[8px] font-black uppercase tracking-[0.3em] text-accent-gold mb-1 block">Tappa {step.step_order}</span>
+                      <h4 className="text-[18px] font-serif font-black text-text-primary leading-tight mb-2">{step.title}</h4>
+                      <div className="flex items-center gap-1.5 text-accent font-black text-[10px] uppercase tracking-widest">
+                        Esplora <ArrowRight size={13} />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+
+                {completedSteps.length === 0 && (
+                  <div className="py-12 text-center">
+                    <p className="text-[14px] text-text-muted italic font-medium">Nessuna tappa completata ancora.<br />Inizia la saga per sbloccare i misteri!</p>
+                  </div>
+                )}
+
+                {lockedSteps.length > 0 && completedSteps.length > 0 && (
+                  <div className="pt-8 border-t border-dashed border-zinc-200 text-center">
+                    <p className="text-[11px] text-text-muted italic font-medium opacity-50">Ancora {lockedSteps.length} misteri da incollare in questo diario...</p>
                   </div>
                 )}
               </div>
@@ -464,41 +517,33 @@ export default function SagaDetail() {
         )}
       </AnimatePresence>
 
-      {/* UNLOCK MODALS - Keep same logic but ensure backdrop aligns */}
-      {selectedStep && (
-        (() => {
-          const cardObj = selectedStep.reference_table === 'cards'
-            ? selectedStep.cardData
-            : {
-              ...selectedStep.partnerData,
-              title: selectedStep.partnerData?.nome || selectedStep.title,
-              image_url: selectedStep.partnerData?.logo_url || selectedStep.image_url,
-              description: selectedStep.description_it,
-              gps_lat: selectedStep.partnerData?.lat || selectedStep._latitude,
-              gps_lng: selectedStep.partnerData?.lng || selectedStep._longitude,
-              gps_radius: selectedStep.radius || 50,
-            };
-          if (!cardObj) return null;
-          if (selectedStep.status === 'completed') {
-            return (
-              <UnlockedCardDetail
-                card={{ ...cardObj, isUnlocked: true }}
-                onClose={() => setSelectedStep(null)}
-              />
-            );
-          } else {
-            return (
-              <LockedCardDetail
-                card={cardObj}
-                userLocation={location}
-                onClose={() => setSelectedStep(null)}
-                onUnlock={() => handleUnlockStepSuccess(selectedStep)}
-                unlocking={unlockingStep}
-              />
-            );
-          }
-        })()
-      )}
+      {/* UNLOCK MODALS */}
+      {selectedStep && (() => {
+        const cardObj = selectedStep.reference_table === 'cards'
+          ? selectedStep.cardData
+          : {
+            ...selectedStep.partnerData,
+            title: selectedStep.partnerData?.nome || selectedStep.title,
+            image_url: selectedStep.partnerData?.logo_url || selectedStep.image_url,
+            description: selectedStep.description_it,
+            gps_lat: selectedStep.partnerData?.lat || selectedStep._latitude,
+            gps_lng: selectedStep.partnerData?.lng || selectedStep._longitude,
+            gps_radius: selectedStep.radius || 50,
+          };
+        if (!cardObj) return null;
+        if (selectedStep.status === 'completed') {
+          return <UnlockedCardDetail card={{ ...cardObj, isUnlocked: true }} onClose={() => setSelectedStep(null)} />;
+        }
+        return (
+          <LockedCardDetail
+            card={cardObj}
+            userLocation={location}
+            onClose={() => setSelectedStep(null)}
+            onUnlock={() => handleUnlockStepSuccess(selectedStep)}
+            unlocking={unlockingStep}
+          />
+        );
+      })()}
 
     </div>
   );
