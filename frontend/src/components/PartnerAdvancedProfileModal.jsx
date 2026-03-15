@@ -108,8 +108,8 @@ const T = {
 };
 
 // ── Component ────────────────────────────────────────────────
-export default function PartnerAdvancedProfileModal({ isOpen, onClose, partner, onComplete }) {
-  const [step, setStep] = useState(1);
+export default function PartnerAdvancedProfileModal({ isOpen, onClose, partner, onComplete, initialStep = 1 }) {
+  const [step, setStep] = useState(initialStep);
   const [saving, setSaving] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [form, setForm] = useState({
@@ -121,6 +121,11 @@ export default function PartnerAdvancedProfileModal({ isOpen, onClose, partner, 
     features:      partner?.features      || {},
     selectedTags:  [],
   });
+
+  // Reset to initialStep each time the modal opens
+  useEffect(() => {
+    if (isOpen) setStep(initialStep);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!partner?.id) return;

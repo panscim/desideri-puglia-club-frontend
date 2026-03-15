@@ -100,7 +100,10 @@ export default function PartnerDashboard() {
 
   // Advanced profile modal
   const [showAdvancedModal, setShowAdvancedModal] = useState(false);
+  const [advancedModalStep, setAdvancedModalStep] = useState(1);
   const [advancedDismissed, setAdvancedDismissed] = useState(false); // solo per questa sessione
+
+  const openAdvancedModal = (step = 1) => { setAdvancedModalStep(step); setShowAdvancedModal(true); };
 
   // Computed field per capire se il profilo è completo
   const isProfileComplete = 
@@ -637,7 +640,7 @@ export default function PartnerDashboard() {
               {/* actions */}
               <div className="flex items-center gap-2 shrink-0">
                 <button
-                  onClick={() => setShowAdvancedModal(true)}
+                  onClick={() => openAdvancedModal(1)}
                   className="px-4 py-2 rounded-2xl text-[12px] font-black text-white transition-all active:scale-95"
                   style={{ background: "#D4793A" }}
                 >
@@ -779,6 +782,112 @@ export default function PartnerDashboard() {
                         {partner?.instagram_url && <a href={partner.instagram_url} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[12px] font-bold text-pink-400 hover:text-pink-600 transition-colors"><Instagram size={16}/> INSTAGRAM</a>}
                      </div>
                   </div>
+                </div>
+              </div>
+
+              {/* ── CLASSIFICAZIONE ── */}
+              <div className="bg-white rounded-[28px] border border-[#E8DDD0] shadow-sm overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between px-6 py-4 border-b border-[#F0EBE3]">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4793A]">Classificazione</p>
+                    <p className="text-[13px] font-semibold text-zinc-600 mt-0.5">Categoria, tipo e caratteristiche</p>
+                  </div>
+                  <button
+                    onClick={() => openAdvancedModal(1)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-black border transition-all active:scale-95"
+                    style={{ borderColor: "#D4793A", color: "#D4793A", background: "#FFF7ED" }}
+                  >
+                    <Edit3 size={12} /> Modifica
+                  </button>
+                </div>
+
+                <div className="px-6 py-5 space-y-4">
+                  {/* Categoria + Subcategoria */}
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {partner?.category ? (
+                      <span
+                        className="inline-flex items-center px-3 py-1.5 rounded-xl text-[12px] font-black"
+                        style={{ background: "#FFF7ED", color: "#D4793A" }}
+                      >
+                        {partner.category}
+                      </span>
+                    ) : (
+                      <span className="text-[12px] text-zinc-400 italic">Categoria non impostata</span>
+                    )}
+                    {partner?.subcategory && (
+                      <span
+                        className="inline-flex items-center px-3 py-1.5 rounded-xl text-[12px] font-semibold"
+                        style={{ background: "#F5F3F0", color: "#6B7280" }}
+                      >
+                        {partner.subcategory}
+                      </span>
+                    )}
+                    {partner?.price_range && (
+                      <span
+                        className="inline-flex items-center px-3 py-1.5 rounded-xl text-[12px] font-black"
+                        style={{ background: "#F0FDF4", color: "#16A34A" }}
+                      >
+                        {{ low:"€", medium:"€€", premium:"€€€", luxury:"€€€€" }[partner.price_range]}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Atmosfera */}
+                  {partner?.atmosphere?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-2">Atmosfera</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {partner.atmosphere.map(a => (
+                          <span key={a} className="px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize"
+                            style={{ background: "#F5F3F0", color: "#6B7280" }}>
+                            {a.replace(/_/g, " ")}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Momenti */}
+                  {partner?.ideal_moment?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-2">Momenti ideali</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {partner.ideal_moment.map(m => (
+                          <span key={m} className="px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize"
+                            style={{ background: "#EFF6FF", color: "#3B82F6" }}>
+                            {m.replace(/_/g, " ")}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Target */}
+                  {partner?.ideal_target?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-400 mb-2">Target</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {partner.ideal_target.map(t => (
+                          <span key={t} className="px-2.5 py-1 rounded-lg text-[11px] font-semibold capitalize"
+                            style={{ background: "#FDF4FF", color: "#9333EA" }}>
+                            {t.replace(/_/g, " ")}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Empty state */}
+                  {!partner?.category && !partner?.subcategory && !partner?.price_range && (
+                    <button
+                      onClick={() => openAdvancedModal(1)}
+                      className="w-full py-4 rounded-2xl text-[13px] font-black text-center transition-all active:scale-[0.98]"
+                      style={{ background: "#FFF7ED", color: "#D4793A", border: "1.5px dashed #F6AD75" }}
+                    >
+                      + Aggiungi classificazione
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -1310,6 +1419,7 @@ export default function PartnerDashboard() {
       {/* ADVANCED PROFILE MODAL */}
       <PartnerAdvancedProfileModal
         isOpen={showAdvancedModal}
+        initialStep={advancedModalStep}
         partner={partner}
         onClose={() => setShowAdvancedModal(false)}
         onComplete={(updated) => {
