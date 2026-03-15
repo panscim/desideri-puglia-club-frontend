@@ -481,13 +481,13 @@ export default function Dashboard() {
           ))}
         </motion.div>
 
-        {/* ── Le Mie Saghe ── */}
+        {/* ── Le Mie Saghe ── (solo saghe con almeno 1 tappa completata) */}
         <AnimatePresence>
-          {activeSagas.length > 0 && (
+          {activeSagas.filter(s => s.doneSteps > 0).length > 0 && (
             <motion.section variants={fadeUp} className="mt-7">
               <SectionHeader title="Le Mie Saghe 🗺️" onMore={() => navigate('/missioni')} />
               <div className="px-5 flex flex-col gap-2.5">
-                {activeSagas.map(saga => (
+                {activeSagas.filter(s => s.doneSteps > 0).map(saga => (
                   <ActiveSagaCard
                     key={saga.questSetId}
                     saga={saga}
