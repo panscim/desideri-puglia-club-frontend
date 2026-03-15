@@ -63,7 +63,7 @@ const STEPS = [
   },
 ];
 
-export default function SagaWizard({ onComplete, onSkip }) {
+export default function SagaWizard({ onComplete }) {
   const [step, setStep] = useState(0);
   const [prefs, setPrefs] = useState({
     intent: [],
@@ -73,23 +73,22 @@ export default function SagaWizard({ onComplete, onSkip }) {
   });
 
   const current = STEPS[step];
+  const isLast = step === STEPS.length - 1;
 
-  const toggle = (id) => {
-    if (current.multi) {
-      setPrefs((p) => {
-        const arr = p[current.key] || [];
-        return {
-          ...p,
-          [current.key]: arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id],
-        };
-      });
+  const toggleMulti = (id) => {
+    setPrefs((p) => {
+      const arr = p[current.key] || [];
+      return { ...p, [current.key]: arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id] };
+    });
+  };
+
+  const selectSingle = (id) => {
+    const newPrefs = { ...prefs, [current.key]: id };
+    setPrefs(newPrefs);
+    if (!isLast) {
+      setStep((s) => s + 1);
     } else {
-      // single: auto-advance after short delay
-      setPrefs((p) => ({ ...p, [current.key]: id }));
-      setTimeout(() => {
-        if (step < STEPS.length - 1) setStep((s) => s + 1);
-        else onComplete({ ...prefs, [current.key]: id });
-      }, 260);
+      onComplete(newPrefs);
     }
   };
 
@@ -98,20 +97,14 @@ export default function SagaWizard({ onComplete, onSkip }) {
     return Array.isArray(val) ? val.includes(id) : val === id;
   };
 
-  const canNext =
-    current.multi
-      ? (prefs[current.key] || []).length > 0
-      : !!prefs[current.key];
+  const canNext = current.multi ? (prefs[current.key] || []).length > 0 : false;
 
   const handleNext = () => {
-    if (step < STEPS.length - 1) setStep((s) => s + 1);
+    if (!isLast) setStep((s) => s + 1);
     else onComplete(prefs);
   };
 
-  const handleSkip = () => {
-    onSkip?.();
-    onComplete(null);
-  };
+  const handleSkip = () => onComplete(null);
 
   return (
     <motion.div
@@ -180,7 +173,7 @@ export default function SagaWizard({ onComplete, onSkip }) {
           {current.options.map((opt) => (
             <button
               key={opt.id}
-              onClick={() => toggle(opt.id)}
+              onClick={() => current.multi ? toggleMulti(opt.id) : selectSingle(opt.id)}
               className="text-left px-4 py-3.5 rounded-2xl border-2 transition-all duration-200 active:scale-[0.97]"
               style={{
                 borderColor: isSelected(opt.id) ? "#f97316" : "#E5E7EB",

@@ -543,8 +543,7 @@ export default function Partner() {
       <AnimatePresence>
         {showSaga && (
           <SagaWizard
-            onComplete={(prefs) => { setSagaPrefs(prefs); setShowSaga(false); }}
-            onSkip={() => { setSagaPrefs(null); setShowSaga(false); }}
+            onComplete={(p) => { setSagaPrefs(p); setShowSaga(false); }}
           />
         )}
       </AnimatePresence>
