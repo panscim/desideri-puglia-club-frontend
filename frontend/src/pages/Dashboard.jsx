@@ -483,38 +483,42 @@ export default function Dashboard() {
         <motion.div variants={fadeUp} className="px-5 mt-4">
           <button
             onClick={() => setShowNow(true)}
-            className="w-full relative overflow-hidden rounded-[28px] text-left active:scale-[0.98] transition-all"
-            style={{ background: 'linear-gradient(135deg, #0f1922 0%, #1e1108 50%, #2d1408 100%)' }}
+            className="w-full relative overflow-hidden rounded-[28px] text-left active:scale-[0.98] transition-all border border-[#E8DDD0] shadow-xl shadow-black/5"
+            style={{ background: 'linear-gradient(145deg, #FBF7F0 0%, #F5EDE0 100%)' }}
           >
-            {/* Glow principale */}
-            <div className="absolute inset-0 pointer-events-none opacity-50"
-              style={{ background: 'radial-gradient(ellipse at 90% 10%, #D4793A 0%, transparent 55%)' }} />
-            {/* Glow secondario */}
-            <div className="absolute inset-0 pointer-events-none opacity-10"
-              style={{ background: 'radial-gradient(ellipse at 5% 95%, #D4793A 0%, transparent 50%)' }} />
+            {/* Accent strip top */}
+            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#D4693A] via-[#E8845A] to-transparent" />
 
             <div className="relative px-7 pt-7 pb-6">
-              {/* Titolo grande — il vero protagonista */}
-              <h3 className="text-[42px] font-serif font-black text-white leading-[1] tracking-tight mb-3">
+              {/* Label */}
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-5 h-5 rounded-full bg-[#D4693A] flex items-center justify-center">
+                  <Sparkle size={11} weight="fill" className="text-white" />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4693A]">Il tuo concierge</span>
+              </div>
+
+              {/* Titolo — protagonista */}
+              <h3 className="text-[40px] font-serif font-black text-[#16243E] leading-[1] tracking-tight mb-3">
                 Cosa faccio<br />adesso?
               </h3>
 
               {/* Sottotitolo */}
-              <p className="text-[13px] text-white/50 font-medium mb-5 leading-relaxed">
+              <p className="text-[13px] text-[#8A95AD] font-medium mb-5 leading-relaxed">
                 4 domande · 3 posti perfetti per il tuo momento
               </p>
 
-              {/* Hint chips — anticipano le opzioni */}
+              {/* Hint chips */}
               <div className="flex gap-2 mb-6 flex-wrap">
                 {['🍽️ Cena', '😌 Relax', '🌙 Serata', '👥 Amici'].map(hint => (
-                  <span key={hint} className="text-[11px] font-bold text-white/65 bg-white/8 border border-white/10 px-3 py-1.5 rounded-full">
+                  <span key={hint} className="text-[11px] font-bold text-[#4A5670] bg-white border border-[#DDD6CC] px-3 py-1.5 rounded-full">
                     {hint}
                   </span>
                 ))}
               </div>
 
-              {/* CTA full-width */}
-              <div className="bg-[#D4793A] text-white font-black text-[13px] uppercase tracking-[0.15em] px-6 py-4 rounded-2xl flex items-center justify-between shadow-lg shadow-[#D4793A]/30">
+              {/* CTA */}
+              <div className="bg-[#16243E] text-white font-black text-[13px] uppercase tracking-[0.15em] px-6 py-4 rounded-2xl flex items-center justify-between shadow-md">
                 <span>Dimmi cosa fare</span>
                 <ArrowRight size={18} weight="bold" />
               </div>
