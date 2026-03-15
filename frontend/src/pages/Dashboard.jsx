@@ -21,6 +21,7 @@ import {
 } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import SearchModal from '../components/SearchModal';
+import CosaFaccioAdesso from '../components/CosaFaccioAdesso';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /* ─────────────────────────────────────────
@@ -332,6 +333,7 @@ export default function Dashboard() {
   const [activeSagas, setActiveSagas] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [events, setEvents] = useState([]);
+  const [showNow, setShowNow] = useState(false);
   const [news] = useState(DEFAULT_NEWS);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -481,6 +483,28 @@ export default function Dashboard() {
           ))}
         </motion.div>
 
+        {/* ── Cosa faccio adesso? ── */}
+        <motion.div variants={fadeUp} className="px-5 mt-5">
+          <button
+            onClick={() => setShowNow(true)}
+            className="w-full relative overflow-hidden rounded-3xl text-left active:scale-[0.98] transition-all"
+            style={{ background: 'linear-gradient(120deg, #16243E 0%, #2d1a0e 60%, #3d2010 100%)' }}
+          >
+            {/* Glow */}
+            <div className="absolute inset-0 opacity-30 pointer-events-none" style={{ background: 'radial-gradient(circle at 85% 20%, #D4793A, transparent 55%)' }} />
+            <div className="relative px-6 py-5 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4793A]/80 mb-1">Suggerimento Istantaneo</p>
+                <h3 className="text-[22px] font-serif font-black text-white leading-tight">Cosa faccio adesso?</h3>
+                <p className="text-[12px] text-white/50 font-medium mt-1">3 consigli su misura · 30 secondi</p>
+              </div>
+              <div className="shrink-0 w-12 h-12 rounded-2xl bg-[#D4793A] flex items-center justify-center shadow-lg">
+                <ArrowRight size={20} weight="bold" className="text-white" />
+              </div>
+            </div>
+          </button>
+        </motion.div>
+
         {/* ── Le Mie Saghe ── (solo saghe con almeno 1 tappa completata) */}
         <AnimatePresence>
           {activeSagas.filter(s => s.doneSteps > 0).length > 0 && (
@@ -586,6 +610,13 @@ export default function Dashboard() {
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}
         saghe={saghe}
+      />
+
+      {/* ── Cosa faccio adesso modal ── */}
+      <CosaFaccioAdesso
+        isOpen={showNow}
+        onClose={() => setShowNow(false)}
+        userCity={userLoc ? null : 'Barletta'}
       />
     </div>
   );
