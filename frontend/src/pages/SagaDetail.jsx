@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ChevronDown, Navigation2, Lock, Unlock, CheckCircle2, History, ArrowRight, ChevronRight } from 'lucide-react';
-import { Sparkle, Store, MapPin, ArrowUpRight } from '@phosphor-icons/react';
+import { ChevronLeft, ChevronDown, Navigation2, Lock, Unlock, CheckCircle2, History, ArrowRight, ChevronRight, Store } from 'lucide-react';
+import { Sparkle } from '@phosphor-icons/react';
 import { QuestService } from '../services/quest';
 import { supabase } from '../services/supabase';
 import { useAuth } from '../contexts/AuthContext';
