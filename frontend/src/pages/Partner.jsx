@@ -540,13 +540,11 @@ export default function Partner() {
       `}</style>
 
       {/* SAGA WIZARD */}
-      <AnimatePresence>
-        {showSaga && (
-          <SagaWizard
-            onComplete={(p) => { setSagaPrefs(p); setShowSaga(false); }}
-          />
-        )}
-      </AnimatePresence>
+      {showSaga && (
+        <SagaWizard
+          onComplete={(p) => { setSagaPrefs(p); setShowSaga(false); }}
+        />
+      )}
     </div>
   );
 }

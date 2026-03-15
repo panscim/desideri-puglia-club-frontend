@@ -1,8 +1,8 @@
 // src/components/SagaWizard.jsx
 // Bottom-sheet wizard to capture user saga preferences (4 steps + skip)
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { X, ArrowRight } from "@phosphor-icons/react";
 
 const STEPS = [
   {
