@@ -483,44 +483,60 @@ export default function Dashboard() {
         <motion.div variants={fadeUp} className="px-5 mt-4">
           <button
             onClick={() => setShowNow(true)}
-            className="w-full relative overflow-hidden rounded-[28px] text-left active:scale-[0.98] transition-all border border-[#E8DDD0] shadow-xl shadow-black/5"
-            style={{ background: 'linear-gradient(145deg, #FBF7F0 0%, #F5EDE0 100%)' }}
+            className="w-full relative overflow-hidden rounded-[32px] text-left active:scale-[0.97] transition-transform"
+            style={{ background: 'linear-gradient(150deg, #A83E1E 0%, #C05828 35%, #D4793A 65%, #C05828 100%)' }}
           >
-            {/* Accent strip top */}
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#D4693A] via-[#E8845A] to-transparent" />
+            {/* Grain texture — feel premium/editorial */}
+            <div className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-25"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+                backgroundSize: '160px'
+              }}
+            />
 
-            <div className="relative px-7 pt-7 pb-6">
-              {/* Label */}
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-5 h-5 rounded-full bg-[#D4693A] flex items-center justify-center">
-                  <Sparkle size={11} weight="fill" className="text-white" />
+            {/* Animated glow orb — card "respira" */}
+            <motion.div
+              animate={{ x: [0, 18, -8, 12, 0], y: [0, -12, 8, -6, 0], scale: [1, 1.2, 0.95, 1.1, 1] }}
+              transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -top-14 -right-14 w-60 h-60 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(255,175,80,0.55) 0%, transparent 70%)', filter: 'blur(28px)' }}
+            />
+            {/* Bottom glow */}
+            <div className="absolute -bottom-10 -left-6 w-44 h-44 pointer-events-none"
+              style={{ background: 'radial-gradient(circle, rgba(255,100,30,0.25) 0%, transparent 70%)', filter: 'blur(22px)' }}
+            />
+
+            <div className="relative px-7 pt-7 pb-7">
+              {/* Eyebrow */}
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center shrink-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#A83E1E]" />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4693A]">Il tuo concierge</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-white/70">Il tuo concierge</span>
               </div>
 
-              {/* Titolo — protagonista */}
-              <h3 className="text-[40px] font-serif font-black text-[#16243E] leading-[1] tracking-tight mb-3">
-                Cosa faccio<br />adesso?
+              {/* Titolo enorme — l'impatto è nella scala */}
+              <h3 className="text-[58px] font-serif font-black text-white leading-[0.88] tracking-tight mb-6">
+                Cosa<br />faccio<br />adesso?
               </h3>
 
-              {/* Sottotitolo */}
-              <p className="text-[13px] text-[#8A95AD] font-medium mb-5 leading-relaxed">
-                4 domande · 3 posti perfetti per il tuo momento
-              </p>
-
-              {/* Hint chips */}
-              <div className="flex gap-2 mb-6 flex-wrap">
+              {/* Hint chips glassmorphism */}
+              <div className="flex gap-2 mb-7 flex-wrap">
                 {['🍽️ Cena', '😌 Relax', '🌙 Serata', '👥 Amici'].map(hint => (
-                  <span key={hint} className="text-[11px] font-bold text-[#4A5670] bg-white border border-[#DDD6CC] px-3 py-1.5 rounded-full">
+                  <span key={hint} className="text-[11px] font-bold text-white/85 bg-black/15 border border-white/15 px-3 py-1.5 rounded-full backdrop-blur-sm">
                     {hint}
                   </span>
                 ))}
               </div>
 
-              {/* CTA */}
-              <div className="bg-[#16243E] text-white font-black text-[13px] uppercase tracking-[0.15em] px-6 py-4 rounded-2xl flex items-center justify-between shadow-md">
-                <span>Dimmi cosa fare</span>
-                <ArrowRight size={18} weight="bold" />
+              {/* Bottom row: descrizione + CTA pill bianca */}
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-[12px] text-white/50 font-medium leading-relaxed">
+                  4 domande<br />3 posti perfetti
+                </p>
+                <div className="shrink-0 bg-white text-[#A83E1E] font-black text-[12px] uppercase tracking-widest px-6 py-3.5 rounded-2xl shadow-xl flex items-center gap-2">
+                  Inizia <ArrowRight size={14} weight="bold" />
+                </div>
               </div>
             </div>
           </button>
