@@ -285,10 +285,10 @@ const DEFAULT_NEWS = [
 /* ─────────────────────────────────────────
    MAIN DASHBOARD
 ───────────────────────────────────────── */
-// Palette estratta dalla GIF: azzurro ghiaccio + terracotta glow + grigio pietra
-const GIF_BG       = '#E8F0F4'; // azzurro ghiaccio chiaro
-const GIF_BG_DEEP  = '#D0DFE8'; // leggermente più saturo verso il basso
-const GIF_STONE    = '#7A92A0'; // grigio-blu pietra
+// Palette estratta dalla GIF: bianco + viola/ciano blob
+const GIF_BG       = '#F8F8FC'; // bianco con velo lavanda
+const GIF_BG_DEEP  = '#F0EEF9'; // lavanda chiarissimo
+const GIF_STONE    = '#8A8FB8'; // grigio-viola freddo
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -436,7 +436,7 @@ export default function Dashboard() {
               src="/hero.gif"
               alt=""
               className="h-full w-auto object-contain select-none pointer-events-none"
-              style={{ filter: 'drop-shadow(0 8px 32px rgba(212,105,58,0.30))' }}
+              style={{ mixBlendMode: 'multiply' }}
             />
           </motion.div>
 
@@ -456,7 +456,12 @@ export default function Dashboard() {
                 style={{ fontSize: 'clamp(38px, 10vw, 52px)' }}
               >
                 Chiedi a Desideri<br />
-                <span style={{ color: '#D4693A' }}>cosa fare</span>
+                <span style={{
+                  background: 'linear-gradient(135deg, #A855F7 0%, #06B6D4 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}>cosa fare</span>
               </h2>
               <p className="text-[13px] font-medium mt-3 italic" style={{ color: GIF_STONE }}>
                 {getCFAContextualLine()}
@@ -469,8 +474,8 @@ export default function Dashboard() {
               onClick={() => { setInitialIntent(null); setShowNow(true); }}
               className="flex items-center gap-3 px-8 py-4 rounded-[20px] shadow-xl active:shadow-md transition-all"
               style={{
-                background: 'linear-gradient(135deg, #C05828 0%, #D4693A 60%, #E07840 100%)',
-                boxShadow: '0 8px 28px rgba(192,88,40,0.38)',
+                background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #06B6D4 100%)',
+                boxShadow: '0 8px 28px rgba(124,58,237,0.35)',
               }}
             >
               <span className="text-white font-black text-[16px] tracking-wide">Cosa faccio adesso?</span>
@@ -485,9 +490,9 @@ export default function Dashboard() {
                   onClick={() => openCFA(intent.id)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
                   style={{
-                    background: 'rgba(255,255,255,0.55)',
-                    border: '1px solid rgba(255,255,255,0.7)',
-                    color: '#16243E',
+                    background: 'rgba(168,85,247,0.08)',
+                    border: '1px solid rgba(168,85,247,0.2)',
+                    color: '#5B21B6',
                     backdropFilter: 'blur(8px)',
                   }}
                 >
