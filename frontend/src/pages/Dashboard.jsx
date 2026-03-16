@@ -285,6 +285,11 @@ const DEFAULT_NEWS = [
 /* ─────────────────────────────────────────
    MAIN DASHBOARD
 ───────────────────────────────────────── */
+// Palette estratta dalla GIF: azzurro ghiaccio + terracotta glow + grigio pietra
+const GIF_BG       = '#E8F0F4'; // azzurro ghiaccio chiaro
+const GIF_BG_DEEP  = '#D0DFE8'; // leggermente più saturo verso il basso
+const GIF_STONE    = '#7A92A0'; // grigio-blu pietra
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { profile } = useAuth();
@@ -364,7 +369,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="h-[100dvh] bg-[#FDFAF5] flex flex-col overflow-hidden">
+      <div className="h-[100dvh] flex flex-col overflow-hidden" style={{ background: GIF_BG }}>
         <div className="px-5 pt-14 pb-5">
           <Skeleton className="h-[36px] w-48 mb-1" />
           <Skeleton className="h-[28px] w-32" />
@@ -375,8 +380,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="h-[100dvh] max-h-[100dvh] w-full bg-[#FDFAF5] flex flex-col overflow-hidden font-sans text-[#16243E]">
-
+    <div
+      className="h-[100dvh] max-h-[100dvh] w-full flex flex-col overflow-hidden font-sans"
+      style={{ background: GIF_BG, color: '#16243E' }}
+    >
       <motion.main
         variants={stagger}
         initial="hidden"
@@ -386,137 +393,167 @@ export default function Dashboard() {
       >
 
         {/* ══════════════════════════════════════════
-            HERO CFA BLOCK — piena pagina, above fold
+            HERO — GIF + CTA
         ══════════════════════════════════════════ */}
-        <div className="relative px-5 pt-14 pb-8">
-
-          {/* Top row: greeting + notifiche */}
-          <div className="flex items-start justify-between mb-8">
+        <div
+          className="relative flex flex-col items-center"
+          style={{
+            background: `linear-gradient(180deg, ${GIF_BG} 0%, ${GIF_BG_DEEP} 60%, ${GIF_BG} 100%)`,
+            paddingTop: 'env(safe-area-inset-top, 0px)',
+          }}
+        >
+          {/* Top bar: greeting + notifiche */}
+          <div className="w-full flex items-center justify-between px-5 pt-12 pb-2">
             <div>
-              <p className="text-[11px] font-black text-[#D4693A] uppercase tracking-[0.12em] mb-0.5">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: GIF_STONE }}>
                 {getGreeting()}
               </p>
-              <h1 className="font-serif font-black text-[#16243E] text-[28px] leading-[1.05] tracking-tight">
-                {profile?.nome || profile?.nickname || 'Esploratore'} 👋
-              </h1>
+              <p className="text-[18px] font-serif font-black text-[#16243E] leading-tight">
+                {profile?.nome || profile?.nickname || 'Esploratore'}
+              </p>
             </div>
             <button
               onClick={() => navigate('/notifiche')}
-              className="relative w-[44px] h-[44px] rounded-[14px] bg-[#16243E] flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0"
+              className="relative w-[42px] h-[42px] rounded-[13px] flex items-center justify-center active:scale-90 transition-transform"
+              style={{ background: '#16243E' }}
             >
-              <Bell size={20} weight="fill" className="text-white" />
+              <Bell size={19} weight="fill" className="text-white" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-[10px] h-[10px] bg-red-500 rounded-full border-2 border-[#FDFAF5]" />
+                <span className="absolute -top-1 -right-1 w-[10px] h-[10px] bg-red-500 rounded-full border-2" style={{ borderColor: GIF_BG }} />
               )}
             </button>
           </div>
 
-          {/* CFA label + headline */}
-          <div className="mb-7">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-5 h-5 rounded-full bg-[#D4693A] flex items-center justify-center shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-white" />
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4693A]">
-                Il tuo concierge
-              </span>
+          {/* GIF animazione */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, ease: [0, 0, 0.2, 1] }}
+            className="w-full flex items-center justify-center"
+            style={{ height: '52vw', maxHeight: 280, minHeight: 200 }}
+          >
+            <img
+              src="/hero.gif"
+              alt=""
+              className="h-full w-auto object-contain select-none pointer-events-none"
+              style={{ filter: 'drop-shadow(0 8px 32px rgba(212,105,58,0.30))' }}
+            />
+          </motion.div>
+
+          {/* Headline + CTA */}
+          <motion.div
+            variants={fadeUp}
+            className="flex flex-col items-center text-center px-6 pb-10 gap-5"
+          >
+            <div>
+              <p
+                className="text-[10px] font-black uppercase tracking-[0.3em] mb-2"
+                style={{ color: GIF_STONE }}
+              >
+                Il tuo concierge personale
+              </p>
+              <h2 className="font-serif font-black text-[#16243E] leading-[0.9] tracking-tight"
+                style={{ fontSize: 'clamp(38px, 10vw, 52px)' }}
+              >
+                Chiedi a Desideri<br />
+                <span style={{ color: '#D4693A' }}>cosa fare</span>
+              </h2>
+              <p className="text-[13px] font-medium mt-3 italic" style={{ color: GIF_STONE }}>
+                {getCFAContextualLine()}
+              </p>
             </div>
 
-            <h2 className="font-serif font-black text-[#16243E] text-[48px] leading-[0.92] tracking-tight mb-3">
-              Cosa faccio<br />
-              <span className="text-[#D4693A]">adesso?</span>
-            </h2>
+            {/* CTA unico */}
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              onClick={() => { setInitialIntent(null); setShowNow(true); }}
+              className="flex items-center gap-3 px-8 py-4 rounded-[20px] shadow-xl active:shadow-md transition-all"
+              style={{
+                background: 'linear-gradient(135deg, #C05828 0%, #D4693A 60%, #E07840 100%)',
+                boxShadow: '0 8px 28px rgba(192,88,40,0.38)',
+              }}
+            >
+              <span className="text-white font-black text-[16px] tracking-wide">Cosa faccio adesso?</span>
+              <ArrowRight size={18} weight="bold" className="text-white/80" />
+            </motion.button>
 
-            <p className="text-[14px] font-medium text-[#8A95AD] italic">
-              {getCFAContextualLine()}
-            </p>
-          </div>
-
-          {/* Intent options — 5 tappable rows */}
-          <motion.div variants={fadeUp} className="flex flex-col gap-2.5">
-            {INTENTS.map((intent, i) => (
-              <motion.button
-                key={intent.id}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.08 + i * 0.055, duration: 0.32, ease: [0, 0, 0.2, 1] }}
-                whileTap={{ scale: 0.975 }}
-                onClick={() => openCFA(intent.id)}
-                className="w-full flex items-center gap-4 bg-white border border-[#EAE3D6] rounded-[20px] px-5 py-4 shadow-sm active:shadow-none active:border-[#D4693A]/40 transition-all group text-left"
-              >
-                <span className="text-[28px] shrink-0 leading-none">{intent.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-black text-[#16243E] leading-tight group-hover:text-[#D4693A] transition-colors">
-                    {intent.label}
-                  </p>
-                  <p className="text-[11px] font-medium text-[#8A95AD] mt-0.5 truncate">
-                    {intent.sub}
-                  </p>
-                </div>
-                <ArrowRight
-                  size={16}
-                  weight="bold"
-                  className="text-[#D0C8BC] group-hover:text-[#D4693A] group-hover:translate-x-0.5 transition-all shrink-0"
-                />
-              </motion.button>
-            ))}
+            {/* Scorciatoie intent */}
+            <div className="flex flex-wrap justify-center gap-2 mt-1">
+              {INTENTS.map(intent => (
+                <button
+                  key={intent.id}
+                  onClick={() => openCFA(intent.id)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
+                  style={{
+                    background: 'rgba(255,255,255,0.55)',
+                    border: '1px solid rgba(255,255,255,0.7)',
+                    color: '#16243E',
+                    backdropFilter: 'blur(8px)',
+                  }}
+                >
+                  <span>{intent.emoji}</span>
+                  {intent.label.split(' ')[0]}
+                </button>
+              ))}
+            </div>
           </motion.div>
         </div>
 
-        {/* Divider */}
-        <div className="mx-5 h-px bg-[#EAE3D6] mb-8" />
+        {/* ── Sezioni sotto il fold — sfondo bianco/caldo ── */}
+        <div className="bg-white rounded-t-[32px] -mt-4 pt-8 pb-4" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.06)' }}>
 
-        {/* ── Le Mie Saghe (solo se in corso) ── */}
-        <AnimatePresence>
-          {activeSagas.filter(s => s.doneSteps > 0).length > 0 && (
-            <motion.section variants={fadeUp} className="mb-8">
-              <SectionHeader title="Le Mie Saghe 🗺️" onMore={() => navigate('/missioni')} />
-              <div className="px-5 flex flex-col gap-2.5">
-                {activeSagas.filter(s => s.doneSteps > 0).map(saga => (
-                  <ActiveSagaCard
-                    key={saga.questSetId}
-                    saga={saga}
-                    onClick={() => navigate(`/saga/${saga.questSetId}/intro`)}
-                  />
-                ))}
-              </div>
-            </motion.section>
-          )}
-        </AnimatePresence>
+          {/* Le Mie Saghe (solo se in corso) */}
+          <AnimatePresence>
+            {activeSagas.filter(s => s.doneSteps > 0).length > 0 && (
+              <motion.section variants={fadeUp} className="mb-8">
+                <SectionHeader title="Le Mie Saghe 🗺️" onMore={() => navigate('/missioni')} />
+                <div className="px-5 flex flex-col gap-2.5">
+                  {activeSagas.filter(s => s.doneSteps > 0).map(saga => (
+                    <ActiveSagaCard
+                      key={saga.questSetId}
+                      saga={saga}
+                      onClick={() => navigate(`/saga/${saga.questSetId}/intro`)}
+                    />
+                  ))}
+                </div>
+              </motion.section>
+            )}
+          </AnimatePresence>
 
-        {/* ── Saghe Vicine ── */}
-        <motion.section variants={fadeUp} className="mb-8">
-          <SectionHeader title="Saghe Vicine" onMore={() => navigate('/missioni')} />
-          <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
-            {saghe.slice(0, 6).map(saga => (
-              <MissionCard
-                key={saga.id}
-                saga={saga}
-                isFav={favorites.includes(saga.id)}
-                onFav={(e) => toggleFavorite(e, saga.id)}
-                onClick={() => navigate(`/saga/${saga.id}/intro`)}
-              />
-            ))}
-          </div>
-        </motion.section>
+          {/* Saghe Vicine */}
+          <motion.section variants={fadeUp} className="mb-8">
+            <SectionHeader title="Saghe Vicine" onMore={() => navigate('/missioni')} />
+            <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
+              {saghe.slice(0, 6).map(saga => (
+                <MissionCard
+                  key={saga.id}
+                  saga={saga}
+                  isFav={favorites.includes(saga.id)}
+                  onFav={(e) => toggleFavorite(e, saga.id)}
+                  onClick={() => navigate(`/saga/${saga.id}/intro`)}
+                />
+              ))}
+            </div>
+          </motion.section>
 
-        {/* ── Notizie ed Eventi ── */}
-        <motion.section variants={fadeUp} className="mb-8">
-          <SectionHeader title="Notizie ed Eventi" onMore={() => navigate('/eventi')} />
-          <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
-            {news.map(item => (
-              <NewsCard key={item.id} item={item} />
-            ))}
-            {events.map(ev => (
-              <EventCard
-                key={ev.id}
-                ev={ev}
-                onClick={() => navigate(`/eventi/${ev.id}`)}
-              />
-            ))}
-          </div>
-        </motion.section>
+          {/* Notizie ed Eventi */}
+          <motion.section variants={fadeUp} className="mb-8">
+            <SectionHeader title="Notizie ed Eventi" onMore={() => navigate('/eventi')} />
+            <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
+              {news.map(item => (
+                <NewsCard key={item.id} item={item} />
+              ))}
+              {events.map(ev => (
+                <EventCard
+                  key={ev.id}
+                  ev={ev}
+                  onClick={() => navigate(`/eventi/${ev.id}`)}
+                />
+              ))}
+            </div>
+          </motion.section>
 
+        </div>
       </motion.main>
 
       {/* CFA Modal */}
@@ -526,7 +563,6 @@ export default function Dashboard() {
         userCity={userLoc ? null : 'Barletta'}
         initialIntent={initialIntent}
       />
-
     </div>
   );
 }
