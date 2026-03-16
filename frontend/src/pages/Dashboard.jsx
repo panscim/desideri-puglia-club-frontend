@@ -21,7 +21,6 @@ import {
 } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
 import SearchModal from '../components/SearchModal';
-import CosaFaccioAdesso from '../components/CosaFaccioAdesso';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /* ─────────────────────────────────────────
@@ -342,7 +341,6 @@ export default function Dashboard() {
   const [activeSagas, setActiveSagas] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [events, setEvents] = useState([]);
-  const [showNow, setShowNow] = useState(false);
   const [news] = useState(DEFAULT_NEWS);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -479,69 +477,6 @@ export default function Dashboard() {
           </button>
         </div>
 
-        {/* ── Cosa faccio adesso? — HERO CARD ── */}
-        <motion.div variants={fadeUp} className="px-5 mt-4">
-          <button
-            onClick={() => setShowNow(true)}
-            className="w-full relative overflow-hidden rounded-[32px] text-left active:scale-[0.97] transition-transform"
-            style={{ background: 'linear-gradient(150deg, #A83E1E 0%, #C05828 35%, #D4793A 65%, #C05828 100%)' }}
-          >
-            {/* Grain texture — feel premium/editorial */}
-            <div className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-25"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-                backgroundSize: '160px'
-              }}
-            />
-
-            {/* Animated glow orb — card "respira" */}
-            <motion.div
-              animate={{ x: [0, 18, -8, 12, 0], y: [0, -12, 8, -6, 0], scale: [1, 1.2, 0.95, 1.1, 1] }}
-              transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -top-14 -right-14 w-60 h-60 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(255,175,80,0.55) 0%, transparent 70%)', filter: 'blur(28px)' }}
-            />
-            {/* Bottom glow */}
-            <div className="absolute -bottom-10 -left-6 w-44 h-44 pointer-events-none"
-              style={{ background: 'radial-gradient(circle, rgba(255,100,30,0.25) 0%, transparent 70%)', filter: 'blur(22px)' }}
-            />
-
-            <div className="relative px-7 pt-7 pb-7">
-              {/* Eyebrow */}
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center shrink-0">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#A83E1E]" />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.35em] text-white/70">Il tuo concierge</span>
-              </div>
-
-              {/* Titolo enorme — l'impatto è nella scala */}
-              <h3 className="text-[58px] font-serif font-black text-white leading-[0.88] tracking-tight mb-6">
-                Cosa<br />faccio<br />adesso?
-              </h3>
-
-              {/* Hint chips glassmorphism */}
-              <div className="flex gap-2 mb-7 flex-wrap">
-                {['🍽️ Cena', '😌 Relax', '🌙 Serata', '👥 Amici'].map(hint => (
-                  <span key={hint} className="text-[11px] font-bold text-white/85 bg-black/15 border border-white/15 px-3 py-1.5 rounded-full backdrop-blur-sm">
-                    {hint}
-                  </span>
-                ))}
-              </div>
-
-              {/* Bottom row: descrizione + CTA pill bianca */}
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-[12px] text-white/50 font-medium leading-relaxed">
-                  4 domande<br />3 posti perfetti
-                </p>
-                <div className="shrink-0 bg-white text-[#A83E1E] font-black text-[12px] uppercase tracking-widest px-6 py-3.5 rounded-2xl shadow-xl flex items-center gap-2">
-                  Inizia <ArrowRight size={14} weight="bold" />
-                </div>
-              </div>
-            </div>
-          </button>
-        </motion.div>
-
         {/* ── Category pills ── */}
         <motion.div variants={fadeUp} className="flex gap-2 px-5 pb-1 overflow-x-auto no-scrollbar mt-5">
           {CATS.map(c => (
@@ -572,51 +507,6 @@ export default function Dashboard() {
             </motion.section>
           )}
         </AnimatePresence>
-
-        {/* ── Itinerari Section (Personal Diary Style) ── */}
-        <div className="px-5 mt-8 mb-4">
-          <motion.div
-            variants={fadeUp}
-            onClick={() => navigate('/daily-plans')}
-            className="relative overflow-hidden rounded-[2px] bg-[#FCF9F2] p-7 cursor-pointer active:scale-[0.99] transition-all shadow-xl shadow-black/5 border-l-[12px] border-l-[#EAE3D6] border-y border-r border-[#EDE3D4]"
-            style={{
-              backgroundImage: `linear-gradient(#EAE3D6 1px, transparent 1px)`,
-              backgroundSize: '100% 32px',
-              backgroundPosition: '0 16px',
-              rotate: '-0.8deg'
-            }}
-          >
-            {/* Decorative Tape/Note effect */}
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-16 h-5 bg-[#D4693A]/10 border-x border-[#D4693A]/20 rotate-[-2deg] backdrop-blur-[2px] z-10" />
-            
-            <div className="relative pl-4">
-              <p className="text-[10px] font-black text-[#D4693A] uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full border border-[#D4693A] flex items-center justify-center">
-                  <span className="w-1 h-1 rounded-full bg-[#D4693A]" />
-                </span>
-                Appunti di Viaggio
-              </p>
-              
-              <h3 className="font-serif font-black text-[#16243E] text-[24px] leading-[1.1] mb-3">
-                Cosa facciamo insieme oggi?
-              </h3>
-              
-              <p className="text-[14px] font-medium text-[#4A5670] italic mb-6 leading-[32px] max-w-[90%]">
-                "Il piano per la tua giornata perfetta in Puglia è già pronto, aspetta solo te..."
-              </p>
-              
-              <div className="flex justify-start">
-                <button className="bg-[#16243E] text-white text-[12px] font-bold px-7 py-3 rounded-full shadow-lg active:scale-95 transition-transform uppercase tracking-widest flex items-center gap-2">
-                  Pianifica la mia giornata
-                  <ArrowRight size={14} weight="bold" />
-                </button>
-              </div>
-            </div>
-
-            {/* Subtle paper grain texture overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: `url("https://www.transparenttextures.com/patterns/natural-paper.png")` }} />
-          </motion.div>
-        </div>
 
         {/* ── Saghe Vicine ── */}
         <motion.section variants={fadeUp} className="mt-8">
@@ -662,12 +552,6 @@ export default function Dashboard() {
         saghe={saghe}
       />
 
-      {/* ── Cosa faccio adesso modal ── */}
-      <CosaFaccioAdesso
-        isOpen={showNow}
-        onClose={() => setShowNow(false)}
-        userCity={userLoc ? null : 'Barletta'}
-      />
     </div>
   );
 }
