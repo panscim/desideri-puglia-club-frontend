@@ -15,8 +15,7 @@ export const QuestService = {
                 .from('quest_sets')
                 .select(`
           *,
-          steps:quest_set_steps(*),
-          reward:cards(*)
+          steps:quest_set_steps(*)
         `)
                 .eq('is_active', true)
                 .order('created_at', { ascending: false })
