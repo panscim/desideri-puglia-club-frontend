@@ -81,7 +81,7 @@ async function fetchCandidatePartners(cityHint) {
 
 // ─── SUB-COMPONENTS ──────────────────────────────────────────────
 
-const WizardStep = ({ step, onSelect, stepIndex, totalSteps }) => (
+const WizardStep = ({ step, onSelect, stepIndex, totalSteps, displayIndex }) => (
   <div className="flex flex-col h-full">
     {/* Progress dots */}
     <div className="flex gap-1.5 justify-center mb-8">
@@ -89,8 +89,8 @@ const WizardStep = ({ step, onSelect, stepIndex, totalSteps }) => (
         <div
           key={i}
           className={`h-1.5 rounded-full transition-all duration-300 ${
-            i < stepIndex ? 'bg-accent w-6' :
-            i === stepIndex ? 'bg-accent w-10' :
+            i < displayIndex ? 'bg-accent w-6' :
+            i === displayIndex ? 'bg-accent w-10' :
             'bg-zinc-200 w-6'
           }`}
         />
@@ -245,22 +245,33 @@ const EmptyResults = ({ onRetry }) => (
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────
 
-export default function CosaFaccioAdesso({ isOpen, onClose, userCity }) {
+export default function CosaFaccioAdesso({ isOpen, onClose, userCity, initialIntent }) {
   const { profile } = useAuth();
   const navigate = useNavigate();
 
-  const [step, setStep] = useState(0);
-  const [answers, setAnswers] = useState({});
+  const [step, setStep] = useState(initialIntent ? 1 : 0);
+  const [answers, setAnswers] = useState(initialIntent ? { intent: initialIntent } : {});
   const [phase, setPhase] = useState('wizard'); // 'wizard' | 'loading' | 'results' | 'empty'
   const [results, setResults] = useState({ partners: [], percorso: null });
   const [regenerating, setRegenerating] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  // Sync when initialIntent changes (e.g. user picks a different option)
+  React.useEffect(() => {
+    if (isOpen) {
+      setStep(initialIntent ? 1 : 0);
+      setAnswers(initialIntent ? { intent: initialIntent } : {});
+      setPhase('wizard');
+      setResults({ partners: [], percorso: null });
+      setSaved(false);
+    }
+  }, [isOpen, initialIntent]);
+
   const currentStep = STEPS[step];
 
   const reset = () => {
-    setStep(0);
-    setAnswers({});
+    setStep(initialIntent ? 1 : 0);
+    setAnswers(initialIntent ? { intent: initialIntent } : {});
     setPhase('wizard');
     setResults({ partners: [], percorso: null });
     setSaved(false);
@@ -370,7 +381,9 @@ export default function CosaFaccioAdesso({ isOpen, onClose, userCity }) {
                   {phase === 'results' ? getResultTitle(answers.intent, answers.companions) : 'Cosa faccio adesso?'}
                 </p>
                 {phase === 'wizard' && (
-                  <p className="text-[12px] text-text-muted font-medium">Domanda {step + 1} di {STEPS.length}</p>
+                  <p className="text-[12px] text-text-muted font-medium">
+                    Domanda {initialIntent ? step : step + 1} di {initialIntent ? STEPS.length - 1 : STEPS.length}
+                  </p>
                 )}
               </div>
             </div>
@@ -396,7 +409,8 @@ export default function CosaFaccioAdesso({ isOpen, onClose, userCity }) {
                   <WizardStep
                     step={currentStep}
                     stepIndex={step}
-                    totalSteps={STEPS.length}
+                    displayIndex={initialIntent ? step - 1 : step}
+                    totalSteps={initialIntent ? STEPS.length - 1 : STEPS.length}
                     onSelect={handleSelect}
                   />
                 </motion.div>

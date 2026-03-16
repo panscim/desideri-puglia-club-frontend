@@ -6,21 +6,15 @@ import { QuestService } from '../services/quest';
 import { EventsService } from '../services/events';
 import { NotificationService } from '../services/notifications';
 import {
-  MagnifyingGlass,
   Heart,
   Bell,
-  Fire,
   ArrowRight,
   ArrowUpRight as NavigationArrow,
   MapPin,
-  Compass,
-  Bank,
-  ForkKnife,
-  Waves,
   Sparkle,
 } from '@phosphor-icons/react';
 import { useTranslation } from 'react-i18next';
-import SearchModal from '../components/SearchModal';
+import CosaFaccioAdesso from '../components/CosaFaccioAdesso';
 import { motion, AnimatePresence } from 'framer-motion';
 
 /* ─────────────────────────────────────────
@@ -33,14 +27,22 @@ const getGreeting = () => {
   return 'Buona sera';
 };
 
-const getContextualSub = () => {
+const getCFAContextualLine = () => {
   const h = new Date().getHours();
-  if (h < 9)  return 'Cosa scopri stamattina?';
+  if (h < 9)  return 'Inizia bene la mattina';
   if (h < 13) return 'Cosa fai oggi in Puglia?';
   if (h < 17) return 'Il pomeriggio è tutto tuo';
-  if (h < 20) return "L'ora giusta per esplorare";
-  return 'Come finisci questa serata?';
+  if (h < 20) return "L'ora giusta per uscire";
+  return 'Come finisce questa serata?';
 };
+
+const INTENTS = [
+  { id: 'mangiare', emoji: '🍽️', label: 'Mangiare qualcosa', sub: 'Ristoranti, osterie, pizzerie' },
+  { id: 'vedere',   emoji: '👁️', label: 'Vedere qualcosa di bello', sub: 'Arte, cultura, panorami' },
+  { id: 'tappa',    emoji: '🤲', label: 'Una tappa autentica', sub: 'Borghi, cantine, masserie' },
+  { id: 'relax',    emoji: '😌', label: 'Rilassarmi', sub: 'Spa, natura, slow' },
+  { id: 'serata',   emoji: '🌙', label: 'Vivere la serata', sub: 'Bar, enoteca, musica live' },
+];
 
 /* ─────────────────────────────────────────
    SUB-COMPONENTS
@@ -49,7 +51,6 @@ const getContextualSub = () => {
 /** Countdown pill for events */
 const EventTimer = ({ startDate, endDate }) => {
   const [label, setLabel] = useState('');
-
   useEffect(() => {
     const calc = () => {
       const now = Date.now();
@@ -69,7 +70,6 @@ const EventTimer = ({ startDate, endDate }) => {
     const t = setInterval(calc, 60000);
     return () => clearInterval(t);
   }, [startDate, endDate]);
-
   if (!label) return null;
   return (
     <span className="inline-flex items-center gap-1.5 text-[10px] font-black text-red-600 bg-red-50 border border-red-100 px-2.5 py-1.5 rounded-full whitespace-nowrap">
@@ -78,31 +78,14 @@ const EventTimer = ({ startDate, endDate }) => {
   );
 };
 
-/** Category pill button */
-const CatPill = ({ icon, label, active, onClick }) => (
-  <button
-    onClick={onClick}
-    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold whitespace-nowrap border transition-all duration-200 active:scale-95 ${active
-        ? 'bg-[#16243E] text-white border-[#16243E] shadow-md'
-        : 'bg-white text-[#4A5670] border-[#EAE3D6] shadow-sm'
-      }`}
-  >
-    <span className="text-[14px]">{icon}</span>
-    {label}
-  </button>
-);
-
-/** Active saga card (vertical list) */
+/** Active saga card */
 const ActiveSagaCard = ({ saga, onClick }) => (
   <motion.div
     onClick={onClick}
     whileTap={{ scale: 0.985 }}
     className="flex items-center gap-3.5 bg-white border border-[#EAE3D6] rounded-[20px] p-3.5 cursor-pointer shadow-sm group relative overflow-hidden"
   >
-    {/* left accent bar on hover */}
     <span className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#D4693A] rounded-r-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-
-    {/* thumb */}
     <div className="w-[66px] h-[66px] rounded-[14px] overflow-hidden shrink-0 bg-[#EDE3D4] relative">
       <img
         src={saga.sagaImage || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=200'}
@@ -110,8 +93,6 @@ const ActiveSagaCard = ({ saga, onClick }) => (
         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
       />
     </div>
-
-    {/* info */}
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-2 mb-1">
         <span className="inline-flex items-center gap-1 text-[10px] font-black text-[#D4693A] bg-[#FBF0EB] border border-[#D4693A]/15 px-2 py-0.5 rounded-full uppercase tracking-wide">
@@ -137,19 +118,17 @@ const ActiveSagaCard = ({ saga, onClick }) => (
         </span>
       </div>
     </div>
-
     <span className="text-[#D0C8BC] group-hover:text-[#D4693A] group-hover:translate-x-0.5 transition-all text-xl shrink-0">›</span>
   </motion.div>
 );
 
-/** Mission card (horizontal scroll) */
+/** Mission card */
 const MissionCard = ({ saga, isFav, onFav, onClick }) => (
   <motion.div
     onClick={onClick}
     whileTap={{ scale: 0.97 }}
     className="w-[252px] shrink-0 snap-start bg-white rounded-[24px] overflow-hidden shadow-md border border-[#EAE3D6] cursor-pointer group flex flex-col"
   >
-    {/* image */}
     <div className="h-[144px] relative overflow-hidden bg-[#EDE3D4]">
       <img
         src={saga.image_url || saga.map_image_url || 'https://images.unsplash.com/photo-1596484552834-8a58f7eb41e8?q=80&w=600'}
@@ -157,22 +136,15 @@ const MissionCard = ({ saga, isFav, onFav, onClick }) => (
         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-[#16243E]/60 via-transparent to-transparent" />
-
-      {/* city pill */}
       <span className="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-[#16243E]/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full border border-white/10">
         📍 {saga.city || 'Puglia'}
       </span>
-
-      {/* heart */}
       <button
         onClick={onFav}
-        className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center border border-white/15 transition-transform active:scale-90 ${isFav ? 'bg-red-500/85' : 'bg-[#16243E]/70'
-          }`}
+        className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full backdrop-blur-md flex items-center justify-center border border-white/15 transition-transform active:scale-90 ${isFav ? 'bg-red-500/85' : 'bg-[#16243E]/70'}`}
       >
         <Heart size={15} weight={isFav ? 'fill' : 'bold'} className="text-white" />
       </button>
-
-      {/* originals badge */}
       <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-2 py-1 rounded-full border border-white/8">
         {(saga.is_original || saga.isOriginal) ? (
           <>
@@ -184,8 +156,6 @@ const MissionCard = ({ saga, isFav, onFav, onClick }) => (
         )}
       </div>
     </div>
-
-    {/* body */}
     <div className="p-4 flex flex-col flex-1">
       <h4 className="font-serif font-black text-[#16243E] text-[16px] leading-snug mb-3 line-clamp-2 group-hover:text-[#D4693A] transition-colors">
         {saga.title || saga.titolo}
@@ -241,7 +211,6 @@ const EventCard = ({ ev, onClick }) => {
           alt={ev.titolo}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
         />
-        {/* date badge */}
         <div className="absolute top-2.5 left-2.5 bg-[#16243E]/88 backdrop-blur-md px-2.5 py-1.5 rounded-[10px] text-center min-w-[44px]">
           <p className="text-[9px] font-black text-[#E8845A] uppercase tracking-wider">
             {d.toLocaleString('it-IT', { month: 'short' })}
@@ -267,26 +236,17 @@ const EventCard = ({ ev, onClick }) => {
   );
 };
 
-/* ─────────────────────────────────────────
-   SECTION HEADER
-───────────────────────────────────────── */
 const SectionHeader = ({ title, onMore }) => (
   <div className="flex items-end justify-between px-5 mb-3.5">
     <h2 className="font-serif font-black text-[#16243E] text-[22px] leading-tight tracking-tight">{title}</h2>
     {onMore && (
-      <button
-        onClick={onMore}
-        className="flex items-center gap-1 text-[11px] font-bold text-[#D4693A] active:opacity-70"
-      >
+      <button onClick={onMore} className="flex items-center gap-1 text-[11px] font-bold text-[#D4693A] active:opacity-70">
         Vedi tutte <ArrowRight size={11} weight="bold" />
       </button>
     )}
   </div>
 );
 
-/* ─────────────────────────────────────────
-   SKELETON LOADER
-───────────────────────────────────────── */
 const Skeleton = ({ className }) => (
   <div className={`animate-pulse bg-[#EDE3D4] rounded-[16px] ${className}`} />
 );
@@ -294,8 +254,7 @@ const Skeleton = ({ className }) => (
 const DashboardSkeleton = () => (
   <div className="px-5 pt-4 flex flex-col gap-5">
     <Skeleton className="h-[72px] w-full" />
-    <Skeleton className="h-[40px] w-full" />
-    <Skeleton className="h-[60px] w-3/4" />
+    <Skeleton className="h-[280px] w-full" />
     <div className="flex gap-3">
       <Skeleton className="h-[180px] w-[252px] shrink-0" />
       <Skeleton className="h-[180px] w-[252px] shrink-0" />
@@ -304,16 +263,8 @@ const DashboardSkeleton = () => (
 );
 
 /* ─────────────────────────────────────────
-   MAIN DASHBOARD
+   DEFAULT NEWS
 ───────────────────────────────────────── */
-const CATS = [
-  { id: 'all', icon: '🧭', label: 'Tutti' },
-  { id: 'cultura', icon: '🏛️', label: 'Cultura' },
-  { id: 'cibo', icon: '🍝', label: 'Cibo' },
-  { id: 'natura', icon: '🌿', label: 'Natura' },
-  { id: 'concierge', icon: '✨', label: 'Per te' },
-];
-
 const DEFAULT_NEWS = [
   {
     id: 'news-1',
@@ -331,6 +282,9 @@ const DEFAULT_NEWS = [
   },
 ];
 
+/* ─────────────────────────────────────────
+   MAIN DASHBOARD
+───────────────────────────────────────── */
 export default function Dashboard() {
   const navigate = useNavigate();
   const { profile } = useAuth();
@@ -343,11 +297,10 @@ export default function Dashboard() {
   const [events, setEvents] = useState([]);
   const [news] = useState(DEFAULT_NEWS);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [userLoc, setUserLoc] = useState(null);
-  const [activeCat, setActiveCat] = useState('all');
+  const [showNow, setShowNow] = useState(false);
+  const [initialIntent, setInitialIntent] = useState(null);
 
-  /* ── data load ── */
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -385,6 +338,11 @@ export default function Dashboard() {
     }
   };
 
+  const openCFA = (intentId) => {
+    setInitialIntent(intentId);
+    setShowNow(true);
+  };
+
   const toggleFavorite = async (e, setId) => {
     e.stopPropagation();
     if (!profile?.id) return;
@@ -396,7 +354,6 @@ export default function Dashboard() {
     }
   };
 
-  /* ── animation variants ── */
   const fadeUp = {
     hidden: { opacity: 0, y: 16 },
     show: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0, 0, 0.2, 1] } },
@@ -405,11 +362,9 @@ export default function Dashboard() {
     show: { transition: { staggerChildren: 0.07 } },
   };
 
-  /* ── loading state ── */
   if (loading) {
     return (
       <div className="h-[100dvh] bg-[#FDFAF5] flex flex-col overflow-hidden">
-        {/* static header */}
         <div className="px-5 pt-14 pb-5">
           <Skeleton className="h-[36px] w-48 mb-1" />
           <Skeleton className="h-[28px] w-32" />
@@ -419,13 +374,9 @@ export default function Dashboard() {
     );
   }
 
-  /* ── render ── */
   return (
     <div className="h-[100dvh] max-h-[100dvh] w-full bg-[#FDFAF5] flex flex-col overflow-hidden font-sans text-[#16243E]">
 
-      {/* ════════════════════════════════
-          SCROLLABLE BODY WITH COLLAPSIBLE HEADER
-      ════════════════════════════════ */}
       <motion.main
         variants={stagger}
         initial="hidden"
@@ -433,67 +384,92 @@ export default function Dashboard() {
         className="flex-1 overflow-y-auto overflow-x-hidden pb-28"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
-        {/* 1. GREETING ROW (Scrolls away) */}
-        <div className="px-5 pt-14 pb-4">
-          <div className="flex items-start justify-between mb-5">
+
+        {/* ══════════════════════════════════════════
+            HERO CFA BLOCK — piena pagina, above fold
+        ══════════════════════════════════════════ */}
+        <div className="relative px-5 pt-14 pb-8">
+
+          {/* Top row: greeting + notifiche */}
+          <div className="flex items-start justify-between mb-8">
             <div>
               <p className="text-[11px] font-black text-[#D4693A] uppercase tracking-[0.12em] mb-0.5">
                 {getGreeting()}
               </p>
-              <h1 className="font-serif font-black text-[#16243E] text-[34px] leading-[1.05] tracking-tight">
+              <h1 className="font-serif font-black text-[#16243E] text-[28px] leading-[1.05] tracking-tight">
                 {profile?.nome || profile?.nickname || 'Esploratore'} 👋
               </h1>
-              <p className="text-[12px] font-medium text-[#8A95AD] mt-1">
-                {getContextualSub()}
-              </p>
             </div>
-
-            {/* notif button */}
             <button
               onClick={() => navigate('/notifiche')}
-              className="relative w-[46px] h-[46px] rounded-[16px] bg-[#16243E] flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0"
+              className="relative w-[44px] h-[44px] rounded-[14px] bg-[#16243E] flex items-center justify-center shadow-lg active:scale-90 transition-transform shrink-0"
             >
-              <Bell size={22} weight="fill" className="text-white" />
+              <Bell size={20} weight="fill" className="text-white" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-[11px] h-[11px] bg-red-500 rounded-full border-2 border-[#FDFAF5]" />
+                <span className="absolute -top-1 -right-1 w-[10px] h-[10px] bg-red-500 rounded-full border-2 border-[#FDFAF5]" />
               )}
             </button>
           </div>
+
+          {/* CFA label + headline */}
+          <div className="mb-7">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-5 h-5 rounded-full bg-[#D4693A] flex items-center justify-center shrink-0">
+                <div className="w-1.5 h-1.5 rounded-full bg-white" />
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#D4693A]">
+                Il tuo concierge
+              </span>
+            </div>
+
+            <h2 className="font-serif font-black text-[#16243E] text-[48px] leading-[0.92] tracking-tight mb-3">
+              Cosa faccio<br />
+              <span className="text-[#D4693A]">adesso?</span>
+            </h2>
+
+            <p className="text-[14px] font-medium text-[#8A95AD] italic">
+              {getCFAContextualLine()}
+            </p>
+          </div>
+
+          {/* Intent options — 5 tappable rows */}
+          <motion.div variants={fadeUp} className="flex flex-col gap-2.5">
+            {INTENTS.map((intent, i) => (
+              <motion.button
+                key={intent.id}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.08 + i * 0.055, duration: 0.32, ease: [0, 0, 0.2, 1] }}
+                whileTap={{ scale: 0.975 }}
+                onClick={() => openCFA(intent.id)}
+                className="w-full flex items-center gap-4 bg-white border border-[#EAE3D6] rounded-[20px] px-5 py-4 shadow-sm active:shadow-none active:border-[#D4693A]/40 transition-all group text-left"
+              >
+                <span className="text-[28px] shrink-0 leading-none">{intent.emoji}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] font-black text-[#16243E] leading-tight group-hover:text-[#D4693A] transition-colors">
+                    {intent.label}
+                  </p>
+                  <p className="text-[11px] font-medium text-[#8A95AD] mt-0.5 truncate">
+                    {intent.sub}
+                  </p>
+                </div>
+                <ArrowRight
+                  size={16}
+                  weight="bold"
+                  className="text-[#D0C8BC] group-hover:text-[#D4693A] group-hover:translate-x-0.5 transition-all shrink-0"
+                />
+              </motion.button>
+            ))}
+          </motion.div>
         </div>
 
-        {/* 2. STICKY SEARCH BAR — utility, non protagonista */}
-        <div className="sticky top-0 z-30 bg-[#FDFAF5]/95 backdrop-blur-md px-5 py-2 -mt-2 mb-1">
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="w-full flex items-center bg-white/80 border border-[#EAE3D6] rounded-2xl px-4 py-2 gap-2.5 active:scale-[0.99] transition-transform"
-          >
-            <MagnifyingGlass size={16} weight="bold" className="text-[#8A95AD] shrink-0" />
-            <span className="flex-1 text-left text-[13px] font-medium text-[#8A95AD] truncate">
-              Cerca luoghi, eventi, esperienze…
-            </span>
-            <span className="text-[11px] font-bold text-[#8A95AD] shrink-0">
-              📍 {userLoc ? 'Qui vicino' : 'Barletta'}
-            </span>
-          </button>
-        </div>
+        {/* Divider */}
+        <div className="mx-5 h-px bg-[#EAE3D6] mb-8" />
 
-        {/* ── Category pills ── */}
-        <motion.div variants={fadeUp} className="flex gap-2 px-5 pb-1 overflow-x-auto no-scrollbar mt-5">
-          {CATS.map(c => (
-            <CatPill
-              key={c.id}
-              icon={c.icon}
-              label={c.label}
-              active={activeCat === c.id}
-              onClick={() => setActiveCat(c.id)}
-            />
-          ))}
-        </motion.div>
-
-        {/* ── Le Mie Saghe ── (solo saghe con almeno 1 tappa completata) */}
+        {/* ── Le Mie Saghe (solo se in corso) ── */}
         <AnimatePresence>
           {activeSagas.filter(s => s.doneSteps > 0).length > 0 && (
-            <motion.section variants={fadeUp} className="mt-7">
+            <motion.section variants={fadeUp} className="mb-8">
               <SectionHeader title="Le Mie Saghe 🗺️" onMore={() => navigate('/missioni')} />
               <div className="px-5 flex flex-col gap-2.5">
                 {activeSagas.filter(s => s.doneSteps > 0).map(saga => (
@@ -509,7 +485,7 @@ export default function Dashboard() {
         </AnimatePresence>
 
         {/* ── Saghe Vicine ── */}
-        <motion.section variants={fadeUp} className="mt-8">
+        <motion.section variants={fadeUp} className="mb-8">
           <SectionHeader title="Saghe Vicine" onMore={() => navigate('/missioni')} />
           <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
             {saghe.slice(0, 6).map(saga => (
@@ -525,7 +501,7 @@ export default function Dashboard() {
         </motion.section>
 
         {/* ── Notizie ed Eventi ── */}
-        <motion.section variants={fadeUp} className="mt-8">
+        <motion.section variants={fadeUp} className="mb-8">
           <SectionHeader title="Notizie ed Eventi" onMore={() => navigate('/eventi')} />
           <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
             {news.map(item => (
@@ -543,13 +519,12 @@ export default function Dashboard() {
 
       </motion.main>
 
-      {/* ════════════════════════════════
-          SEARCH MODAL
-      ════════════════════════════════ */}
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        saghe={saghe}
+      {/* CFA Modal */}
+      <CosaFaccioAdesso
+        isOpen={showNow}
+        onClose={() => setShowNow(false)}
+        userCity={userLoc ? null : 'Barletta'}
+        initialIntent={initialIntent}
       />
 
     </div>
