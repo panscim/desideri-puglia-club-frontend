@@ -285,14 +285,88 @@ const DEFAULT_NEWS = [
 /* ─────────────────────────────────────────
    MAIN DASHBOARD
 ───────────────────────────────────────── */
-const HERO_BG = '#F7F1E7';
-const HERO_BG_DEEP = '#EDE2D2';
-const HERO_MUTED = '#8E7A67';
+const HERO_BG = '#F7F3EC';
+const HERO_BG_DEEP = '#EFE7DC';
+const HERO_MUTED = '#8D806F';
 const HERO_INK = '#16243E';
-const HERO_TERRACOTTA = '#D4793A';
-const HERO_GOLD = '#C4974A';
-const HERO_SEA = '#2FA7C9';
-const HERO_OLIVE = '#6C7A3A';
+const HERO_LINE = 'rgba(22,36,62,0.08)';
+const HERO_PARTICLE = '#24456C';
+const HERO_PARTICLE_SOFT = '#6F8FA9';
+const HERO_GLOW = 'rgba(255,255,255,0.72)';
+
+const CONCIERGE_PARTICLES = [
+  { id: 1, x: '20%', y: '30%', size: 10, depth: 0.7, duration: 14, delay: 0, color: HERO_PARTICLE },
+  { id: 2, x: '31%', y: '44%', size: 6, depth: 0.45, duration: 16, delay: 1.2, color: HERO_PARTICLE_SOFT },
+  { id: 3, x: '41%', y: '24%', size: 8, depth: 0.65, duration: 13, delay: 0.4, color: HERO_PARTICLE },
+  { id: 4, x: '49%', y: '37%', size: 12, depth: 1, duration: 17, delay: 1.8, color: HERO_PARTICLE },
+  { id: 5, x: '58%', y: '19%', size: 7, depth: 0.5, duration: 15, delay: 0.9, color: HERO_PARTICLE_SOFT },
+  { id: 6, x: '67%', y: '30%', size: 11, depth: 0.9, duration: 18, delay: 2.2, color: HERO_PARTICLE },
+  { id: 7, x: '75%', y: '46%', size: 8, depth: 0.55, duration: 14, delay: 0.7, color: HERO_PARTICLE_SOFT },
+  { id: 8, x: '60%', y: '55%', size: 6, depth: 0.42, duration: 19, delay: 0.3, color: HERO_PARTICLE },
+  { id: 9, x: '48%', y: '62%', size: 10, depth: 0.82, duration: 16, delay: 1.1, color: HERO_PARTICLE },
+  { id: 10, x: '35%', y: '59%', size: 7, depth: 0.48, duration: 15, delay: 2, color: HERO_PARTICLE_SOFT },
+  { id: 11, x: '24%', y: '54%', size: 11, depth: 0.92, duration: 18, delay: 0.6, color: HERO_PARTICLE },
+  { id: 12, x: '40%', y: '48%', size: 5, depth: 0.35, duration: 20, delay: 1.6, color: HERO_PARTICLE_SOFT },
+  { id: 13, x: '54%', y: '47%', size: 5, depth: 0.38, duration: 21, delay: 0.2, color: HERO_PARTICLE_SOFT },
+  { id: 14, x: '46%', y: '11%', size: 4, depth: 0.25, duration: 22, delay: 1.3, color: HERO_PARTICLE_SOFT },
+  { id: 15, x: '18%', y: '64%', size: 4, depth: 0.2, duration: 20, delay: 2.3, color: HERO_PARTICLE_SOFT },
+];
+
+const AbstractConciergeField = () => (
+  <div
+    className="relative w-full max-w-[320px] aspect-square"
+    style={{ perspective: '900px' }}
+  >
+    <motion.div
+      animate={{ rotate: [0, 4, 0, -4, 0], scale: [1, 1.015, 1] }}
+      transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+      className="absolute inset-[16%] rounded-full"
+      style={{
+        background: 'radial-gradient(circle, rgba(36,69,108,0.08) 0%, rgba(36,69,108,0.03) 34%, transparent 68%)',
+        filter: 'blur(12px)',
+      }}
+    />
+
+    <motion.div
+      animate={{ opacity: [0.3, 0.55, 0.3], scale: [0.96, 1.04, 0.96] }}
+      transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
+      className="absolute left-1/2 top-1/2 h-[84px] w-[84px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+      style={{
+        background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.55) 32%, rgba(255,255,255,0.04) 70%)',
+        filter: 'blur(8px)',
+      }}
+    />
+
+    {CONCIERGE_PARTICLES.map((particle) => (
+      <motion.div
+        key={particle.id}
+        animate={{
+          x: [0, 10 * particle.depth, -8 * particle.depth, 0],
+          y: [0, -12 * particle.depth, 9 * particle.depth, 0],
+          scale: [1, 1 + 0.16 * particle.depth, 0.96, 1],
+          opacity: [0.22 + 0.18 * particle.depth, 0.72, 0.28, 0.22 + 0.18 * particle.depth],
+        }}
+        transition={{
+          duration: particle.duration,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          delay: particle.delay,
+        }}
+        className="absolute rounded-full"
+        style={{
+          left: particle.x,
+          top: particle.y,
+          width: particle.size,
+          height: particle.size,
+          background: particle.color,
+          boxShadow: `0 0 ${particle.size * 2}px ${HERO_GLOW}`,
+          filter: particle.depth > 0.7 ? 'blur(0px)' : 'blur(0.2px)',
+          transform: `translateZ(${particle.depth * 28}px)`,
+        }}
+      />
+    ))}
+  </div>
+);
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -407,12 +481,11 @@ export default function Dashboard() {
           }}
         >
           <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-[460px] opacity-80"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[420px] opacity-70"
             style={{
               background: `
-                radial-gradient(circle at 18% 18%, rgba(212,121,58,0.16), transparent 24%),
-                radial-gradient(circle at 82% 16%, rgba(47,167,201,0.14), transparent 22%),
-                radial-gradient(circle at 50% 34%, rgba(196,151,74,0.12), transparent 28%)
+                radial-gradient(circle at 50% 22%, rgba(36,69,108,0.08), transparent 24%),
+                radial-gradient(circle at 50% 46%, rgba(255,255,255,0.6), transparent 30%)
               `,
             }}
           />
@@ -447,41 +520,7 @@ export default function Dashboard() {
             className="w-full flex items-center justify-center px-6"
             style={{ height: '52vw', maxHeight: 280, minHeight: 200 }}
           >
-            <div className="relative w-full max-w-[320px] aspect-square">
-              <motion.div
-                animate={{ scale: [1, 1.08, 1], rotate: [0, 10, 0] }}
-                transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute left-[18%] top-[24%] h-[48%] w-[48%] rounded-full blur-[18px]"
-                style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.78), rgba(212,121,58,0.9) 50%, rgba(212,121,58,0.08) 100%)' }}
-              />
-              <motion.div
-                animate={{ scale: [1.04, 0.96, 1.04], rotate: [0, -14, 0], x: [0, 8, 0], y: [0, -10, 0] }}
-                transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute right-[16%] top-[22%] h-[34%] w-[34%] rounded-[38%] blur-[14px]"
-                style={{ background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75), rgba(47,167,201,0.92) 55%, rgba(47,167,201,0.06) 100%)' }}
-              />
-              <motion.div
-                animate={{ scale: [1, 1.06, 1], rotate: [0, 18, 0], x: [0, -6, 0], y: [0, 12, 0] }}
-                transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute bottom-[18%] left-[28%] h-[32%] w-[32%] rounded-[42%] blur-[12px]"
-                style={{ background: 'radial-gradient(circle at 45% 35%, rgba(255,255,255,0.65), rgba(108,122,58,0.8) 52%, rgba(108,122,58,0.04) 100%)' }}
-              />
-              <div
-                className="absolute inset-[18%] rounded-[32px] border"
-                style={{
-                  borderColor: 'rgba(255,255,255,0.5)',
-                  background: 'linear-gradient(145deg, rgba(255,255,255,0.34), rgba(255,255,255,0.08))',
-                  backdropFilter: 'blur(18px)',
-                  boxShadow: '0 28px 60px rgba(22,36,62,0.08)',
-                }}
-              />
-              <motion.div
-                animate={{ opacity: [0.45, 0.85, 0.45], scale: [0.98, 1.05, 0.98] }}
-                transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute left-1/2 top-1/2 h-[72px] w-[72px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[6px]"
-                style={{ background: `radial-gradient(circle, ${HERO_GOLD} 0%, rgba(196,151,74,0.08) 72%)` }}
-              />
-            </div>
+            <AbstractConciergeField />
           </motion.div>
 
           {/* Headline + CTA */}
@@ -500,12 +539,7 @@ export default function Dashboard() {
                 style={{ color: HERO_INK, fontSize: 'clamp(38px, 10vw, 52px)' }}
               >
                 Desideri ti guida<br />
-                <span style={{
-                  background: `linear-gradient(135deg, ${HERO_TERRACOTTA} 0%, ${HERO_GOLD} 38%, ${HERO_SEA} 100%)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}>nel momento giusto</span>
+                <span style={{ color: HERO_PARTICLE }}>nel momento giusto</span>
               </h2>
               <p className="text-[13px] font-medium mt-3 italic" style={{ color: HERO_MUTED }}>
                 {getCFAContextualLine()}
@@ -516,14 +550,14 @@ export default function Dashboard() {
             <motion.button
               whileTap={{ scale: 0.96 }}
               onClick={() => { setInitialIntent(null); setShowNow(true); }}
-              className="flex items-center gap-3 px-8 py-4 rounded-[20px] shadow-xl active:shadow-md transition-all"
+              className="flex items-center gap-3 px-8 py-4 rounded-[20px] active:shadow-md transition-all"
               style={{
-                background: `linear-gradient(135deg, ${HERO_TERRACOTTA} 0%, ${HERO_GOLD} 42%, ${HERO_SEA} 100%)`,
-                boxShadow: '0 14px 34px rgba(47,167,201,0.18)',
+                background: HERO_INK,
+                boxShadow: '0 14px 28px rgba(22,36,62,0.14)',
               }}
             >
               <span className="text-white font-black text-[16px] tracking-wide">Cosa faccio adesso?</span>
-              <ArrowRight size={18} weight="bold" className="text-white/80" />
+              <ArrowRight size={18} weight="bold" className="text-white/70" />
             </motion.button>
 
             {/* Scorciatoie intent */}
@@ -534,11 +568,10 @@ export default function Dashboard() {
                   onClick={() => openCFA(intent.id)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
                   style={{
-                    background: 'rgba(255,255,255,0.62)',
-                    border: '1px solid rgba(212,121,58,0.18)',
+                    background: 'rgba(255,255,255,0.5)',
+                    border: `1px solid ${HERO_LINE}`,
                     color: HERO_INK,
-                    backdropFilter: 'blur(8px)',
-                    boxShadow: '0 8px 20px rgba(22,36,62,0.04)',
+                    boxShadow: '0 8px 20px rgba(22,36,62,0.03)',
                   }}
                 >
                   <span>{intent.emoji}</span>
