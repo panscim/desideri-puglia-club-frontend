@@ -16,6 +16,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import CosaFaccioAdesso from '../components/CosaFaccioAdesso';
 import { motion, AnimatePresence } from 'framer-motion';
+import { colors as TOKENS } from '../utils/designTokens';
 
 /* ─────────────────────────────────────────
    HELPERS
@@ -285,31 +286,39 @@ const DEFAULT_NEWS = [
 /* ─────────────────────────────────────────
    MAIN DASHBOARD
 ───────────────────────────────────────── */
-const HERO_BG = '#F7F3EC';
-const HERO_BG_DEEP = '#EFE7DC';
-const HERO_MUTED = '#8D806F';
+const HERO_BG = TOKENS.bgPrimary;
+const HERO_MUTED = TOKENS.textMuted;
 const HERO_INK = '#16243E';
-const HERO_LINE = 'rgba(22,36,62,0.08)';
-const HERO_PARTICLE = '#24456C';
-const HERO_PARTICLE_SOFT = '#6F8FA9';
-const HERO_GLOW = 'rgba(255,255,255,0.72)';
+const HERO_LINE = TOKENS.border;
+const HERO_PARTICLE = '#223A5A';
+const HERO_PARTICLE_SOFT = '#8EA1B3';
+const HERO_GLOW = 'rgba(255,255,255,0.9)';
 
 const CONCIERGE_PARTICLES = [
-  { id: 1, x: '20%', y: '30%', size: 10, depth: 0.7, duration: 14, delay: 0, color: HERO_PARTICLE },
-  { id: 2, x: '31%', y: '44%', size: 6, depth: 0.45, duration: 16, delay: 1.2, color: HERO_PARTICLE_SOFT },
-  { id: 3, x: '41%', y: '24%', size: 8, depth: 0.65, duration: 13, delay: 0.4, color: HERO_PARTICLE },
-  { id: 4, x: '49%', y: '37%', size: 12, depth: 1, duration: 17, delay: 1.8, color: HERO_PARTICLE },
-  { id: 5, x: '58%', y: '19%', size: 7, depth: 0.5, duration: 15, delay: 0.9, color: HERO_PARTICLE_SOFT },
-  { id: 6, x: '67%', y: '30%', size: 11, depth: 0.9, duration: 18, delay: 2.2, color: HERO_PARTICLE },
-  { id: 7, x: '75%', y: '46%', size: 8, depth: 0.55, duration: 14, delay: 0.7, color: HERO_PARTICLE_SOFT },
-  { id: 8, x: '60%', y: '55%', size: 6, depth: 0.42, duration: 19, delay: 0.3, color: HERO_PARTICLE },
-  { id: 9, x: '48%', y: '62%', size: 10, depth: 0.82, duration: 16, delay: 1.1, color: HERO_PARTICLE },
-  { id: 10, x: '35%', y: '59%', size: 7, depth: 0.48, duration: 15, delay: 2, color: HERO_PARTICLE_SOFT },
-  { id: 11, x: '24%', y: '54%', size: 11, depth: 0.92, duration: 18, delay: 0.6, color: HERO_PARTICLE },
-  { id: 12, x: '40%', y: '48%', size: 5, depth: 0.35, duration: 20, delay: 1.6, color: HERO_PARTICLE_SOFT },
-  { id: 13, x: '54%', y: '47%', size: 5, depth: 0.38, duration: 21, delay: 0.2, color: HERO_PARTICLE_SOFT },
-  { id: 14, x: '46%', y: '11%', size: 4, depth: 0.25, duration: 22, delay: 1.3, color: HERO_PARTICLE_SOFT },
-  { id: 15, x: '18%', y: '64%', size: 4, depth: 0.2, duration: 20, delay: 2.3, color: HERO_PARTICLE_SOFT },
+  { id: 1, x: '18%', y: '31%', size: 5, depth: 0.9, duration: 7.2, delay: 0.1, color: '#FFFFFF' },
+  { id: 2, x: '24%', y: '22%', size: 4, depth: 0.78, duration: 8.1, delay: 0.4, color: '#FFFFFF' },
+  { id: 3, x: '31%', y: '18%', size: 4, depth: 0.7, duration: 7.6, delay: 0.8, color: HERO_PARTICLE_SOFT },
+  { id: 4, x: '42%', y: '14%', size: 5, depth: 0.95, duration: 6.9, delay: 0.3, color: '#FFFFFF' },
+  { id: 5, x: '54%', y: '15%', size: 4, depth: 0.72, duration: 7.4, delay: 1.2, color: HERO_PARTICLE_SOFT },
+  { id: 6, x: '66%', y: '20%', size: 4, depth: 0.7, duration: 8.4, delay: 0.5, color: '#FFFFFF' },
+  { id: 7, x: '74%', y: '30%', size: 5, depth: 0.92, duration: 7.1, delay: 0.9, color: '#FFFFFF' },
+  { id: 8, x: '80%', y: '44%', size: 4, depth: 0.76, duration: 8.5, delay: 1.4, color: HERO_PARTICLE_SOFT },
+  { id: 9, x: '74%', y: '58%', size: 5, depth: 0.9, duration: 6.8, delay: 0.6, color: '#FFFFFF' },
+  { id: 10, x: '65%', y: '69%', size: 4, depth: 0.7, duration: 7.9, delay: 1.1, color: HERO_PARTICLE_SOFT },
+  { id: 11, x: '52%', y: '75%', size: 5, depth: 0.96, duration: 7.3, delay: 0.2, color: '#FFFFFF' },
+  { id: 12, x: '39%', y: '74%', size: 4, depth: 0.68, duration: 8.3, delay: 1.6, color: HERO_PARTICLE_SOFT },
+  { id: 13, x: '27%', y: '68%', size: 4, depth: 0.72, duration: 7.7, delay: 0.7, color: '#FFFFFF' },
+  { id: 14, x: '18%', y: '57%', size: 5, depth: 0.9, duration: 6.7, delay: 1.3, color: '#FFFFFF' },
+  { id: 15, x: '14%', y: '44%', size: 4, depth: 0.74, duration: 8, delay: 0.9, color: HERO_PARTICLE_SOFT },
+  { id: 16, x: '33%', y: '33%', size: 3, depth: 0.42, duration: 6.5, delay: 0.4, color: HERO_PARTICLE },
+  { id: 17, x: '48%', y: '28%', size: 3, depth: 0.38, duration: 6.8, delay: 1.1, color: HERO_PARTICLE_SOFT },
+  { id: 18, x: '61%', y: '36%', size: 3, depth: 0.45, duration: 7.1, delay: 0.3, color: HERO_PARTICLE },
+  { id: 19, x: '58%', y: '52%', size: 3, depth: 0.35, duration: 6.9, delay: 1.4, color: HERO_PARTICLE_SOFT },
+  { id: 20, x: '45%', y: '56%', size: 3, depth: 0.32, duration: 7.4, delay: 0.6, color: HERO_PARTICLE },
+  { id: 21, x: '37%', y: '47%', size: 3, depth: 0.36, duration: 6.6, delay: 1.6, color: '#FFFFFF' },
+  { id: 22, x: '50%', y: '44%', size: 6, depth: 1, duration: 6.2, delay: 0.2, color: '#FFFFFF' },
+  { id: 23, x: '29%', y: '53%', size: 2, depth: 0.24, duration: 7.8, delay: 1.8, color: HERO_PARTICLE_SOFT },
+  { id: 24, x: '67%', y: '47%', size: 2, depth: 0.24, duration: 8.2, delay: 1, color: HERO_PARTICLE_SOFT },
 ];
 
 const AbstractConciergeField = () => (
@@ -318,22 +327,22 @@ const AbstractConciergeField = () => (
     style={{ perspective: '900px' }}
   >
     <motion.div
-      animate={{ rotate: [0, 4, 0, -4, 0], scale: [1, 1.015, 1] }}
-      transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-      className="absolute inset-[16%] rounded-full"
+      animate={{ rotate: [0, 6, 0, -6, 0], scale: [1, 1.03, 1] }}
+      transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+      className="absolute inset-[18%] rounded-full"
       style={{
-        background: 'radial-gradient(circle, rgba(36,69,108,0.08) 0%, rgba(36,69,108,0.03) 34%, transparent 68%)',
-        filter: 'blur(12px)',
+        background: 'radial-gradient(circle, rgba(34,58,90,0.08) 0%, rgba(34,58,90,0.025) 38%, transparent 72%)',
+        filter: 'blur(10px)',
       }}
     />
 
     <motion.div
-      animate={{ opacity: [0.3, 0.55, 0.3], scale: [0.96, 1.04, 0.96] }}
-      transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-      className="absolute left-1/2 top-1/2 h-[84px] w-[84px] -translate-x-1/2 -translate-y-1/2 rounded-full"
+      animate={{ opacity: [0.22, 0.46, 0.22], scale: [0.94, 1.08, 0.94] }}
+      transition={{ duration: 5.8, repeat: Infinity, ease: 'easeInOut' }}
+      className="absolute left-1/2 top-1/2 h-[96px] w-[96px] -translate-x-1/2 -translate-y-1/2 rounded-full"
       style={{
-        background: 'radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.55) 32%, rgba(255,255,255,0.04) 70%)',
-        filter: 'blur(8px)',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.86) 0%, rgba(255,255,255,0.34) 35%, rgba(255,255,255,0.02) 72%)',
+        filter: 'blur(10px)',
       }}
     />
 
@@ -341,10 +350,10 @@ const AbstractConciergeField = () => (
       <motion.div
         key={particle.id}
         animate={{
-          x: [0, 10 * particle.depth, -8 * particle.depth, 0],
-          y: [0, -12 * particle.depth, 9 * particle.depth, 0],
-          scale: [1, 1 + 0.16 * particle.depth, 0.96, 1],
-          opacity: [0.22 + 0.18 * particle.depth, 0.72, 0.28, 0.22 + 0.18 * particle.depth],
+          x: [0, 12 * particle.depth, -10 * particle.depth, 0],
+          y: [0, -10 * particle.depth, 8 * particle.depth, 0],
+          scale: [1, 1 + 0.22 * particle.depth, 0.94, 1],
+          opacity: [0.26 + 0.2 * particle.depth, 0.9, 0.34, 0.26 + 0.2 * particle.depth],
         }}
         transition={{
           duration: particle.duration,
@@ -359,7 +368,7 @@ const AbstractConciergeField = () => (
           width: particle.size,
           height: particle.size,
           background: particle.color,
-          boxShadow: `0 0 ${particle.size * 2}px ${HERO_GLOW}`,
+          boxShadow: `0 0 ${particle.size * 3}px ${HERO_GLOW}`,
           filter: particle.depth > 0.7 ? 'blur(0px)' : 'blur(0.2px)',
           transform: `translateZ(${particle.depth * 28}px)`,
         }}
@@ -476,16 +485,16 @@ export default function Dashboard() {
         <div
           className="relative flex flex-col items-center overflow-hidden"
           style={{
-            background: `linear-gradient(180deg, ${HERO_BG} 0%, ${HERO_BG_DEEP} 60%, ${HERO_BG} 100%)`,
+            background: HERO_BG,
             paddingTop: 'env(safe-area-inset-top, 0px)',
           }}
         >
           <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-[420px] opacity-70"
+            className="pointer-events-none absolute inset-x-0 top-0 h-[380px] opacity-55"
             style={{
               background: `
-                radial-gradient(circle at 50% 22%, rgba(36,69,108,0.08), transparent 24%),
-                radial-gradient(circle at 50% 46%, rgba(255,255,255,0.6), transparent 30%)
+                radial-gradient(circle at 50% 36%, rgba(34,58,90,0.06), transparent 26%),
+                radial-gradient(circle at 50% 36%, rgba(255,255,255,0.5), transparent 36%)
               `,
             }}
           />
@@ -497,7 +506,7 @@ export default function Dashboard() {
                 {getGreeting()}
               </p>
               <p className="text-[18px] font-serif font-black leading-tight" style={{ color: HERO_INK }}>
-                {profile?.nome || profile?.nickname || 'Esploratore'}
+                {profile?.nome || profile?.nickname || 'Esploratore'} <span aria-hidden="true">👋</span>
               </p>
             </div>
             <button
