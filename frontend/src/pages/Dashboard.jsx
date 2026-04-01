@@ -13,6 +13,7 @@ import {
   MapPin,
   Sparkle,
 } from '@phosphor-icons/react';
+import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import CosaFaccioAdesso from '../components/CosaFaccioAdesso';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -483,22 +484,12 @@ export default function Dashboard() {
             HERO — Concierge + CTA
         ══════════════════════════════════════════ */}
         <div
-          className="relative flex flex-col items-center overflow-hidden"
+          className="relative flex flex-col items-center"
           style={{
             background: HERO_BG,
             paddingTop: 'env(safe-area-inset-top, 0px)',
           }}
         >
-          <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-[380px] opacity-55"
-            style={{
-              background: `
-                radial-gradient(circle at 50% 36%, rgba(34,58,90,0.06), transparent 26%),
-                radial-gradient(circle at 50% 36%, rgba(255,255,255,0.5), transparent 36%)
-              `,
-            }}
-          />
-
           {/* Top bar: greeting + notifiche */}
           <div className="w-full flex items-center justify-between px-5 pt-12 pb-2">
             <div>
@@ -521,72 +512,78 @@ export default function Dashboard() {
             </button>
           </div>
 
-          {/* Visual astratto concierge */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, ease: [0, 0, 0.2, 1] }}
-            className="w-full flex items-center justify-center px-6"
-            style={{ height: '52vw', maxHeight: 280, minHeight: 200 }}
-          >
-            <AbstractConciergeField />
-          </motion.div>
-
-          {/* Headline + CTA */}
           <motion.div
             variants={fadeUp}
-            className="flex flex-col items-center text-center px-6 pb-10 gap-5"
+            className="w-full px-5 pt-4 pb-9"
           >
-            <div>
-              <p
-                className="text-[10px] font-black uppercase tracking-[0.3em] mb-2"
-                style={{ color: HERO_MUTED }}
+            <div
+              className="rounded-[28px] bg-white border px-5 py-5 shadow-sm"
+              style={{ borderColor: HERO_LINE }}
+            >
+              <div className="mb-4">
+                <p
+                  className="text-[10px] font-black uppercase tracking-[0.3em] mb-2"
+                  style={{ color: HERO_MUTED }}
+                >
+                  Concierge
+                </p>
+                <h2
+                  className="font-serif font-black leading-[0.95] tracking-tight"
+                  style={{ color: HERO_INK, fontSize: 'clamp(30px, 8vw, 42px)' }}
+                >
+                  Cosa vuoi fare
+                  <br />
+                  in questo momento?
+                </h2>
+              </div>
+
+              <button
+                onClick={() => { setInitialIntent(null); setShowNow(true); }}
+                className="w-full flex items-center gap-3 rounded-[18px] border px-4 py-4 text-left transition active:scale-[0.99]"
+                style={{
+                  borderColor: HERO_LINE,
+                  background: TOKENS.bgSecondary,
+                  boxShadow: '0 6px 16px rgba(31,41,51,0.04)',
+                }}
               >
-                Il tuo compagno di scoperta
-              </p>
-              <h2 className="font-serif font-black leading-[0.9] tracking-tight"
-                style={{ color: HERO_INK, fontSize: 'clamp(38px, 10vw, 52px)' }}
-              >
-                Desideri ti guida<br />
-                <span style={{ color: HERO_PARTICLE }}>nel momento giusto</span>
-              </h2>
-              <p className="text-[13px] font-medium mt-3 italic" style={{ color: HERO_MUTED }}>
+                <span
+                  className="flex h-10 w-10 items-center justify-center rounded-full shrink-0"
+                  style={{ background: 'rgba(22,36,62,0.08)', color: HERO_INK }}
+                >
+                  <Search size={18} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[15px] font-black" style={{ color: HERO_INK }}>
+                    Cerca un posto, un&apos;idea o un&apos;esperienza
+                  </p>
+                  <p className="text-[12px] font-medium mt-0.5" style={{ color: HERO_MUTED }}>
+                    Mangiare, vedere, rilassarti, uscire
+                  </p>
+                </div>
+                <ArrowRight size={18} weight="bold" style={{ color: HERO_MUTED }} />
+              </button>
+
+              <p className="text-[13px] font-medium mt-4 italic" style={{ color: HERO_MUTED }}>
                 {getCFAContextualLine()}
               </p>
-            </div>
 
-            {/* CTA unico */}
-            <motion.button
-              whileTap={{ scale: 0.96 }}
-              onClick={() => { setInitialIntent(null); setShowNow(true); }}
-              className="flex items-center gap-3 px-8 py-4 rounded-[20px] active:shadow-md transition-all"
-              style={{
-                background: HERO_INK,
-                boxShadow: '0 14px 28px rgba(22,36,62,0.14)',
-              }}
-            >
-              <span className="text-white font-black text-[16px] tracking-wide">Cosa faccio adesso?</span>
-              <ArrowRight size={18} weight="bold" className="text-white/70" />
-            </motion.button>
-
-            {/* Scorciatoie intent */}
-            <div className="flex flex-wrap justify-center gap-2 mt-1">
-              {INTENTS.map(intent => (
-                <button
-                  key={intent.id}
-                  onClick={() => openCFA(intent.id)}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
-                  style={{
-                    background: 'rgba(255,255,255,0.5)',
-                    border: `1px solid ${HERO_LINE}`,
-                    color: HERO_INK,
-                    boxShadow: '0 8px 20px rgba(22,36,62,0.03)',
-                  }}
-                >
-                  <span>{intent.emoji}</span>
-                  {intent.label.split(' ')[0]}
-                </button>
-              ))}
+              <div className="flex flex-wrap gap-2 mt-4">
+                {INTENTS.map(intent => (
+                  <button
+                    key={intent.id}
+                    onClick={() => openCFA(intent.id)}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
+                    style={{
+                      background: TOKENS.bgPrimary,
+                      border: `1px solid ${HERO_LINE}`,
+                      color: HERO_INK,
+                    }}
+                  >
+                    <span>{intent.emoji}</span>
+                    {intent.label.split(' ')[0]}
+                  </button>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>
