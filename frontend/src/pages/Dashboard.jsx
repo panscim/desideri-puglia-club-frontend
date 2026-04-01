@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { QuestService } from '../services/quest';
 import { EventsService } from '../services/events';
 import { NotificationService } from '../services/notifications';
+import { supabase } from '../services/supabase';
 import {
   Heart,
   Bell,
@@ -388,7 +389,7 @@ export default function Dashboard() {
   const [activeSagas, setActiveSagas] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [events, setEvents] = useState([]);
-  const [news] = useState(DEFAULT_NEWS);
+  const [news, setNews] = useState(DEFAULT_NEWS);
   const [unreadCount, setUnreadCount] = useState(0);
   const [userLoc, setUserLoc] = useState(null);
   const [showNow, setShowNow] = useState(false);
@@ -414,18 +415,21 @@ export default function Dashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [activeEvents, activeSaghe, userActiveSagas, userFavorites] = await Promise.all([
+      const [activeEvents, activeSaghe, userActiveSagas, userFavorites, newsRows] = await Promise.all([
         EventsService.getActiveEvents(),
         QuestService.getActiveSets(),
         profile?.id ? QuestService.getUserActiveSagas(profile.id) : [],
         profile?.id ? QuestService.getUserFavorites(profile.id) : [],
+        fetchDashboardNews(),
       ]);
       setEvents(activeEvents || []);
       setSaghe(activeSaghe || []);
       setActiveSagas(userActiveSagas || []);
       setFavorites(userFavorites || []);
+      setNews(newsRows?.length ? newsRows : DEFAULT_NEWS);
     } catch (err) {
       console.error('Dashboard load error', err);
+      setNews(DEFAULT_NEWS);
     } finally {
       setLoading(false);
     }
@@ -434,6 +438,28 @@ export default function Dashboard() {
   const openCFA = (intentId) => {
     setInitialIntent(intentId);
     setShowNow(true);
+  };
+
+  const fetchDashboardNews = async () => {
+    const { data, error } = await supabase
+      .from('news_items')
+      .select('id, title, image_url, category, published_at')
+      .eq('is_published', true)
+      .order('published_at', { ascending: false })
+      .limit(6);
+
+    if (error) {
+      console.warn('Dashboard news fallback:', error.message);
+      return DEFAULT_NEWS;
+    }
+
+    return (data || []).map((item) => ({
+      id: item.id,
+      title: item.title,
+      image_url: item.image_url,
+      category: item.category,
+      date: item.published_at,
+    }));
   };
 
   const toggleFavorite = async (e, setId) => {
