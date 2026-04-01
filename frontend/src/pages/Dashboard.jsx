@@ -285,10 +285,14 @@ const DEFAULT_NEWS = [
 /* ─────────────────────────────────────────
    MAIN DASHBOARD
 ───────────────────────────────────────── */
-// Palette estratta dalla GIF: bianco + viola/ciano blob
-const GIF_BG       = '#F8F8FC'; // bianco con velo lavanda
-const GIF_BG_DEEP  = '#F0EEF9'; // lavanda chiarissimo
-const GIF_STONE    = '#8A8FB8'; // grigio-viola freddo
+const HERO_BG = '#F7F1E7';
+const HERO_BG_DEEP = '#EDE2D2';
+const HERO_MUTED = '#8E7A67';
+const HERO_INK = '#16243E';
+const HERO_TERRACOTTA = '#D4793A';
+const HERO_GOLD = '#C4974A';
+const HERO_SEA = '#2FA7C9';
+const HERO_OLIVE = '#6C7A3A';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -369,7 +373,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="h-[100dvh] flex flex-col overflow-hidden" style={{ background: GIF_BG }}>
+      <div className="h-[100dvh] flex flex-col overflow-hidden" style={{ background: HERO_BG }}>
         <div className="px-5 pt-14 pb-5">
           <Skeleton className="h-[36px] w-48 mb-1" />
           <Skeleton className="h-[28px] w-32" />
@@ -382,7 +386,7 @@ export default function Dashboard() {
   return (
     <div
       className="h-[100dvh] max-h-[100dvh] w-full flex flex-col overflow-hidden font-sans"
-      style={{ background: GIF_BG, color: '#16243E' }}
+      style={{ background: HERO_BG, color: HERO_INK }}
     >
       <motion.main
         variants={stagger}
@@ -393,22 +397,33 @@ export default function Dashboard() {
       >
 
         {/* ══════════════════════════════════════════
-            HERO — GIF + CTA
+            HERO — Concierge + CTA
         ══════════════════════════════════════════ */}
         <div
-          className="relative flex flex-col items-center"
+          className="relative flex flex-col items-center overflow-hidden"
           style={{
-            background: `linear-gradient(180deg, ${GIF_BG} 0%, ${GIF_BG_DEEP} 60%, ${GIF_BG} 100%)`,
+            background: `linear-gradient(180deg, ${HERO_BG} 0%, ${HERO_BG_DEEP} 60%, ${HERO_BG} 100%)`,
             paddingTop: 'env(safe-area-inset-top, 0px)',
           }}
         >
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-[460px] opacity-80"
+            style={{
+              background: `
+                radial-gradient(circle at 18% 18%, rgba(212,121,58,0.16), transparent 24%),
+                radial-gradient(circle at 82% 16%, rgba(47,167,201,0.14), transparent 22%),
+                radial-gradient(circle at 50% 34%, rgba(196,151,74,0.12), transparent 28%)
+              `,
+            }}
+          />
+
           {/* Top bar: greeting + notifiche */}
           <div className="w-full flex items-center justify-between px-5 pt-12 pb-2">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: GIF_STONE }}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: HERO_MUTED }}>
                 {getGreeting()}
               </p>
-              <p className="text-[18px] font-serif font-black text-[#16243E] leading-tight">
+              <p className="text-[18px] font-serif font-black leading-tight" style={{ color: HERO_INK }}>
                 {profile?.nome || profile?.nickname || 'Esploratore'}
               </p>
             </div>
@@ -419,25 +434,54 @@ export default function Dashboard() {
             >
               <Bell size={19} weight="fill" className="text-white" />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-[10px] h-[10px] bg-red-500 rounded-full border-2" style={{ borderColor: GIF_BG }} />
+                <span className="absolute -top-1 -right-1 w-[10px] h-[10px] bg-red-500 rounded-full border-2" style={{ borderColor: HERO_BG }} />
               )}
             </button>
           </div>
 
-          {/* GIF animazione */}
+          {/* Visual astratto concierge */}
           <motion.div
             initial={{ opacity: 0, scale: 0.92 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.7, ease: [0, 0, 0.2, 1] }}
-            className="w-full flex items-center justify-center"
+            className="w-full flex items-center justify-center px-6"
             style={{ height: '52vw', maxHeight: 280, minHeight: 200 }}
           >
-            <img
-              src="/hero.gif"
-              alt=""
-              className="h-full w-auto object-contain select-none pointer-events-none"
-              style={{ mixBlendMode: 'multiply' }}
-            />
+            <div className="relative w-full max-w-[320px] aspect-square">
+              <motion.div
+                animate={{ scale: [1, 1.08, 1], rotate: [0, 10, 0] }}
+                transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute left-[18%] top-[24%] h-[48%] w-[48%] rounded-full blur-[18px]"
+                style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.78), rgba(212,121,58,0.9) 50%, rgba(212,121,58,0.08) 100%)' }}
+              />
+              <motion.div
+                animate={{ scale: [1.04, 0.96, 1.04], rotate: [0, -14, 0], x: [0, 8, 0], y: [0, -10, 0] }}
+                transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute right-[16%] top-[22%] h-[34%] w-[34%] rounded-[38%] blur-[14px]"
+                style={{ background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.75), rgba(47,167,201,0.92) 55%, rgba(47,167,201,0.06) 100%)' }}
+              />
+              <motion.div
+                animate={{ scale: [1, 1.06, 1], rotate: [0, 18, 0], x: [0, -6, 0], y: [0, 12, 0] }}
+                transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute bottom-[18%] left-[28%] h-[32%] w-[32%] rounded-[42%] blur-[12px]"
+                style={{ background: 'radial-gradient(circle at 45% 35%, rgba(255,255,255,0.65), rgba(108,122,58,0.8) 52%, rgba(108,122,58,0.04) 100%)' }}
+              />
+              <div
+                className="absolute inset-[18%] rounded-[32px] border"
+                style={{
+                  borderColor: 'rgba(255,255,255,0.5)',
+                  background: 'linear-gradient(145deg, rgba(255,255,255,0.34), rgba(255,255,255,0.08))',
+                  backdropFilter: 'blur(18px)',
+                  boxShadow: '0 28px 60px rgba(22,36,62,0.08)',
+                }}
+              />
+              <motion.div
+                animate={{ opacity: [0.45, 0.85, 0.45], scale: [0.98, 1.05, 0.98] }}
+                transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute left-1/2 top-1/2 h-[72px] w-[72px] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[6px]"
+                style={{ background: `radial-gradient(circle, ${HERO_GOLD} 0%, rgba(196,151,74,0.08) 72%)` }}
+              />
+            </div>
           </motion.div>
 
           {/* Headline + CTA */}
@@ -448,22 +492,22 @@ export default function Dashboard() {
             <div>
               <p
                 className="text-[10px] font-black uppercase tracking-[0.3em] mb-2"
-                style={{ color: GIF_STONE }}
+                style={{ color: HERO_MUTED }}
               >
-                Il tuo concierge personale
+                Il tuo compagno di scoperta
               </p>
-              <h2 className="font-serif font-black text-[#16243E] leading-[0.9] tracking-tight"
-                style={{ fontSize: 'clamp(38px, 10vw, 52px)' }}
+              <h2 className="font-serif font-black leading-[0.9] tracking-tight"
+                style={{ color: HERO_INK, fontSize: 'clamp(38px, 10vw, 52px)' }}
               >
-                Chiedi a Desideri<br />
+                Desideri ti guida<br />
                 <span style={{
-                  background: 'linear-gradient(135deg, #A855F7 0%, #06B6D4 100%)',
+                  background: `linear-gradient(135deg, ${HERO_TERRACOTTA} 0%, ${HERO_GOLD} 38%, ${HERO_SEA} 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                }}>cosa fare</span>
+                }}>nel momento giusto</span>
               </h2>
-              <p className="text-[13px] font-medium mt-3 italic" style={{ color: GIF_STONE }}>
+              <p className="text-[13px] font-medium mt-3 italic" style={{ color: HERO_MUTED }}>
                 {getCFAContextualLine()}
               </p>
             </div>
@@ -474,8 +518,8 @@ export default function Dashboard() {
               onClick={() => { setInitialIntent(null); setShowNow(true); }}
               className="flex items-center gap-3 px-8 py-4 rounded-[20px] shadow-xl active:shadow-md transition-all"
               style={{
-                background: 'linear-gradient(135deg, #7C3AED 0%, #A855F7 50%, #06B6D4 100%)',
-                boxShadow: '0 8px 28px rgba(124,58,237,0.35)',
+                background: `linear-gradient(135deg, ${HERO_TERRACOTTA} 0%, ${HERO_GOLD} 42%, ${HERO_SEA} 100%)`,
+                boxShadow: '0 14px 34px rgba(47,167,201,0.18)',
               }}
             >
               <span className="text-white font-black text-[16px] tracking-wide">Cosa faccio adesso?</span>
@@ -490,10 +534,11 @@ export default function Dashboard() {
                   onClick={() => openCFA(intent.id)}
                   className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
                   style={{
-                    background: 'rgba(168,85,247,0.08)',
-                    border: '1px solid rgba(168,85,247,0.2)',
-                    color: '#5B21B6',
+                    background: 'rgba(255,255,255,0.62)',
+                    border: '1px solid rgba(212,121,58,0.18)',
+                    color: HERO_INK,
                     backdropFilter: 'blur(8px)',
+                    boxShadow: '0 8px 20px rgba(22,36,62,0.04)',
                   }}
                 >
                   <span>{intent.emoji}</span>
