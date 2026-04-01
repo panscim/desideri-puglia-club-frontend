@@ -335,7 +335,7 @@ export default function Profilo() {
                   <p className="text-[12px] font-medium mt-0.5" style={{ color: T.textMut }}>Prenota un evento per trovarlo qui</p>
                 </div>
                 <button
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/eventi')}
                   className="px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest"
                   style={{ background: T.textPri, color: 'white' }}>
                   Scopri eventi

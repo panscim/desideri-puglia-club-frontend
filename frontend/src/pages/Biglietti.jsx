@@ -93,7 +93,7 @@ const Biglietti = () => {
                                 Prenota il tuo posto per i prossimi eventi esclusivi del Club nella sezione Scopri.
                             </p>
                             <button
-                                onClick={() => navigate('/dashboard')}
+                                onClick={() => navigate('/eventi')}
                                 className="px-8 py-3.5 bg-zinc-950 text-white rounded-full font-bold text-[15px] shadow-lg shadow-zinc-950/10 active:scale-95 transition"
                             >
                                 Scopri Eventi

@@ -651,13 +651,10 @@ export default function Dashboard() {
             </div>
           </motion.section>
 
-          {/* Notizie ed Eventi */}
+          {/* Eventi */}
           <motion.section variants={fadeUp} className="mb-8">
-            <SectionHeader title="Notizie ed Eventi" onMore={() => navigate('/eventi')} />
+            <SectionHeader title="Eventi" onMore={() => navigate('/eventi')} />
             <div className="flex gap-3.5 px-5 overflow-x-auto no-scrollbar snap-x pb-2">
-              {news.map(item => (
-                <NewsCard key={item.id} item={item} />
-              ))}
               {events.map(ev => (
                 <EventCard
                   key={ev.id}
