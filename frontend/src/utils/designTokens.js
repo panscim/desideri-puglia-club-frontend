@@ -3,8 +3,8 @@
 
 export const colors = {
     // Backgrounds
-    bgPrimary: '#FAF7F2',   // Sabbia Premium
-    bgSecondary: '#F9F9F7',   // Neutro chiaro
+    bgPrimary: '#F9F9F7',   // Sfondo pagina globale
+    bgSecondary: '#FAF7F2',   // Sabbia premium per blocchi in rilievo
     bgDark: '#0f0f0f',   // Dark mode base
     bgDark2: '#1C2833',   // Deep dark
     bgWhite: '#FFFFFF',

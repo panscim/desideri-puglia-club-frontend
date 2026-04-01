@@ -559,46 +559,139 @@ export default function Dashboard() {
             className="w-full px-5 pt-4 pb-9"
           >
             <div
-              className="rounded-[28px] bg-white border px-4 py-4 shadow-sm"
+              className="rounded-[30px] border px-4 py-4 shadow-sm overflow-hidden relative"
               style={{ borderColor: HERO_LINE }}
             >
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,247,242,0.96) 55%, rgba(255,255,255,0.98) 100%)',
+                }}
+              />
+              <div
+                className="absolute -top-14 -right-14 w-40 h-40 rounded-full"
+                style={{ background: 'radial-gradient(circle, rgba(212,121,58,0.10) 0%, rgba(212,121,58,0.02) 55%, transparent 72%)' }}
+              />
+              <div
+                className="absolute -bottom-16 -left-10 w-32 h-32 rounded-full"
+                style={{ background: 'radial-gradient(circle, rgba(22,36,62,0.07) 0%, rgba(22,36,62,0.015) 60%, transparent 76%)' }}
+              />
+
+              <div className="relative">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <p
+                      className="text-[10px] font-black uppercase tracking-[0.28em] mb-2"
+                      style={{ color: HERO_MUTED }}
+                    >
+                      Concierge
+                    </p>
+                    <h2
+                      className="font-serif font-black leading-[0.98] tracking-tight text-[27px]"
+                      style={{ color: HERO_INK }}
+                    >
+                      Trova il posto giusto,
+                      <br />
+                      al momento giusto.
+                    </h2>
+                  </div>
+                  <div
+                    className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+                    style={{ background: 'rgba(22,36,62,0.06)', color: HERO_INK }}
+                  >
+                    <Sparkle size={20} weight="fill" />
+                  </div>
+                </div>
+
               <button
                 onClick={() => { setInitialIntent(null); setShowNow(true); }}
-                className="w-full flex items-center gap-3 rounded-[18px] border px-4 py-3.5 text-left transition active:scale-[0.99]"
+                className="w-full flex items-center gap-3 rounded-[20px] border px-4 py-4 text-left transition active:scale-[0.99]"
                 style={{
                   borderColor: HERO_LINE,
-                  background: TOKENS.bgSecondary,
-                  boxShadow: '0 6px 16px rgba(31,41,51,0.04)',
+                  background: 'rgba(255,255,255,0.94)',
+                  boxShadow: '0 12px 28px rgba(31,41,51,0.06)',
                 }}
               >
                 <span
-                  className="flex h-10 w-10 items-center justify-center rounded-full shrink-0"
+                  className="flex h-11 w-11 items-center justify-center rounded-full shrink-0"
                   style={{ background: 'rgba(22,36,62,0.08)', color: HERO_INK }}
                 >
-                  <Search size={18} />
+                  <Search size={19} />
                 </span>
-                <p className="min-w-0 flex-1 truncate text-[14px] font-bold" style={{ color: HERO_MUTED }}>
-                  Cerca un posto, un&apos;idea o un&apos;esperienza
-                </p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[15px] font-black" style={{ color: HERO_INK }}>
+                    Cerca un posto, un&apos;idea o un&apos;esperienza
+                  </p>
+                  <p className="truncate text-[12px] mt-0.5" style={{ color: HERO_MUTED }}>
+                    Cene, bar, borghi, relax, serate, tappe speciali
+                  </p>
+                </div>
+                <span
+                  className="hidden sm:inline-flex rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em]"
+                  style={{ background: 'rgba(212,121,58,0.12)', color: '#D4693A' }}
+                >
+                  Apri
+                </span>
                 <ArrowRight size={18} weight="bold" style={{ color: HERO_MUTED }} />
               </button>
 
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <p className="text-[12px] font-medium italic" style={{ color: HERO_MUTED }}>
+                  {getCFAContextualLine()}
+                </p>
+                <span
+                  className="rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] whitespace-nowrap"
+                  style={{ background: 'rgba(22,36,62,0.06)', color: HERO_INK }}
+                >
+                  Ispirazione live
+                </span>
+              </div>
+
+              <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
                 {INTENTS.map(intent => (
                   <button
                     key={intent.id}
                     onClick={() => openCFA(intent.id)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-bold transition-all active:scale-95"
+                    className="flex items-center gap-2 rounded-full border px-4 py-2.5 text-[12px] font-bold transition-all active:scale-95 whitespace-nowrap"
                     style={{
-                      background: TOKENS.bgPrimary,
+                      background: 'rgba(255,255,255,0.86)',
                       border: `1px solid ${HERO_LINE}`,
                       color: HERO_INK,
+                      boxShadow: '0 6px 16px rgba(31,41,51,0.04)',
                     }}
                   >
                     <span>{intent.emoji}</span>
-                    {intent.label.split(' ')[0]}
+                    {intent.label}
                   </button>
                 ))}
+              </div>
+
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => navigate('/eventi')}
+                  className="rounded-[18px] border px-4 py-3 text-left active:scale-[0.99] transition"
+                  style={{ borderColor: HERO_LINE, background: 'rgba(255,255,255,0.82)' }}
+                >
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-1" style={{ color: HERO_MUTED }}>
+                    Agenda
+                  </p>
+                  <p className="text-[14px] font-black" style={{ color: HERO_INK }}>
+                    Vedi eventi del Club
+                  </p>
+                </button>
+                <button
+                  onClick={() => navigate('/partner')}
+                  className="rounded-[18px] border px-4 py-3 text-left active:scale-[0.99] transition"
+                  style={{ borderColor: HERO_LINE, background: 'rgba(255,255,255,0.82)' }}
+                >
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-1" style={{ color: HERO_MUTED }}>
+                    Luoghi
+                  </p>
+                  <p className="text-[14px] font-black" style={{ color: HERO_INK }}>
+                    Esplora partner scelti
+                  </p>
+                </button>
+              </div>
               </div>
             </div>
           </motion.div>

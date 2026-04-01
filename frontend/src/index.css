@@ -10,7 +10,7 @@
   /* Dashboard Redesign Tokens */
   --sand:         #F7F1E8;
   --sand-deep:    #EDE3D4;
-  --cream:        #FDFAF5;
+  --cream:        #F9F9F7;
   --terra:        #D4693A;
   --terra-soft:   #E8845A;
   --terra-pale:   #FBF0EB;
@@ -66,8 +66,12 @@
   text-decoration: none !important;
 }
 
+html, body, #root {
+  background-color: #F9F9F7;
+}
+
 body {
-  background-color: #F0EDE8;
+  background-color: #F9F9F7;
   color: var(--text-primary);
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;

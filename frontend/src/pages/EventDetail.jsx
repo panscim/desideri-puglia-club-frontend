@@ -141,8 +141,8 @@ const EventDetail = () => {
     const refreshLocation = async () => {
         setIsRefreshingGps(true);
         try {
-            const { coords } = await getCurrentPosition();
-            setUserCoords({ lat: coords.latitude, lng: coords.longitude });
+            const coords = await getCurrentPosition();
+            setUserCoords({ latitude: coords.latitude, longitude: coords.longitude });
         } catch { /* Gps error fallback handled */ }
         finally { setIsRefreshingGps(false); }
     };
@@ -190,7 +190,7 @@ const EventDetail = () => {
     const getTimezone = () => { const o = -new Date().getTimezoneOffset() / 60; return `GMT${o >= 0 ? '+' : ''}${o}`; };
 
     if (loading) return (
-        <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: '#FAF9F6' }}>
+        <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: '#F9F9F7' }}>
             <div className="w-10 h-10 border-2 border-stone-200 border-t-stone-600 rounded-full animate-spin mb-4" />
             <p className="text-stone-400 text-xs tracking-[0.2em] uppercase font-medium">Caricamento...</p>
         </div>
@@ -206,11 +206,11 @@ const EventDetail = () => {
     };
 
     return (
-        <div className="min-h-screen" style={{ background: '#FAF9F6', fontFamily: "'Inter', sans-serif" }}>
+        <div className="min-h-screen" style={{ background: '#F9F9F7', fontFamily: "'Inter', sans-serif" }}>
 
             {/* ── HEADER ── */}
             <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 py-4"
-                style={{ background: 'rgba(250,249,246,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
+                style={{ background: 'rgba(249,249,247,0.92)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
                 <button onClick={() => navigate(-1)}
                     className="w-10 h-10 flex items-center justify-center rounded-full transition-all hover:bg-stone-100 active:scale-95">
                     <ArrowLeft size={20} className="text-stone-700" />
@@ -237,7 +237,7 @@ const EventDetail = () => {
 
                     {/* Arch mask at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 h-12"
-                        style={{ background: '#FAF9F6', borderRadius: '48px 48px 0 0', marginBottom: -1 }} />
+                        style={{ background: '#F9F9F7', borderRadius: '48px 48px 0 0', marginBottom: -1 }} />
 
                     {/* Status badge */}
                     <div className="absolute top-5 left-5">
@@ -589,7 +589,7 @@ const EventDetail = () => {
 
             {/* ── STICKY BOTTOM BAR ── */}
             < div className="fixed bottom-0 left-0 right-0 max-w-lg mx-auto z-50"
-                style={{ background: 'rgba(250,249,246,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                style={{ background: 'rgba(249,249,247,0.97)', backdropFilter: 'blur(20px)', borderTop: '1px solid rgba(0,0,0,0.06)' }}>
                 <div className="px-5 py-3 pb-6">
                     {isPrenotato ? (
                         <div className="flex items-center justify-between">
