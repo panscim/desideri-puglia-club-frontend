@@ -32,20 +32,12 @@ const getGreeting = () => {
 
 const getCFAContextualLine = () => {
   const h = new Date().getHours();
-  if (h < 9)  return 'Inizia bene la mattina';
-  if (h < 13) return 'Cosa fai oggi in Puglia?';
-  if (h < 17) return 'Il pomeriggio è tutto tuo';
-  if (h < 20) return "L'ora giusta per uscire";
+  if (h < 9) return 'Da dove comincia questa giornata?';
+  if (h < 13) return 'Cosa merita davvero oggi?';
+  if (h < 17) return 'Dove ti porta questo pomeriggio?';
+  if (h < 20) return "Come finisce questa serata?";
   return 'Come finisce questa serata?';
 };
-
-const INTENTS = [
-  { id: 'mangiare', emoji: '🍽️', label: 'Mangiare qualcosa', sub: 'Ristoranti, osterie, pizzerie' },
-  { id: 'vedere',   emoji: '👁️', label: 'Vedere qualcosa di bello', sub: 'Arte, cultura, panorami' },
-  { id: 'tappa',    emoji: '🤲', label: 'Una tappa autentica', sub: 'Borghi, cantine, masserie' },
-  { id: 'relax',    emoji: '😌', label: 'Rilassarmi', sub: 'Spa, natura, slow' },
-  { id: 'serata',   emoji: '🌙', label: 'Vivere la serata', sub: 'Bar, enoteca, musica live' },
-];
 
 /* ─────────────────────────────────────────
    SUB-COMPONENTS
@@ -435,7 +427,7 @@ export default function Dashboard() {
     }
   };
 
-  const openCFA = (intentId) => {
+  const openCFA = (intentId = null) => {
     setInitialIntent(intentId);
     setShowNow(true);
   };
@@ -558,140 +550,80 @@ export default function Dashboard() {
             variants={fadeUp}
             className="w-full px-5 pt-4 pb-9"
           >
-            <div
-              className="rounded-[30px] border px-4 py-4 shadow-sm overflow-hidden relative"
-              style={{ borderColor: HERO_LINE }}
-            >
-              <div
-                className="absolute inset-0"
+            <div className="relative pt-2 pb-4 overflow-hidden">
+              <motion.div
+                aria-hidden="true"
+                className="absolute inset-x-0 top-2 h-[220px] pointer-events-none"
+                animate={{ opacity: [0.55, 0.9, 0.55] }}
+                transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,247,242,0.96) 55%, rgba(255,255,255,0.98) 100%)',
+                  background:
+                    'radial-gradient(circle at 85% 28%, rgba(212,121,58,0.14) 0%, rgba(212,121,58,0.04) 24%, transparent 52%), radial-gradient(circle at 18% 78%, rgba(22,36,62,0.11) 0%, rgba(22,36,62,0.02) 32%, transparent 55%)',
+                  filter: 'blur(10px)',
                 }}
               />
-              <div
-                className="absolute -top-14 -right-14 w-40 h-40 rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(212,121,58,0.10) 0%, rgba(212,121,58,0.02) 55%, transparent 72%)' }}
-              />
-              <div
-                className="absolute -bottom-16 -left-10 w-32 h-32 rounded-full"
-                style={{ background: 'radial-gradient(circle, rgba(22,36,62,0.07) 0%, rgba(22,36,62,0.015) 60%, transparent 76%)' }}
+              <motion.div
+                aria-hidden="true"
+                className="absolute left-0 right-0 top-[124px] h-px"
+                animate={{ scaleX: [0.86, 1, 0.86], opacity: [0.35, 0.7, 0.35] }}
+                transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(22,36,62,0.12) 20%, rgba(212,121,58,0.28) 50%, rgba(22,36,62,0.12) 80%, transparent 100%)',
+                  transformOrigin: 'center',
+                }}
               />
 
               <div className="relative">
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <div>
-                    <p
-                      className="text-[10px] font-black uppercase tracking-[0.28em] mb-2"
-                      style={{ color: HERO_MUTED }}
-                    >
-                      Concierge
-                    </p>
-                    <h2
-                      className="font-serif font-black leading-[0.98] tracking-tight text-[27px]"
-                      style={{ color: HERO_INK }}
-                    >
-                      Trova il posto giusto,
-                      <br />
-                      al momento giusto.
-                    </h2>
-                  </div>
-                  <div
-                    className="hidden sm:flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
-                    style={{ background: 'rgba(22,36,62,0.06)', color: HERO_INK }}
-                  >
-                    <Sparkle size={20} weight="fill" />
-                  </div>
-                </div>
-
-              <button
-                onClick={() => { setInitialIntent(null); setShowNow(true); }}
-                className="w-full flex items-center gap-3 rounded-[20px] border px-4 py-4 text-left transition active:scale-[0.99]"
-                style={{
-                  borderColor: HERO_LINE,
-                  background: 'rgba(255,255,255,0.94)',
-                  boxShadow: '0 12px 28px rgba(31,41,51,0.06)',
-                }}
-              >
-                <span
-                  className="flex h-11 w-11 items-center justify-center rounded-full shrink-0"
-                  style={{ background: 'rgba(22,36,62,0.08)', color: HERO_INK }}
-                >
-                  <Search size={19} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-black" style={{ color: HERO_INK }}>
-                    Cerca un posto, un&apos;idea o un&apos;esperienza
-                  </p>
-                  <p className="truncate text-[12px] mt-0.5" style={{ color: HERO_MUTED }}>
-                    Cene, bar, borghi, relax, serate, tappe speciali
-                  </p>
-                </div>
-                <span
-                  className="hidden sm:inline-flex rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em]"
-                  style={{ background: 'rgba(212,121,58,0.12)', color: '#D4693A' }}
-                >
-                  Apri
-                </span>
-                <ArrowRight size={18} weight="bold" style={{ color: HERO_MUTED }} />
-              </button>
-
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <p className="text-[12px] font-medium italic" style={{ color: HERO_MUTED }}>
-                  {getCFAContextualLine()}
+                <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-3 whitespace-nowrap" style={{ color: HERO_MUTED }}>
+                  Concierge
                 </p>
-                <span
-                  className="rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] whitespace-nowrap"
-                  style={{ background: 'rgba(22,36,62,0.06)', color: HERO_INK }}
+                <h2
+                  className="font-serif font-black leading-[0.98] tracking-tight text-[clamp(32px,8.5vw,54px)] whitespace-nowrap overflow-hidden text-ellipsis"
+                  style={{ color: HERO_INK }}
                 >
-                  Ispirazione live
-                </span>
-              </div>
+                  {getCFAContextualLine()}
+                </h2>
+                <motion.p
+                  className="mt-3 text-[14px] font-medium whitespace-nowrap overflow-hidden text-ellipsis"
+                  style={{ color: HERO_MUTED }}
+                  animate={{ opacity: [0.72, 1, 0.72], x: [0, 2, 0] }}
+                  transition={{ duration: 5.8, repeat: Infinity, ease: 'easeInOut' }}
+                >
+                  Il tuo concierge personale per trovare il posto giusto senza perdere tempo.
+                </motion.p>
 
-              <div className="mt-4 flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                {INTENTS.map(intent => (
-                  <button
-                    key={intent.id}
-                    onClick={() => openCFA(intent.id)}
-                    className="flex items-center gap-2 rounded-full border px-4 py-2.5 text-[12px] font-bold transition-all active:scale-95 whitespace-nowrap"
+                <button
+                  onClick={() => openCFA()}
+                  className="mt-7 w-full flex items-center gap-3 rounded-[22px] text-left transition active:scale-[0.99]"
+                >
+                  <div
+                    className="w-full flex items-center gap-3 rounded-[22px] border px-4 py-4"
                     style={{
-                      background: 'rgba(255,255,255,0.86)',
-                      border: `1px solid ${HERO_LINE}`,
-                      color: HERO_INK,
-                      boxShadow: '0 6px 16px rgba(31,41,51,0.04)',
+                      borderColor: HERO_LINE,
+                      background: 'rgba(255,255,255,0.88)',
+                      boxShadow: '0 16px 36px rgba(31,41,51,0.07)',
                     }}
                   >
-                    <span>{intent.emoji}</span>
-                    {intent.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => navigate('/eventi')}
-                  className="rounded-[18px] border px-4 py-3 text-left active:scale-[0.99] transition"
-                  style={{ borderColor: HERO_LINE, background: 'rgba(255,255,255,0.82)' }}
-                >
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-1" style={{ color: HERO_MUTED }}>
-                    Agenda
-                  </p>
-                  <p className="text-[14px] font-black" style={{ color: HERO_INK }}>
-                    Vedi eventi del Club
-                  </p>
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full shrink-0" style={{ background: 'rgba(22,36,62,0.08)', color: HERO_INK }}>
+                      <Search size={20} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[16px] font-black whitespace-nowrap" style={{ color: HERO_INK }}>
+                        Cerca un posto, un&apos;idea o qualcosa da fare
+                      </p>
+                      <p className="truncate text-[12px] mt-0.5 whitespace-nowrap" style={{ color: HERO_MUTED }}>
+                        Cene, borghi, cocktail, mare, relax, esperienze selezionate
+                      </p>
+                    </div>
+                    <motion.span
+                      animate={{ x: [0, 4, 0] }}
+                      transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                      className="shrink-0"
+                    >
+                      <ArrowRight size={18} weight="bold" style={{ color: HERO_MUTED }} />
+                    </motion.span>
+                  </div>
                 </button>
-                <button
-                  onClick={() => navigate('/partner')}
-                  className="rounded-[18px] border px-4 py-3 text-left active:scale-[0.99] transition"
-                  style={{ borderColor: HERO_LINE, background: 'rgba(255,255,255,0.82)' }}
-                >
-                  <p className="text-[10px] font-black uppercase tracking-[0.16em] mb-1" style={{ color: HERO_MUTED }}>
-                    Luoghi
-                  </p>
-                  <p className="text-[14px] font-black" style={{ color: HERO_INK }}>
-                    Esplora partner scelti
-                  </p>
-                </button>
-              </div>
               </div>
             </div>
           </motion.div>

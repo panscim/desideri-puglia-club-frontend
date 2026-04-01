@@ -155,11 +155,13 @@ const EventDetail = () => {
 
     const status = useMemo(() => {
         if (!event) return null;
-        const start = new Date(event.data_inizio);
-        const end = new Date(event.data_fine);
-        const isStarted = currentTime >= start;
-        const isEnded = currentTime > end;
-        const isTimeOk = isStarted && !isEnded;
+        const start = event?.data_inizio ? new Date(event.data_inizio) : null;
+        const end = event?.data_fine ? new Date(event.data_fine) : null;
+        const hasValidStart = start && !Number.isNaN(start.getTime());
+        const hasValidEnd = end && !Number.isNaN(end.getTime());
+        const isStarted = hasValidStart ? currentTime >= start : false;
+        const isEnded = hasValidEnd ? currentTime > end : false;
+        const isTimeOk = hasValidStart ? (hasValidEnd ? isStarted && !isEnded : isStarted) : false;
         let distance = null, isLocationOk = false, distanceLabel = '';
         if (userCoords && event.latitudine && event.longitudine) {
             distance = calculateDistance(userCoords.latitude, userCoords.longitude, event.latitudine, event.longitudine);
@@ -188,6 +190,11 @@ const EventDetail = () => {
     const formatDateLong = (d) => !d ? '' : new Date(d).toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
     const formatTime = (d) => !d ? '' : new Date(d).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
     const getTimezone = () => { const o = -new Date().getTimezoneOffset() / 60; return `GMT${o >= 0 ? '+' : ''}${o}`; };
+    const safeEventDate = event?.data_inizio ? new Date(event.data_inizio) : null;
+    const safeEventEnd = event?.data_fine ? new Date(event.data_fine) : null;
+    const safeDateLabel = safeEventDate && !Number.isNaN(safeEventDate.getTime()) ? formatDateLong(safeEventDate) : '';
+    const safeStartTime = safeEventDate && !Number.isNaN(safeEventDate.getTime()) ? formatTime(safeEventDate) : '';
+    const safeEndTime = safeEventEnd && !Number.isNaN(safeEventEnd.getTime()) ? formatTime(safeEventEnd) : '';
 
     if (loading) return (
         <div className="min-h-screen flex flex-col items-center justify-center" style={{ background: '#F9F9F7' }}>
@@ -200,8 +207,8 @@ const EventDetail = () => {
 
     const handleBookingWhatsApp = () => {
         // Find partner phone number if any, or default
-        const phone = event.partners?.telefono || '393331234567'; // Sostituire col field vero partner se esiste
-        const message = `Ciao, vorrei prenotare per l'evento: *${event.titolo}* del ${formatDateLong(event.data_inizio)}`;
+        const phone = event.partners?.phone || event.partners?.whatsapp_phone || '393331234567';
+        const message = `Ciao, vorrei prenotare per l'evento: *${event.titolo}*${safeDateLabel ? ` del ${safeDateLabel}` : ''}`;
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
     };
 
@@ -275,10 +282,10 @@ const EventDetail = () => {
                         </div>
                         <div>
                             <p className="text-[15px] font-semibold leading-snug" style={{ color: '#1A1A1A' }}>
-                                {formatDateLong(event.data_inizio)}
+                                {safeDateLabel || 'Data da definire'}
                             </p>
                             <p className="text-sm mt-0.5" style={{ color: '#7A7060' }}>
-                                {formatTime(event.data_inizio)} – {formatTime(event.data_fine)} {getTimezone()}
+                                {safeStartTime || '--:--'}{safeEndTime ? ` – ${safeEndTime}` : ''} {getTimezone()}
                             </p>
                         </div>
                     </div>
@@ -404,7 +411,7 @@ const EventDetail = () => {
                                     Cancellazione
                                 </p>
                                 <p className="text-[13.5px] leading-relaxed" style={{ color: '#5A5040' }}>
-                                    Puoi annullare la tua prenotazione entro e non oltre le <strong>{formatTime(new Date(new Date(event.data_inizio).getTime() - 86400000))}</strong> del <strong>{formatDateLong(new Date(new Date(event.data_inizio).getTime() - 86400000))}</strong>.
+                                    Puoi annullare la tua prenotazione entro e non oltre le <strong>{safeStartTime || '--:--'}</strong> del giorno precedente all&apos;evento.
                                 </p>
                             </div>
                         </div>
@@ -693,7 +700,7 @@ const EventDetail = () => {
                                             <p className="font-bold text-[15px]">{event.titolo}</p>
                                             <p className="font-bold text-[15px]">{event.prezzo > 0 ? `€ ${event.prezzo}` : 'Gratis'}</p>
                                         </div>
-                                        <p className="text-[13px] text-stone-500">{formatDateLong(event.data_inizio)} alle {formatTime(event.data_inizio)}</p>
+                                        <p className="text-[13px] text-stone-500">{safeDateLabel || 'Data da definire'}{safeStartTime ? ` alle ${safeStartTime}` : ''}</p>
 
                                         {/* Metodi e Istruzioni */}
                                         <div className="mt-4 pt-4 border-t border-stone-200">

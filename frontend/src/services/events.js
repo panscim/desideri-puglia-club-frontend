@@ -219,8 +219,8 @@ export const EventsService = {
                 .from('eventi_club')
                 .select(`
                     *,
-                    partners ( id, name, city, logo_url, description ),
-                    cards:ricompensa_card_id ( id, image_url, rarity, title, curiosity1_it )
+                  partners ( id, name, city, logo_url, description, address, phone, whatsapp_phone, latitude, longitude ),
+                  cards:ricompensa_card_id ( id, image_url, rarity, title, description, curiosity1_it )
                 `)
                 .eq('id', id)
                 .maybeSingle()
@@ -241,7 +241,7 @@ export const EventsService = {
                 .from('partner_events_created')
                 .select(`
                     *,
-                    partners ( id, name, city, logo_url, description, subscription_status )
+                    partners ( id, name, city, logo_url, description, subscription_status, address, phone, whatsapp_phone, latitude, longitude )
                 `)
                 .eq('id', id)
                 .maybeSingle()
@@ -262,6 +262,10 @@ export const EventsService = {
                     payment_instructions: partnerData.payment_instructions,
                     categoria: partnerData.interest_tags?.[0] || 'Partner Event',
                     immagine_url: partnerData.partners?.logo_url || 'https://images.unsplash.com/photo-1529543544282-ea669407fca3?q=80&w=800',
+                    latitudine: partnerData.latitude ?? partnerData.partners?.latitude ?? null,
+                    longitudine: partnerData.longitude ?? partnerData.partners?.longitude ?? null,
+                    nome_luogo: partnerData.partners?.name || partnerData.location || partnerData.city,
+                    indirizzo: partnerData.partners?.address || null,
                     isGuestEvent: true,
                     partners: partnerData.partners,
                     iscritti_count: iscrittiCount || 0
