@@ -62,6 +62,7 @@ const Layout = () => {
   // 🔹 Sidebar Navigation (Desktop)
   const navItems = [
     { path: '/dashboard', icon: Compass, label: 'Scopri' },
+    { path: '/eventi', icon: Ticket, label: 'Eventi' },
     { path: '/missioni', icon: Scroll, label: 'Itinerari' },
     { path: '/partner', icon: Buildings, label: 'Partner' },
     { path: '/profilo', icon: User, label: t('nav.profile') || 'Profilo' },
@@ -141,6 +142,7 @@ const Layout = () => {
 
             {[
               { path: '/dashboard', icon: Sparkle, label: 'Scopri' },
+              { path: '/eventi', icon: Ticket, label: 'Eventi' },
               { path: '/missioni', icon: Scroll, label: 'Itinerari' },
               { path: '/partner', icon: Buildings, label: 'Partner' },
               { path: '/profilo', icon: UserCircle, label: 'Profilo' }

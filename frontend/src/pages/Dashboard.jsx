@@ -518,13 +518,29 @@ export default function Dashboard() {
         >
           {/* Top bar: greeting + notifiche */}
           <div className="w-full flex items-center justify-between px-5 pt-12 pb-2">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: HERO_MUTED }}>
-                {getGreeting()}
-              </p>
-              <p className="text-[18px] font-serif font-black leading-tight" style={{ color: HERO_INK }}>
-                {profile?.nome || profile?.nickname || 'Esploratore'} <span aria-hidden="true">👋</span>
-              </p>
+            <div className="flex items-center gap-3 min-w-0">
+              {profile?.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={profile?.nome || 'Avatar'}
+                  className="w-11 h-11 rounded-full object-cover border border-black/5 shadow-sm shrink-0"
+                />
+              ) : (
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center text-[15px] font-black shrink-0"
+                  style={{ background: 'rgba(22,36,62,0.08)', color: HERO_INK }}
+                >
+                  {(profile?.nome || profile?.nickname || 'E').slice(0, 1).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: HERO_MUTED }}>
+                  {getGreeting()}
+                </p>
+                <p className="text-[18px] font-serif font-black leading-tight truncate" style={{ color: HERO_INK }}>
+                  {profile?.nome || profile?.nickname || 'Esploratore'} <span aria-hidden="true">👋</span>
+                </p>
+              </div>
             </div>
             <button
               onClick={() => navigate('/notifiche')}
@@ -543,29 +559,12 @@ export default function Dashboard() {
             className="w-full px-5 pt-4 pb-9"
           >
             <div
-              className="rounded-[28px] bg-white border px-5 py-5 shadow-sm"
+              className="rounded-[28px] bg-white border px-4 py-4 shadow-sm"
               style={{ borderColor: HERO_LINE }}
             >
-              <div className="mb-4">
-                <p
-                  className="text-[10px] font-black uppercase tracking-[0.3em] mb-2"
-                  style={{ color: HERO_MUTED }}
-                >
-                  Concierge
-                </p>
-                <h2
-                  className="font-serif font-black leading-[0.95] tracking-tight"
-                  style={{ color: HERO_INK, fontSize: 'clamp(30px, 8vw, 42px)' }}
-                >
-                  Cosa vuoi fare
-                  <br />
-                  in questo momento?
-                </h2>
-              </div>
-
               <button
                 onClick={() => { setInitialIntent(null); setShowNow(true); }}
-                className="w-full flex items-center gap-3 rounded-[18px] border px-4 py-4 text-left transition active:scale-[0.99]"
+                className="w-full flex items-center gap-3 rounded-[18px] border px-4 py-3.5 text-left transition active:scale-[0.99]"
                 style={{
                   borderColor: HERO_LINE,
                   background: TOKENS.bgSecondary,
@@ -578,22 +577,13 @@ export default function Dashboard() {
                 >
                   <Search size={18} />
                 </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[15px] font-black" style={{ color: HERO_INK }}>
-                    Cerca un posto, un&apos;idea o un&apos;esperienza
-                  </p>
-                  <p className="text-[12px] font-medium mt-0.5" style={{ color: HERO_MUTED }}>
-                    Mangiare, vedere, rilassarti, uscire
-                  </p>
-                </div>
+                <p className="min-w-0 flex-1 truncate text-[14px] font-bold" style={{ color: HERO_MUTED }}>
+                  Cerca un posto, un&apos;idea o un&apos;esperienza
+                </p>
                 <ArrowRight size={18} weight="bold" style={{ color: HERO_MUTED }} />
               </button>
 
-              <p className="text-[13px] font-medium mt-4 italic" style={{ color: HERO_MUTED }}>
-                {getCFAContextualLine()}
-              </p>
-
-              <div className="flex flex-wrap gap-2 mt-4">
+              <div className="flex flex-wrap gap-2 mt-3">
                 {INTENTS.map(intent => (
                   <button
                     key={intent.id}

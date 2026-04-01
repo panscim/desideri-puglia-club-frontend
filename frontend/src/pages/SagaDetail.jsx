@@ -42,7 +42,7 @@ const getPartnersBetween = (stepA, stepB, partners) => {
 // --- SUB-COMPONENTS ---
 
 const PartnerMiniCard = ({ partner }) => (
-  <div className="shrink-0 w-40 bg-white rounded-2xl overflow-hidden border border-black/5 shadow-sm">
+  <div className="shrink-0 w-44 bg-white rounded-[1.6rem] overflow-hidden border border-black/5 shadow-[0_10px_28px_rgba(0,0,0,0.05)]">
     {partner.logo_url ? (
       <img src={partner.logo_url} alt={partner.name} className="w-full h-24 object-cover" />
     ) : (
@@ -50,10 +50,10 @@ const PartnerMiniCard = ({ partner }) => (
         <Store size={28} className="text-accent/30" />
       </div>
     )}
-    <div className="p-3">
+    <div className="p-4">
       <p className="text-[13px] font-black text-text-primary leading-tight truncate">{partner.name}</p>
       {partner.category && (
-        <p className="text-[10px] text-text-muted font-bold uppercase tracking-wide mt-0.5 truncate">{partner.category}</p>
+        <p className="text-[10px] text-text-muted font-bold uppercase tracking-wide mt-1 truncate">{partner.category}</p>
       )}
     </div>
   </div>
@@ -73,7 +73,7 @@ const PartnerDiscoveryNode = ({ idx, partners, expanded, onToggle }) => {
 
       <button
         onClick={onToggle}
-        className="flex items-center gap-2 py-1.5 group"
+        className="flex items-center gap-2 rounded-full border border-black/5 bg-white/80 px-3 py-2 group shadow-sm"
       >
         <div className="w-7 h-7 rounded-full bg-accent-gold/10 border border-accent-gold/20 flex items-center justify-center shrink-0 group-hover:bg-accent-gold/20 transition-colors">
           <Store size={13} className="text-accent-gold" />
@@ -97,7 +97,7 @@ const PartnerDiscoveryNode = ({ idx, partners, expanded, onToggle }) => {
             transition={{ duration: 0.25 }}
             className="overflow-hidden"
           >
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-3 pt-2 pr-4">
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-3 pt-3 pr-4">
               {partners.map(p => (
                 <PartnerMiniCard key={p.id} partner={p} />
               ))}
@@ -293,6 +293,37 @@ export default function SagaDetail() {
             </p>
           </div>
 
+          <div className="mb-8 rounded-[2rem] border border-black/5 bg-white px-5 py-5 shadow-[0_12px_36px_rgba(0,0,0,0.05)]">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-accent-gold mb-2">
+                  Diario della saga
+                </p>
+                <h3 className="text-[22px] font-serif font-black text-text-primary leading-tight">
+                  {isSagaComplete ? 'Hai completato tutto il percorso.' : activeStep ? 'La storia prosegue da qui.' : 'La tua esplorazione è in corso.'}
+                </h3>
+              </div>
+              <div className="shrink-0 rounded-full bg-accent/10 text-accent px-3 py-2 text-[11px] font-black uppercase tracking-[0.18em]">
+                {completedSteps.length}/{steps.length}
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              <div className="rounded-[1.2rem] bg-[#FCFAF2] px-3 py-3 border border-black/5">
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-text-muted mb-1">Scoperte</p>
+                <p className="text-[18px] font-serif font-black text-text-primary">{completedSteps.length}</p>
+              </div>
+              <div className="rounded-[1.2rem] bg-[#FCFAF2] px-3 py-3 border border-black/5">
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-text-muted mb-1">Da svelare</p>
+                <p className="text-[18px] font-serif font-black text-text-primary">{lockedSteps.length + (activeStep ? 1 : 0)}</p>
+              </div>
+              <div className="rounded-[1.2rem] bg-[#FCFAF2] px-3 py-3 border border-black/5">
+                <p className="text-[9px] font-black uppercase tracking-[0.18em] text-text-muted mb-1">Progresso</p>
+                <p className="text-[18px] font-serif font-black text-text-primary">{progressPercent}%</p>
+              </div>
+            </div>
+          </div>
+
           {/* Road Map */}
           <div className="relative">
             {/* Vertical connecting line */}
@@ -329,29 +360,41 @@ export default function SagaDetail() {
                     </div>
 
                     {/* Content card */}
-                    <div className={`flex-1 rounded-3xl p-5 border transition-all ${
-                      isDone ? 'bg-white border-black/5 shadow-sm' :
-                      isCurrent ? 'bg-white border-accent/20 shadow-xl shadow-black/5' :
-                      'bg-white/60 border-black/5'
+                    <div className={`flex-1 rounded-[1.9rem] p-5 border transition-all ${
+                      isDone ? 'bg-white border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.04)]' :
+                      isCurrent ? 'bg-white border-accent/20 shadow-[0_18px_40px_rgba(0,0,0,0.08)]' :
+                      'bg-white/75 border-black/5'
                     }`}>
-                      <span className="text-[9px] font-black uppercase tracking-[0.25em] text-accent-gold">
-                        {idx === 0 ? 'Partenza' : idx === steps.length - 1 ? 'Gran Finale' : `Tappa ${idx + 1}`}
-                      </span>
-                      <h4 className={`text-[16px] font-serif font-black mt-0.5 leading-snug ${
+                      <div className="flex items-start justify-between gap-3 mb-2">
+                        <span className="text-[9px] font-black uppercase tracking-[0.25em] text-accent-gold">
+                          {idx === 0 ? 'Partenza' : idx === steps.length - 1 ? 'Gran Finale' : `Tappa ${idx + 1}`}
+                        </span>
+                        <span className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] ${
+                          isDone ? 'bg-accent/10 text-accent' : isCurrent ? 'bg-accent-gold/15 text-accent-gold' : 'bg-zinc-100 text-zinc-400'
+                        }`}>
+                          {isDone ? 'Scoperta' : isCurrent ? 'Attiva' : 'Bloccata'}
+                        </span>
+                      </div>
+
+                      <h4 className={`text-[18px] font-serif font-black mt-0.5 leading-snug ${
                         isDone || isCurrent ? 'text-text-primary' : 'text-text-muted'
                       }`}>
                         {isDone || isCurrent ? step.title : `Mistero n.${idx + 1}`}
                       </h4>
 
-                      {isCurrent && (
-                        <>
-                          <p className="text-[13px] text-text-muted mt-3 italic leading-relaxed border-l-2 border-accent-gold/30 pl-3">
+                      {(isDone || isCurrent) && (
+                        <div className="mt-3 rounded-[1.2rem] bg-[#FCFAF2] border border-black/5 px-4 py-3">
+                          <p className="text-[12px] text-text-muted leading-relaxed italic">
                             "{step.hint}"
                           </p>
+                        </div>
+                      )}
 
+                      {isCurrent && (
+                        <>
                           {/* Distance */}
                           {distanceMeters !== null && (
-                            <div className="mt-3 flex items-center gap-2">
+                            <div className="mt-4 flex items-center gap-2 rounded-full w-fit bg-accent-gold/10 border border-accent-gold/20 px-3 py-2">
                               <Navigation2 size={13} className="text-accent-gold" />
                               <span className="text-[12px] font-black text-text-primary">
                                 {distanceMeters > 999
@@ -366,7 +409,7 @@ export default function SagaDetail() {
                           <motion.button
                             whileTap={{ scale: 0.97 }}
                             onClick={() => handleUnlockStepSuccess(step)}
-                            className={`mt-4 w-full py-3.5 rounded-2xl font-black uppercase tracking-wider text-[12px] flex items-center justify-center gap-2 transition-all ${
+                            className={`mt-4 w-full py-4 rounded-[1.2rem] font-black uppercase tracking-wider text-[12px] flex items-center justify-center gap-2 transition-all ${
                               canUnlockProximity
                                 ? 'bg-accent text-white shadow-lg shadow-accent/30'
                                 : 'bg-zinc-100 text-zinc-400'
@@ -382,7 +425,7 @@ export default function SagaDetail() {
                       )}
 
                       {isDone && (
-                        <div className="mt-3 flex items-center gap-1 text-[11px] font-black text-accent uppercase tracking-widest">
+                        <div className="mt-4 flex items-center gap-1 text-[11px] font-black text-accent uppercase tracking-widest">
                           <CheckCircle2 size={12} /> Completata
                         </div>
                       )}
@@ -406,7 +449,7 @@ export default function SagaDetail() {
           {/* Saga Complete */}
           {isSagaComplete && (
             <motion.div
-              className="text-center py-12 mt-4"
+              className="text-center py-12 mt-6 rounded-[2.4rem] bg-white border border-black/5 shadow-[0_18px_44px_rgba(0,0,0,0.06)]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -474,7 +517,7 @@ export default function SagaDetail() {
                       <span className="text-[8px] font-black uppercase tracking-[0.3em] text-accent-gold mb-1 block">Tappa {step.step_order}</span>
                       <h4 className="text-[18px] font-serif font-black text-text-primary leading-tight mb-2">{step.title}</h4>
                       <div className="flex items-center gap-1.5 text-accent font-black text-[10px] uppercase tracking-widest">
-                        Esplora <ArrowRight size={13} />
+                        Nel diario <ArrowRight size={13} />
                       </div>
                     </div>
                   </motion.div>
