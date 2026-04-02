@@ -2,6 +2,10 @@ import { getStripe } from './_lib/stripeClient.js'
 import { createSupabaseAdmin } from './_lib/supabaseAdmin.js'
 import { getPlanByTier } from './_lib/partnerPlans.js'
 
+function resolveAppUrl(req) {
+  return process.env.VITE_APP_URL || process.env.APP_URL || req.headers.origin || 'http://localhost:5173'
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST')
@@ -57,8 +61,8 @@ export default async function handler(req, res) {
       await supabase.from('partners').update({ stripe_customer_id: customerId }).eq('id', partner.id)
     }
 
-    const base = 'https://desideri-puglia-club-frontend.vercel.app'
-    const okUrl = base + '/partner/dashboard?payment_success=1'
+    const base = resolveAppUrl(req)
+    const okUrl = base + '/partner/dashboard?payment_success=1&subscribed=1&plan=' + encodeURIComponent(plan.tier) + '&session_id={CHECKOUT_SESSION_ID}'
     const koUrl = base + '/partner/subscription/' + tier + '?canceled=1'
 
     const session = await stripe.checkout.sessions.create({

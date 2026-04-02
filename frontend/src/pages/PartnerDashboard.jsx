@@ -278,6 +278,19 @@ export default function PartnerDashboard() {
 
         const isPaymentSuccess = params.get("payment_success") === "1";
         const isFreshlySubscribed = params.get("subscribed") === "1";
+        const checkoutSessionId = params.get("session_id");
+
+        if (checkoutSessionId && (isPaymentSuccess || isFreshlySubscribed)) {
+          try {
+            await fetch("/api/verify-partner-subscription-session", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ sessionId: checkoutSessionId }),
+            });
+          } catch (verifyError) {
+            console.warn("[PartnerDashboard] verify checkout session failed:", verifyError);
+          }
+        }
 
         // Se non trovo il partner ma ho subscribed=1 o payment_success=1, aspetto un attimo (eventual consistency)
         if (!data && (isFreshlySubscribed || isPaymentSuccess)) {

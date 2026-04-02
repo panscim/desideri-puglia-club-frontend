@@ -14,7 +14,6 @@ import {
   MapPin,
   Sparkle,
 } from '@phosphor-icons/react';
-import { Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import CosaFaccioAdesso from '../components/CosaFaccioAdesso';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -284,92 +283,6 @@ const HERO_BG = TOKENS.bgPrimary;
 const HERO_MUTED = TOKENS.textMuted;
 const HERO_INK = '#16243E';
 const HERO_LINE = TOKENS.border;
-const HERO_PARTICLE = '#223A5A';
-const HERO_PARTICLE_SOFT = '#8EA1B3';
-const HERO_GLOW = 'rgba(255,255,255,0.9)';
-
-const CONCIERGE_PARTICLES = [
-  { id: 1, x: '18%', y: '31%', size: 5, depth: 0.9, duration: 7.2, delay: 0.1, color: '#FFFFFF' },
-  { id: 2, x: '24%', y: '22%', size: 4, depth: 0.78, duration: 8.1, delay: 0.4, color: '#FFFFFF' },
-  { id: 3, x: '31%', y: '18%', size: 4, depth: 0.7, duration: 7.6, delay: 0.8, color: HERO_PARTICLE_SOFT },
-  { id: 4, x: '42%', y: '14%', size: 5, depth: 0.95, duration: 6.9, delay: 0.3, color: '#FFFFFF' },
-  { id: 5, x: '54%', y: '15%', size: 4, depth: 0.72, duration: 7.4, delay: 1.2, color: HERO_PARTICLE_SOFT },
-  { id: 6, x: '66%', y: '20%', size: 4, depth: 0.7, duration: 8.4, delay: 0.5, color: '#FFFFFF' },
-  { id: 7, x: '74%', y: '30%', size: 5, depth: 0.92, duration: 7.1, delay: 0.9, color: '#FFFFFF' },
-  { id: 8, x: '80%', y: '44%', size: 4, depth: 0.76, duration: 8.5, delay: 1.4, color: HERO_PARTICLE_SOFT },
-  { id: 9, x: '74%', y: '58%', size: 5, depth: 0.9, duration: 6.8, delay: 0.6, color: '#FFFFFF' },
-  { id: 10, x: '65%', y: '69%', size: 4, depth: 0.7, duration: 7.9, delay: 1.1, color: HERO_PARTICLE_SOFT },
-  { id: 11, x: '52%', y: '75%', size: 5, depth: 0.96, duration: 7.3, delay: 0.2, color: '#FFFFFF' },
-  { id: 12, x: '39%', y: '74%', size: 4, depth: 0.68, duration: 8.3, delay: 1.6, color: HERO_PARTICLE_SOFT },
-  { id: 13, x: '27%', y: '68%', size: 4, depth: 0.72, duration: 7.7, delay: 0.7, color: '#FFFFFF' },
-  { id: 14, x: '18%', y: '57%', size: 5, depth: 0.9, duration: 6.7, delay: 1.3, color: '#FFFFFF' },
-  { id: 15, x: '14%', y: '44%', size: 4, depth: 0.74, duration: 8, delay: 0.9, color: HERO_PARTICLE_SOFT },
-  { id: 16, x: '33%', y: '33%', size: 3, depth: 0.42, duration: 6.5, delay: 0.4, color: HERO_PARTICLE },
-  { id: 17, x: '48%', y: '28%', size: 3, depth: 0.38, duration: 6.8, delay: 1.1, color: HERO_PARTICLE_SOFT },
-  { id: 18, x: '61%', y: '36%', size: 3, depth: 0.45, duration: 7.1, delay: 0.3, color: HERO_PARTICLE },
-  { id: 19, x: '58%', y: '52%', size: 3, depth: 0.35, duration: 6.9, delay: 1.4, color: HERO_PARTICLE_SOFT },
-  { id: 20, x: '45%', y: '56%', size: 3, depth: 0.32, duration: 7.4, delay: 0.6, color: HERO_PARTICLE },
-  { id: 21, x: '37%', y: '47%', size: 3, depth: 0.36, duration: 6.6, delay: 1.6, color: '#FFFFFF' },
-  { id: 22, x: '50%', y: '44%', size: 6, depth: 1, duration: 6.2, delay: 0.2, color: '#FFFFFF' },
-  { id: 23, x: '29%', y: '53%', size: 2, depth: 0.24, duration: 7.8, delay: 1.8, color: HERO_PARTICLE_SOFT },
-  { id: 24, x: '67%', y: '47%', size: 2, depth: 0.24, duration: 8.2, delay: 1, color: HERO_PARTICLE_SOFT },
-];
-
-const AbstractConciergeField = () => (
-  <div
-    className="relative w-full max-w-[320px] aspect-square"
-    style={{ perspective: '900px' }}
-  >
-    <motion.div
-      animate={{ rotate: [0, 6, 0, -6, 0], scale: [1, 1.03, 1] }}
-      transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
-      className="absolute inset-[18%] rounded-full"
-      style={{
-        background: 'radial-gradient(circle, rgba(34,58,90,0.08) 0%, rgba(34,58,90,0.025) 38%, transparent 72%)',
-        filter: 'blur(10px)',
-      }}
-    />
-
-    <motion.div
-      animate={{ opacity: [0.22, 0.46, 0.22], scale: [0.94, 1.08, 0.94] }}
-      transition={{ duration: 5.8, repeat: Infinity, ease: 'easeInOut' }}
-      className="absolute left-1/2 top-1/2 h-[96px] w-[96px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-      style={{
-        background: 'radial-gradient(circle, rgba(255,255,255,0.86) 0%, rgba(255,255,255,0.34) 35%, rgba(255,255,255,0.02) 72%)',
-        filter: 'blur(10px)',
-      }}
-    />
-
-    {CONCIERGE_PARTICLES.map((particle) => (
-      <motion.div
-        key={particle.id}
-        animate={{
-          x: [0, 12 * particle.depth, -10 * particle.depth, 0],
-          y: [0, -10 * particle.depth, 8 * particle.depth, 0],
-          scale: [1, 1 + 0.22 * particle.depth, 0.94, 1],
-          opacity: [0.26 + 0.2 * particle.depth, 0.9, 0.34, 0.26 + 0.2 * particle.depth],
-        }}
-        transition={{
-          duration: particle.duration,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: particle.delay,
-        }}
-        className="absolute rounded-full"
-        style={{
-          left: particle.x,
-          top: particle.y,
-          width: particle.size,
-          height: particle.size,
-          background: particle.color,
-          boxShadow: `0 0 ${particle.size * 3}px ${HERO_GLOW}`,
-          filter: particle.depth > 0.7 ? 'blur(0px)' : 'blur(0.2px)',
-          transform: `translateZ(${particle.depth * 28}px)`,
-        }}
-      />
-    ))}
-  </div>
-);
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -550,23 +463,23 @@ export default function Dashboard() {
             variants={fadeUp}
             className="w-full px-5 pt-4 pb-9"
           >
-            <div className="relative pt-2 pb-4 overflow-hidden">
+            <div className="relative pt-2 pb-2 overflow-hidden">
               <motion.div
                 aria-hidden="true"
-                className="absolute inset-x-0 top-2 h-[220px] pointer-events-none"
-                animate={{ opacity: [0.55, 0.9, 0.55] }}
-                transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute inset-x-0 top-4 h-[180px] pointer-events-none"
+                animate={{ opacity: [0.4, 0.72, 0.4], scale: [0.98, 1.02, 0.98] }}
+                transition={{ duration: 7.2, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
                   background:
-                    'radial-gradient(circle at 85% 28%, rgba(212,121,58,0.14) 0%, rgba(212,121,58,0.04) 24%, transparent 52%), radial-gradient(circle at 18% 78%, rgba(22,36,62,0.11) 0%, rgba(22,36,62,0.02) 32%, transparent 55%)',
-                  filter: 'blur(10px)',
+                    'radial-gradient(circle at 82% 32%, rgba(212,121,58,0.12) 0%, rgba(212,121,58,0.03) 26%, transparent 56%), radial-gradient(circle at 15% 72%, rgba(22,36,62,0.10) 0%, rgba(22,36,62,0.02) 34%, transparent 58%)',
+                  filter: 'blur(14px)',
                 }}
               />
               <motion.div
                 aria-hidden="true"
-                className="absolute left-0 right-0 top-[124px] h-px"
-                animate={{ scaleX: [0.86, 1, 0.86], opacity: [0.35, 0.7, 0.35] }}
-                transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute left-0 right-0 top-[112px] h-px"
+                animate={{ scaleX: [0.9, 1, 0.9], opacity: [0.2, 0.55, 0.2] }}
+                transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut' }}
                 style={{
                   background: 'linear-gradient(90deg, transparent 0%, rgba(22,36,62,0.12) 20%, rgba(212,121,58,0.28) 50%, rgba(22,36,62,0.12) 80%, transparent 100%)',
                   transformOrigin: 'center',
@@ -578,51 +491,28 @@ export default function Dashboard() {
                   Concierge
                 </p>
                 <h2
-                  className="font-serif font-black leading-[0.98] tracking-tight text-[clamp(32px,8.5vw,54px)] whitespace-nowrap overflow-hidden text-ellipsis"
+                  className="font-serif font-black leading-[0.98] tracking-tight text-[clamp(32px,8.5vw,54px)]"
                   style={{ color: HERO_INK }}
                 >
                   {getCFAContextualLine()}
                 </h2>
-                <motion.p
-                  className="mt-3 text-[14px] font-medium whitespace-nowrap overflow-hidden text-ellipsis"
-                  style={{ color: HERO_MUTED }}
-                  animate={{ opacity: [0.72, 1, 0.72], x: [0, 2, 0] }}
-                  transition={{ duration: 5.8, repeat: Infinity, ease: 'easeInOut' }}
-                >
-                  Il tuo concierge personale per trovare il posto giusto senza perdere tempo.
-                </motion.p>
 
                 <button
                   onClick={() => openCFA()}
-                  className="mt-7 w-full flex items-center gap-3 rounded-[22px] text-left transition active:scale-[0.99]"
+                  className="mt-7 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[11px] font-black uppercase tracking-[0.22em] transition active:scale-[0.98]"
+                  style={{
+                    background: HERO_INK,
+                    color: '#FFFFFF',
+                    boxShadow: '0 14px 28px rgba(22,36,62,0.16)',
+                  }}
                 >
-                  <div
-                    className="w-full flex items-center gap-3 rounded-[22px] border px-4 py-4"
-                    style={{
-                      borderColor: HERO_LINE,
-                      background: 'rgba(255,255,255,0.88)',
-                      boxShadow: '0 16px 36px rgba(31,41,51,0.07)',
-                    }}
+                  <motion.span
+                    animate={{ x: [0, 3, 0] }}
+                    transition={{ duration: 2.1, repeat: Infinity, ease: 'easeInOut' }}
                   >
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full shrink-0" style={{ background: 'rgba(22,36,62,0.08)', color: HERO_INK }}>
-                      <Search size={20} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[16px] font-black whitespace-nowrap" style={{ color: HERO_INK }}>
-                        Cerca un posto, un&apos;idea o qualcosa da fare
-                      </p>
-                      <p className="truncate text-[12px] mt-0.5 whitespace-nowrap" style={{ color: HERO_MUTED }}>
-                        Cene, borghi, cocktail, mare, relax, esperienze selezionate
-                      </p>
-                    </div>
-                    <motion.span
-                      animate={{ x: [0, 4, 0] }}
-                      transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
-                      className="shrink-0"
-                    >
-                      <ArrowRight size={18} weight="bold" style={{ color: HERO_MUTED }} />
-                    </motion.span>
-                  </div>
+                    <ArrowRight size={15} weight="bold" />
+                  </motion.span>
+                  Trova ispirazione
                 </button>
               </div>
             </div>
