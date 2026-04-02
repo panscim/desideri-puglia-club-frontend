@@ -25,16 +25,6 @@ import toast from 'react-hot-toast';
 const seasonLabels = { spring: 'Primavera', summer: 'Estate', autumn: 'Autunno', winter: 'Inverno' };
 const targetLabels  = { couples: 'Coppie', solo: 'Solo', group: 'Gruppo', family: 'Famiglia' };
 
-/* ── Variants ────────────────────────────────────────────── */
-const container = {
-  hidden: { opacity: 0 },
-  show:   { opacity: 1, transition: { staggerChildren: 0.07, delayChildren: 0.1 } }
-};
-const item = {
-  hidden: { opacity: 0, y: 18 },
-  show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }
-};
-
 /* ── Sub-components ──────────────────────────────────────── */
 const Pill = ({ children, className = '' }) => (
   <span className={`inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.25em] px-3 py-1.5 rounded-full border ${className}`}>
@@ -171,6 +161,7 @@ const PlanDetail = () => {
   const creatorName = plan.creator
     ? (`${plan.creator.nome || ''} ${plan.creator.cognome || ''}`).trim() || plan.creator.nickname
     : 'Resident Desideri';
+  const slots = Array.isArray(plan.slots) ? plan.slots : [];
 
   /* ── Render ───────────────────────────────────────────── */
   return (
@@ -253,10 +244,19 @@ const PlanDetail = () => {
 
         {/* ── Itinerary section ─────────────────────────── */}
         {isPurchased ? (
-          <motion.div variants={container} initial="hidden" animate="show" className="space-y-5">
+          <div className="space-y-5">
+
+            <div className="bg-white rounded-2xl p-4 border border-zinc-100 shadow-sm">
+              <p className="text-[13px] text-zinc-600 font-medium leading-relaxed italic mb-4">{plan.description_it}</p>
+              <div className="flex flex-wrap gap-2">
+                {plan.season && <Pill className="bg-zinc-50 border-zinc-100 text-zinc-500"><Sun size={9} weight="fill" className="text-orange-400" /> {seasonLabels[plan.season]}</Pill>}
+                {plan.target_audience && <Pill className="bg-zinc-50 border-zinc-100 text-zinc-500"><Users size={9} weight="fill" className="text-orange-400" /> {targetLabels[plan.target_audience]}</Pill>}
+                {!!slots.length && <Pill className="bg-zinc-50 border-zinc-100 text-zinc-500"><Timer size={9} weight="fill" className="text-orange-400" /> {slots.length} tappe</Pill>}
+              </div>
+            </div>
 
             {/* Weather Toggle — clearly labeled */}
-            <motion.div variants={item} className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm overflow-hidden">
               <div className="px-4 py-3 flex items-center justify-between">
                 <div>
                   <p className="text-[11px] font-black text-zinc-900 uppercase tracking-wide">Piano del Giorno</p>
@@ -285,7 +285,7 @@ const PlanDetail = () => {
 
               {/* Timeline — clear numbered steps */}
               <div className="px-4 pb-4 space-y-3">
-                {plan.slots?.map((slot, i) => {
+                {slots.map((slot, i) => {
                   const showAlt = isRainMode && slot.alt_activity_title_it;
                   return (
                     <motion.div
@@ -343,11 +343,20 @@ const PlanDetail = () => {
                     </motion.div>
                   );
                 })}
+
+                {!slots.length && (
+                  <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 px-4 py-5">
+                    <p className="text-[12px] font-black text-zinc-800 mb-1">Itinerario in aggiornamento</p>
+                    <p className="text-[12px] text-zinc-500 leading-relaxed">
+                      Le tappe non sono disponibili in questo momento. Ho lasciato il piano visibile, ma va ricaricato o ripubblicato dal database.
+                    </p>
+                  </div>
+                )}
               </div>
-            </motion.div>
+            </div>
 
             {/* ── Radar v5 ────────────────────────────────── */}
-            <motion.div variants={item} className="rounded-2xl overflow-hidden bg-zinc-950 border border-white/[0.06] shadow-xl">
+            <div className="rounded-2xl overflow-hidden bg-zinc-950 border border-white/[0.06] shadow-xl">
               <div className="relative p-5">
                 <div className="absolute inset-0 opacity-30" style={{
                   background: 'radial-gradient(ellipse 80% 60% at 110% -10%, rgba(249,115,22,0.3), transparent)'
@@ -391,15 +400,15 @@ const PlanDetail = () => {
                   </p>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Footer signature */}
-            <motion.div variants={item} className="py-8 flex flex-col items-center gap-3 opacity-30">
+            <div className="py-8 flex flex-col items-center gap-3 opacity-30">
               <div className="w-6 h-[1px] bg-zinc-500" />
               <p className="text-[7px] font-black uppercase tracking-[0.6em] text-zinc-500">Desideri Puglia · Private Club</p>
-            </motion.div>
+            </div>
 
-          </motion.div>
+          </div>
 
         ) : (
           /* ── Lock / Preview ────────────────────────────── */
