@@ -116,6 +116,13 @@ function normalizeEvent(raw) {
     imageUrl: raw.immagine_url || raw.image_url || raw?.partners?.logo_url || fallbackEventImage,
     partnerName: raw?.partners?.name || raw?.partners?.nome || raw?.nome_luogo || raw?.location || 'Desideri Club',
     attendees: raw.iscritti_count || 0,
+    partner: raw?.partners || null,
+    rewardCard: raw?.cards || null,
+    paymentMethods: raw?.payment_methods || [],
+    isGuestEvent: Boolean(raw?.isGuestEvent),
+    latitude: raw?.latitudine ?? raw?.latitude ?? raw?.partners?.latitude ?? null,
+    longitude: raw?.longitudine ?? raw?.longitude ?? raw?.partners?.longitude ?? null,
+    address: raw?.indirizzo ?? raw?.address ?? raw?.partners?.address ?? null,
   };
 }
 
@@ -247,6 +254,61 @@ async function getPlanDetailMobile(planId) {
   } catch (error) {
     console.error('mobile getPlanDetail error', error);
     return null;
+  }
+}
+
+async function getUserBookingIdsMobile(userId) {
+  if (!supabase || !userId) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('prenotazioni_eventi')
+      .select('event_id')
+      .eq('user_id', userId)
+      .in('status', ['confermato', 'da_pagare_in_loco']);
+
+    if (error) throw error;
+    return (data || []).map((item) => item.event_id);
+  } catch (error) {
+    console.error('mobile getUserBookingIds error', error);
+    return [];
+  }
+}
+
+async function createBookingMobile({ userId, eventId, isGuestEvent, paymentMethods = [] }) {
+  if (!supabase || !userId || !eventId) {
+    return { success: false, error: 'Sessione non valida.' };
+  }
+
+  if (paymentMethods.includes('carta')) {
+    return {
+      success: false,
+      error: 'Il pagamento con carta verra collegato nel prossimo step mobile.',
+      needsStripe: true,
+    };
+  }
+
+  const initialStatus = paymentMethods.includes('in_loco') ? 'da_pagare_in_loco' : 'confermato';
+
+  try {
+    const { data, error } = await supabase
+      .from('prenotazioni_eventi')
+      .insert([
+        {
+          user_id: userId,
+          event_id: eventId,
+          is_guest_event: Boolean(isGuestEvent),
+          status: initialStatus,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, data, status: initialStatus };
+  } catch (error) {
+    console.error('mobile createBooking error', error);
+    return { success: false, error: error.message || 'Errore durante la prenotazione.' };
   }
 }
 
@@ -503,50 +565,155 @@ function EventsTab({ events, refreshing, onRefresh, onOpenEvent }) {
   );
 }
 
-function EventDetailScreen({ event, onBack }) {
+function EventDetailScreen({ event, onBack, isBooked, bookingLoading, bookingMessage, onBook }) {
   if (!event) return null;
 
+  const safeDate = formatDateLabel(event.startsAt);
+  const safeTime = formatTimeLabel(event.startsAt);
+
   return (
-    <ScrollView contentContainerStyle={styles.detailScreenContent}>
-      <Pressable onPress={onBack} style={styles.backButton}>
-        <Text style={styles.backButtonLabel}>Indietro</Text>
-      </Pressable>
+    <View style={styles.eventDetailShell}>
+      <ScrollView contentContainerStyle={styles.eventDetailContent}>
+        <View style={styles.detailHeader}>
+          <Pressable onPress={onBack} style={styles.detailHeaderButton}>
+            <Text style={styles.detailHeaderButtonText}>Indietro</Text>
+          </Pressable>
+          <Text style={styles.detailHeaderLabel}>Evento</Text>
+          <View style={styles.detailHeaderSpacer} />
+        </View>
 
-      <Image source={{ uri: event.imageUrl }} style={styles.detailHeroImage} />
-      <View style={styles.detailCopyCard}>
-        <Text style={styles.badgeWarm}>{event.category}</Text>
-        <Text style={styles.detailTitle}>{event.title}</Text>
-        <Text style={styles.detailLead}>{event.description || 'Evento selezionato del club.'}</Text>
+        <View style={styles.webHeroWrap}>
+          <Image source={{ uri: event.imageUrl }} style={styles.webHeroImage} />
+          <View style={styles.webHeroOverlay} />
+          <View style={styles.webHeroBadgeWrap}>
+            <Text style={styles.webHeroStatus}>{event.startsAt ? 'Prossimamente' : 'Evento'}</Text>
+          </View>
+          <View style={styles.webHeroTitleWrap}>
+            <Text style={styles.webHeroEyebrow}>Evento Esclusivo</Text>
+            <Text style={styles.webHeroTitle}>{event.title}</Text>
+          </View>
+          <View style={styles.webHeroArch} />
+        </View>
 
-        <View style={styles.metricsGrid}>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>Quando</Text>
-            <Text style={styles.metricValue}>
-              {formatDateLabel(event.startsAt)} · {formatTimeLabel(event.startsAt)}
-            </Text>
+        <View style={styles.webInfoCard}>
+          <View style={styles.webInfoRow}>
+            <View style={styles.webInfoIcon}>
+              <Text style={styles.webInfoIconText}>📅</Text>
+            </View>
+            <View style={styles.webInfoCopy}>
+              <Text style={styles.webInfoTitle}>{safeDate}</Text>
+              <Text style={styles.webInfoBody}>{safeTime || 'Orario da definire'}</Text>
+            </View>
           </View>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>Luogo</Text>
-            <Text style={styles.metricValue}>{event.location}</Text>
+
+          <View style={styles.webDivider} />
+
+          <View style={styles.webInfoRow}>
+            <View style={styles.webInfoIcon}>
+              <Text style={styles.webInfoIconText}>📍</Text>
+            </View>
+            <View style={styles.webInfoCopy}>
+              <Text style={styles.webInfoTitle}>{event.location}</Text>
+              <Text style={styles.webInfoBody}>{event.address || event.partnerName}</Text>
+            </View>
           </View>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>Prezzo</Text>
-            <Text style={styles.metricValue}>{euroLabel(event.price)}</Text>
-          </View>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>Partner</Text>
-            <Text style={styles.metricValue}>{event.partnerName}</Text>
+
+          <View style={styles.webDivider} />
+
+          <View style={styles.webSplitRow}>
+            <View style={styles.webSplitBlock}>
+              <Text style={styles.webSplitLabel}>Organizzatore</Text>
+              <View style={styles.organizerRow}>
+                {event.partner?.logo_url ? (
+                  <Image source={{ uri: event.partner.logo_url }} style={styles.organizerLogo} />
+                ) : (
+                  <View style={styles.organizerLogoFallback}>
+                    <Text style={styles.organizerLogoFallbackText}>D</Text>
+                  </View>
+                )}
+                <View style={styles.organizerCopy}>
+                  <Text style={styles.organizerName}>{event.partnerName}</Text>
+                  <Text style={styles.organizerAction}>Contatta</Text>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.webSplitBlock}>
+              <Text style={styles.webSplitLabel}>Chi c&apos;e?</Text>
+              <Text style={styles.attendeesValue}>{event.attendees || 0} partecipanti</Text>
+              <Text style={styles.attendeesHint}>Community del club</Text>
+            </View>
           </View>
         </View>
 
-        <ContentCard
-          eyebrow="Migrazione"
-          title="Prossimo step mobile"
-          body="Colleghiamo qui prenotazione, biglietto e QR code, sostituendo del tutto il dettaglio web."
-          accent
-        />
+        {event.description ? (
+          <View style={styles.editorialSection}>
+            <Text style={styles.editorialTitle}>L&apos;Esperienza</Text>
+            <Text style={styles.editorialBody}>{event.description}</Text>
+          </View>
+        ) : null}
+
+        <View style={styles.editorialSection}>
+          <Text style={styles.editorialTitle}>Termini e rimborsi</Text>
+          <View style={styles.termCard}>
+            <Text style={styles.termTitle}>Cancellazione</Text>
+            <Text style={styles.termBody}>
+              Puoi annullare la tua prenotazione entro il giorno precedente all&apos;evento.
+            </Text>
+          </View>
+          <View style={styles.termCard}>
+            <Text style={styles.termTitle}>Pagamento</Text>
+            <Text style={styles.termBody}>
+              {event.paymentMethods.includes('carta')
+                ? 'Pagamento con carta previsto. Lo colleghiamo nel prossimo step mobile.'
+                : event.paymentMethods.includes('in_loco')
+                  ? 'Prenotazione confermata, pagamento in loco.'
+                  : 'Prenotazione diretta dal club.'}
+            </Text>
+          </View>
+        </View>
+
+        {event.rewardCard ? (
+          <View style={styles.rewardCardWrap}>
+            <Text style={styles.rewardEyebrow}>Ricompensa Esclusiva</Text>
+            <View style={styles.rewardRow}>
+              <Image source={{ uri: event.rewardCard.image_url }} style={styles.rewardImage} />
+              <View style={styles.rewardCopy}>
+                <Text style={styles.rewardTitle}>{event.rewardCard.title}</Text>
+                <Text style={styles.rewardBody}>{event.rewardCard.description}</Text>
+              </View>
+            </View>
+          </View>
+        ) : null}
+
+        <View style={styles.detailBottomSpacer} />
+      </ScrollView>
+
+      <View style={styles.stickyBottomBar}>
+        <View style={styles.stickyBarRow}>
+          <View style={styles.stickyCopy}>
+            <Text style={styles.stickyTitle}>{isBooked ? 'Ci sarai!' : euroLabel(event.price)}</Text>
+            <Text style={styles.stickySub}>
+              {isBooked ? 'Prenotazione attiva' : event.paymentMethods.includes('in_loco') ? 'Pagamento in loco' : 'Posti disponibili'}
+            </Text>
+          </View>
+          <Pressable
+            onPress={onBook}
+            disabled={isBooked || bookingLoading}
+            style={[styles.stickyButton, isBooked && styles.stickyButtonBooked, bookingLoading && styles.buttonDisabled]}
+          >
+            <Text style={[styles.stickyButtonText, isBooked && styles.stickyButtonTextBooked]}>
+              {bookingLoading ? '...' : isBooked ? 'Prenotato' : 'Prenota'}
+            </Text>
+          </Pressable>
+        </View>
+        {bookingMessage ? (
+          <Text style={[styles.stickyHelper, bookingMessage.toLowerCase().includes('errore') && styles.stickyHelperError]}>
+            {bookingMessage}
+          </Text>
+        ) : null}
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -680,6 +847,9 @@ function MobileShell({ session }) {
   const [refreshingPlans, setRefreshingPlans] = useState(false);
   const [selectedPlanDetail, setSelectedPlanDetail] = useState(null);
   const [selectedPlanLoading, setSelectedPlanLoading] = useState(false);
+  const [bookedEventIds, setBookedEventIds] = useState([]);
+  const [bookingLoading, setBookingLoading] = useState(false);
+  const [bookingMessage, setBookingMessage] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -716,6 +886,14 @@ function MobileShell({ session }) {
     refreshPlans();
   }, []);
 
+  useEffect(() => {
+    if (!session?.user?.id) {
+      setBookedEventIds([]);
+      return;
+    }
+    refreshBookings();
+  }, [session?.user?.id]);
+
   const refreshEvents = async () => {
     setRefreshingEvents(true);
     const nextEvents = await getActiveEventsMobile();
@@ -730,7 +908,13 @@ function MobileShell({ session }) {
     setRefreshingPlans(false);
   };
 
+  const refreshBookings = async () => {
+    const ids = await getUserBookingIdsMobile(session?.user?.id);
+    setBookedEventIds(ids);
+  };
+
   const openEvent = (event) => {
+    setBookingMessage('');
     setRoute({ type: 'eventDetail', item: event });
   };
 
@@ -741,6 +925,36 @@ function MobileShell({ session }) {
     const detail = await getPlanDetailMobile(plan.id);
     setSelectedPlanDetail(detail);
     setSelectedPlanLoading(false);
+  };
+
+  const handleBookEvent = async (event) => {
+    if (!session?.user?.id || !event?.id) return;
+    setBookingLoading(true);
+    setBookingMessage('');
+    const result = await createBookingMobile({
+      userId: session.user.id,
+      eventId: event.id,
+      isGuestEvent: event.isGuestEvent,
+      paymentMethods: event.paymentMethods,
+    });
+    setBookingLoading(false);
+
+    if (!result.success) {
+      setBookingMessage(result.error || 'Errore durante la prenotazione.');
+      return;
+    }
+
+    setBookedEventIds((current) => (current.includes(event.id) ? current : [...current, event.id]));
+    setEvents((current) =>
+      current.map((item) =>
+        item.id === event.id ? { ...item, attendees: (item.attendees || 0) + 1 } : item,
+      ),
+    );
+    setRoute({
+      type: 'eventDetail',
+      item: { ...event, attendees: (event.attendees || 0) + 1 },
+    });
+    setBookingMessage(result.status === 'da_pagare_in_loco' ? 'Prenotazione confermata: pagherai in loco.' : 'Prenotazione confermata.');
   };
 
   const goToTab = (tabKey) => {
@@ -758,7 +972,19 @@ function MobileShell({ session }) {
     }
 
     if (route.type === 'eventDetail') {
-      return <EventDetailScreen event={route.item} onBack={() => setRoute({ type: 'tab' })} />;
+      return (
+        <EventDetailScreen
+          event={route.item}
+          onBack={() => {
+            setBookingMessage('');
+            setRoute({ type: 'tab' });
+          }}
+          isBooked={bookedEventIds.includes(route.item.id)}
+          bookingLoading={bookingLoading}
+          bookingMessage={bookingMessage}
+          onBook={() => handleBookEvent(route.item)}
+        />
+      );
     }
 
     if (route.type === 'planDetail') {
@@ -797,6 +1023,9 @@ function MobileShell({ session }) {
     return <ProfileTab profile={profile} onSignOut={() => supabase.auth.signOut()} />;
   }, [
     activeTab,
+    bookedEventIds,
+    bookingLoading,
+    bookingMessage,
     events,
     loadingProfile,
     plans,
@@ -1019,9 +1248,47 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   detailScreenContent: {
-    padding: 20,
-    gap: 16,
-    paddingBottom: 32,
+    paddingBottom: 0,
+  },
+  eventDetailShell: {
+    flex: 1,
+    backgroundColor: colors.bgPrimary,
+  },
+  eventDetailContent: {
+    paddingBottom: 0,
+  },
+  detailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 10,
+  },
+  detailHeaderButton: {
+    minHeight: 40,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  detailHeaderButtonText: {
+    color: colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  detailHeaderLabel: {
+    color: colors.textMuted,
+    fontSize: 11,
+    letterSpacing: 2.4,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+  },
+  detailHeaderSpacer: {
+    width: 72,
   },
   greetingRow: {
     flexDirection: 'row',
@@ -1273,6 +1540,185 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgPrimary,
     overflow: 'hidden',
   },
+  webHeroWrap: {
+    position: 'relative',
+    width: '100%',
+    height: 360,
+  },
+  webHeroImage: {
+    width: '100%',
+    height: '100%',
+  },
+  webHeroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.26)',
+  },
+  webHeroBadgeWrap: {
+    position: 'absolute',
+    top: 18,
+    left: 18,
+  },
+  webHeroStatus: {
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.24)',
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1.6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  webHeroTitleWrap: {
+    position: 'absolute',
+    left: 24,
+    right: 24,
+    bottom: 58,
+    gap: 6,
+  },
+  webHeroEyebrow: {
+    color: 'rgba(255,255,255,0.76)',
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 2.6,
+  },
+  webHeroTitle: {
+    color: '#FFFFFF',
+    fontSize: 32,
+    lineHeight: 36,
+    fontWeight: '700',
+  },
+  webHeroArch: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: -1,
+    height: 46,
+    backgroundColor: colors.bgPrimary,
+    borderTopLeftRadius: 42,
+    borderTopRightRadius: 42,
+  },
+  webInfoCard: {
+    marginHorizontal: 16,
+    marginTop: -2,
+    backgroundColor: colors.surface,
+    borderRadius: 28,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#F0EDE8',
+    shadowColor: '#000000',
+    shadowOpacity: 0.07,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  webInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingHorizontal: 22,
+    paddingVertical: 20,
+  },
+  webInfoIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 16,
+    backgroundColor: '#F5F2EC',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  webInfoIconText: {
+    fontSize: 16,
+  },
+  webInfoCopy: {
+    flex: 1,
+    gap: 3,
+  },
+  webInfoTitle: {
+    color: '#1A1A1A',
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: '700',
+  },
+  webInfoBody: {
+    color: '#7A7060',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  webDivider: {
+    height: 1,
+    backgroundColor: '#F0EDE8',
+  },
+  webSplitRow: {
+    flexDirection: 'row',
+  },
+  webSplitBlock: {
+    flex: 1,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+  },
+  webSplitLabel: {
+    color: '#9A8E7E',
+    fontSize: 11,
+    letterSpacing: 1.8,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  organizerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  organizerLogo: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1,
+    borderColor: '#E8E3DA',
+  },
+  organizerLogoFallback: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#F5F2EC',
+    borderWidth: 1,
+    borderColor: '#E8E3DA',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  organizerLogoFallbackText: {
+    color: '#7A6040',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  organizerCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  organizerName: {
+    color: '#1A1A1A',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  organizerAction: {
+    color: '#C4974A',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  attendeesValue: {
+    color: '#1A1A1A',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  attendeesHint: {
+    color: '#7A7060',
+    fontSize: 12,
+  },
   backButton: {
     alignSelf: 'flex-start',
     minHeight: 42,
@@ -1313,6 +1759,42 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 16,
     lineHeight: 24,
+  },
+  editorialSection: {
+    marginHorizontal: 16,
+    marginTop: 22,
+    gap: 12,
+  },
+  editorialTitle: {
+    color: '#1A1A1A',
+    fontSize: 24,
+    lineHeight: 28,
+    fontWeight: '700',
+  },
+  editorialBody: {
+    color: '#5A5040',
+    fontSize: 15,
+    lineHeight: 24,
+  },
+  termCard: {
+    backgroundColor: '#FAF9F6',
+    borderWidth: 1,
+    borderColor: '#EDE9E0',
+    borderRadius: 22,
+    padding: 16,
+    gap: 6,
+  },
+  termTitle: {
+    color: '#1A1A1A',
+    fontSize: 13,
+    letterSpacing: 1.8,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+  },
+  termBody: {
+    color: '#5A5040',
+    fontSize: 14,
+    lineHeight: 21,
   },
   metricsGrid: {
     gap: 12,
@@ -1375,6 +1857,113 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
     fontWeight: '600',
+  },
+  rewardCardWrap: {
+    marginHorizontal: 16,
+    marginTop: 22,
+    backgroundColor: colors.surface,
+    borderRadius: 28,
+    borderWidth: 1,
+    borderColor: '#F0EDE8',
+    padding: 20,
+    gap: 16,
+  },
+  rewardEyebrow: {
+    color: '#C4974A',
+    fontSize: 10,
+    letterSpacing: 2.2,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+  },
+  rewardRow: {
+    flexDirection: 'row',
+    gap: 14,
+  },
+  rewardImage: {
+    width: 80,
+    height: 112,
+    borderRadius: 18,
+    backgroundColor: '#E8EBEE',
+  },
+  rewardCopy: {
+    flex: 1,
+    gap: 8,
+  },
+  rewardTitle: {
+    color: '#1A1A1A',
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: '700',
+  },
+  rewardBody: {
+    color: '#7A7060',
+    fontSize: 13,
+    lineHeight: 20,
+  },
+  stickyBottomBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(249,249,247,0.97)',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.06)',
+    paddingHorizontal: 18,
+    paddingTop: 12,
+    paddingBottom: 20,
+  },
+  stickyBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  stickyCopy: {
+    flex: 1,
+  },
+  stickyTitle: {
+    color: '#1A1A1A',
+    fontSize: 20,
+    lineHeight: 24,
+    fontWeight: '700',
+  },
+  stickySub: {
+    color: '#7A9E8A',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  stickyButton: {
+    minHeight: 44,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1A1710',
+  },
+  stickyButtonBooked: {
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1,
+    borderColor: '#bbf7d0',
+  },
+  stickyButtonText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  stickyButtonTextBooked: {
+    color: '#15803d',
+  },
+  stickyHelper: {
+    marginTop: 10,
+    color: '#7A7060',
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  stickyHelperError: {
+    color: '#B33A2B',
+  },
+  detailBottomSpacer: {
+    height: 110,
   },
   tabBar: {
     flexDirection: 'row',
