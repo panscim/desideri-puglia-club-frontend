@@ -309,7 +309,11 @@ export default function PartnerDashboard() {
 
         // --- SUBSCRIPTION GUARD ---
         let subStatus = String(data.subscription_status || "").toLowerCase();
-        let isSubscribed = subStatus === "active" || subStatus === "trialing" || isFreshlySubscribed;
+        let isSubscribed =
+          subStatus === "active" ||
+          subStatus === "trialing" ||
+          Boolean(data.is_active) ||
+          isFreshlySubscribed;
 
         // Se payment_success=1 ma il webhook non ha ancora aggiornato lo status, polling
         if (isPaymentSuccess && !isSubscribed) {
@@ -325,7 +329,7 @@ export default function PartnerDashboard() {
               .maybeSingle();
             if (retry.data) {
               const retryStatus = String(retry.data.subscription_status || "").toLowerCase();
-              if (retryStatus === "active" || retryStatus === "trialing") {
+              if (retryStatus === "active" || retryStatus === "trialing" || Boolean(retry.data.is_active)) {
                 data = retry.data;
                 subStatus = retryStatus;
                 isSubscribed = true;

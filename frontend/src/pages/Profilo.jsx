@@ -56,7 +56,7 @@ export default function Profilo() {
 
   const partnerHasActiveSubscription = (record) => {
     const status = String(record?.subscription_status || '').toLowerCase()
-    return status === 'active' || status === 'trialing'
+    return status === 'active' || status === 'trialing' || Boolean(record?.is_active)
   }
 
   const partnerNeedsOnboarding = (record) => {
