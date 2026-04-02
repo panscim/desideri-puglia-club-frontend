@@ -68,26 +68,53 @@ const CreatorAvatar = ({ src, name }) => {
 const PlanDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const [plan,        setPlan]        = useState(null);
   const [loading,     setLoading]     = useState(true);
   const [isPurchased, setIsPurchased] = useState(false);
+  const [purchaseLoading, setPurchaseLoading] = useState(true);
   const [isBuying,    setIsBuying]    = useState(false);
   const [isRainMode,  setIsRainMode]  = useState(false);
   const [vibeStatus,  setVibeStatus]  = useState('Sincronizzazione...');
   const [vibeLevel,   setVibeLevel]   = useState(7);
 
-  useEffect(() => { loadPlan(); fetchVibes(); window.scrollTo(0, 0); }, [id, user]);
+  useEffect(() => { loadPlan(); fetchVibes(); window.scrollTo(0, 0); }, [id]);
+
+  useEffect(() => {
+    if (!plan || authLoading) return;
+
+    let cancelled = false;
+
+    const syncPurchaseState = async () => {
+      if (!user) {
+        if (!cancelled) {
+          setIsPurchased(false);
+          setPurchaseLoading(false);
+        }
+        return;
+      }
+
+      setPurchaseLoading(true);
+      const ok = await ConciergeService.checkPurchase(user.id, plan.id);
+
+      if (!cancelled) {
+        setIsPurchased(ok);
+        setPurchaseLoading(false);
+      }
+    };
+
+    syncPurchaseState();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [plan, user, authLoading]);
 
   const loadPlan = async () => {
     setLoading(true);
     const data = await ConciergeService.getPlanDetail(id);
     setPlan(data);
-    if (user && data) {
-      const ok = await ConciergeService.checkPurchase(user.id, id);
-      setIsPurchased(ok);
-    }
     setLoading(false);
   };
 
@@ -108,7 +135,13 @@ const PlanDetail = () => {
     if (!user) { toast.error('Accedi prima di sbloccare'); navigate('/login'); return; }
     setIsBuying(true);
     const result = await ConciergeService.purchasePlan(user.id, id);
-    if (result.success) { toast.success('Giornata sbloccata. Benvenuto.'); setIsPurchased(true); }
+    if (result.success) {
+      toast.success('Giornata sbloccata. Benvenuto.');
+      setPurchaseLoading(true);
+      const ok = await ConciergeService.checkPurchase(user.id, id);
+      setIsPurchased(ok);
+      setPurchaseLoading(false);
+    }
     setIsBuying(false);
   };
 
@@ -420,7 +453,7 @@ const PlanDetail = () => {
 
       {/* ╔══ BOTTOM CTA ════════════════════════════════════╗ */}
       <AnimatePresence>
-        {!isPurchased && (
+        {!isPurchased && !purchaseLoading && (
           <motion.div
             initial={{ y: 90, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
