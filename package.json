@@ -2,7 +2,16 @@
   "name": "desideri-puglia-club-root",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "frontend",
+    "mobile"
+  ],
   "scripts": {
+    "dev:web": "npm --workspace frontend run dev",
+    "build:web": "npm --workspace frontend run build",
+    "dev:mobile": "npm --workspace mobile run start",
+    "ios": "npm --workspace mobile run ios",
+    "android": "npm --workspace mobile run android",
     "vercel-install": "npm install && cd frontend && npm install",
     "vercel-build": "cd frontend && npm run build"
   },

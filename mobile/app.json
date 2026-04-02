@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "Desideri di Puglia Club",
+    "slug": "desideri-puglia-club",
+    "scheme": "desidericlub",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.desideridipuglia.club"
+    },
+    "android": {
+      "package": "com.desideridipuglia.club"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "replace-me-after-eas-init"
+      }
+    }
+  }
+}
