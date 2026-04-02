@@ -8,9 +8,6 @@ import {
   MapPin, X, Star, MapTrifold, List, ArrowUpRight as NavigationArrow, ShieldCheck,
   MagnifyingGlass, CaretLeft
 } from "@phosphor-icons/react";
-import { toThumbUrl } from "../utils/imageUtils";
-import { rankPartners } from "../utils/matching";
-import SagaWizard from "../components/SagaWizard";
 
 // ── LEAFLET ──
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
@@ -87,8 +84,7 @@ const itemVariants = { hidden: { opacity: 0, y: 30, scale: 0.95 }, show: { opaci
 function PartnerCard({ p }) {
   const rating = (4.5 + ((p.name?.length || 0) % 6) * 0.1).toFixed(1);
   const reviews = 12 + ((p.name?.length || 0) * 3) % 80;
-  const imgFull = p.cover_image_url || p.logo_url || `https://picsum.photos/seed/${p.id}/600/400`;
-  const imgSrc = toThumbUrl(imgFull);
+  const imgSrc = p.cover_image_url || p.logo_url || `https://picsum.photos/seed/${p.id}/600/400`;
 
   return (
     <motion.div variants={itemVariants} className="mb-5">
@@ -109,8 +105,6 @@ function PartnerCard({ p }) {
             src={imgSrc} alt={p.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
-            decoding="async"
-            onError={e => { if (e.target.src !== imgFull) e.target.src = imgFull; }}
           />
 
           {/* Scrim leggero solo in basso per leggere il badge */}
@@ -154,10 +148,7 @@ function PartnerCard({ p }) {
               </span>
             )}
             {p.distance != null && (
-              <span
-                className="flex items-center gap-1 text-[10px] font-black ml-auto px-2.5 py-0.5 rounded-full"
-                style={{ background: `${T.orange}18`, color: T.orange }}>
-                <NavigationArrow size={9} weight="bold" />
+              <span className="text-[10px] font-semibold ml-auto" style={{ color: T.orange }}>
                 {p.distance} km
               </span>
             )}
@@ -219,25 +210,7 @@ export default function Partner() {
   const [mapCenter, setMapCenter] = useState([41.1171, 16.8719]);
   const [mapZoom, setMapZoom] = useState(9);
 
-  // Saga matching
-  const [showSaga, setShowSaga] = useState(false);
-  const [sagaPrefs, setSagaPrefs] = useState(null);
-
-  useEffect(() => {
-    loadPartners();
-    // Auto-request GPS silently on mount (only sets position, not the filter)
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords: { latitude, longitude } }) => {
-          setUserPos([latitude, longitude]);
-          setMapCenter([latitude, longitude]);
-          setMapZoom(12);
-        },
-        () => {}, // silent fail — user can still click "Vicino a me"
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
-  }, []);
+  useEffect(() => { loadPartners(); }, []);
 
   const loadPartners = async () => {
     try {
@@ -259,13 +232,6 @@ export default function Partner() {
   };
 
   const requestGPS = () => {
-    // If we already have position from the silent auto-request, just activate the filter
-    if (userPos) {
-      setGpsActive(true);
-      setMapCenter(userPos);
-      setMapZoom(12);
-      return;
-    }
     if (!navigator.geolocation) return toast.error("GPS non disponibile.");
     setGpsLoading(true);
     navigator.geolocation.getCurrentPosition(
@@ -292,26 +258,16 @@ export default function Partner() {
     if (activeCategory !== ALL_KEY) list = list.filter(p => p.category === activeCategory);
     if (activeCity !== ALL_KEY) list = list.filter(p => p.city === activeCity);
     if (q) list = list.filter(p => `${p.name} ${p.city} ${p.category}`.toLowerCase().includes(q));
-    // Always compute distance when GPS position is available
-    if (userPos) {
-      list = list.map(p => ({
-        ...p,
-        distance: p.coords ? Math.round(haversineKm(userPos[0], userPos[1], p.coords[0], p.coords[1]) * 10) / 10 : null,
-      }));
-    }
-    // Filter by radius only when "Vicino a me" is active
     if (gpsActive && userPos) {
       list = list
+        .map(p => ({ ...p, distance: p.coords ? Math.round(haversineKm(userPos[0], userPos[1], p.coords[0], p.coords[1]) * 10) / 10 : null }))
         .filter(p => p.distance !== null && p.distance <= radius)
         .sort((a, b) => (a.distance ?? 999) - (b.distance ?? 999));
-    } else if (sagaPrefs) {
-      // Rank by saga matching score
-      list = rankPartners(list, sagaPrefs, userPos ? { lat: userPos[0], lng: userPos[1] } : null);
     } else {
       list.sort((a, b) => a.is_verified === b.is_verified ? (a.name || "").localeCompare(b.name || "") : a.is_verified ? -1 : 1);
     }
     return list;
-  }, [partners, search, activeCategory, activeCity, gpsActive, userPos, radius, sagaPrefs]);
+  }, [partners, search, activeCategory, activeCity, gpsActive, userPos, radius]);
 
   const mappablePartners = useMemo(() => filtered.filter(p => p.coords), [filtered]);
 
@@ -343,37 +299,18 @@ export default function Partner() {
           <CaretLeft size={18} weight="bold" color="white" />
         </button>
 
-        <div className="flex items-center gap-2">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-on-image" style={{ color: 'white' }}>
-            Partner
-          </p>
-          {sagaPrefs && (
-            <span
-              className="text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full"
-              style={{ background: T.orange, color: 'white' }}>
-              ✨ Saga
-            </span>
-          )}
-        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-on-image" style={{ color: 'white' }}>
+          Partner
+        </p>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => sagaPrefs ? setSagaPrefs(null) : setShowSaga(true)}
-            className="px-3 py-1.5 rounded-xl text-[11px] font-black active:scale-95 transition-all no-theme-flip"
-            style={sagaPrefs
-              ? { background: '#27272a', border: '1px solid #3f3f46', color: T.orange }
-              : { background: T.orange, color: 'white' }}>
-            {sagaPrefs ? "✕ Saga" : "✨ Saga"}
-          </button>
-          <button
+        <button
           onClick={() => setViewMode(v => v === 'list' ? 'map' : 'list')}
           className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-all no-theme-flip"
           style={viewMode === 'map'
             ? { background: T.orange, color: 'white' }
             : { background: '#27272a', border: '1px solid #3f3f46', color: 'white' }}>
           {viewMode === 'map' ? <List size={17} weight="bold" color="white" /> : <MapTrifold size={17} weight="bold" color="white" />}
-          </button>
-        </div>
+        </button>
       </nav>
 
       <main className="pt-28 px-5 max-w-lg mx-auto">
@@ -538,13 +475,6 @@ export default function Partner() {
         .leaflet-popup-content { margin: 8px !important; width: auto !important; }
         .leaflet-popup-tip { display: none; }
       `}</style>
-
-      {/* SAGA WIZARD */}
-      {showSaga && (
-        <SagaWizard
-          onComplete={(p) => { setSagaPrefs(p); setShowSaga(false); }}
-        />
-      )}
     </div>
   );
 }
