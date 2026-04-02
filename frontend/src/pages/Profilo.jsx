@@ -64,10 +64,7 @@ export default function Profilo() {
     return (
       !record.name ||
       record.name === 'Nuovo Partner' ||
-      !record.category ||
-      record.category === 'Altro' ||
       !record.address ||
-      !record.description ||
       !record.logo_url ||
       !record.cover_image_url
     )

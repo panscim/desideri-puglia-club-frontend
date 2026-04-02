@@ -108,11 +108,7 @@ export default function PartnerDashboard() {
   const partnerNeedsOnboarding = (record) =>
     !record?.name ||
     record.name === "Nuovo Partner" ||
-    !record?.city ||
     !record?.address ||
-    !record?.category ||
-    record.category === "Altro" ||
-    !record?.description ||
     !record?.logo_url ||
     !record?.cover_image_url;
 
