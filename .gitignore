@@ -8,3 +8,5 @@
 **/.env.*.local
 node_modules
 **/node_modules
+.expo
+mobile/dist-export
