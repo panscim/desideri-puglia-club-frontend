@@ -105,6 +105,17 @@ export default function PartnerDashboard() {
 
   const openAdvancedModal = (step = 1) => { setAdvancedModalStep(step); setShowAdvancedModal(true); };
 
+  const partnerNeedsOnboarding = (record) =>
+    !record?.name ||
+    record.name === "Nuovo Partner" ||
+    !record?.city ||
+    !record?.address ||
+    !record?.category ||
+    record.category === "Altro" ||
+    !record?.description ||
+    !record?.logo_url ||
+    !record?.cover_image_url;
+
   // Computed field per capire se il profilo è completo
   const isProfileComplete = 
     partner?.name &&
@@ -323,6 +334,15 @@ export default function PartnerDashboard() {
         if (!isSubscribed) {
           console.log("[PartnerDashboard] Subscription not active, redirecting to /partner/subscription");
           navigate("/partner/subscription");
+          return;
+        }
+
+        if (partnerNeedsOnboarding(data)) {
+          console.log("[PartnerDashboard] Partner onboarding incomplete, redirecting to /partner/join");
+          const onboardingParams = new URLSearchParams();
+          if (isFreshlySubscribed || isPaymentSuccess) onboardingParams.set("subscribed", "1");
+          if (params.get("plan")) onboardingParams.set("plan", params.get("plan"));
+          navigate(`/partner/join${onboardingParams.toString() ? `?${onboardingParams.toString()}` : ""}`);
           return;
         }
 

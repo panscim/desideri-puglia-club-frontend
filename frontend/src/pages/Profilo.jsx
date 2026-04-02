@@ -54,6 +54,25 @@ export default function Profilo() {
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [passwordSending, setPasswordSending] = useState(false)
 
+  const partnerHasActiveSubscription = (record) => {
+    const status = String(record?.subscription_status || '').toLowerCase()
+    return status === 'active' || status === 'trialing'
+  }
+
+  const partnerNeedsOnboarding = (record) => {
+    if (!record) return false
+    return (
+      !record.name ||
+      record.name === 'Nuovo Partner' ||
+      !record.category ||
+      record.category === 'Altro' ||
+      !record.address ||
+      !record.description ||
+      !record.logo_url ||
+      !record.cover_image_url
+    )
+  }
+
   useEffect(() => {
     if (!profile?.id) return
 
@@ -70,7 +89,11 @@ export default function Profilo() {
         setLoading(true)
         const [cardsRes, partnerRes] = await Promise.all([
           supabase.from('user_cards').select('id', { count: 'exact', head: true }).eq('user_id', profile.id),
-          supabase.from('partners').select('id,name').eq('owner_user_id', profile.id).maybeSingle()
+          supabase
+            .from('partners')
+            .select('id,name,plan_tier,subscription_status,is_active,logo_url,cover_image_url,category,address,description')
+            .eq('owner_user_id', profile.id)
+            .maybeSingle()
         ])
         const cardCount = cardsRes.count ?? 0
         setStats({ cards: cardCount, km: Math.round(cardCount * 2.3), xp: cardCount * 50 })
@@ -170,7 +193,27 @@ export default function Profilo() {
   }
 
   const handleModeSwitch = (target) => {
-    navigate(target === 'partner' ? '/partner/dashboard' : '/dashboard')
+    if (target !== 'partner') {
+      navigate('/dashboard')
+      return
+    }
+
+    if (!partner) {
+      navigate('/partner/subscription')
+      return
+    }
+
+    if (!partnerHasActiveSubscription(partner)) {
+      navigate('/partner/subscription')
+      return
+    }
+
+    if (partnerNeedsOnboarding(partner)) {
+      navigate('/partner/join')
+      return
+    }
+
+    navigate('/partner/dashboard')
   }
 
   const displayName = profile?.nome && profile?.cognome

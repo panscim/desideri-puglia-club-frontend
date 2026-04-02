@@ -187,7 +187,7 @@ export default function PartnerPlanDetail() {
         body: JSON.stringify({
           userId: profile.id,
           tier,
-          successUrl: `${window.location.origin}/partner/dashboard?payment_success=1`,
+          successUrl: `${window.location.origin}/partner/dashboard?payment_success=1&subscribed=1&plan=${encodeURIComponent(tier)}`,
           cancelUrl: `${window.location.origin}/partner/subscription/${tier}?canceled=1`,
         }),
       })
