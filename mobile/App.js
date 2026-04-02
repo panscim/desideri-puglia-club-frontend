@@ -15,6 +15,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { createClient } from '@supabase/supabase-js';
+import QRCodeSVG from 'react-native-qrcode-svg';
 
 const colors = {
   bgPrimary: '#F9F9F7',
@@ -309,6 +310,33 @@ async function createBookingMobile({ userId, eventId, isGuestEvent, paymentMetho
   } catch (error) {
     console.error('mobile createBooking error', error);
     return { success: false, error: error.message || 'Errore durante la prenotazione.' };
+  }
+}
+
+async function getUserDetailedBookingsMobile(userId) {
+  if (!supabase || !userId) return [];
+
+  try {
+    const { data: bookings, error } = await supabase
+      .from('prenotazioni_eventi')
+      .select('id, event_id, status, created_at, is_guest_event')
+      .eq('user_id', userId)
+      .in('status', ['confermato', 'da_pagare_in_loco'])
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    if (!bookings?.length) return [];
+
+    const events = await getActiveEventsMobile();
+    return bookings
+      .map((booking) => ({
+        ...booking,
+        event: events.find((item) => item.id === booking.event_id) || null,
+      }))
+      .filter((booking) => booking.event);
+  } catch (error) {
+    console.error('mobile getUserDetailedBookings error', error);
+    return [];
   }
 }
 
@@ -815,7 +843,116 @@ function PlanDetailScreen({ plan, detail, loading, onBack }) {
   );
 }
 
-function ProfileTab({ profile, onSignOut }) {
+function TicketPreviewCard({ booking, onPress }) {
+  const event = booking.event;
+  if (!event) return null;
+
+  return (
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.ticketCard, pressed && styles.cardPressed]}>
+      <View style={styles.ticketHeader}>
+        <View style={[styles.ticketStatusPill, booking.status === 'da_pagare_in_loco' && styles.ticketStatusPillBlue]}>
+          <Text style={[styles.ticketStatusText, booking.status === 'da_pagare_in_loco' && styles.ticketStatusTextBlue]}>
+            {booking.status === 'da_pagare_in_loco' ? 'Pagamento in loco' : 'Confermato'}
+          </Text>
+        </View>
+        <Text style={styles.ticketId}>ID: {booking.id.slice(0, 8).toUpperCase()}</Text>
+      </View>
+
+      <View style={styles.ticketBodyRow}>
+        <Image source={{ uri: event.imageUrl }} style={styles.ticketImage} />
+        <View style={styles.ticketCopy}>
+          <Text numberOfLines={2} style={styles.ticketTitle}>
+            {event.title}
+          </Text>
+          <Text style={styles.ticketMeta}>{formatDateLabel(event.startsAt)} · {formatTimeLabel(event.startsAt)}</Text>
+          <Text numberOfLines={1} style={styles.ticketMeta}>{event.location}</Text>
+        </View>
+      </View>
+
+      <View style={styles.ticketDividerWrap}>
+        <View style={styles.ticketDividerCircleLeft} />
+        <View style={styles.ticketDividerCircleRight} />
+        <View style={styles.ticketDivider} />
+      </View>
+
+      <View style={styles.ticketFooter}>
+        <View style={styles.ticketQrStub}>
+          <Text style={styles.ticketQrStubText}>QR</Text>
+        </View>
+        <View>
+          <Text style={styles.ticketFooterTitle}>Mostra QR Code</Text>
+          <Text style={styles.ticketFooterBody}>Valida il tuo ingresso</Text>
+        </View>
+      </View>
+    </Pressable>
+  );
+}
+
+function BookingConfirmationScreen({ booking, profile, onBack }) {
+  const event = booking?.event;
+  if (!booking || !event) return null;
+
+  return (
+    <View style={styles.eventDetailShell}>
+      <ScrollView contentContainerStyle={styles.confirmationContent}>
+        <View style={styles.detailHeader}>
+          <Pressable onPress={onBack} style={styles.detailHeaderButton}>
+            <Text style={styles.detailHeaderButtonText}>Indietro</Text>
+          </Pressable>
+          <Text style={styles.detailHeaderLabel}>Biglietto</Text>
+          <View style={styles.detailHeaderSpacer} />
+        </View>
+
+        <View style={styles.confirmationWrap}>
+          <Text style={styles.confirmationEyebrow}>Ticket Digitale</Text>
+          <Text style={styles.confirmationTitle}>{event.title}</Text>
+
+          <View style={styles.qrCard}>
+            <QRCodeSVG value={booking.id} size={164} backgroundColor="#FFFFFF" color="#1A1A1A" />
+          </View>
+
+          <View style={styles.qrSeparatorWrap}>
+            <View style={styles.qrSeparatorCircleLeft} />
+            <View style={styles.qrSeparatorCircleRight} />
+            <View style={styles.qrSeparatorLine} />
+          </View>
+
+          <View style={styles.confirmationInfoList}>
+            <View style={styles.confirmationInfoItem}>
+              <Text style={styles.confirmationInfoLabel}>Nome</Text>
+              <Text style={styles.confirmationInfoValue}>
+                {profile?.nome || profile?.name || 'Utente'} {profile?.cognome || ''}
+              </Text>
+            </View>
+            <View style={styles.confirmationInfoItem}>
+              <Text style={styles.confirmationInfoLabel}>Organizzatore</Text>
+              <Text style={styles.confirmationInfoValue}>{event.partnerName}</Text>
+            </View>
+            <View style={styles.confirmationInfoItem}>
+              <Text style={styles.confirmationInfoLabel}>Data / Ora</Text>
+              <Text style={styles.confirmationInfoValue}>
+                {formatDateLabel(event.startsAt)} · {formatTimeLabel(event.startsAt)}
+              </Text>
+            </View>
+            <View style={styles.confirmationInfoItem}>
+              <Text style={styles.confirmationInfoLabel}>Luogo</Text>
+              <Text style={styles.confirmationInfoValue}>{event.location}</Text>
+            </View>
+          </View>
+
+          <View style={styles.confirmationActionCard}>
+            <Text style={styles.confirmationActionTitle}>Come funziona?</Text>
+            <Text style={styles.confirmationActionBody}>
+              Mostra questo QR all&apos;ingresso dell&apos;evento. Nel prossimo step colleghiamo anche lo stato ticket usato e la conferma finale.
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+function ProfileTab({ profile, bookings, onOpenBooking, onSignOut }) {
   return (
     <ScrollView contentContainerStyle={styles.screenContent}>
       <ContentCard
@@ -829,6 +966,18 @@ function ProfileTab({ profile, onSignOut }) {
         body="Dopo questi flussi core portiamo anche onboarding, abbonamento e dashboard partner nativi."
         accent
       />
+      <SectionHeader eyebrow="Biglietti" title="Le tue prenotazioni" />
+      {bookings.length ? (
+        bookings.slice(0, 2).map((booking) => (
+          <TicketPreviewCard key={booking.id} booking={booking} onPress={() => onOpenBooking(booking)} />
+        ))
+      ) : (
+        <ContentCard
+          eyebrow="Biglietti"
+          title="Ancora nessun biglietto"
+          body="Appena prenoti un evento, qui trovi il tuo ticket con QR."
+        />
+      )}
       <Pressable style={styles.secondaryButton} onPress={onSignOut}>
         <Text style={styles.secondaryButtonText}>Esci</Text>
       </Pressable>
@@ -848,6 +997,7 @@ function MobileShell({ session }) {
   const [selectedPlanDetail, setSelectedPlanDetail] = useState(null);
   const [selectedPlanLoading, setSelectedPlanLoading] = useState(false);
   const [bookedEventIds, setBookedEventIds] = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [bookingMessage, setBookingMessage] = useState('');
 
@@ -889,6 +1039,7 @@ function MobileShell({ session }) {
   useEffect(() => {
     if (!session?.user?.id) {
       setBookedEventIds([]);
+      setBookings([]);
       return;
     }
     refreshBookings();
@@ -909,8 +1060,12 @@ function MobileShell({ session }) {
   };
 
   const refreshBookings = async () => {
-    const ids = await getUserBookingIdsMobile(session?.user?.id);
+    const [ids, detailed] = await Promise.all([
+      getUserBookingIdsMobile(session?.user?.id),
+      getUserDetailedBookingsMobile(session?.user?.id),
+    ]);
     setBookedEventIds(ids);
+    setBookings(detailed);
   };
 
   const openEvent = (event) => {
@@ -945,15 +1100,21 @@ function MobileShell({ session }) {
     }
 
     setBookedEventIds((current) => (current.includes(event.id) ? current : [...current, event.id]));
+    const nextBooking = {
+      id: result.data.id,
+      event_id: event.id,
+      status: result.status,
+      created_at: result.data.created_at,
+      is_guest_event: Boolean(event.isGuestEvent),
+      event: { ...event, attendees: (event.attendees || 0) + 1 },
+    };
+    setBookings((current) => [nextBooking, ...current.filter((item) => item.id !== nextBooking.id)]);
     setEvents((current) =>
       current.map((item) =>
         item.id === event.id ? { ...item, attendees: (item.attendees || 0) + 1 } : item,
       ),
     );
-    setRoute({
-      type: 'eventDetail',
-      item: { ...event, attendees: (event.attendees || 0) + 1 },
-    });
+    setRoute({ type: 'bookingConfirmation', booking: nextBooking });
     setBookingMessage(result.status === 'da_pagare_in_loco' ? 'Prenotazione confermata: pagherai in loco.' : 'Prenotazione confermata.');
   };
 
@@ -998,6 +1159,16 @@ function MobileShell({ session }) {
       );
     }
 
+    if (route.type === 'bookingConfirmation') {
+      return (
+        <BookingConfirmationScreen
+          booking={route.booking}
+          profile={profile}
+          onBack={() => setRoute({ type: 'tab' })}
+        />
+      );
+    }
+
     if (activeTab === 'home') {
       return (
         <HomeTab
@@ -1020,10 +1191,18 @@ function MobileShell({ session }) {
       return <PlansTab plans={plans} refreshing={refreshingPlans} onRefresh={refreshPlans} onOpenPlan={openPlan} />;
     }
 
-    return <ProfileTab profile={profile} onSignOut={() => supabase.auth.signOut()} />;
+    return (
+      <ProfileTab
+        profile={profile}
+        bookings={bookings}
+        onOpenBooking={(booking) => setRoute({ type: 'bookingConfirmation', booking })}
+        onSignOut={() => supabase.auth.signOut()}
+      />
+    );
   }, [
     activeTab,
     bookedEventIds,
+    bookings,
     bookingLoading,
     bookingMessage,
     events,
@@ -1421,6 +1600,142 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     fontSize: 15,
     lineHeight: 22,
+  },
+  ticketCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 34,
+    borderWidth: 1,
+    borderColor: '#E7E2D8',
+    overflow: 'hidden',
+  },
+  ticketHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  ticketStatusPill: {
+    backgroundColor: 'rgba(16,185,129,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(16,185,129,0.18)',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  ticketStatusPillBlue: {
+    backgroundColor: 'rgba(59,130,246,0.1)',
+    borderColor: 'rgba(59,130,246,0.18)',
+  },
+  ticketStatusText: {
+    color: '#059669',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.3,
+    textTransform: 'uppercase',
+  },
+  ticketStatusTextBlue: {
+    color: '#2563EB',
+  },
+  ticketId: {
+    color: '#B3ABA1',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  ticketBodyRow: {
+    flexDirection: 'row',
+    gap: 16,
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    paddingBottom: 18,
+  },
+  ticketImage: {
+    width: 92,
+    height: 92,
+    borderRadius: 24,
+    backgroundColor: '#E8EBEE',
+  },
+  ticketCopy: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: 8,
+  },
+  ticketTitle: {
+    color: '#111111',
+    fontSize: 18,
+    lineHeight: 23,
+    fontWeight: '700',
+  },
+  ticketMeta: {
+    color: '#6B7280',
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: '600',
+  },
+  ticketDividerWrap: {
+    position: 'relative',
+    height: 24,
+    justifyContent: 'center',
+  },
+  ticketDividerCircleLeft: {
+    position: 'absolute',
+    left: -12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.bgPrimary,
+    borderWidth: 1,
+    borderColor: '#E7E2D8',
+  },
+  ticketDividerCircleRight: {
+    position: 'absolute',
+    right: -12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.bgPrimary,
+    borderWidth: 1,
+    borderColor: '#E7E2D8',
+  },
+  ticketDivider: {
+    borderTopWidth: 2,
+    borderStyle: 'dashed',
+    borderTopColor: '#ECE7DE',
+    marginHorizontal: 20,
+  },
+  ticketFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 20,
+    backgroundColor: '#FCFBF9',
+  },
+  ticketQrStub: {
+    width: 42,
+    height: 42,
+    borderRadius: 16,
+    backgroundColor: '#111111',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ticketQrStubText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  ticketFooterTitle: {
+    color: '#111111',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  ticketFooterBody: {
+    color: '#9CA3AF',
+    fontSize: 11,
+    fontWeight: '600',
   },
   eventCard: {
     borderRadius: 32,
@@ -1899,6 +2214,115 @@ const styles = StyleSheet.create({
     color: '#7A7060',
     fontSize: 13,
     lineHeight: 20,
+  },
+  confirmationContent: {
+    paddingBottom: 34,
+  },
+  confirmationWrap: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    gap: 18,
+  },
+  confirmationEyebrow: {
+    color: '#9A8E7E',
+    fontSize: 11,
+    letterSpacing: 2.2,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  confirmationTitle: {
+    color: '#1A1A1A',
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  qrCard: {
+    alignSelf: 'center',
+    width: 214,
+    height: 214,
+    borderRadius: 32,
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    borderWidth: 1,
+    borderColor: '#F0EDE8',
+  },
+  qrSeparatorWrap: {
+    position: 'relative',
+    height: 24,
+    justifyContent: 'center',
+  },
+  qrSeparatorCircleLeft: {
+    position: 'absolute',
+    left: -12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.bgPrimary,
+  },
+  qrSeparatorCircleRight: {
+    position: 'absolute',
+    right: -12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: colors.bgPrimary,
+  },
+  qrSeparatorLine: {
+    borderTopWidth: 2,
+    borderStyle: 'dashed',
+    borderTopColor: '#E7E2D8',
+  },
+  confirmationInfoList: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 28,
+    padding: 20,
+    gap: 14,
+    borderWidth: 1,
+    borderColor: '#F0EDE8',
+  },
+  confirmationInfoItem: {
+    gap: 4,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F4F1EB',
+  },
+  confirmationInfoLabel: {
+    color: '#9A8E7E',
+    fontSize: 11,
+    letterSpacing: 1.8,
+    textTransform: 'uppercase',
+    fontWeight: '700',
+  },
+  confirmationInfoValue: {
+    color: '#1A1A1A',
+    fontSize: 16,
+    lineHeight: 22,
+    fontWeight: '600',
+  },
+  confirmationActionCard: {
+    backgroundColor: '#FAF9F6',
+    borderRadius: 24,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: '#EDE9E0',
+    gap: 6,
+  },
+  confirmationActionTitle: {
+    color: '#1A1A1A',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  confirmationActionBody: {
+    color: '#5A5040',
+    fontSize: 14,
+    lineHeight: 21,
   },
   stickyBottomBar: {
     position: 'absolute',
