@@ -138,210 +138,155 @@ const SagaIntro = () => {
       {/* ========== CONTENT ========== */}
       <div className="px-6 py-10 relative z-10 max-w-lg mx-auto">
 
-        {/* Social Proof - Stamped Element */}
         {completionsCount > 0 && (
-          <div className="flex flex-col items-center mb-12 relative">
-            <div className="flex items-center gap-4 py-4 px-6 bg-white rounded-[1.5rem] border border-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.05)] rotate-1">
-                <div className="flex -space-x-3">
-                    {[...Array(Math.min(4, completionsCount))].map((_, i) => (
-                        <div key={i} className="w-9 h-9 rounded-full bg-zinc-100 border-2 border-white shadow-sm overflow-hidden">
-                            <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" className="w-full h-full object-cover" />
-                        </div>
-                    ))}
-                </div>
-                <div>
-                   <p className="text-[11px] font-black uppercase tracking-[0.1em] text-text-muted leading-tight">
-                    Completata da <br />
-                    <span className="text-accent underline decoration-accent/30">{completionsCount.toLocaleString()} clubbers</span>
-                   </p>
-                </div>
-                <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center text-accent -rotate-12 border border-accent/20">
-                    <Sparkles size={20} />
-                </div>
+          <div className="mb-8 rounded-[1.8rem] border border-black/5 bg-white px-5 py-4 shadow-[0_10px_28px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center gap-4">
+              <div className="flex -space-x-3">
+                {[...Array(Math.min(4, completionsCount))].map((_, i) => (
+                  <div key={i} className="w-10 h-10 rounded-full bg-zinc-100 border-2 border-white shadow-sm overflow-hidden">
+                    <img src={`https://i.pravatar.cc/100?u=${i}`} alt="user" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-accent-gold mb-1">Già amata</p>
+                <p className="text-[14px] font-bold leading-tight text-text-primary">
+                  {completionsCount.toLocaleString()} clubber hanno già completato questa saga.
+                </p>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Lore / Description - Editorial */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-5">
+        <section className="mb-8 rounded-[2rem] border border-black/5 bg-white px-5 py-5 shadow-[0_12px_32px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-[2px] bg-accent rounded-full" />
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-accent">La Storia</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.28em] text-accent">La Storia</span>
           </div>
-          <p className="text-[17px] text-text-primary leading-[1.8] font-medium">
+          <p className="text-[16px] text-text-primary leading-[1.75] font-medium">
             {loreText}
           </p>
-        </div>
+        </section>
 
-        {/* ========== STATS GRID - Note Style ========== */}
-        <div className="grid grid-cols-2 gap-4 mb-14">
-            <StatCard
-                icon={<Compass className="w-5 h-5" />}
-                label="Tappe"
-                value={stepsCount}
-                rotation="-1.5deg"
-            />
-            <StatCard
-                icon={<Clock className="w-5 h-5" />}
-                label="Durata"
-                value={timeLabel}
-                rotation="1deg"
-            />
-            <StatCard
-                icon={<Footprints className="w-5 h-5" />}
-                label="Distanza"
-                value={`${distanceKm} km`}
-                rotation="2deg"
-            />
-            <StatCard
-                icon={<MapPin className="w-5 h-5" />}
-                label="Partenza"
-                value={startingPoint}
-                rotation="-1deg"
-            />
-        </div>
-        {/* ========== ITINERARY SUMMARY - Journal Snippet Style ========== */}
-        {saga.steps && saga.steps.length > 0 && (
-          <motion.div 
-            whileTap={{ scale: 0.98 }}
-            onClick={() => setShowItinerary(true)}
-            className="mb-14 relative bg-white px-8 py-10 shadow-[0_15px_45px_rgba(0,0,0,0.06)] border border-black/5 rotate-1 cursor-pointer group rounded-sm"
-          >
-             {/* Torn Paper effect top Edge - subtle */}
-             <div className="absolute -top-1.5 left-0 w-full h-3 bg-[#FCFAF2] bg-repeat-x opacity-100" style={{ 
-                maskImage: 'radial-gradient(circle at 10px -2px, transparent 10px, black 0)',
-                maskSize: '20px 20px'
-             }} />
+        <section className="mb-8 grid grid-cols-2 gap-3">
+          <StatCard icon={<Compass className="w-5 h-5" />} label="Tappe" value={stepsCount} />
+          <StatCard icon={<Clock className="w-5 h-5" />} label="Durata" value={timeLabel} />
+          <StatCard icon={<Footprints className="w-5 h-5" />} label="Distanza" value={`${distanceKm} km`} />
+          <StatCard icon={<MapPin className="w-5 h-5" />} label="Partenza" value={startingPoint} />
+        </section>
 
-             <div className="flex justify-between items-start mb-6">
-                <div className="relative">
-                    <h3 className="text-[14px] font-black uppercase tracking-[0.2em] text-accent-gold mb-2">
-                        Il Sentiero Svelato
-                    </h3>
-                    <div className="w-12 h-1 bg-accent/20 rounded-sm" />
-                </div>
-                <div className="w-10 h-10 rounded-full bg-accent/5 flex items-center justify-center text-accent group-hover:rotate-12 transition-transform">
-                    <Route size={20} />
-                </div>
-             </div>
-
-             <div className="space-y-4">
-                {saga.steps.slice(0, 3).map((s, idx) => {
-                    const stepTitle = getLocalized(s, 'title', lang) || s.description_it || s.title || `Tappa ${idx + 1}`;
-                    return (
-                        <div key={idx} className="flex items-center gap-4">
-                            <div className="w-1.5 h-1.5 rounded-full bg-accent/40" />
-                            <p className="text-[15px] font-serif font-black text-text-primary tracking-tight italic">
-                                {stepTitle}
-                            </p>
-                        </div>
-                    );
-                })}
-                {saga.steps.length > 3 && (
-                    <div className="flex items-center gap-4 opacity-40">
-                        <div className="w-1.5 h-1.5 rounded-full bg-zinc-300" />
-                        <p className="text-[12px] font-black uppercase tracking-widest">
-                            {saga.steps.length - 3} Altre tappe nel mirino...
-                        </p>
-                    </div>
-                )}
-             </div>
-
-             <div className="mt-6 flex items-center justify-between">
-               <span className="text-[12px] font-black uppercase tracking-widest text-accent group-hover:translate-x-1 transition-transform flex items-center gap-2">
-                 Vedi percorso completo <ChevronRight size={14} strokeWidth={3} />
-               </span>
-               <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center shadow-lg shadow-accent/30 group-hover:scale-110 transition-transform">
-                 <Route size={18} className="text-white" />
-               </div>
-             </div>
-          </motion.div>
-        )}
-
-        {/* ========== TIPS - Pinned Notes ========== */}
-        <div className="mb-14 relative">
-             <div className="flex items-center gap-3 mb-8">
-                <div className="relative">
-                    <h3 className="text-[22px] font-serif font-black text-text-primary px-2 relative z-10 italic">Consigli di Viaggio</h3>
-                    <div className="absolute left-0 bottom-1 w-full h-3 bg-accent/10 -z-0 -rotate-1" />
-                </div>
-             </div>
-
-             <div className="space-y-4">
-                <TipRow
-                    icon={<Footprints size={18} className="text-accent" />}
-                    title="Scarpe Comode"
-                    text="Passeggerai per centri storici e sentieri: scegli bene!"
-                    rotation="0.5deg"
-                />
-                <TipRow
-                    icon={<BatteryMedium size={18} className="text-accent-gold" />}
-                    title="Energia Pura"
-                    text="Il tuo telefono è la tua bussola. Caricalo al massimo!"
-                    rotation="-1deg"
-                />
-                <TipRow
-                    icon={<Sun size={18} className="text-accent-gold" />}
-                    title="Cielo e Terra"
-                    text="Al sicuro sotto il sole o preparati per due gocce di pioggia!"
-                    rotation="1.5deg"
-                />
-             </div>
-        </div>
-
-        {/* ========== FEATURES - Stamps ========== */}
-        <div className="grid grid-cols-2 gap-3 mb-14">
-            <FeatureStamp icon={<Unlock size={18} className="text-accent" />} text="Libertà Totale" />
-            <FeatureStamp icon={<PauseCircle size={18} className="text-accent" />} text="Pausa & Riprendi" />
-            <FeatureStamp icon={<Gamepad2 size={18} className="text-accent" />} text="Sfide & Misteri" />
-            <FeatureStamp icon={<Gift size={18} className="text-accent-gold" />} text="Premio Finale" />
-        </div>
-
-        {/* ========== PROGRESO - If started ========== */}
         {hasStarted && (
-            <div className="mb-12 p-8 bg-white border border-black/5 rounded-[2rem] shadow-sm rotate-1 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-20 h-20 bg-accent-gold/5 flex items-center justify-center rounded-bl-[3rem]">
-                    <Sparkles size={24} className="text-accent-gold/20" />
-                </div>
-                
-                <div className="flex items-center justify-between mb-4">
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-accent-gold">
-                        Il tuo Diario
-                    </span>
-                    <span className="text-text-primary font-black text-xs">{progressPercent}%</span>
-                </div>
-                <div className="w-full h-2.5 bg-zinc-100 rounded-full overflow-hidden p-0.5">
-                    <div
-                        className="h-full bg-accent rounded-full shadow-[0_0_10px_rgba(212,121,58,0.3)] transition-all duration-1000"
-                        style={{ width: `${progressPercent}%` }}
-                    />
-                </div>
-                <p className="text-[10px] text-text-muted mt-4 font-black uppercase tracking-[0.2em] italic">
-                    {completedStepsCount}/{stepsCount} tappe scoperte
-                </p>
+          <section className="mb-8 rounded-[2rem] border border-black/5 bg-white px-5 py-5 shadow-[0_12px_32px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-accent-gold mb-1">Il tuo Diario</p>
+                <h3 className="text-[22px] font-serif font-black text-text-primary">Hai gia iniziato il viaggio.</h3>
+              </div>
+              <span className="text-[18px] font-serif font-black text-text-primary">{progressPercent}%</span>
             </div>
+            <div className="w-full h-2.5 bg-zinc-100 rounded-full overflow-hidden p-0.5">
+              <div
+                className="h-full bg-accent rounded-full shadow-[0_0_10px_rgba(212,121,58,0.3)] transition-all duration-1000"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+            <p className="text-[11px] text-text-muted mt-4 font-black uppercase tracking-[0.18em]">
+              {completedStepsCount}/{stepsCount} tappe scoperte
+            </p>
+          </section>
         )}
 
-        {/* ========== CTA BUTTON - The Star ========== */}
+        {saga.steps && saga.steps.length > 0 && (
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-accent-gold mb-1">Il Percorso</p>
+                <h3 className="text-[24px] font-serif font-black text-text-primary">Quello che vivrai.</h3>
+              </div>
+              <button
+                onClick={() => setShowItinerary(true)}
+                className="w-11 h-11 rounded-full bg-white border border-black/5 flex items-center justify-center shadow-sm text-accent active:scale-95 transition-transform"
+              >
+                <Route size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {saga.steps.slice(0, 4).map((s, idx) => {
+                const stepTitle = getLocalized(s, 'title', lang) || s.description_it || s.title || `Tappa ${idx + 1}`;
+                const stepHint = getLocalized(s, 'narrative_hint', lang) || s.narrative_hint_it || 'Una tappa da scoprire lungo il percorso.';
+                return (
+                  <div key={s.id || idx} className="rounded-[1.7rem] border border-black/5 bg-white px-4 py-4 shadow-[0_8px_20px_rgba(0,0,0,0.04)]">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-accent/10 text-accent flex items-center justify-center shrink-0 text-[13px] font-black">
+                        {idx + 1}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-gold mb-1">
+                          {idx === 0 ? 'Partenza' : idx === stepsCount - 1 ? 'Finale' : `Tappa ${idx + 1}`}
+                        </p>
+                        <h4 className="text-[18px] font-serif font-black text-text-primary leading-tight mb-2">
+                          {stepTitle}
+                        </h4>
+                        <p className="text-[13px] leading-relaxed text-text-muted italic">
+                          {stepHint}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {saga.steps.length > 4 && (
+                <button
+                  onClick={() => setShowItinerary(true)}
+                  className="w-full rounded-[1.5rem] border border-dashed border-black/10 bg-white/70 px-4 py-4 text-[12px] font-black uppercase tracking-[0.18em] text-accent text-left active:scale-[0.99] transition-transform"
+                >
+                  Apri il percorso completo e vedi tutte le tappe
+                </button>
+              )}
+            </div>
+          </section>
+        )}
+
+        <section className="mb-8 rounded-[2rem] border border-black/5 bg-white px-5 py-5 shadow-[0_12px_32px_rgba(0,0,0,0.05)]">
+          <div className="mb-5">
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-accent-gold mb-1">Consigli di Viaggio</p>
+            <h3 className="text-[24px] font-serif font-black text-text-primary">Arrivaci nel modo giusto.</h3>
+          </div>
+          <div className="space-y-3">
+            <TipRow icon={<Footprints size={18} className="text-accent" />} title="Scarpe Comode" text="Passeggerai tra strade, pietra e piccoli spostamenti: meglio essere leggeri." />
+            <TipRow icon={<BatteryMedium size={18} className="text-accent-gold" />} title="Telefono Carico" text="Ti serve per orientarti, aprire la mappa e tenere il ritmo della storia." />
+            <TipRow icon={<Sun size={18} className="text-accent-gold" />} title="Occhi Aperti" text="Questa saga funziona meglio se non la corri: guardati intorno e prenditi il tempo." />
+          </div>
+        </section>
+
+        <section className="mb-10 grid grid-cols-2 gap-3">
+          <FeatureStamp icon={<Unlock size={18} className="text-accent" />} text="Liberta Totale" />
+          <FeatureStamp icon={<PauseCircle size={18} className="text-accent" />} text="Pausa e Riprendi" />
+          <FeatureStamp icon={<Gamepad2 size={18} className="text-accent" />} text="Sfide e Misteri" />
+          <FeatureStamp icon={<Gift size={18} className="text-accent-gold" />} text="Premio Finale" />
+        </section>
+
         <div className="sticky bottom-10 z-50 px-4 w-full">
-            <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={async () => {
-                    if (profile?.id) {
-                        await QuestService.startSaga(profile.id, id);
-                    }
-                    navigate(`/saga/${id}`);
-                }}
-                className="w-full !py-5 bg-accent text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[14px] shadow-[0_20px_40px_rgba(212,121,58,0.3)] flex items-center justify-center gap-4 group border-4 border-white"
-            >
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:rotate-12 transition-transform">
-                    <Play size={16} weight="fill" />
-                </div>
-                {hasStarted ? 'Riprendi Avventura' : 'Inizia la Storia'}
-            </motion.button>
-            <p className="text-center text-[9px] font-black uppercase tracking-[0.4em] text-text-muted mt-5 opacity-40">
-                Puglia Club Pass Required
-            </p>
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={async () => {
+              if (profile?.id) {
+                await QuestService.startSaga(profile.id, id);
+              }
+              navigate(`/saga/${id}`);
+            }}
+            className="w-full !py-5 bg-accent text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-[14px] shadow-[0_20px_40px_rgba(212,121,58,0.3)] flex items-center justify-center gap-4 group border-4 border-white"
+          >
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:rotate-12 transition-transform">
+              <Play size={16} />
+            </div>
+            {hasStarted ? 'Riprendi Avventura' : 'Inizia la Storia'}
+          </motion.button>
+          <p className="text-center text-[9px] font-black uppercase tracking-[0.4em] text-text-muted mt-5 opacity-40">
+            Puglia Club Pass Required
+          </p>
         </div>
       </div>
 
@@ -475,26 +420,22 @@ const PropsSafeMap = ({ steps }) => {
     );
 };
 
-const StatCard = ({ icon, label, value, rotation }) => (
-    <motion.div 
-        style={{ rotate: rotation }}
-        className="bg-white rounded-3xl p-6 border border-black/5 flex flex-col items-center text-center shadow-[0_10px_30px_rgba(0,0,0,0.04)] relative"
+const StatCard = ({ icon, label, value }) => (
+    <motion.div
+        className="bg-white rounded-[1.6rem] p-5 border border-black/5 flex flex-col shadow-[0_10px_24px_rgba(0,0,0,0.04)]"
     >
-        {/* Decorative Tape small */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-3 bg-zinc-100 -translate-y-1.5 rotate-3 border-x border-black/5" />
-        
         <div className="w-10 h-10 flex justify-center items-center bg-accent/5 rounded-full text-accent mb-4">
             {icon}
         </div>
         <div>
             <p className="text-[8px] font-black uppercase tracking-[0.2em] text-text-muted mb-1.5">{label}</p>
-            <p className="text-text-primary font-black font-serif text-[16px] tracking-tight truncate max-w-full italic">{value}</p>
+            <p className="text-text-primary font-black font-serif text-[16px] tracking-tight leading-tight">{value}</p>
         </div>
     </motion.div>
 );
 
 const FeatureStamp = ({ icon, text }) => (
-    <div className="flex items-center gap-3 py-4 px-5 bg-white rounded-2xl border border-black/5 shadow-sm">
+    <div className="flex items-center gap-3 py-4 px-5 bg-white rounded-[1.4rem] border border-black/5 shadow-[0_8px_20px_rgba(0,0,0,0.04)]">
         <div className="w-8 h-8 rounded-lg bg-accent-gold/10 flex items-center justify-center text-accent">
             {React.cloneElement(icon, { size: 16 })}
         </div>
@@ -502,20 +443,16 @@ const FeatureStamp = ({ icon, text }) => (
     </div>
 );
 
-const TipRow = ({ icon, title, text, rotation }) => (
-    <motion.div 
-        style={{ rotate: rotation }}
-        className="flex items-start gap-4 p-5 bg-white rounded-2xl border border-black/5 shadow-sm relative group"
+const TipRow = ({ icon, title, text }) => (
+    <motion.div
+        className="flex items-start gap-4 p-4 bg-[#FCFAF2] rounded-[1.3rem] border border-black/5 relative"
     >
-        {/* Pin Style Dot */}
-        <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-accent/20" />
-        
         <div className="mt-0.5 w-10 h-10 shrink-0 bg-accent-gold/5 rounded-full flex items-center justify-center text-accent-gold">
             {icon}
         </div>
         <div>
-            <h4 className="text-text-primary text-[14px] font-black mb-1 uppercase tracking-widest">{title}</h4>
-            <p className="text-text-muted text-[13px] leading-relaxed font-medium italic opacity-80">{text}</p>
+            <h4 className="text-text-primary text-[13px] font-black mb-1 uppercase tracking-[0.16em]">{title}</h4>
+            <p className="text-text-muted text-[13px] leading-relaxed font-medium">{text}</p>
         </div>
     </motion.div>
 );
